@@ -1,7 +1,7 @@
 ---
 title: "Connecting the Popularity Adjusted Block Model to the Generalized Random Dot Product Graph"
-output: pdf_document
-# output: html_document
+# output: pdf_document
+output: html_document
 # geometry: "left=1cm,right=1cm,top=1cm,bottom=1.5cm"
 urlcolor: blue
 header-includes:
@@ -116,12 +116,22 @@ construct.Q <- function(angles) {
 obj.fun <- function(angles, Z.hat) {
   R <- construct.Q(angles)
   
-  Z.candidate <- Z.hat %*% R
-  B <- Z.candidate %*% t(Z.candidate)
-  return(sum(apply(Z.candidate[, 1:2] ** 2, 1, min)) + 
-           sum(apply(cbind((Z.candidate[, 3] - Z.candidate[, 4]) ** 2,
-                           (Z.candidate[, 3] + Z.candidate[, 4]) ** 2), 
-                     1, min)))
+  XU.c <- Z.hat %*% R
+  # clusters <- apply(XU.c[, 1:2] ** 2, 1, which.min)
+  clusters <- c(rep(1, 32), rep(2, 32))
+  in.prods <- XU.c[clusters == 1, ] %*% t(XU.c[clusters == 2, , drop = FALSE])
+  return(
+    sum(apply(XU.c[, 1:2] ** 2, 1, min)) +
+      sum(apply(cbind((XU.c[, 3] - XU.c[, 4]) ** 2,
+                      (XU.c[, 3] + XU.c[, 4]) ** 2),
+                1, min))
+    )
+  # return(
+  #   sum(apply(XU.c[, 1:2] ** 2, 1, min)) +
+  #     Matrix::norm(in.prods, 'F') +
+  #     sum((XU.c[clusters == 1, 3] - XU.c[clusters == 1, 4]) ** 2) +
+  #     sum((XU.c[clusters == 2, 3] + XU.c[clusters == 2, 4]) ** 2)
+  # )
 }
 
 transform.embedding <- function(Z.hat) {
@@ -130,7 +140,7 @@ transform.embedding <- function(Z.hat) {
                     method = 'SANN')$par
   angles.2 <- optim(angles.1, function(x) obj.fun(x, Z.hat),
                     method = 'Nelder-Mead',
-                    control = list(abstol = 1e-10, maxit = 1e6))$par
+                    control = list(abstol = 1e-10, maxit = 1e3))$par
   R <- construct.Q(angles.2)
   return(Z.hat %*% R)
 }
@@ -515,10 +525,10 @@ $S_2(\tau) = \begin{bmatrix}
 \end{bmatrix}$
 
 $S_3(-\tau) = \begin{bmatrix}
-\cosh \tau & 0 & 0 & \sinh(-\tau) \\
+\cosh \tau & 0 & 0 & -\sinh \tau \\
 0 & 1 & 0 & 0 \\
 0 & 0 & 1 & 0 \\
-\sinh(-\tau) & 0 & 0 & \cosh \tau
+-\sinh \tau & 0 & 0 & \cosh \tau
 \end{bmatrix}$
 
 We can write $Q = Q(\theta, \phi, \psi, \tau)$ and tweak the four angles until 
