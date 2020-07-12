@@ -1,0 +1,268 @@
+---
+title: "Clustering and Parameter Estimation for the Popularity Adjusted Block Model"
+# output: pdf_document
+output: html_document
+# geometry: "left=1cm,right=1cm,top=1cm,bottom=1.5cm"
+urlcolor: blue
+header-includes:
+- \usepackage{float}
+- \usepackage{mathtools}
+abstract: |
+  this
+  is
+  an
+  abstract
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = FALSE, 
+                      comment = NA, 
+                      warning = FALSE, 
+                      message = FALSE, 
+                      fig.pos = 'H', 
+                      fig.align = 'center', 
+                      fig.height = 3, 
+                      fig.width = 5, 
+                      fig.dpi = 300)
+
+options(xtable.comment = FALSE, 
+        xtable.table.placement = 'H')
+
+import::from(magrittr, `%>%`)
+library(plot.matrix)
+
+set.seed(314159)
+```
+
+\newcommand{\diag}{\text{diag}}
+
+# 1 Introduction
+
+## 1.1 Previous work
+
+# 2 Connecting the Popularity Adjusted Block Model to the Generalized Random Dot Product Graph
+
+## 2.1 The popularity adjusted block model (PABM)[^pabm]
+
+[^pabm]: https://arxiv.org/abs/1910.01931
+
+Let $G = (V, E)$ be an undirected, unweighted random graph with corresponding 
+affinity matrix $A \in \{0, 1\}^{n \times n}$. Then $A$ is a random matrix 
+with corresponding edge probability matrix $P$ such that 
+$A_{ij} \stackrel{indep}{\sim} Bernoulli(P_{ij})$ for $i > j$ 
+($A_{ji} = A_{ij}$ and $A_{ii} = 0$). Let there exist $K$ underlying 
+communities in $G$, and let $n_{k}$ be the size of the $k$^th^ community in 
+$G$ such that $\sum_{k=1}^K n_k = n$.
+
+If $A$ and $P$ are organized such that $n_k \times n_l$ blocks $A^{(kl)}$ and 
+$P^{(kl)}$ describe the edges and edge probabilities between communities $k$ 
+and $l$, then $P^{(kl)} = \lambda^{(kl)} (\lambda^{(lk)})^\top$ for a set of 
+fixed vectors $\{\lambda^{(st)}\}_{s, t = 1, ..., K}$. Each $\lambda^{(st)}$ 
+for $s, t = 1, ..., K$ is a column vector of length $n_s$ (i.e., the community 
+corresponding to the first index provides the vector length).
+
+We will use the notation $A \sim PABM(\{\lambda^{(kl)}\}_K)$ to denote a random 
+affinity matrix $A$ drawn from a PABM with parameters $\lambda^{(kl)}$ 
+consisting of $K$ underlying clusters/communities.
+
+## 2.2 The generalized random dot product graph (GRDPG)[^grdpg]
+
+[^grdpg]: https://arxiv.org/abs/1709.05506
+
+Let $X \in \mathbb{R}^{n \times d}$ be latent positions of the vertices of a 
+graph $G$. $X$ consists of row vectors $x_i^\top$. Let 
+$A \in \{0, 1\}^{n \times n}$ be the corresponding affinity matrix. 
+
+Fix $p$, $q$ such that $p + q = d$ and define 
+$I_{pq} = \begin{bmatrix} I_p & 0 \\ 0 & -I_q \end{bmatrix}$. 
+
+Then $G = (V, E)$ is a generalized random dot product graph with signature 
+$(p, q)$ and patent positions $X$ iff its random affinity matrix can be 
+described as $A_{ij} \stackrel{indep}{\sim} Bernoulli(P_{ij})$ where 
+$P_{ij} = x_i^\top I_{pq} x_j$.
+
+We will use the notation $A \sim GRDPG_{p,q}(X)$ to denote a random affinity 
+matrix $A$ drawn from latent positions $X$ and signature $(p, q)$.
+
+## 2.3 Connecting the PABM to the GRDPG for $K = 2$
+
+Let $X = \begin{bmatrix} 
+\lambda^{(11)} & \lambda^{(12)} & 0 & 0 \\ 
+0 & 0 & \lambda^{(21)} & \lambda^{(22)} 
+\end{bmatrix}$ and 
+$Y = \begin{bmatrix} \lambda^{(11)} & 0 & \lambda^{(12)} & 0 \\
+0 & \lambda^{(21)} & 0 & \lambda^{(22)} \end{bmatrix}$. 
+Then $P = X Y^\top$. 
+
+We can note that $Y = X \Pi$ where $\Pi$ is the permutation matrix 
+$\Pi = \begin{bmatrix} 1 & 0 & 0 & 0 \\ 0 & 0 & 1 & 0 \\ 
+0 & 1 & 0 & 0 \\ 0 & 0 & 0 & 1 \end{bmatrix}$. 
+Therefore, $P = X \Pi X^\top$. 
+
+Taking the spectral decomposition of $\Pi = U D U^\top$, we can see that 
+$P = (X U) D (X U)^\top$. We can then denote $\Sigma = |D|^{1/2}$, the 
+square root of the absolute values of the (diagonal) entries of $D$ and 
+obtain $P = (X U \Sigma) I_{pq} (X U \Sigma)^\top$ where $p$ and $q$ correspond 
+to the number of positive and negative eigenvalues of $\Pi$, respectively. 
+Therefore, the PABM with $K = 2$ is a special case of the GRDPG. We can however 
+expand upon this a bit further.
+
+The permutation described by $\Pi$ has two fixed points and one cycle of order 
+2. The two fixed points are at positions $1$ and $4$, so $\Pi$ has two 
+eigenvalues equal to $1$ and corresponding eigenvectors $e_1$ and $e_4$. The 
+cycle of order 2 switching positions $2$ and $3$ corresponds to eigenvalues 
+$1$ and $-1$ with corresponding eigenvalues $(e_2 + e_3) / \sqrt{2}$ and 
+$(e_2 - e_3) / \sqrt{2}$ respectively. Therefore, 
+$D = \begin{bmatrix} 
+1 & 0 & 0 & 0 \\ 
+0 & 1 & 0 & 0 \\
+0 & 0 & 1 & 0 \\
+0 & 0 & 0 & -1
+\end{bmatrix} = I_{3, 1}$ and 
+$U = \begin{bmatrix} 1 & 0 & 0 & 0 \\
+0 & 0 & 1 / \sqrt{2} & 1 / \sqrt{2} \\
+0 & 0 & 1 / \sqrt{2} & - 1 / \sqrt{2} \\
+0 & 1 & 0 & 0 \end{bmatrix}$.
+
+Putting it all together, we get $P = (X U) I_{3, 1} (X U)^\top$. Therefore, 
+the PABM with $K = 2$ is a GRDPG with $p = 3$, $q = 1$, $d = K^2 = 4$, and 
+latent positions 
+$X U = \begin{bmatrix} 
+\lambda^{(11)} & 0 & \lambda^{(12)} / \sqrt{2} & \lambda^{(12)} / \sqrt{2} \\
+0 & \lambda^{(22)} & \lambda^{(21)} / \sqrt{2} & -\lambda^{(21)} / \sqrt{2}
+\end{bmatrix}$.
+
+## 2.4 Generalization to $K > 2$
+
+Let $\Lambda^{(k)} = 
+\begin{bmatrix} \lambda^{(k,1)} & \cdots & \lambda^{(k, K)} \end{bmatrix}
+\in [0, 1]^{n_k \times K}$.  
+Let $X$ be a block diagonal matrix 
+$X = \diag(\Lambda^{(1)}, ..., \Lambda^{(K)}) \in [0, 1]^{n \times K^2}$.
+
+Let $L^{(k)}$ be a block diagonal matrix of column vectors $\lambda^{(lk)}$ for 
+$l = 1, ..., K$. $L^{(k)} = \diag(\lambda^{(1k)}, ..., \lambda^{(Kk)}) \in 
+[0, 1]^{n \times K}$.  
+Let $Y = \begin{bmatrix} L^{(1)} & \cdots & L^{(K)} \end{bmatrix} \in 
+[0, 1]^{n \times K^2}$.
+
+Then $P = X Y^\top$.
+
+Similar to the $K = 2$ case, we again have $Y = X \Pi$ for a permutation matrix
+$\Pi$, so $P = X \Pi X^\top$.
+
+The permutation described by $\Pi$ has $K$ fixed points, which correspond to 
+$K$ eigenvalues equal to $1$ with corresponding eigenvectors $e_k$ where 
+$k = r (K + 1) + 1$ for $r = 0, ..., K - 1$. It also has 
+$\binom{K}{2} = K (K - 1) / 2$ cycles of order $2$. Each cycle corresponds to 
+a pair of eigenvalues $+1$ and $-1$ and a pair of eigenvectors 
+$(e_s + e_t) / \sqrt{2}$ and $(e_s - e_t) / \sqrt{2}$[^pairs].
+
+[^pairs]: TODO: describe pairs $(s, t)$ in more elegant/succinct closed form
+
+So $\Pi$ has $K (K + 1) / 2$ eigenvalues equal to $1$ and $K (K - 1) / 2$ 
+eigenvalues equal to $-1$. $\Pi$ has the decomposed form 
+$\Pi = U I_{K (K + 1) / 2, K (K - 1) / 2} U^\top$, and we can describe the 
+PABM with $K$ communities as a GRDPG with latent positions $X U$ with signature 
+$\Big( K (K + 1) / 2, K (K - 1) / 2 \Big)$.
+
+**Example: $K = 3$**
+
+Using the same notation as before:
+
+$X = \begin{bmatrix} 
+\lambda^{(11)} & \lambda^{(12)} & \lambda^{(13)} & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & \lambda^{(21)} & \lambda^{(22)} & \lambda^{(23)} & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & \lambda^{(31)} & \lambda^{(32)} & \lambda^{(33)}
+\end{bmatrix}$
+
+$Y = \begin{bmatrix} 
+\lambda^{(11)} & 0 & 0 & \lambda^{(12)} & 0 & 0 & \lambda^{(13)} & 0 & 0 \\
+0 & \lambda^{(21)} & 0 & 0 & \lambda^{(22)} & 0 & 0 & \lambda^{(23)} & 0 \\
+0 & 0 & \lambda^{(31)} & 0 & 0 & \lambda^{(32)} & 0 & 0 & \lambda^{(33)}
+\end{bmatrix}$
+
+Then $P = X Y$ and $Y = X \Pi$ where 
+$\Pi = \begin{bmatrix} 
+1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1
+\end{bmatrix}$
+
+Perhaps a simpler way to look at this is:
+
+* Positions 1, 5, 9 are fixed
+* The cycles of order 2 are
+    * $(2, 4)$
+    * $(3, 7)$
+    * $(6, 8)$
+    
+Therefore, we can decompose $\Pi = U I_{6, 3} U^\top$ where the first three 
+columns of $U$ consist of $e_1$, $e_5$, and $e_9$ corresponding to the fixed 
+positions $1$, $5$, and $9$, the next three columns consist of eigenvectors 
+$(e_k + e_l) / \sqrt{2}$, and the last three columns consist of eigenvectors 
+$(e_k - e_l) / \sqrt{2}$, where pairs $(k, l)$ correspond to the cycles of 
+order 2 described above.
+
+The latent positions are the rows of  
+$XU = \begin{bmatrix}
+\lambda^{(11)} & 0 & 0 & \lambda^{(12)} / \sqrt{2} & \lambda^{(13)} / \sqrt{2} & 0 & \lambda^{(12)} / \sqrt{2} & \lambda^{(13)} / \sqrt{2} & 0 \\
+0 & \lambda^{(22)} & 0 & \lambda^{(21)} / \sqrt{2} & 0 & \lambda^{(23)} / \sqrt{2} & -\lambda^{(21)} / \sqrt{2} & 0 & \lambda^{(23)} / \sqrt{2} \\
+0 & 0 & \lambda^{(33)} & 0 & \lambda^{(31)} / \sqrt{2} & \lambda^{(32)} / \sqrt{2} & 0 & -\lambda^{(31)} / \sqrt{2} & -\lambda^{(32)} / \sqrt{2}
+\end{bmatrix}$.
+
+# 3 Methodology
+
+Two inference objectives arise from the PABM:
+
+1. Cluster membership identification (up to permutation).
+2. Parameter estimation (estimating $\lambda^{(kl)}$'s).
+
+Here, we will focus more on (1) and pose possible methods for (2). In our 
+methods, we assume that $K$, the number of clusters, is known beforehand. 
+
+## 3.1 Cluster membership identification
+
+### 3.1.1 Using edge probability matrix $P$
+
+We previously stated one possible set of latent positions that result in the 
+edge probability matrix of a PABM, $P = (XU) I_{pq} (XU)^\top$. If we have 
+(or can estimate) $XU$ directly, then both the clustering and parameter 
+identification problem are trivial since $U$ is orthonormal and fixed for each 
+value of $K$. However, direct identification or estimation of $XU$ is not 
+possible. 
+
+If we decompose $P = Z I_{pq} Z^\top$, then
+$\exists Q \in \mathbb{O}(p, q)$ such that $XU = Z Q$. Even if we start with 
+the exact edge probability matrix, we cannot recover the "original" latent 
+positions $XU$. Note that unlike in the case of the regular random dot product 
+graph, $Q$ is not an orthogonal matrix. If $z_i$'s are the rows of $XU$, then 
+$||z_i - z_j||^2 \neq ||Q z_i - Q z_j||^2$, and 
+$\langle z_i, z_j \rangle \neq \langle Q z_i, Q z_j \rangle$. This prevents 
+us from using the properties of $XU$ directly. In particular, if 
+$Q \in \mathbb{O}(n)$, then we could use the fact that 
+$\langle z_i, z_j \rangle = \langle Q z_i, Q z_j \rangle = 0$ if vertices $i$ 
+and $j$ are in different clusters. 
+
+We can note from the explicit form of $XU$ that it represents points in 
+$\mathbb{R}^{K^2}$ such that points within each cluster lie on $K$-dimensional 
+subspaces. Furthermore, the subspaces are orthogonal to each other. 
+Multiplication by $Q \in \mathbb{O}(p, q)$ removes the orthogonality property 
+but retains the property that each cluster is represented by a $K$-dimensional 
+subspace. Using this property, previous work proposes the use of subspace 
+clustering while acknowledging some of its shortcomings. 
+
+**Theorem 1.** 
+*Let $P = V D V^\top$ be the spectral decomposition of the edge probability
+matrix.*
+
+### 3.1.2 Using adjacency matrix $A$
+
+## 3.2 Parameter estimation
+
+# 4 Simulated Examples

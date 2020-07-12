@@ -1,11 +1,11 @@
 import::from(magrittr, `%>%`)
 library(plot.matrix)
 import::from(foreach, `%do%`)
-library(CVXR)
+# library(CVXR)
 
 source('http://pages.iu.edu/~mtrosset/Courses/675/stress.r')
 
-doMC::registerDoMC(8)
+doMC::registerDoMC(parallel::detectCores())
 
 embedding <- function(A, p = NULL, q = NULL,
                       eps = 1e-6) {
@@ -172,23 +172,6 @@ B <- lsa::cosine(t(XU))
 
 Q.inv <- MASS::ginv(XU) %*% Z
 Q <- solve(Q.inv)
-
-q <- Variable(4, 4)
-objective <- Maximize(cvxr_norm(Z %*% q %*% t(Z), 2))
-objective <- Minimize(cvxr_norm(q %*% Z[1, ] %*% t(Z[64, ]) %*% t(q), 2))
-objective <- Minimize(cvxr_norm(Z %*% q, 'fro'))
-constraints <- list(q %*% Ipq %*% t(q) - Ipq == 0)
-constraints <- list(cvxr_norm(q %*% Ipq %*% t(q) - Ipq, 'fro') == 0)
-constraints <- list(cvxr_norm(t(q) - Ipq %*% solve(q) %*% Ipq, 'fro') == 0)
-constraints <- list(matrix_frac(q[, 1], Ipq) == 1,
-                    matrix_frac(q[, 2], Ipq) == 1,
-                    matrix_frac(q[, 3], Ipq) == 1,
-                    matrix_frac(q[, 4], Ipq) == -1)
-constraints <- list(matrix_trace(q) == 2,
-                    sum_squares(q) == 4)
-problem <- Problem(objective, constraints)
-solution <- solve(problem, verbose = TRUE, gp = TRUE)
-solution$getValue(q)
 
 out <- vegan::procrustes(XU, Z)
 
