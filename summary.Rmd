@@ -1,17 +1,30 @@
 ---
 title: "Clustering and Parameter Estimation for the Popularity Adjusted Block Model"
-# output: pdf_document
+# output:
+#   pdf_document:
+#     citation_package: natbib
+#     number_sections: yes
 output: html_document
 # geometry: "left=1cm,right=1cm,top=1cm,bottom=1.5cm"
 urlcolor: blue
 header-includes:
 - \usepackage{float}
 - \usepackage{mathtools}
+- \usepackage{natbib}
+- \usepackage[linesnumbered,vlined,ruled]{algorithm2e} 
+- \setcitestyle{numbers,square}
+bibliography: misc.bib
 abstract: |
-  this
-  is
-  an
-  abstract
+  In this paper, we connect two probabolistic models for graphs, the Popularity 
+  Adjusted Block Model (PABM) and the Generalized Random Dot Product Graph 
+  (GRDPG) and use properties established in this connection to aid in 
+  clustering and parameter estimation. In particular, we note that the PABM 
+  can be represented as latent positions such that points within the same 
+  cluster lie on a subspace, and the subspaces that represent different 
+  clusters are orthogonal to one another. Using this property as well as the 
+  asymptotic properties of Adjacency Spectral Embedding of the GRDPG, we are 
+  able to establish theoretical asymptotic results of our clustering and 
+  parameter estimation methods for the PABM.
 ---
 
 ```{r setup, include = FALSE}
@@ -29,23 +42,66 @@ options(xtable.comment = FALSE,
         xtable.table.placement = 'H')
 
 import::from(magrittr, `%>%`)
+import::from(foreach, foreach, `%do%`)
 library(plot.matrix)
+library(mclust)
+library(ggplot2)
 
 set.seed(314159)
+
+source('http://pages.iu.edu/~mtrosset/Courses/675/stress.r')
+
+doMC::registerDoMC(parallel::detectCores())
+
+embedding <- function(A, p = NULL, q = NULL,
+                      eps = 1e-6) {
+  eigen.A <- eigen(A, symmetric = TRUE)
+  if (is.null(p) | is.null(q)) {
+    keep <- (abs(eigen.A$values) > eps)
+  } else {
+    keep <- c(seq(p), seq(n, n - q + 1))
+  }
+  
+  U <- eigen.A$vectors[, keep]
+  S <- diag(sqrt(abs(eigen.A$values[keep])))
+  return(U %*% S)
+}
+
+draw.graph <- function(P) {
+  A <- apply(P, 1:2, function(p) rbinom(1, 1, p))
+  A[lower.tri(A)] <- 0
+  diag(A) <- 0
+  A <- A + t(A)
+  return(A)
+}
 ```
 
 \newcommand{\diag}{\text{diag}}
 
-# 1 Introduction
+# Introduction
 
-## 1.1 Previous work
+The Popularity Adjusted Block Model (PABM) was introduced by 
+\citet*{307cbeb9b1be48299388437423d94bf1} as a generalization of the Stochastic 
+Block Model (SBM) to address the heterogeneity of edge probabilities within and 
+between communities or clusters. 
 
-# 2 Connecting the Popularity Adjusted Block Model to the Generalized Random Dot Product Graph
+## Previous work
 
-## 2.1 The popularity adjusted block model (PABM)[^pabm]
+\citet*{noroozi2019estimation} proposed using sparse subspace clustering (SSC) 
+to identify the cluster memberships given either an edge probability matrix $P$ 
+or an adjacency matrix $A$. In the case that $P$ is known, the cluster 
+memberships can be identified exactly (up to permutation). A similar procedure 
+can be applied if $P$ is unknown and we have an observation $A$, but the 
+theoretical guarantees of this method applied to the PABM are unknown. In 
+particular, the method requires spherical Gaussian noise. The authors of this 
+paper then use point estimators for $\{\lambda^{(kl)}\}$ with the results of 
+SSC. 
 
-[^pabm]: https://arxiv.org/abs/1910.01931
+# Connecting the Popularity Adjusted Block Model to the Generalized Random Dot Product Graph
 
+## The popularity adjusted block model (PABM) \cite{noroozi2019estimation}
+
+**Definition 1**
 Let $G = (V, E)$ be an undirected, unweighted random graph with corresponding 
 affinity matrix $A \in \{0, 1\}^{n \times n}$. Then $A$ is a random matrix 
 with corresponding edge probability matrix $P$ such that 
@@ -65,10 +121,9 @@ We will use the notation $A \sim PABM(\{\lambda^{(kl)}\}_K)$ to denote a random
 affinity matrix $A$ drawn from a PABM with parameters $\lambda^{(kl)}$ 
 consisting of $K$ underlying clusters/communities.
 
-## 2.2 The generalized random dot product graph (GRDPG)[^grdpg]
+## The generalized random dot product graph (GRDPG) \cite{rubindelanchy2017statistical}
 
-[^grdpg]: https://arxiv.org/abs/1709.05506
-
+**Definition 2**
 Let $X \in \mathbb{R}^{n \times d}$ be latent positions of the vertices of a 
 graph $G$. $X$ consists of row vectors $x_i^\top$. Let 
 $A \in \{0, 1\}^{n \times n}$ be the corresponding affinity matrix. 
@@ -84,8 +139,24 @@ $P_{ij} = x_i^\top I_{pq} x_j$.
 We will use the notation $A \sim GRDPG_{p,q}(X)$ to denote a random affinity 
 matrix $A$ drawn from latent positions $X$ and signature $(p, q)$.
 
-## 2.3 Connecting the PABM to the GRDPG for $K = 2$
+## Connecting the PABM to the GRDPG
 
+### Case where $K = 2$
+
+**Theorem 1**. 
+Let $X = \begin{bmatrix} 
+\lambda^{(11)} & \lambda^{(12)} & 0 & 0 \\ 
+0 & 0 & \lambda^{(21)} & \lambda^{(22)} 
+\end{bmatrix}$ 
+where the $\lambda^{(kl)}$'s are defined as in Definition 1 for $K=2$, and 
+let $U = \begin{bmatrix} 1 & 0 & 0 & 0 \\
+0 & 0 & 1 / \sqrt{2} & 1 / \sqrt{2} \\
+0 & 0 & 1 / \sqrt{2} & - 1 / \sqrt{2} \\
+0 & 1 & 0 & 0 \end{bmatrix}$. 
+Then $A \sim GRDPG_{3, 1}(3, 1)$ and $A \sim PABM(\{(\lambda^{(kl)}\}_K)$ are 
+equivalent.
+
+*Proof*.
 Let $X = \begin{bmatrix} 
 \lambda^{(11)} & \lambda^{(12)} & 0 & 0 \\ 
 0 & 0 & \lambda^{(21)} & \lambda^{(22)} 
@@ -132,33 +203,34 @@ $X U = \begin{bmatrix}
 0 & \lambda^{(22)} & \lambda^{(21)} / \sqrt{2} & -\lambda^{(21)} / \sqrt{2}
 \end{bmatrix}$.
 
-## 2.4 Generalization to $K > 2$
+### Generalization to $K > 2$
 
+**Theorem 2**. There exists a block diagonal matrix 
+$X \in \mathbb{R}^{n \times K^2}$ defined by PABM parameters 
+$\{\lambda^{(kl)}\}_K$ and $U \in \mathbb{R}^{K^2 \times K^2}$ that is fixed 
+for each $K$ such that $A \sim GRDPG_{K (K+1) / 2, K (K-1) / 2}(XU)$ and 
+$A \sim PABM(\{(\lambda^{(kl)}\})_K)$ are equivalent.
+
+*Proof*
 Let $\Lambda^{(k)} = 
 \begin{bmatrix} \lambda^{(k,1)} & \cdots & \lambda^{(k, K)} \end{bmatrix}
 \in [0, 1]^{n_k \times K}$.  
 Let $X$ be a block diagonal matrix 
-$X = \diag(\Lambda^{(1)}, ..., \Lambda^{(K)}) \in [0, 1]^{n \times K^2}$.
-
+$X = \diag(\Lambda^{(1)}, ..., \Lambda^{(K)}) \in [0, 1]^{n \times K^2}$.  
 Let $L^{(k)}$ be a block diagonal matrix of column vectors $\lambda^{(lk)}$ for 
 $l = 1, ..., K$. $L^{(k)} = \diag(\lambda^{(1k)}, ..., \lambda^{(Kk)}) \in 
 [0, 1]^{n \times K}$.  
 Let $Y = \begin{bmatrix} L^{(1)} & \cdots & L^{(K)} \end{bmatrix} \in 
-[0, 1]^{n \times K^2}$.
-
-Then $P = X Y^\top$.
-
+[0, 1]^{n \times K^2}$.  
+Then $P = X Y^\top$.  
 Similar to the $K = 2$ case, we again have $Y = X \Pi$ for a permutation matrix
-$\Pi$, so $P = X \Pi X^\top$.
-
+$\Pi$, so $P = X \Pi X^\top$.  
 The permutation described by $\Pi$ has $K$ fixed points, which correspond to 
 $K$ eigenvalues equal to $1$ with corresponding eigenvectors $e_k$ where 
 $k = r (K + 1) + 1$ for $r = 0, ..., K - 1$. It also has 
 $\binom{K}{2} = K (K - 1) / 2$ cycles of order $2$. Each cycle corresponds to 
 a pair of eigenvalues $+1$ and $-1$ and a pair of eigenvectors 
-$(e_s + e_t) / \sqrt{2}$ and $(e_s - e_t) / \sqrt{2}$[^pairs].
-
-[^pairs]: TODO: describe pairs $(s, t)$ in more elegant/succinct closed form
+$(e_s + e_t) / \sqrt{2}$ and $(e_s - e_t) / \sqrt{2}$.
 
 So $\Pi$ has $K (K + 1) / 2$ eigenvalues equal to $1$ and $K (K - 1) / 2$ 
 eigenvalues equal to $-1$. $\Pi$ has the decomposed form 
@@ -166,9 +238,7 @@ $\Pi = U I_{K (K + 1) / 2, K (K - 1) / 2} U^\top$, and we can describe the
 PABM with $K$ communities as a GRDPG with latent positions $X U$ with signature 
 $\Big( K (K + 1) / 2, K (K - 1) / 2 \Big)$.
 
-**Example: $K = 3$**
-
-Using the same notation as before:
+**Example** for $K = 3$. Using the same notation as before:
 
 $X = \begin{bmatrix} 
 \lambda^{(11)} & \lambda^{(12)} & \lambda^{(13)} & 0 & 0 & 0 & 0 & 0 & 0 \\
@@ -182,7 +252,7 @@ $Y = \begin{bmatrix}
 0 & 0 & \lambda^{(31)} & 0 & 0 & \lambda^{(32)} & 0 & 0 & \lambda^{(33)}
 \end{bmatrix}$
 
-Then $P = X Y$ and $Y = X \Pi$ where 
+Then $P = X Y^\top$ and $Y = X \Pi$ where 
 $\Pi = \begin{bmatrix} 
 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
@@ -194,7 +264,7 @@ $\Pi = \begin{bmatrix}
 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1
 \end{bmatrix}$
 
-Perhaps a simpler way to look at this is:
+Another way to look at this is:
 
 * Positions 1, 5, 9 are fixed
 * The cycles of order 2 are
@@ -216,7 +286,7 @@ $XU = \begin{bmatrix}
 0 & 0 & \lambda^{(33)} & 0 & \lambda^{(31)} / \sqrt{2} & \lambda^{(32)} / \sqrt{2} & 0 & -\lambda^{(31)} / \sqrt{2} & -\lambda^{(32)} / \sqrt{2}
 \end{bmatrix}$.
 
-# 3 Methodology
+# Methods
 
 Two inference objectives arise from the PABM:
 
@@ -224,18 +294,19 @@ Two inference objectives arise from the PABM:
 2. Parameter estimation (estimating $\lambda^{(kl)}$'s).
 
 Here, we will focus more on (1) and pose possible methods for (2). In our 
-methods, we assume that $K$, the number of clusters, is known beforehand. 
+methods, we assume that $K$, the number of clusters, is known beforehand and 
+does not require estimation.
 
-## 3.1 Cluster membership identification
+## Clustering
 
-### 3.1.1 Using edge probability matrix $P$
+### Using edge probability matrix $P$
 
 We previously stated one possible set of latent positions that result in the 
 edge probability matrix of a PABM, $P = (XU) I_{pq} (XU)^\top$. If we have 
 (or can estimate) $XU$ directly, then both the clustering and parameter 
 identification problem are trivial since $U$ is orthonormal and fixed for each 
 value of $K$. However, direct identification or estimation of $XU$ is not 
-possible. 
+possible \cite{rubindelanchy2017statistical}. 
 
 If we decompose $P = Z I_{pq} Z^\top$, then
 $\exists Q \in \mathbb{O}(p, q)$ such that $XU = Z Q$. Even if we start with 
@@ -255,14 +326,235 @@ subspaces. Furthermore, the subspaces are orthogonal to each other.
 Multiplication by $Q \in \mathbb{O}(p, q)$ removes the orthogonality property 
 but retains the property that each cluster is represented by a $K$-dimensional 
 subspace. Using this property, previous work proposes the use of subspace 
-clustering while acknowledging some of its shortcomings. 
+clustering while acknowledging some of its shortcomings 
+\cite{noroozi2019estimation} \cite{soltanolkotabi2014}. 
 
-**Theorem 1.** 
-*Let $P = V D V^\top$ be the spectral decomposition of the edge probability
-matrix.*
+**Theorem 3.** 
+Let $P = V D V^\top$ be the spectral decomposition of the edge probability
+matrix. Let $B = V V^\top$. Then $B_{ij} = 0$ if vertices $i$ and $j$ are 
+of different clusters.
 
-### 3.1.2 Using adjacency matrix $A$
+*Proof (sketch)*
+By projection, $V V^\top = X (X^\top X)^{-1} X^\top$ where $X$ is defined as 
+in Theorem 2. Since $X$ is block diagonal with each block corresponding 
+to one cluster, $X (X^\top X)^{-1} X^\top$ is also a block diagonal matrix 
+with each block corresponding to a cluster and zeros elsewhere. Therefore, 
+if vertices $i$ and $j$ belong to different clusters, then the $ij$^th^ element 
+of $X (X^\top X)^{-1} X^\top = V V^\top = B$ is 0.
 
-## 3.2 Parameter estimation
+\begin{algorithm}[H]
+  \DontPrintSemicolon
+  \SetAlgoLined
+  \KwData{Edge probability matrix $P$, number of clusters $K$}
+  \KwResult{Cluster assignments $1, ..., K$}
+    Compute the spectral decomposition $P = V D V^\top$\;
+    Compute the inner product matrix $B = V V^\top$\;
+    Identify the connected components and map each to clusters $1..K$\;
+  \caption{PABM clustering on the edge probability matrix}
+\end{algorithm}
 
-# 4 Simulated Examples
+### Using adjacency matrix $A$
+
+The adjacency embedding of $A$ approaches latent positions that form $P$ as 
+the number of vertices $n$ increases. More 
+precisely, let $\{\lambda^{(kl)}\}_K \sim \mathcal{F}_K$ for some joint 
+distribution consisting of $K$ underlying clusters $\mathcal{F}_K$. Then the 
+latent positions $XU \sim \mathcal{G}_K$ for some related joint distribution 
+with $K$ underlying clusters $\mathcal{G}_K$. Denote $Z_n$ as a sample of size 
+$n$ from $\mathcal{G}_K$ and adjacency matrix $A_n$ as one draw from edge 
+probability matrix $P_n = Z_n I_{pq} Z_n^\top$. Let $\hat{Z}_n$ be the 
+adjacency embedding of $A_n$ with rows $(\hat{z}_i^{(n)})^\top$. Then by
+\citet*{rubindelanchy2017statistical}, 
+
+$$\max\limits_{i \in \{1, ..., n\}} ||Q_n \hat{z}_i^{(n)} - z_i^{(n)}|| = O_P\bigg(\frac{(\log n)^c}{n^{1/2}} \bigg)$$
+
+for some $c>0$ and sequence of $Q_n \in \mathbb{O}(p, q)$. In addition, 
+\citeauthor{rubindelanchy2017statistical} produce a central limit theorem 
+result.
+
+**Theorem 4**. Let $\hat{V}^{(n)} \in \mathbb{R}^{n \times K^2}$ be the matrix 
+of $K^2$ eigenvectors of $A_n$ corresponding to the $K (K+1) / 2$ most positive 
+eigenvalues and $K (K-1) / 2$ most negative eigenvalues with rows
+$(\hat{v}_i^{(n)})^\top$. Let $(i, j)$ correspond to pairs belonging to 
+different clusters. Then for some $c > 0$, 
+
+$$\max\limits_{i, j} ||(\hat{v}^{(n)}_i)^\top \hat{v}_j^{(n)}|| = O_P\bigg( \frac{(\log n)^c}{n}\bigg)$$
+
+In addition, $(\hat{v}^{(n)}_i)^\top \hat{v}_j^{(n)}$ converge to a generalized 
+chi-square distribution. 
+
+\begin{algorithm}[H]
+  \DontPrintSemicolon
+  \SetAlgoLined
+  \KwData{Adjacency matrix $A$, number of clusters $K$}
+  \KwResult{Cluster assignments $1, ..., K$}
+    Compute the eigenvectors of $A$ that correspond to the $K (K+1) / 2$ most 
+    positive eigenvalues and $K (K-1) / 2$ most negative eigenvalues. Construct 
+    $V$ using these eigenvectors as its columns.\;
+    Compute $B = V V^\top$.\;
+    Construct graph $G$ using $B$ as its similarity matrix.\;
+    Partition $G$ into $K$ disconnected components 
+    (e.g., using edge thresholding or spectral clustering).\;
+    Map each connected components as the clusters $1, ..., K$.\;
+  \caption{PABM clustering on the adjacency matrix}
+\end{algorithm}
+
+## Parameter estimation
+
+For this section, we will focus on the case $K = 2$. Under this condition, the 
+PABM is equivalent to the GRDPG with signature $(3, 1)$. 
+
+The adjacency spectral embeddings of both $A$ and $P$ are not unique. In 
+particular, let $Z$ be the ASE of $P$. Then $P = Z I_{3, 1} Z^\top$. However, 
+for any $Q \in \mathbb{O}(3, 1)$, 
+$(ZQ) I_{3, 1} (ZQ)^\top = Z (Q I_{3, 1} Q^\top) Z^\top = Z I_{3, 1} Z^\top = P$,
+so $ZQ$ is also a valid ASE Of $P$. If we can find $Q \in \mathbb{O}(3, 1)$ 
+such that $ZQ = XU$, we can compute the parameters $\{\lambda^{(kl)}\}$ 
+directly. Furthermore, if we instead use the ASE of the adjacency matrix $A$, 
+$\exists Q \in \mathbb{O}(3, 1)$ such that $\max\limits_i ||Q \hat{z}_i - XU||$ 
+is minimized (and goes to zero under a probabolistic model for
+$\{\lambda^{(kl)}\}$'s). 
+
+Thus if we can identify $Q$ such that the $ZQ = XU$ in the case of embedding 
+$P$ or $\hat{Z} Q - XU$ is minimized in the case of embedding $A$, we can 
+identify or estimate the PABM parameters directly from the embedding. $XU$ is 
+unknown, but we can still obtain an embedding $ZQ$ that follows the properties 
+of $XU$, which will yield estimates $\{\hat{\lambda}^{(kl)}\}$ that are valid 
+in that they will produce the edge probability matrix $P$.[^lambdas] 
+
+[^lambdas]: Note that the set $\{\lambda^{(kl)}\}_K$ that produces a unique 
+$P$ is not unique \citep{noroozi2019estimation}.
+
+In particular, we can note the following properties of $XU$:
+
+1. If row $i$ is in cluster 1, then its second index is 0. If it is in cluster 
+2, its first index is 0.
+2. If row $i$ is in cluster 1, then its third and fourth indices are equal. If 
+it is in cluster 2, the fourth index is the negative of its third index.
+3. If rows $i$ and $j$ are in different clusters, their dot product is 0.
+
+If we have cluster memberships (either known *a priori* or estimated using a 
+clustering method), then we can estimate $XU$ by picking
+$Q \in \mathbb{O}(3, 1)$ such that $ZQ$ best fits these properties. 
+
+$\mathbb{O}(3, 1)$ happens to be the Lorentz group, and each 
+$Q \in \mathbb{O}(3, 1)$ can be represented as the product of six matrices that 
+depend on a total of four parameters \cite{10.1088/978-1-6817-4254-0}. This 
+lends itself as an optimization problem:
+
+$$\begin{split}
+  \min_{\theta, \phi, \psi, \tau} & ||\xi^{(1, 1)}||^2 + ||\xi^{(2, 2)}||^2 + ||\xi^{(1, 3)} - \xi^{(1, 4)}||^2 + ||\xi^{(2, 3)} + \xi^{(2, 4)}||^2 \\
+  \text{s.t. } & \Xi = Z Q(\theta, \phi, \psi, \tau) \\
+  & \xi^{(i, j)} \text{ is the } j^{th} \text{ column of } \Xi \text{ with rows from the } i^{th} \text{ cluster}
+\end{split}$$
+
+Note that if $Q$ can be properly estimated, the asymptotic results from 
+\citet{rubindelanchy2017statistical} can be applied here.
+
+# Simulated Examples
+
+For these examples, we will set the following parameters:
+
+* $K = 2$
+* Mixture parameter $\alpha = .5$
+* $\lambda^{(kk)} \stackrel{indep}{\sim} Beta(2, 1)$
+* $\lambda^{(kl)} \stackrel{indep}{\sim} Beta(1, 2)$ for $k \neq l$
+
+```{r}
+K <- 2
+p <- K * (K + 1) / 2
+q <- K * (K - 1) / 2
+alpha <- .5
+a1 <- 2
+b1 <- 1
+a2 <- 1
+b2 <- 2
+```
+
+## Clustering
+
+In this part, we will assess Algorithm 1's performance for sample sizes 
+$n = 64, 128, 256, 512, 1024$. For each sample size $n$, $100$ sets of 
+$\lambda^{(kl)}$'s are drawn and for each set of parameters, one adjacency 
+matrix $A$ is drawn and clustered. 
+
+```{r}
+n.vec <- c(64, 128, 256, 512, 1024)
+iter <- 100
+```
+
+```{r}
+draw.pabm.beta.2 <- function(n, a1, b1, a2, b2, alpha = .5) {
+  z <- sample(c(1, 2), n, prob = c(alpha, 1 - alpha), replace = TRUE)
+    z <- sort(z)
+    
+    n1 <- sum(z == 1)
+    n2 <- sum(z == 2)
+    
+    lambda11 <- rbeta(n1, a1, b1)
+    lambda22 <- rbeta(n2, a1, b1)
+    lambda12 <- rbeta(n1, a2, b2)
+    lambda21 <- rbeta(n2, a2, b2)
+    
+    X <- cbind(c(lambda11, rep(0, n2)),
+               c(lambda12, rep(0, n2)),
+               c(rep(0, n1), lambda21),
+               c(rep(0, n1), lambda22))
+    Y <- cbind(c(lambda11, rep(0, n2)),
+               c(rep(0, n1), lambda21),
+               c(lambda12, rep(0, n2)),
+               c(rep(0, n1), lambda22))
+    P <- X %*% t(Y)
+    A <- draw.graph(P)
+    
+    return(list(A = A, z = z))
+}
+
+normalized.laplacian <- function(W) {
+  n <- nrow(W)
+  D.neg.sqrt <- diag(colSums(W) ** -.5)
+  I <- diag(n)
+  return(I - D.neg.sqrt %*% W %*% D.neg.sqrt)
+}
+
+cluster.pabm <- function(A, K) {
+  p <- K * (K + 1) / 2
+  q <- K * (K - 1) / 2
+  V <- eigen(A, symmetric = TRUE)$vectors[, c(seq(p), seq(n, n - q + 1))]
+  V <- V / mean(V)
+  B <- abs(V %*% t(V))
+  # L <- graph.laplacian(B)
+  L <- normalized.laplacian(B)
+  eigenmap <- eigen(L, symmetric = TRUE)$vectors[, seq(n - 1, n - K)]
+  clustering <- mclust::Mclust(eigenmap, K)$classification
+}
+```
+
+```{r}
+results.df <- foreach(n = n.vec,.combine = dplyr::bind_rows) %do% {
+  plyr::ldply(seq(iter), function(i) {
+    Az <- draw.pabm.beta.2(n, a1, b1, a2, b2, alpha)
+    A <- Az$A
+    z <- Az$z
+    clustering <- cluster.pabm(A, K)
+    accuracy <- mean(clustering == z)
+    if (accuracy < .5) accuracy <- 1 - accuracy
+    dplyr::tibble(n = n, accuracy = accuracy) %>% 
+      return()
+  }, .parallel = TRUE) %>% 
+    return()
+}
+
+results.df %>% 
+  dplyr::group_by(n) %>% 
+  dplyr::summarise(mean.acc = mean(accuracy),
+                   sd.acc = sd(accuracy)) %>% 
+  ggplot() + 
+  labs(y = 'accuracy') + 
+  geom_line(aes(x = n, y = mean.acc)) + 
+  geom_errorbar(aes(x = n, ymin = mean.acc - sd.acc, ymax = mean.acc + sd.acc))
+```
+
+## Parameter estimation
+
+# References

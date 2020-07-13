@@ -38,10 +38,10 @@ z <- c(rep(1, n1),
 
 Ipq <- diag(c(1, 1, 1, -1))
 
-lambda11 <- rbeta(n1, 5, 1)
-lambda22 <- rbeta(n2, 5, 1)
-lambda12 <- rbeta(n1, 1, 5)
-lambda21 <- rbeta(n2, 1, 5)
+lambda11 <- rbeta(n1, 2, 1)
+lambda22 <- rbeta(n2, 2, 1)
+lambda12 <- rbeta(n1, 1, 2)
+lambda21 <- rbeta(n2, 1, 2)
 
 X <- cbind(c(lambda11, rep(0, n2)),
            c(lambda12, rep(0, n2)),
