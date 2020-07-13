@@ -96,14 +96,14 @@ memberships can be identified exactly (up to permutation). A similar procedure
 can be applied if $P$ is unknown and we have an observation $A$, but the 
 theoretical guarantees of this method applied to the PABM are unknown. In 
 particular, the method requires spherical Gaussian noise. The authors of this 
-paper then use point estimators for $\{\lambda^{(kl)}\}$ with the results of 
-SSC. 
+paper then use point estimators for $\{\lambda^{(kl)}\}$ using cluster labels 
+obtained via SSC. 
 
 # Connecting the Popularity Adjusted Block Model to the Generalized Random Dot Product Graph
 
 ## The popularity adjusted block model (PABM) \cite{noroozi2019estimation}
 
-**Definition 1**
+**Definition 1**.
 Let $G = (V, E)$ be an undirected, unweighted random graph with corresponding 
 affinity matrix $A \in \{0, 1\}^{n \times n}$. Then $A$ is a random matrix 
 with corresponding edge probability matrix $P$ such that 
@@ -125,7 +125,7 @@ consisting of $K$ underlying clusters/communities.
 
 ## The generalized random dot product graph (GRDPG) \cite{rubindelanchy2017statistical}
 
-**Definition 2**
+**Definition 2**.
 Let $X \in \mathbb{R}^{n \times d}$ be latent positions of the vertices of a 
 graph $G$. $X$ consists of row vectors $x_i^\top$. Let 
 $A \in \{0, 1\}^{n \times n}$ be the corresponding affinity matrix. 
@@ -140,6 +140,18 @@ $P_{ij} = x_i^\top I_{pq} x_j$.
 
 We will use the notation $A \sim GRDPG_{p,q}(X)$ to denote a random affinity 
 matrix $A$ drawn from latent positions $X$ and signature $(p, q)$.
+
+**Remark**. 
+Like the "ungeneralized" random dot product graph, the latent positions of a 
+generalized random dot product graph (RDPG) are not unique. More specifically, 
+if $P_{ij} = x_i^\top I_{pq} x_j$, then we also have for any 
+$Q \in \{R : R^\top I_{pq} R = I_{pq} \}$, 
+$(Q x_i)^\top I_{pq} (Q x_j) = x_i^\top (Q^\top I_{pq} Q) x_j = 
+x_i^\top I_{pq} x_j = P_{ij}$ (this is the indefinite orthogonal group, 
+$\mathbb{O}(p, q)$).
+Unlike in the RDPG case, transforming the latent positions by multiplication 
+with $Q \in \mathbb{O}(p, q)$ does not necessarily maintain interpoint angles or 
+distances. 
 
 ## Connecting the PABM to the GRDPG
 
