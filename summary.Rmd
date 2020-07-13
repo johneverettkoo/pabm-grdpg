@@ -349,9 +349,10 @@ of $X (X^\top X)^{-1} X^\top = V V^\top = B$ is 0.
   \SetAlgoLined
   \KwData{Edge probability matrix $P$, number of clusters $K$}
   \KwResult{Cluster assignments $1, ..., K$}
-    Compute the spectral decomposition $P = V D V^\top$\;
-    Compute the inner product matrix $B = V V^\top$\;
-    Identify the connected components and map each to clusters $1..K$\;
+    Compute the spectral decomposition $P = V D V^\top$.\;
+    Compute the inner product matrix $B = V V^\top$.\;
+    Construct graph $G$ using $B$ as edge similarities.\;
+    Identify the connected components and map each to cluster labels $1, ..., K.$\;
   \caption{PABM clustering on the edge probability matrix}
 \end{algorithm}
 
@@ -397,7 +398,7 @@ chi-square distribution.
     Construct graph $G$ using $B$ as its similarity matrix.\;
     Partition $G$ into $K$ disconnected components 
     (e.g., using edge thresholding or spectral clustering).\;
-    Map each connected components as the clusters $1, ..., K$.\;
+    Map each of the connected components to the cluster labels $1, ..., K$.\;
   \caption{PABM clustering on the adjacency matrix}
 \end{algorithm}
 
@@ -728,7 +729,7 @@ pairs(Z, asp = 1, col = z)
 Denoting $Z$ as the ASE of $P$, we can recover $ZQ$ that is equivalent to $XU$ 
 (Fig. \ref{fig:q_trans}).
 
-```{r q_trans, fig.cap = 'Pair plots of $ZQ$ where $Q$ was found by minimizing objective function (1). This embedding is equivalent to $XU$ up to a 90-degree rotation.'}
+```{r q_trans, fig.cap = 'Pair plots of $ZQ$ where $Q$ was found by minimizing objective function (1). This embedding is equivalent to $XU$ up to 90-degree rotations and reflection along axes.'}
 XU.prime <- transform.embedding(Z, z)
 pairs(XU.prime, col = z, asp = 1)
 ```
@@ -742,9 +743,12 @@ pairs(Zhat, col = z, asp = 1)
 
 Minimizing the objective function in (1) results in the following embedding:
 
-```{r}
+```{r q_from_a, fig.cap = 'Pair plots of $\\hat{Z} $ where $\\hat{Z}$ is the ASE of an adjacency matrix of a PABM and $Q$ is estimated by minimizing objective function (1).'}
 XU.hat <- transform.embedding(Zhat, z)
 pairs(XU.hat, col = z, asp = 1)
+
+# X.hat <- XU.hat %*% t(U)
+# plot(abs(X.hat) > .25)
 ```
 
 # References
