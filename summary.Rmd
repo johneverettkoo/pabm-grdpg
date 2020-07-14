@@ -156,9 +156,8 @@ We will use the notation $A \sim GRDPG_{p,q}(X)$ to denote a random affinity
 matrix $A$ drawn from latent positions $X$ and signature $(p, q)$.
 
 **Remark**. 
-Like the "ungeneralized" random dot product graph, the latent positions of a 
-generalized random dot product graph (RDPG) are not unique. More specifically, 
-if $P_{ij} = x_i^\top I_{pq} x_j$, then we also have for any 
+Like the RDPG, the latent positions of a GRDPG are not unique. More 
+specifically, if $P_{ij} = x_i^\top I_{pq} x_j$, then we also have for any 
 $Q \in \{R : R^\top I_{pq} R = I_{pq} \}$, 
 $(Q x_i)^\top I_{pq} (Q x_j) = x_i^\top (Q^\top I_{pq} Q) x_j = 
 x_i^\top I_{pq} x_j = P_{ij}$ (this is the indefinite orthogonal group, 
@@ -337,8 +336,8 @@ possible \cite{rubindelanchy2017statistical}.
 If we decompose $P = Z I_{pq} Z^\top$, then
 $\exists Q \in \mathbb{O}(p, q)$ such that $XU = Z Q$. Even if we start with 
 the exact edge probability matrix, we cannot recover the "original" latent 
-positions $XU$. Note that unlike in the case of the regular random dot product 
-graph, $Q$ is not an orthogonal matrix. If $z_i$'s are the rows of $XU$, then 
+positions $XU$. Note that unlike in the case of the RDPG, 
+$Q$ is not an orthogonal matrix. If $z_i$'s are the rows of $XU$, then 
 $||z_i - z_j||^2 \neq ||Q z_i - Q z_j||^2$, and 
 $\langle z_i, z_j \rangle \neq \langle Q z_i, Q z_j \rangle$. This prevents 
 us from using the properties of $XU$ directly. In particular, if 
@@ -473,7 +472,8 @@ lends itself as an optimization problem:
 
 \begin{equation}
 \begin{split}
-  \min_{\theta, \phi, \psi, \tau} & ||\xi^{(1, 1)}||^2 + ||\xi^{(2, 2)}||^2 + ||\xi^{(1, 3)} - \xi^{(1, 4)}||^2 + ||\xi^{(2, 3)} + \xi^{(2, 4)}||^2 \\
+  \min_{\theta, \phi, \psi, \tau} & ||\xi^{(1, 2)}||^2 + ||\xi^{(2, 1)}||^2 + 
+  ||\xi^{(1, 3)} - \xi^{(1, 4)}||^2 + ||\xi^{(2, 3)} + \xi^{(2, 4)}||^2 \\
   \text{s.t. } & \Xi = Z Q(\theta, \phi, \psi, \tau) \\
   & \xi^{(i, j)} \text{ is the } j^{th} \text{ column of } \Xi \text{ with rows from the } i^{th} \text{ cluster}
 \end{split}
@@ -683,16 +683,16 @@ obj.fun <- function(angles, Z.hat, clusters) {
   XU.c <- Z.hat %*% R
   in.prods <- XU.c[clusters == 1, ] %*% t(XU.c[clusters == 2, , drop = FALSE])
   return(
-    sum(XU.c[clusters == 1, 1] ** 2) + 
-      sum(XU.c[clusters == 2, 2] ** 2) + 
-      sum((XU.c[clusters == 1, 3] + XU.c[clusters == 1, 4]) ** 2) + 
-      sum((XU.c[clusters == 2, 3] - XU.c[clusters == 2, 4]) ** 2)
+    sum(XU.c[clusters == 1, 2] ** 2) + 
+      sum(XU.c[clusters == 2, 1] ** 2) + 
+      sum((XU.c[clusters == 1, 3] - XU.c[clusters == 1, 4]) ** 2) + 
+      sum((XU.c[clusters == 2, 3] + XU.c[clusters == 2, 4]) ** 2)
   )
 }
 
-transform.embedding <- function(Z.hat, clusters) {
+transform.embedding <- function(Z.hat, clusters, init.angles) {
   # init.angles <- runif(4, -pi, pi)
-  init.angles <- rep(0, 4)
+  # init.angles <- rep(0, 4)
   angles.1 <- optim(init.angles, function(x) obj.fun(x, Z.hat, clusters), 
                     method = 'SANN')$par
   angles.2 <- optim(angles.1, function(x) obj.fun(x, Z.hat, clusters),
@@ -756,7 +756,7 @@ Denoting $Z$ as the ASE of $P$, we can recover $ZQ$ that is equivalent to $XU$
 (Fig. \ref{fig:q_trans}).
 
 ```{r q_trans, fig.cap = 'Pair plots of $ZQ$ where $Q$ was found by minimizing objective function (1). This embedding is equivalent to $XU$ up to 90-degree rotations and reflection along axes.'}
-XU.prime <- transform.embedding(Z, z)
+XU.prime <- transform.embedding(Z, z, runif(4, 0, 0))
 pairs(XU.prime, col = z, asp = 1)
 ```
 
@@ -770,7 +770,7 @@ pairs(Zhat, col = z, asp = 1)
 Minimizing the objective function in (1) results in the following embedding:
 
 ```{r q_from_a, fig.cap = 'Pair plots of $\\hat{Z} $ where $\\hat{Z}$ is the ASE of an adjacency matrix of a PABM and $Q$ is estimated by minimizing objective function (1).'}
-XU.hat <- transform.embedding(Zhat, z)
+XU.hat <- transform.embedding(Zhat, z, runif(4, -pi, pi))
 pairs(XU.hat, col = z, asp = 1)
 
 # X.hat <- XU.hat %*% t(U)
