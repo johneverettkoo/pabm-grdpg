@@ -97,7 +97,9 @@ vertex of the graph can be represented by a point in latent space such that
 the edge probability between any pair of vertices is given by their 
 corresponding dot product in the latent space. The SBM is equivalent to a 
 special case of the RDPG model in which all vertices in a given community share 
-the same position in the latent space. An analogous property exists for the 
+the same position in the latent space. It has also been shown that similar 
+probabolistic graph models, (such as the Mixed Membership Stochastic Block Model
+\cite{rubindelanchy2017statistical}). An analogous property exists for the 
 PABM not under the RDPG model but under the *Generalized* Random Dot Product 
 Graph model. 
 
