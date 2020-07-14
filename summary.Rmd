@@ -375,7 +375,8 @@ of $X (X^\top X)^{-1} X^\top = V V^\top = B$ is 0.
   \KwData{Edge probability matrix $P$, number of clusters $K$}
   \KwResult{Cluster assignments $1, ..., K$}
     Compute the spectral decomposition $P = V D V^\top$.\;
-    Compute the inner product matrix $B = V V^\top$.\;
+    Compute the inner product matrix $B = |V V^\top|$, applying $|\cdot|$ 
+    entry-wise.\;
     Construct graph $G$ using $B$ as edge similarities.\;
     Identify the connected components of $G$ and map each to cluster labels 
     $1, ..., K.$\;
@@ -421,7 +422,7 @@ centered at $0$.
     Compute the eigenvectors of $A$ that correspond to the $K (K+1) / 2$ most 
     positive eigenvalues and $K (K-1) / 2$ most negative eigenvalues. Construct 
     $V$ using these eigenvectors as its columns.\;
-    Compute $B = V V^\top$.\;
+    Compute $B = |V V^\top|$, applying $|\cdot|$ entry-wise.\;
     Construct graph $G$ using $B$ as its similarity matrix.\;
     Partition $G$ into $K$ disconnected components 
     (e.g., using edge thresholding or spectral clustering).\;
