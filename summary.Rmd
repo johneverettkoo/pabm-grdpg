@@ -20,11 +20,11 @@ abstract: |
   (GRDPG) and use properties established in this connection to aid in 
   clustering and parameter estimation. In particular, we note that the PABM 
   can be represented as latent positions such that points within the same 
-  cluster lie on a subspace, and the subspaces that represent different 
-  clusters are orthogonal to one another. Using this property as well as the 
-  asymptotic properties of Adjacency Spectral Embedding of the GRDPG, we are 
-  able to establish theoretical asymptotic results of our clustering and 
-  parameter estimation methods for the PABM.
+  cluster lie on a subspace, and the subspaces that represent each 
+  cluster are orthogonal to one another. Using this property as well as the 
+  asymptotic properties of Adjacency Spectral Embedding (ASE) of the GRDPG, we 
+  are able to establish theoretical asymptotic results of our clustering and 
+  parameter estimation methods for the PABM. 
 ---
 
 ```{r setup, include = FALSE}
@@ -82,10 +82,24 @@ draw.graph <- function(P) {
 
 # Introduction
 
+One popular probabolistic model for graphs with underlying communities is the 
+Stochastic Block Model (SBM), which assumes that the edge probability from 
+one cluster to another follows a Beronulli distribution with a fixed 
+probability for each pair of communities. 
 The Popularity Adjusted Block Model (PABM) was introduced by 
-\citet*{307cbeb9b1be48299388437423d94bf1} as a generalization of the Stochastic 
-Block Model (SBM) to address the heterogeneity of edge probabilities within and 
-between communities or clusters. 
+\citet*{307cbeb9b1be48299388437423d94bf1} as a generalization of the SBM to 
+address the heterogeneity of edge probabilities within and between communities 
+or clusters while still maintaining the community structure. 
+
+The Random Dot Product Graph (RDPG) \cite{athreya2017statistical} is another 
+probabolistic model with Beronulli edge probabilities. Under this model, each 
+vertex of the graph can be represented by a point in latent space such that 
+the edge probability between any pair of vertices is given by their 
+corresponding dot product in the latent space. The SBM is equivalent to a 
+special case of the RDPG model in which all vertices in a given community share 
+the same position in the latent space. An analogous property exists for the 
+PABM not under the RDPG model but under the *Generalized* Random Dot Product 
+Graph model. 
 
 ## Previous work
 
@@ -364,7 +378,8 @@ of $X (X^\top X)^{-1} X^\top = V V^\top = B$ is 0.
     Compute the spectral decomposition $P = V D V^\top$.\;
     Compute the inner product matrix $B = V V^\top$.\;
     Construct graph $G$ using $B$ as edge similarities.\;
-    Identify the connected components and map each to cluster labels $1, ..., K.$\;
+    Identify the connected components of $G$ and map each to cluster labels 
+    $1, ..., K.$\;
   \caption{PABM clustering on the edge probability matrix}
 \end{algorithm}
 
@@ -410,7 +425,7 @@ chi-square distribution.
     Construct graph $G$ using $B$ as its similarity matrix.\;
     Partition $G$ into $K$ disconnected components 
     (e.g., using edge thresholding or spectral clustering).\;
-    Map each of the connected components to the cluster labels $1, ..., K$.\;
+    Map each partition to the cluster labels $1, ..., K$.\;
   \caption{PABM clustering on the adjacency matrix}
 \end{algorithm}
 
