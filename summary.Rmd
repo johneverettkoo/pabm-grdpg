@@ -40,7 +40,9 @@ knitr::opts_chunk$set(echo = FALSE,
 
 options(xtable.comment = FALSE, 
         xtable.table.placement = 'H')
+```
 
+```{r}
 import::from(magrittr, `%>%`)
 import::from(foreach, foreach, `%do%`)
 library(plot.matrix)
@@ -48,8 +50,6 @@ library(mclust)
 library(ggplot2)
 
 theme_set(theme_bw())
-
-set.seed(314159)
 
 source('http://pages.iu.edu/~mtrosset/Courses/675/stress.r')
 
@@ -565,6 +565,8 @@ cluster.pabm <- function(A, K) {
 ```
 
 ```{r fig.cap = 'IQR clustering error using Algorithm 1 for sample sizes from 64 to 1024. Simulations were repeated 100 times for each sample size.', cache = TRUE}
+set.seed(314159)
+
 results.df <- foreach(n = n.vec,.combine = dplyr::bind_rows) %do% {
   plyr::ldply(seq(iter), function(i) {
     Az <- draw.pabm.beta.2(n, a1, b1, a2, b2, alpha)
@@ -704,6 +706,8 @@ transform.embedding <- function(Z.hat, clusters, init.angles) {
 ```
 
 ```{r}
+set.seed(123456)
+
 n <- 64
 z <- sample(c(1, 2), n, prob = c(alpha, 1 - alpha), replace = TRUE)
 z <- sort(z)
@@ -756,7 +760,7 @@ Denoting $Z$ as the ASE of $P$, we can recover $ZQ$ that is equivalent to $XU$
 (Fig. \ref{fig:q_trans}).
 
 ```{r q_trans, fig.cap = 'Pair plots of $ZQ$ where $Q$ was found by minimizing objective function (1). This embedding is equivalent to $XU$ up to 90-degree rotations and reflection along axes.'}
-XU.prime <- transform.embedding(Z, z, runif(4, 0, 0))
+XU.prime <- transform.embedding(Z, z, runif(4, -pi, pi))
 pairs(XU.prime, col = z, asp = 1)
 ```
 
