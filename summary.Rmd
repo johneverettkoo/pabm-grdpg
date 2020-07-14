@@ -410,8 +410,9 @@ different clusters. Then for some $c > 0$,
 
 $$\max\limits_{i, j} ||(\hat{v}^{(n)}_i)^\top \hat{v}_j^{(n)}|| = O_P\bigg( \frac{(\log n)^c}{n}\bigg)$$
 
-In addition, $(\hat{v}^{(n)}_i)^\top \hat{v}_j^{(n)}$ converge to a generalized 
-chi-square distribution. 
+In addition, by the central limit theorem, 
+$(\hat{v}^{(n)}_i)^\top \hat{v}_j^{(n)}$ converge to a normal distribution 
+centered at $0$. 
 
 \begin{algorithm}[H]
   \DontPrintSemicolon
