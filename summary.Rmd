@@ -13,6 +13,7 @@ header-includes:
 - \usepackage{natbib}
 - \usepackage[linesnumbered,vlined,ruled]{algorithm2e} 
 - \setcitestyle{numbers,square}
+- \usepackage{verbatim}
 bibliography: misc.bib
 abstract: |
   In this paper, we connect two probabilistic models for graphs, the Popularity 
@@ -380,7 +381,7 @@ of $X (X^\top X)^{-1} X^\top = V V^\top = B$ is 0.
     Construct graph $G$ using $B$ as edge similarities.\;
     Identify the connected components of $G$ and map each to cluster labels 
     $1, ..., K.$\;
-  \caption{PABM clustering on the edge probability matrix}
+  \caption{PABM clustering on the edge probability matrix.}
 \end{algorithm}
 
 ### Using adjacency matrix $A$
@@ -427,10 +428,73 @@ centered at $0$.
     Partition $G$ into $K$ disconnected components 
     (e.g., using edge thresholding or spectral clustering).\;
     Map each partition to the cluster labels $1, ..., K$.\;
-  \caption{PABM clustering on the adjacency matrix}
+  \caption{PABM clustering on the adjacency matrix.}
 \end{algorithm}
 
 ## Parameter estimation
+
+For any $P$ edge probability matrix for the PABM such that the rows and 
+columns are organized by cluster, the $kl$^th^ block is an outer product 
+of two vectors, i.e., $P^{(kl)} = \lambda^{(kl)} (\lambda^{(lk)})^\top$. 
+Therefore, given $P^{(kl)}$, $\lambda%{(kl)}$ and $\lambda^{(lk)}$ are 
+solvable exactly (up to multiplication by $-1$) using singular value 
+decomposition. More specifically, let $P = \sigma^2 u v^\top$ be the 
+singular value decomposition of $P$. $u \in \mathbb{R}^{n_k}$ and 
+$v \in \mathbb{R}^{n_l}$ are vectors and 
+$\sigma^2 > 0$ is a scalar. Then $\lambda^{(kl)} = \pm \sigma u$ and 
+$\lambda^{(lk)} = \pm \sigma v$.
+
+\begin{algorithm}[H]
+  \DontPrintSemicolon
+  \SetAlgoLined
+  \caption{PABM parameter estimation using the edge probability matrix.}
+  \KwData{Edge probability matrix $P$, cluster assignments $1, ..., K$.}
+  \KwResult{PABM parameters $\{\lambda^{(kl)}\}_K$}
+  Arrange the rows and columns of $P$ by cluster such that each $P^{(kl)}$ 
+  block consists of edge probabilities between clusters $k$ and $l$.\; 
+  \For{$k, l = 1, ..., K$, $k \geq l$} {
+    Compute $P^{(kl)} = (\sigma^{(kl)})^2 u^{(kl)} (v^{(kl)})^\top$, the SVD of 
+    the $kl^{th}$ block.\;
+    Assign $\lambda^{(kl)} \leftarrow \pm \sigma^{(kl)} u^{(kl)}$ and 
+    $\lambda^{(lk)} \leftarrow \pm \sigma^{(kl)} v^{(kl)}$.
+  }
+\end{algorithm}
+
+A similar method can be applied using $\hat{Z}$, the adjacency spectral 
+embedding of $A$.
+
+\begin{algorithm}[H]
+  \DontPrintSemicolon
+  \SetAlgoLined
+  \caption{PABM parameter estimation using the adjacency matrix.}
+  \KwData{Adjacency matrix $A$, cluster assignments $1, ..., K$}
+  \KwResult{PABM parameter estimates $\{\hat{\lambda}^{(kl)}\}_K$.}
+  Assign $p \leftarrow K (K + 1) / 2$ and $q \leftarrow K (K - 1) / 2$.\;
+  Compute $\hat{Z}$, the adjacency spectral embedding of $A$ using signature
+  $(p, q)$.\;
+  Compute $\hat{P} = \hat{Z} I_{pq} \hat{Z}^\top$, the estimate of the edge 
+  probability matrix based on the adjacency spectral embedding.\;
+  Arrange the rows and columns of $\hat{P}$ by cluster such that each 
+  $\hat{P}^{(kl)}$ block consists of estimated edge probabilities between 
+  clusters $k$ and $l$.\;
+  \For{$k, l = 1, ..., K$, $k \leq l$} {
+    Compute $\hat{P}^{(kl)} = U \Sigma V^\top$, the SVD of the $kl^{th}$ 
+    block.\;
+    Assign $u^{(kl)}$ and $v^{(kl)}$ as the first columns of $U$ and $V$. 
+    Assign $\sigma^2 \leftarrow \Sigma_{11}$.\;
+    Assign $\hat{\lambda}^{(kl)} \leftarrow \pm \sigma^{(kl)} u^{(kl)}$ and 
+    $\hat{\lambda}^{(lk)} \leftarrow \pm \sigma^{(kl)} v^{(kl)}$.
+  }
+\end{algorithm}
+
+**Theorem 5**. Let $\lambda^{(kl)}_{n_k} \sim F_{n_k}$ for $k, l = 1, ..., K$, 
+and let $\{\hat{\lambda}^{(kl)}_{n_k}\}_K$ be the set of estimates computed by 
+Algorithm 4. 
+Then ... ***TODO***
+
+\begin{comment}
+
+### Using Adjacency Spectral Embedding
 
 For this section, we will focus on the case $K = 2$. Under this condition, the 
 PABM is equivalent to the GRDPG with signature $(3, 1)$. 
@@ -485,6 +549,8 @@ lends itself as an optimization problem:
 Note that if $Q$ can be properly estimated, the asymptotic results from 
 \citet{rubindelanchy2017statistical} can be applied here.
 
+\end{comment}
+
 # Simulated Examples
 
 For these examples, we will set the following parameters:
@@ -507,7 +573,7 @@ b2 <- 2
 
 ## Clustering
 
-In this part, we will assess Algorithm 1's performance for sample sizes 
+In this part, we will assess Algorithm 2's performance for sample sizes 
 $n = 64, 128, 256, 512, 1024$. For each sample size $n$, $100$ sets of 
 $\lambda^{(kl)}$'s are drawn and for each set of parameters, one adjacency 
 matrix $A$ is drawn and clustered. 
@@ -619,6 +685,8 @@ ggplot(densities.df) +
 ```
 
 ## Parameter estimation
+
+\begin{comment}
 
 ```{r}
 rot.mat.2 <- function(angle, axis = 1) {
@@ -762,7 +830,7 @@ pairs(Z, asp = 1, col = z)
 Denoting $Z$ as the ASE of $P$, we can recover $ZQ$ that is equivalent to $XU$ 
 (Fig. \ref{fig:q_trans}).
 
-```{r q_trans, fig.cap = 'Pair plots of $ZQ$ where $Q$ was found by minimizing objective function (1). This embedding is equivalent to $XU$ up to 90-degree rotations and reflection along axes.'}
+```{r q_trans, fig.cap = 'Pair plots of $ZQ$ where $Q$ was found by minimizing objective function (1). This embedding is equivalent to $XU$ up to 90-degree rotations and reflection along axes.', cache = TRUE}
 XU.prime <- transform.embedding(Z, z, runif(4, -pi, pi))
 pairs(XU.prime, col = z, asp = 1)
 ```
@@ -776,12 +844,121 @@ pairs(Zhat, col = z, asp = 1)
 
 Minimizing the objective function in (1) results in the following embedding:
 
-```{r q_from_a, fig.cap = 'Pair plots of $\\hat{Z} $ where $\\hat{Z}$ is the ASE of an adjacency matrix of a PABM and $Q$ is estimated by minimizing objective function (1).'}
+```{r q_from_a, cache = TRUE, fig.cap = 'Pair plots of $\\hat{Z} $ where $\\hat{Z}$ is the ASE of an adjacency matrix of a PABM and $Q$ is estimated by minimizing objective function (1).'}
 XU.hat <- transform.embedding(Zhat, z, runif(4, -pi, pi))
 pairs(XU.hat, col = z, asp = 1)
 
 # X.hat <- XU.hat %*% t(U)
 # plot(abs(X.hat) > .25)
+```
+
+\end{comment}
+
+```{r}
+estimate.lambda.block <- function(P.block, within = FALSE) {
+  if (within) {
+    P.svd <- svd(P.block)
+    u <- P.svd$u[, 1]
+    if (mean(u) < 0) u <- -u
+    s <- sqrt(P.svd$d[1])
+    return(s * u)
+  } else {
+    P.svd <- svd(P.block)
+    u <- P.svd$u[, 1]
+    if (mean(u) < 0) u <- -u
+    v <- P.svd$v[, 1]
+    if (mean(v) < 0) v <- -v
+    s <- sqrt(P.svd$d[1])
+    return(list(s * u, s * v))
+  }
+}
+
+lambda.rmse <- function(lambda.matrix, Phat, clustering) {
+  K <- max(clustering)
+  n <- nrow(Phat)
+  n.vector <- sapply(seq(K), function(k) sum(clustering == k))
+  sapply(seq(K), function(k) {
+    low.ind.k <- ifelse(k == 1, 1, sum(n.vector[seq(k - 1)]) + 1)
+    high.ind.k <- sum(n.vector[seq(k)])
+    sapply(seq(k), function(l) {
+      P.block <- Phat[clustering == k, clustering == l]
+      if (k == l) {
+        lambda <- as.numeric(lambda.matrix[seq(low.ind.k, high.ind.k), l])
+        lambda.hat <- estimate.lambda.block(P.block, TRUE)
+        return(sum((lambda - lambda.hat) ** 2))
+      } else {
+        low.ind.l <- ifelse(l == 1, 1, sum(n.vector[seq(l = 1)]) + 1)
+        high.ind.l <- sum(n.vector[seq(l)])
+        lambda.kl <- as.numeric(lambda.matrix[seq(low.ind.k, high.ind.k), l])
+        lambda.lk <- as.numeric(lambda.matrix[seq(low.ind.l, high.ind.l), k])
+        lambda.hats <- estimate.lambda.block(P.block)
+        return(sum((lambda.kl - lambda.hats[[1]]) ** 2) + 
+                 sum((lambda.lk - lambda.hats[[2]]) ** 2))
+      }
+    }) %>% 
+      sum() %>% 
+      return()
+  }) %>% 
+    sum() %>% 
+    magrittr::divide_by(n * K) %>% 
+    sqrt() %>% 
+    return()
+}
+```
+
+Figure \ref{fig:lambda_est} shows the medians and interquartile ranges of root 
+mean square errors for Algorithm 4 over 100 simulations using the same 
+parameters as before. 
+
+```{r lambda_est, cache = TRUE, fig.cap = 'Median and IQR RMSE from Algorithm 4 using sample sizes from 64 to 1024. Simulations were repeated 100 times for each sample size.'}
+set.seed(314159)
+
+Ipq <- diag(c(1, 1, 1, -1))
+
+rmse.df <- foreach(n = n.vec, .combine = dplyr::bind_rows) %do% {
+  plyr::ldply(seq(iter), function(i) {
+    z <- sample(c(1, 2), n, prob = c(alpha, 1 - alpha), replace = TRUE)
+    z <- sort(z)
+    
+    n1 <- sum(z == 1)
+    n2 <- sum(z == 2)
+    
+    lambda11 <- rbeta(n1, a1, b1)
+    lambda22 <- rbeta(n2, a1, b1)
+    lambda12 <- rbeta(n1, a2, b2)
+    lambda21 <- rbeta(n2, a2, b2)
+    
+    X <- cbind(c(lambda11, rep(0, n2)),
+               c(lambda12, rep(0, n2)),
+               c(rep(0, n1), lambda21),
+               c(rep(0, n1), lambda22))
+    Y <- cbind(c(lambda11, rep(0, n2)),
+               c(rep(0, n1), lambda21),
+               c(lambda12, rep(0, n2)),
+               c(rep(0, n1), lambda22))
+    P <- X %*% t(Y)
+    A <- draw.graph(P)
+    lambda.matrix <- cbind(c(lambda11, lambda21),
+                           c(lambda12, lambda22))
+    Zhat <- embedding(A, p, q)
+    Phat <- Zhat %*% Ipq %*% t(Zhat)
+    rmse <- lambda.rmse(lambda.matrix, Phat, z)
+    dplyr::tibble(n = n, rmse = rmse) %>% 
+      return()
+  }, .parallel = TRUE) %>% 
+    return()
+}
+
+rmse.df %>% 
+  dplyr::group_by(n) %>% 
+  dplyr::summarise(median.rmse = median(rmse),
+                   q1.rmse = quantile(rmse, .25),
+                   q3.rmse = quantile(rmse, .75)) %>% 
+  dplyr::ungroup() %>% 
+  ggplot() + 
+  geom_line(aes(x = n, y = median.rmse)) + 
+  geom_errorbar(aes(x = n, ymin = q1.rmse, ymax = q3.rmse)) + 
+  labs(y = 'RMSE')
 ```
 
 # References

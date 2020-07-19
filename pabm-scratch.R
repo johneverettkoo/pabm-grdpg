@@ -410,3 +410,8 @@ S <- matrix(c(cosh(angle), sinh(angle), 0, 0,
               0, 0, 0, 1), 
             byrow = TRUE, 
             nrow = 4, ncol = 4)
+
+
+p11 <- P[1:n1, 1:n1]
+p22 <- P[(n1+1):n, (n1+1):n]
+p12 <- P[1:n1, (n1+1):n]
