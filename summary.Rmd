@@ -45,38 +45,8 @@ options(xtable.comment = FALSE,
 
 ```{r}
 import::from(magrittr, `%>%`)
-import::from(foreach, foreach, `%do%`)
 library(plot.matrix)
-library(mclust)
 library(ggplot2)
-
-theme_set(theme_bw())
-
-source('http://pages.iu.edu/~mtrosset/Courses/675/stress.r')
-
-doMC::registerDoMC(parallel::detectCores())
-
-embedding <- function(A, p = NULL, q = NULL,
-                      eps = 1e-6) {
-  eigen.A <- eigen(A, symmetric = TRUE)
-  if (is.null(p) | is.null(q)) {
-    keep <- (abs(eigen.A$values) > eps)
-  } else {
-    keep <- c(seq(p), seq(n, n - q + 1))
-  }
-  
-  U <- eigen.A$vectors[, keep]
-  S <- diag(sqrt(abs(eigen.A$values[keep])))
-  return(U %*% S)
-}
-
-draw.graph <- function(P) {
-  A <- apply(P, 1:2, function(p) rbinom(1, 1, p))
-  A[lower.tri(A)] <- 0
-  diag(A) <- 0
-  A <- A + t(A)
-  return(A)
-}
 ```
 
 \newcommand{\diag}{\text{diag}}
@@ -560,17 +530,6 @@ For these examples, we will set the following parameters:
 * $\lambda^{(kk)} \stackrel{indep}{\sim} Beta(2, 1)$
 * $\lambda^{(kl)} \stackrel{indep}{\sim} Beta(1, 2)$ for $k \neq l$
 
-```{r}
-K <- 2
-p <- K * (K + 1) / 2
-q <- K * (K - 1) / 2
-alpha <- .5
-a1 <- 2
-b1 <- 1
-a2 <- 1
-b2 <- 2
-```
-
 ## Clustering
 
 In this part, we will assess Algorithm 2's performance for sample sizes 
@@ -581,102 +540,25 @@ matrix $A$ is drawn and clustered.
 We will not consider clustering using the edge probability matrix $P$ since 
 this will always result exact recovery of the original clusters.
 
-```{r}
-n.vec <- c(64, 128, 256, 512, 1024)
-iter <- 100
-```
-
-```{r}
-draw.pabm.beta.2 <- function(n, a1, b1, a2, b2, alpha = .5) {
-  z <- sample(c(1, 2), n, prob = c(alpha, 1 - alpha), replace = TRUE)
-  z <- sort(z)
-  
-  n1 <- sum(z == 1)
-  n2 <- sum(z == 2)
-  
-  lambda11 <- rbeta(n1, a1, b1)
-  lambda22 <- rbeta(n2, a1, b1)
-  lambda12 <- rbeta(n1, a2, b2)
-  lambda21 <- rbeta(n2, a2, b2)
-  
-  X <- cbind(c(lambda11, rep(0, n2)),
-             c(lambda12, rep(0, n2)),
-             c(rep(0, n1), lambda21),
-             c(rep(0, n1), lambda22))
-  Y <- cbind(c(lambda11, rep(0, n2)),
-             c(rep(0, n1), lambda21),
-             c(lambda12, rep(0, n2)),
-             c(rep(0, n1), lambda22))
-  P <- X %*% t(Y)
-  A <- draw.graph(P)
-  
-  return(list(A = A, z = z))
-}
-
-normalized.laplacian <- function(W) {
-  n <- nrow(W)
-  D.neg.sqrt <- diag(colSums(W) ** -.5)
-  I <- diag(n)
-  return(I - D.neg.sqrt %*% W %*% D.neg.sqrt)
-}
-
-cluster.pabm <- function(A, K) {
-  p <- K * (K + 1) / 2
-  q <- K * (K - 1) / 2
-  V <- eigen(A, symmetric = TRUE)$vectors[, c(seq(p), seq(n, n - q + 1))]
-  V <- V / mean(V)
-  B <- abs(V %*% t(V))
-  # L <- graph.laplacian(B)
-  L <- normalized.laplacian(B)
-  eigenmap <- eigen(L, symmetric = TRUE)$vectors[, seq(n - 1, n - K)]
-  clustering <- mclust::Mclust(eigenmap, K)$classification
-}
-```
-
-```{r fig.cap = 'IQR clustering error using Algorithm 1 for sample sizes from 64 to 1024. Simulations were repeated 100 times for each sample size.', cache = TRUE}
-set.seed(314159)
-
-results.df <- foreach(n = n.vec,.combine = dplyr::bind_rows) %do% {
-  plyr::ldply(seq(iter), function(i) {
-    Az <- draw.pabm.beta.2(n, a1, b1, a2, b2, alpha)
-    A <- Az$A
-    z <- Az$z
-    clustering <- cluster.pabm(A, K)
-    error <- mean(clustering == z)
-    if (error > .5) error <- 1 - error
-    dplyr::tibble(n = n, error = error) %>% 
-      return()
-  }, .parallel = TRUE) %>% 
-    return()
-}
-
-results.df %>% 
-  dplyr::group_by(n) %>% 
+```{r fig.cap = 'IQR clustering error using Algorithm 1 for sample sizes from 64 to 1024. Simulations were repeated 100 times for each sample size.', cache = FALSE}
+clustering.df <- readr::read_csv('clustering.csv')
+clustering.df %>%
+  dplyr::group_by(n) %>%
   dplyr::summarise(med.err = median(error),
                    first.q = quantile(error, .25),
-                   third.q = quantile(error, .75)) %>% 
-  ggplot() + 
-  # scale_y_log10() + 
-  labs(y = 'error') + 
-  geom_line(aes(x = n, y = med.err)) + 
+                   third.q = quantile(error, .75)) %>%
+  ggplot() +
+  # scale_y_log10() +
+  labs(y = 'error') +
+  geom_line(aes(x = n, y = med.err)) +
   geom_errorbar(aes(x = n, ymin = first.q, ymax = third.q))
 ```
 
 We can also examine how the distribution of $(\hat{v}_i)^\top \hat{v_j}$ varies 
 with $n$: 
 
-```{r, fig.cap = 'Between-cluster inner products of the eigenvectors of $A$ for varying sample sizes.', cache = TRUE}
-densities.df <- plyr::ldply(n.vec, function(n) {
-  Az <- draw.pabm.beta.2(n, a1, b1, a2, b2, alpha)
-  A <- Az$A
-  z <- Az$z
-  n1 <- sum(z == 1)
-  n2 <- sum(z == 2)
-  V <- eigen(A, symmetric = TRUE)$vectors[, c(seq(3), n)]
-  B <- V %*% t(V)
-  inner.prods <- as.numeric(B[(n1+1):n, (n1+1):n])
-  return(dplyr::tibble(n = n, inner.prods = inner.prods))
-}, .parallel = TRUE)
+```{r, fig.cap = 'Between-cluster inner products of the eigenvectors of $A$ for varying sample sizes.', cache = FALSE}
+densities.df <- readr::read_csv('densities.csv')
 
 ggplot(densities.df) + 
   geom_density(aes(x = inner.prods, colour = factor(n))) + 
@@ -688,94 +570,6 @@ ggplot(densities.df) +
 ## Parameter estimation
 
 \begin{comment}
-
-```{r}
-rot.mat.2 <- function(angle, axis = 1) {
-  # rotation matrix for K=2
-  
-  if (axis %in% c(1, 3)) {
-    rotation <- matrix(c(cos(angle), -sin(angle), sin(angle), cos(angle)),
-                       nrow = 2, ncol = 2, byrow = TRUE)
-    if (axis == 1) {
-      return(as.matrix(Matrix::bdiag(1, rotation, -1)))
-    } else {
-      return(as.matrix(Matrix::bdiag(rotation, 1, -1)))
-    }
-  } else if (axis == 2) {
-    return(matrix(c(cos(angle), 0, sin(angle), 0,
-                    0, 1, 0, 0,
-                    -sin(angle), 0, cos(angle), 0,
-                    0, 0, 0, -1),
-                  nrow = 4, ncol = 4,
-                  byrow = TRUE))
-  } else {
-    stop(simpleError('axis must be 1, 2, or 3'))
-  }
-}
-
-hyp.rot.mat.2 <- function(angle, axis = 1) {
-  # hyperbolic rotation matrix for $K=2
-  
-  if (axis == 1) {
-    return(matrix(c(1, 0, 0, 0,
-                    0, 1, 0, 0, 
-                    0, 0, cosh(angle), sinh(angle),
-                    0, 0, sinh(angle), cosh(angle)), 
-                  byrow = TRUE,
-                  nrow = 4, ncol = 4))
-  } else if (axis == 2) {
-    return(matrix(c(1, 0, 0, 0,
-                    0, cosh(angle), 0, sinh(angle),
-                    0, 0, 1, 0,
-                    0, sinh(angle), 0, cosh(angle)),
-                  byrow = TRUE,
-                  nrow = 4, ncol = 4))
-  } else if (axis == 3) {
-    return(matrix(c(cosh(angle), 0, 0, sinh(angle),
-                    0, 1, 0, 0, 
-                    0, 0, 1, 0, 
-                    sinh(angle), 0, 0, cosh(angle)),
-                  byrow = TRUE,
-                  nrow = 4, ncol = 4))
-  } else {
-    stop(simpleError('axis must be 1, 2, or 3'))
-  }
-}
-
-construct.Q <- function(angles) {
-  rot.angles <- angles[1:3]
-  hyp.angles <- c(angles[1], angles[4], -angles[4])
-  rot.matrices <- lapply(seq(3), function(i) rot.mat.2(rot.angles[i], i))
-  hyp.matrices <- lapply(seq(3), function(i) hyp.rot.mat.2(hyp.angles[i], i))
-  matrices <- c(rot.matrices, hyp.matrices)
-  return(Reduce(`%*%`, matrices))
-}
-
-obj.fun <- function(angles, Z.hat, clusters) {
-  R <- construct.Q(angles)
-  
-  XU.c <- Z.hat %*% R
-  in.prods <- XU.c[clusters == 1, ] %*% t(XU.c[clusters == 2, , drop = FALSE])
-  return(
-    sum(XU.c[clusters == 1, 2] ** 2) + 
-      sum(XU.c[clusters == 2, 1] ** 2) + 
-      sum((XU.c[clusters == 1, 3] - XU.c[clusters == 1, 4]) ** 2) + 
-      sum((XU.c[clusters == 2, 3] + XU.c[clusters == 2, 4]) ** 2)
-  )
-}
-
-transform.embedding <- function(Z.hat, clusters, init.angles) {
-  # init.angles <- runif(4, -pi, pi)
-  # init.angles <- rep(0, 4)
-  angles.1 <- optim(init.angles, function(x) obj.fun(x, Z.hat, clusters), 
-                    method = 'SANN')$par
-  angles.2 <- optim(angles.1, function(x) obj.fun(x, Z.hat, clusters),
-                    method = 'Nelder-Mead',
-                    control = list(abstol = 1e-10, maxit = 1e3))$par
-  R <- construct.Q(angles.2)
-  return(Z.hat %*% R)
-}
-```
 
 ```{r}
 set.seed(123456)
@@ -912,43 +706,7 @@ mean square errors for Algorithm 4 over 100 simulations using the same
 parameters as before. 
 
 ```{r lambda_est, cache = TRUE, fig.cap = 'Median and IQR RMSE from Algorithm 4 using sample sizes from 64 to 1024. Simulations were repeated 100 times for each sample size.'}
-set.seed(314159)
-
-Ipq <- diag(c(1, 1, 1, -1))
-
-rmse.df <- foreach(n = n.vec, .combine = dplyr::bind_rows) %do% {
-  plyr::ldply(seq(iter), function(i) {
-    z <- sample(c(1, 2), n, prob = c(alpha, 1 - alpha), replace = TRUE)
-    z <- sort(z)
-    
-    n1 <- sum(z == 1)
-    n2 <- sum(z == 2)
-    
-    lambda11 <- rbeta(n1, a1, b1)
-    lambda22 <- rbeta(n2, a1, b1)
-    lambda12 <- rbeta(n1, a2, b2)
-    lambda21 <- rbeta(n2, a2, b2)
-    
-    X <- cbind(c(lambda11, rep(0, n2)),
-               c(lambda12, rep(0, n2)),
-               c(rep(0, n1), lambda21),
-               c(rep(0, n1), lambda22))
-    Y <- cbind(c(lambda11, rep(0, n2)),
-               c(rep(0, n1), lambda21),
-               c(lambda12, rep(0, n2)),
-               c(rep(0, n1), lambda22))
-    P <- X %*% t(Y)
-    A <- draw.graph(P)
-    lambda.matrix <- cbind(c(lambda11, lambda21),
-                           c(lambda12, lambda22))
-    Zhat <- embedding(A, p, q)
-    Phat <- Zhat %*% Ipq %*% t(Zhat)
-    rmse <- lambda.rmse(lambda.matrix, Phat, z)
-    dplyr::tibble(n = n, rmse = rmse) %>% 
-      return()
-  }, .parallel = TRUE) %>% 
-    return()
-}
+rmse.df <- readr::read_csv('rmse.csv')
 
 rmse.df %>% 
   dplyr::group_by(n) %>% 
@@ -958,7 +716,7 @@ rmse.df %>%
   dplyr::ungroup() %>% 
   ggplot() + 
   scale_y_log10() + 
-  scale_x_log10() + 
+  scale_x_log10() +
   geom_line(aes(x = n, y = median.rmse)) + 
   geom_errorbar(aes(x = n, ymin = q1.rmse, ymax = q3.rmse)) + 
   labs(y = 'RMSE')
