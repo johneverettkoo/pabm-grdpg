@@ -656,6 +656,7 @@ results.df %>%
                    first.q = quantile(error, .25),
                    third.q = quantile(error, .75)) %>% 
   ggplot() + 
+  # scale_y_log10() + 
   labs(y = 'error') + 
   geom_line(aes(x = n, y = med.err)) + 
   geom_errorbar(aes(x = n, ymin = first.q, ymax = third.q))
@@ -956,6 +957,8 @@ rmse.df %>%
                    q3.rmse = quantile(rmse, .75)) %>% 
   dplyr::ungroup() %>% 
   ggplot() + 
+  scale_y_log10() + 
+  scale_x_log10() + 
   geom_line(aes(x = n, y = median.rmse)) + 
   geom_errorbar(aes(x = n, ymin = q1.rmse, ymax = q3.rmse)) + 
   labs(y = 'RMSE')
