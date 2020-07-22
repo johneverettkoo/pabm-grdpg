@@ -47,6 +47,8 @@ options(xtable.comment = FALSE,
 import::from(magrittr, `%>%`)
 library(plot.matrix)
 library(ggplot2)
+
+theme_set(theme_bw())
 ```
 
 \newcommand{\diag}{\text{diag}}
@@ -571,7 +573,7 @@ ggplot(densities.df) +
 
 \begin{comment}
 
-```{r}
+```{r eval = FALSE}
 set.seed(123456)
 
 n <- 64
@@ -604,7 +606,7 @@ Setting $n = 64$ and generating one example set of $\{\lambda^{(kl)}\}$, we can
 see the latent positions $XU$ follow the expected properties 
 (Fig. \ref{fig:xu}). 
 
-```{r xu, fig.cap = 'Latent positions $XU$ used to construct the PABM edge probability matrix $P$ under the GRDPG framework. Note that the the points follow the properties outlined in Section 3.2.'}
+```{r xu, fig.cap = 'Latent positions $XU$ used to construct the PABM edge probability matrix $P$ under the GRDPG framework. Note that the the points follow the properties outlined in Section 3.2.', eval = FALSE}
 perm <- cbind(c(1, 0, 0, 0),
               c(0, 0, 1, 0),
               c(0, 1, 0, 0),
@@ -618,14 +620,14 @@ pairs(XU, asp = 1, col = z)
 If we instead take the ASE of $P = X \Pi X^\top$, we fail to obtain an 
 embedding that has the same properties (Fig. \ref{fig:ase_of_p}).
 
-```{r ase_of_p, fig.cap = 'The adjacency spectral embedding of the edge probability matrix $P$. Note that even though $P = (XU) I_{p, q} (XU)^\\top$, the resulting embedding does not follow the same properties of $XU$, even up to rotation.'}
+```{r ase_of_p, fig.cap = 'The adjacency spectral embedding of the edge probability matrix $P$. Note that even though $P = (XU) I_{p, q} (XU)^\\top$, the resulting embedding does not follow the same properties of $XU$, even up to rotation.', eval = FALSE}
 pairs(Z, asp = 1, col = z)
 ```
 
 Denoting $Z$ as the ASE of $P$, we can recover $ZQ$ that is equivalent to $XU$ 
 (Fig. \ref{fig:q_trans}).
 
-```{r q_trans, fig.cap = 'Pair plots of $ZQ$ where $Q$ was found by minimizing objective function (1). This embedding is equivalent to $XU$ up to 90-degree rotations and reflection along axes.', cache = TRUE}
+```{r q_trans, fig.cap = 'Pair plots of $ZQ$ where $Q$ was found by minimizing objective function (1). This embedding is equivalent to $XU$ up to 90-degree rotations and reflection along axes.', cache = TRUE, eval = FALSE}
 XU.prime <- transform.embedding(Z, z, runif(4, -pi, pi))
 pairs(XU.prime, col = z, asp = 1)
 ```
@@ -633,13 +635,13 @@ pairs(XU.prime, col = z, asp = 1)
 The ASE of the adjacency matrix $A$ (as one realization of $P$) has the 
 resulting pairs plot:
 
-```{r a_ase, fig.cap = 'Pair plots of the adjacency spectral embedding of $A$ Since $K=2$ is fixed, we use the signature $(3, 1)$ in this embedding.'}
+```{r a_ase, fig.cap = 'Pair plots of the adjacency spectral embedding of $A$ Since $K=2$ is fixed, we use the signature $(3, 1)$ in this embedding.', eval = FALSE}
 pairs(Zhat, col = z, asp = 1)
 ```
 
 Minimizing the objective function in (1) results in the following embedding:
 
-```{r q_from_a, cache = TRUE, fig.cap = 'Pair plots of $\\hat{Z} $ where $\\hat{Z}$ is the ASE of an adjacency matrix of a PABM and $Q$ is estimated by minimizing objective function (1).'}
+```{r q_from_a, cache = TRUE, fig.cap = 'Pair plots of $\\hat{Z} $ where $\\hat{Z}$ is the ASE of an adjacency matrix of a PABM and $Q$ is estimated by minimizing objective function (1).', eval = FALSE}
 XU.hat <- transform.embedding(Zhat, z, runif(4, -pi, pi))
 pairs(XU.hat, col = z, asp = 1)
 
@@ -649,63 +651,11 @@ pairs(XU.hat, col = z, asp = 1)
 
 \end{comment}
 
-```{r}
-estimate.lambda.block <- function(P.block, within = FALSE) {
-  if (within) {
-    P.svd <- svd(P.block)
-    u <- P.svd$u[, 1]
-    if (mean(u) < 0) u <- -u
-    s <- sqrt(P.svd$d[1])
-    return(s * u)
-  } else {
-    P.svd <- svd(P.block)
-    u <- P.svd$u[, 1]
-    if (mean(u) < 0) u <- -u
-    v <- P.svd$v[, 1]
-    if (mean(v) < 0) v <- -v
-    s <- sqrt(P.svd$d[1])
-    return(list(s * u, s * v))
-  }
-}
-
-lambda.rmse <- function(lambda.matrix, Phat, clustering) {
-  K <- max(clustering)
-  n <- nrow(Phat)
-  n.vector <- sapply(seq(K), function(k) sum(clustering == k))
-  sapply(seq(K), function(k) {
-    low.ind.k <- ifelse(k == 1, 1, sum(n.vector[seq(k - 1)]) + 1)
-    high.ind.k <- sum(n.vector[seq(k)])
-    sapply(seq(k), function(l) {
-      P.block <- Phat[clustering == k, clustering == l]
-      if (k == l) {
-        lambda <- as.numeric(lambda.matrix[seq(low.ind.k, high.ind.k), l])
-        lambda.hat <- estimate.lambda.block(P.block, TRUE)
-        return(sum((lambda - lambda.hat) ** 2))
-      } else {
-        low.ind.l <- ifelse(l == 1, 1, sum(n.vector[seq(l = 1)]) + 1)
-        high.ind.l <- sum(n.vector[seq(l)])
-        lambda.kl <- as.numeric(lambda.matrix[seq(low.ind.k, high.ind.k), l])
-        lambda.lk <- as.numeric(lambda.matrix[seq(low.ind.l, high.ind.l), k])
-        lambda.hats <- estimate.lambda.block(P.block)
-        return(sum((lambda.kl - lambda.hats[[1]]) ** 2) + 
-                 sum((lambda.lk - lambda.hats[[2]]) ** 2))
-      }
-    }) %>% 
-      sum() %>% 
-      return()
-  }) %>% 
-    sum() %>% 
-    magrittr::divide_by(n * K) %>% 
-    sqrt() %>% 
-    return()
-}
-```
-
 Figure \ref{fig:lambda_est} shows the medians and interquartile ranges of root 
 mean square errors for Algorithm 4 over 100 simulations using the same 
 parameters as before. 
 
-```{r lambda_est, cache = TRUE, fig.cap = 'Median and IQR RMSE from Algorithm 4 using sample sizes from 64 to 1024. Simulations were repeated 100 times for each sample size.'}
+```{r lambda_est, cache = FALSE, fig.cap = 'Median and IQR RMSE from Algorithm 4 using sample sizes from 64 to 1024. Simulations were repeated 100 times for each sample size.'}
 rmse.df <- readr::read_csv('rmse.csv')
 
 rmse.df %>% 
