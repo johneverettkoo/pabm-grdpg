@@ -6,7 +6,7 @@ import::from(magrittr, `%>%`)
 import::from(foreach, foreach, `%do%`)
 setwd('~/dev/pabm-grdpg')
 import::here(embedding, draw.graph, I.pq, 
-             estimate.lambda.block, lambda.rmse,
+             estimate.lambda.block, lambda.rmse, lambda.rmse.mle,
              .from = 'functions.R')
 
 # parallel backend
@@ -55,7 +55,8 @@ rmse.df <- foreach(n = n.vec, .combine = dplyr::bind_rows) %do% {
     Zhat <- embedding(A, p, q)
     Phat <- Zhat %*% Ipq %*% t(Zhat)
     rmse <- lambda.rmse(lambda.matrix, Phat, z)
-    dplyr::tibble(n = n, rmse = rmse) %>% 
+    rmse.mle <- lambda.rmse.mle(lambda.matrix, A, z)
+    dplyr::tibble(n = n, rmse = rmse, rmse.mle = rmse.mle) %>% 
       return()
   }, .parallel = TRUE) %>% 
     return()
