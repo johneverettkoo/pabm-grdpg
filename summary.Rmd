@@ -537,23 +537,34 @@ For these examples, we will set the following parameters:
 In this part, we will assess Algorithm 2's performance for sample sizes 
 $n = 64, 128, 256, 512, 1024$. For each sample size $n$, $100$ sets of 
 $\lambda^{(kl)}$'s are drawn and for each set of parameters, one adjacency 
-matrix $A$ is drawn and clustered. 
+matrix $A$ is drawn and clustered. We will not consider clustering using the 
+edge probability matrix $P$ since this will always result exact recovery of the
+original clusters (up to permutation).
 
-We will not consider clustering using the edge probability matrix $P$ since 
-this will always result exact recovery of the original clusters.
-
-```{r fig.cap = 'IQR clustering error using Algorithm 1 for sample sizes from 64 to 1024. Simulations were repeated 100 times for each sample size.', cache = FALSE}
+```{r clust_err_sim, fig.cap = 'IQR clustering error using Algorithm 1 (red) compared against subspace clustering (blue) for sample sizes from 64 to 1024. Simulations were repeated 100 times for each sample size. The $y$-axis is shown on a logarithmic scale.', cache = FALSE}
 clustering.df <- readr::read_csv('clustering.csv')
 clustering.df %>%
   dplyr::group_by(n) %>%
   dplyr::summarise(med.err = median(error),
                    first.q = quantile(error, .25),
-                   third.q = quantile(error, .75)) %>%
+                   third.q = quantile(error, .75),
+                   med.err.ssc = median(error.ssc),
+                   first.q.ssc = quantile(error.ssc, .25),
+                   third.q.ssc = quantile(error.ssc, .75)) %>%
+  dplyr::ungroup() %>% 
   ggplot() +
-  # scale_y_log10() +
-  labs(y = 'error') +
-  geom_line(aes(x = n, y = med.err)) +
-  geom_errorbar(aes(x = n, ymin = first.q, ymax = third.q))
+  scale_y_log10() +
+  labs(y = 'clustering error', 
+       colour = NULL) +
+  geom_line(aes(x = n, y = med.err,
+                colour = 'Algorithm 1')) +
+  geom_errorbar(aes(x = n, ymin = first.q, ymax = third.q,
+                    colour = 'Algorithm 1')) + 
+  geom_line(aes(x = n, y = med.err.ssc,
+                colour = 'SSC')) + 
+  geom_errorbar(aes(x = n, ymin = first.q.ssc, ymax = third.q.ssc,
+                    colour = 'SSC')) + 
+  scale_colour_brewer(palette = 'Set1')
 ```
 
 We can also examine how the distribution of $(\hat{v}_i)^\top \hat{v_j}$ varies 
@@ -653,23 +664,34 @@ pairs(XU.hat, col = z, asp = 1)
 
 Figure \ref{fig:lambda_est} shows the medians and interquartile ranges of root 
 mean square errors for Algorithm 4 over 100 simulations using the same 
-parameters as before. 
+parameters as before. Comparison against an MLE-based method 
+\cite{noroozi2019estimation} suggests similar performance.
 
-```{r lambda_est, cache = FALSE, fig.cap = 'Median and IQR RMSE from Algorithm 4 using sample sizes from 64 to 1024. Simulations were repeated 100 times for each sample size.'}
+```{r lambda_est, cache = FALSE, fig.cap = 'Log-log plot of the median and IQR RMSE from Algorithm 4 (red) compared against an MLE-based method (blue) using sample sizes from 64 to 1024. Simulations were repeated 100 times for each sample size.'}
 rmse.df <- readr::read_csv('rmse.csv')
 
 rmse.df %>% 
   dplyr::group_by(n) %>% 
   dplyr::summarise(median.rmse = median(rmse),
                    q1.rmse = quantile(rmse, .25),
-                   q3.rmse = quantile(rmse, .75)) %>% 
+                   q3.rmse = quantile(rmse, .75),
+                   median.rmse.mle = median(rmse.mle),
+                   q1.rmse.mle = quantile(rmse.mle, .25),
+                   q3.rmse.mle = quantile(rmse.mle, .75)) %>% 
   dplyr::ungroup() %>% 
   ggplot() + 
   scale_y_log10() + 
   scale_x_log10() +
-  geom_line(aes(x = n, y = median.rmse)) + 
-  geom_errorbar(aes(x = n, ymin = q1.rmse, ymax = q3.rmse)) + 
-  labs(y = 'RMSE')
+  geom_line(aes(x = n, y = median.rmse, colour = 'Algorithm 4')) + 
+  geom_errorbar(aes(x = n, ymin = q1.rmse, ymax = q3.rmse,
+                    colour = 'Algorithm 4')) + 
+  geom_line(aes(x = n, y = median.rmse.mle, colour = 'MLE-based')) + 
+  geom_errorbar(aes(x = n, ymin = q1.rmse.mle, ymax = q3.rmse.mle,
+                   colour = 'MLE-based')) + 
+  scale_colour_brewer(palette = 'Set1') + 
+  labs(y = 'RMSE', colour = NULL)
 ```
+
+# Discussion
 
 # References
