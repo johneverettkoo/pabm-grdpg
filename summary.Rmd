@@ -1,10 +1,11 @@
 ---
-title: "Clustering and Parameter Estimation for the Popularity Adjusted Block Model"
+title: "Connecting the Popularity Adjusted Block Model to the Generalized Random Dot Product Graph for Clustering and Parameter Estimation"
 output:
   pdf_document:
     citation_package: natbib
     number_sections: yes
 # output: html_document
+fontsize: 12pt
 # geometry: "left=1cm,right=1cm,top=1cm,bottom=1.5cm"
 urlcolor: blue
 header-includes:
