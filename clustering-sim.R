@@ -26,7 +26,7 @@ b1 <- 1
 a2 <- 1
 b2 <- 2
 sparsity <- .01
-n.vec <- c(64, 128, 256, 512, 1024)
+n.vec <- c(64, 128, 256, 512, 1024, 2048)
 iter <- 100
 set.seed(314159)
 
@@ -63,9 +63,9 @@ clustering.df <- foreach(n = n.vec, .combine = dplyr::bind_rows) %do% {
 #   # scale_x_log10() +
 #   labs(y = 'error') +
 #   geom_line(aes(x = n, y = med.err)) +
-#   geom_errorbar(aes(x = n, ymin = first.q, ymax = third.q)) + 
-#   geom_line(aes(x = n, y = med.err.ssc, colour = 'ssc')) + 
-#   geom_errorbar(aes(x = n, ymin = first.q.ssc, ymax = third.q.ssc, 
+#   geom_errorbar(aes(x = n, ymin = first.q, ymax = third.q)) +
+#   geom_line(aes(x = n, y = med.err.ssc, colour = 'ssc')) +
+#   geom_errorbar(aes(x = n, ymin = first.q.ssc, ymax = third.q.ssc,
 #                     colour = 'ssc'))
 
 # export as csv
