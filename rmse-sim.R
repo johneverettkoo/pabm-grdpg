@@ -21,7 +21,7 @@ a1 <- 2
 b1 <- 1
 a2 <- 1
 b2 <- 2
-n.vec <- c(64, 128, 256, 512, 1024)
+n.vec <- c(64, 128, 256, 512, 1024, 2048)
 iter <- 100
 Ipq <- I.pq(p, q)
 set.seed(314159)
@@ -63,3 +63,4 @@ rmse.df <- foreach(n = n.vec, .combine = dplyr::bind_rows) %do% {
 }
 
 readr::write_csv(rmse.df, 'rmse.csv')
+
