@@ -561,6 +561,7 @@ clustering.df %>%
   dplyr::ungroup() %>% 
   ggplot() +
   scale_y_log10() +
+  # scale_x_log10() + 
   labs(y = 'clustering error', 
        colour = NULL) +
   geom_line(aes(x = n, y = med.err,
