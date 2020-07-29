@@ -382,7 +382,10 @@ eigenvalues and $K (K-1) / 2$ most negative eigenvalues with rows
 $(\hat{v}_i^{(n)})^\top$. Let $(i, j)$ correspond to pairs belonging to 
 different clusters. Then for some $c > 0$, 
 
-$$\max\limits_{i, j} ||(\hat{v}^{(n)}_i)^\top \hat{v}_j^{(n)}|| = O_P\bigg( \frac{(\log n)^c}{n}\bigg)$$
+$$\max\limits_{i, j} ||(\hat{v}^{(n)}_i)^\top \hat{v}_j^{(n)}|| = O_P\bigg( \frac{(\log n)^c}{n \sqrt{\rho_n}}\bigg)$$
+where $\lim\limits_{n \to 0} \rho_n = 0$ is a sparsity parameter introduced 
+by \citet{307cbeb9b1be48299388437423d94bf1}. More precisely, 
+$\rho_n o(\log n / \sqrt{n})$.
 
 In addition, by the central limit theorem, 
 $(\hat{v}^{(n)}_i)^\top \hat{v}_j^{(n)}$ converge to a normal distribution 
@@ -460,10 +463,13 @@ embedding of $A$.
   }
 \end{algorithm}
 
-**Theorem 5**. Let $\lambda^{(kl)}_{n_k} \sim F_{n_k}$ for $k, l = 1, ..., K$, 
-and let $\{\hat{\lambda}^{(kl)}_{n_k}\}_K$ be the set of estimates computed by 
-Algorithm 4. 
-Then ... ***TODO***
+**Theorem 5**. Under assumptions 1-6 as laid out by \citet{307cbeb9b1be48299388437423d94bf1}, 
+
+$$\sqrt{\frac{1}{n K} \sum_{k, l = 1}^K 
+||\hat{\lambda}^{(kl)} - \lambda^{(kl)}||^2} 
+\stackrel{P}{\to} 0$$
+
+*Proof*. ***TODO***
 
 \begin{comment}
 
@@ -530,8 +536,8 @@ For these examples, we will set the following parameters:
 
 * $K = 2$
 * Mixture parameter $\alpha = .5$
-* $\lambda^{(kk)} \stackrel{indep}{\sim} Beta(2, 1)$
-* $\lambda^{(kl)} \stackrel{indep}{\sim} Beta(1, 2)$ for $k \neq l$
+* $\lambda^{(kk)} \stackrel{iid}{\sim} Beta(2, 1)$
+* $\lambda^{(kl)} \stackrel{iid}{\sim} Beta(1, 2)$ for $k \neq l$
 
 ## Clustering
 
