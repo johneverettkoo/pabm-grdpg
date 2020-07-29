@@ -278,3 +278,8 @@ lambda.rmse.mle <- function(lambda.matrix, A, z) {
     sqrt() %>% 
     return()
 }
+
+clust.acc <- function(clust1, clust2) {
+  n <- length(clust1)
+  (1 - fossil::rand.index(clust1, clust2)) * choose(n, 2) / n
+}
