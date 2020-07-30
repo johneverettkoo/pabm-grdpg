@@ -385,11 +385,13 @@ different clusters. Then for some $c > 0$,
 $$\max\limits_{i, j} ||(\hat{v}^{(n)}_i)^\top \hat{v}_j^{(n)}|| = O_P\bigg( \frac{(\log n)^c}{n \sqrt{\rho_n}}\bigg)$$
 where $\lim\limits_{n \to 0} \rho_n = 0$ is a sparsity parameter introduced 
 by \citet{307cbeb9b1be48299388437423d94bf1}. More precisely, 
-$\rho_n o(\log n / \sqrt{n})$.
+$\rho_n = o(\log n / \sqrt{n})$.
 
 In addition, by the central limit theorem, 
 $(\hat{v}^{(n)}_i)^\top \hat{v}_j^{(n)}$ converge to a normal distribution 
 centered at $0$. 
+
+This leads to the following algorithm: 
 
 \begin{algorithm}[H]
   \DontPrintSemicolon
@@ -406,6 +408,9 @@ centered at $0$.
     Map each partition to the cluster labels $1, ..., K$.\;
   \caption{PABM clustering on the adjacency matrix.}
 \end{algorithm}
+
+Theorem 4 implies that as $n \to \infty$, the number (not just proportion) of 
+misclassified vertices, up to permutation, outputted by algorithm 2 goes to 0. 
 
 ## Parameter estimation
 
@@ -463,13 +468,17 @@ embedding of $A$.
   }
 \end{algorithm}
 
-**Theorem 5**. Under assumptions 1-6 as laid out by \citet{307cbeb9b1be48299388437423d94bf1}, 
+**Theorem 5**. Under assumptions 1-6 as laid out by \citet{307cbeb9b1be48299388437423d94bf1}, the estimators outputted by 
+algorithm 4 converge to the true values as follows:
 
 $$\sqrt{\frac{1}{n K} \sum_{k, l = 1}^K 
 ||\hat{\lambda}^{(kl)} - \lambda^{(kl)}||^2} 
 \stackrel{P}{\to} 0$$
 
 *Proof*. ***TODO***
+
+The convergence rate of algorithm 4 is the same as that of the methods 
+described by \citet{307cbeb9b1be48299388437423d94bf1}.
 
 \begin{comment}
 
@@ -532,6 +541,8 @@ Note that if $Q$ can be properly estimated, the asymptotic results from
 
 # Simulated Examples
 
+## Case $K = 2$
+
 For these examples, we will set the following parameters:
 
 * $K = 2$
@@ -539,16 +550,16 @@ For these examples, we will set the following parameters:
 * $\lambda^{(kk)} \stackrel{iid}{\sim} Beta(2, 1)$
 * $\lambda^{(kl)} \stackrel{iid}{\sim} Beta(1, 2)$ for $k \neq l$
 
-## Clustering
+### Clustering
 
 In this part, we will assess Algorithm 2's performance for sample sizes 
-$n = 64, 128, 256, 512, 1024$. For each sample size $n$, $100$ sets of 
+$n = 64, 128, 256, 512, 1024, 2048$. For each sample size $n$, $100$ sets of 
 $\lambda^{(kl)}$'s are drawn and for each set of parameters, one adjacency 
 matrix $A$ is drawn and clustered. We will not consider clustering using the 
 edge probability matrix $P$ since this will always result exact recovery of the
 original clusters (up to permutation).
 
-```{r clust_err_sim, fig.cap = 'IQR clustering error using Algorithm 1 (red) compared against subspace clustering (blue) for sample sizes from 64 to 1024. Simulations were repeated 100 times for each sample size. The $y$-axis is shown on a logarithmic scale.', cache = FALSE}
+```{r clust_err_sim, fig.cap = 'IQR clustering error using Algorithm 2 (red) compared against subspace clustering (blue) for sample sizes from 64 to 2048. Simulations were repeated 100 times for each sample size. The $y$-axis is shown on a logarithmic scale.', cache = FALSE}
 clustering.df <- readr::read_csv('clustering.csv')
 clustering.df %>%
   dplyr::group_by(n) %>%
@@ -562,15 +573,45 @@ clustering.df %>%
   ggplot() +
   scale_y_log10() +
   # scale_x_log10() + 
-  labs(y = 'clustering error', 
+  labs(y = 'misclustering proportion', 
        colour = NULL) +
   geom_line(aes(x = n, y = med.err,
-                colour = 'Algorithm 1')) +
+                colour = 'Algorithm 2')) +
   geom_errorbar(aes(x = n, ymin = first.q, ymax = third.q,
-                    colour = 'Algorithm 1')) + 
+                    colour = 'Algorithm 2')) + 
   geom_line(aes(x = n, y = med.err.ssc,
                 colour = 'SSC')) + 
   geom_errorbar(aes(x = n, ymin = first.q.ssc, ymax = third.q.ssc,
+                    colour = 'SSC')) + 
+  scale_colour_brewer(palette = 'Set1')
+```
+
+Theorem 4 implies that algorithm 2 will result in not just in the error rate 
+converging to 0 but the error *count* as well (Fig. \ref{fig:clust_err_ct_sim}).
+
+```{r clust_err_ct_sim, fig.cap = 'IQR of counts of misclustered vertices using Algorithm 2 (red) compared against subspace clustering (blue) for sample sizes from 64 to 2048. Simulations were repeated 100 times for each sample size.', cache = FALSE}
+clustering.df <- readr::read_csv('clustering.csv')
+clustering.df %>%
+  dplyr::group_by(n) %>%
+  dplyr::summarise(med.err = median(error),
+                   first.q = quantile(error, .25),
+                   third.q = quantile(error, .75),
+                   med.err.ssc = median(error.ssc),
+                   first.q.ssc = quantile(error.ssc, .25),
+                   third.q.ssc = quantile(error.ssc, .75)) %>%
+  dplyr::ungroup() %>% 
+  ggplot() +
+  # scale_y_log10() +
+  # scale_x_log10() + 
+  labs(y = 'misclustering count', 
+       colour = NULL) +
+  geom_line(aes(x = n, y = med.err * n,
+                colour = 'Algorithm 2')) +
+  geom_errorbar(aes(x = n, ymin = first.q * n, ymax = third.q * n,
+                    colour = 'Algorithm 2')) + 
+  geom_line(aes(x = n, y = med.err.ssc * n,
+                colour = 'SSC')) + 
+  geom_errorbar(aes(x = n, ymin = first.q.ssc * n, ymax = third.q.ssc * n,
                     colour = 'SSC')) + 
   scale_colour_brewer(palette = 'Set1')
 ```
@@ -588,94 +629,15 @@ ggplot(densities.df) +
   scale_colour_brewer(palette = 'Set1')
 ```
 
-## Parameter estimation
-
-\begin{comment}
-
-```{r eval = FALSE}
-set.seed(123456)
-
-n <- 64
-z <- sample(c(1, 2), n, prob = c(alpha, 1 - alpha), replace = TRUE)
-z <- sort(z)
-
-n1 <- sum(z == 1)
-n2 <- sum(z == 2)
-
-lambda11 <- rbeta(n1, a1, b1)
-lambda22 <- rbeta(n2, a1, b1)
-lambda12 <- rbeta(n1, a2, b2)
-lambda21 <- rbeta(n2, a2, b2)
-
-X <- cbind(c(lambda11, rep(0, n2)),
-           c(lambda12, rep(0, n2)),
-           c(rep(0, n1), lambda21),
-           c(rep(0, n1), lambda22))
-Y <- cbind(c(lambda11, rep(0, n2)),
-           c(rep(0, n1), lambda21),
-           c(lambda12, rep(0, n2)),
-           c(rep(0, n1), lambda22))
-P <- X %*% t(Y)
-A <- draw.graph(P)
-Z <- embedding(P)
-Zhat <- embedding(A, 3, 1)
-```
-
-Setting $n = 64$ and generating one example set of $\{\lambda^{(kl)}\}$, we can 
-see the latent positions $XU$ follow the expected properties 
-(Fig. \ref{fig:xu}). 
-
-```{r xu, fig.cap = 'Latent positions $XU$ used to construct the PABM edge probability matrix $P$ under the GRDPG framework. Note that the the points follow the properties outlined in Section 3.2.', eval = FALSE}
-perm <- cbind(c(1, 0, 0, 0),
-              c(0, 0, 1, 0),
-              c(0, 1, 0, 0),
-              c(0, 0, 0, 1))
-U <- eigen(perm)$vectors[, c(3, 1, 2, 4)]
-XU <- X %*% U
-
-pairs(XU, asp = 1, col = z)
-```
-
-If we instead take the ASE of $P = X \Pi X^\top$, we fail to obtain an 
-embedding that has the same properties (Fig. \ref{fig:ase_of_p}).
-
-```{r ase_of_p, fig.cap = 'The adjacency spectral embedding of the edge probability matrix $P$. Note that even though $P = (XU) I_{p, q} (XU)^\\top$, the resulting embedding does not follow the same properties of $XU$, even up to rotation.', eval = FALSE}
-pairs(Z, asp = 1, col = z)
-```
-
-Denoting $Z$ as the ASE of $P$, we can recover $ZQ$ that is equivalent to $XU$ 
-(Fig. \ref{fig:q_trans}).
-
-```{r q_trans, fig.cap = 'Pair plots of $ZQ$ where $Q$ was found by minimizing objective function (1). This embedding is equivalent to $XU$ up to 90-degree rotations and reflection along axes.', cache = TRUE, eval = FALSE}
-XU.prime <- transform.embedding(Z, z, runif(4, -pi, pi))
-pairs(XU.prime, col = z, asp = 1)
-```
-
-The ASE of the adjacency matrix $A$ (as one realization of $P$) has the 
-resulting pairs plot:
-
-```{r a_ase, fig.cap = 'Pair plots of the adjacency spectral embedding of $A$ Since $K=2$ is fixed, we use the signature $(3, 1)$ in this embedding.', eval = FALSE}
-pairs(Zhat, col = z, asp = 1)
-```
-
-Minimizing the objective function in (1) results in the following embedding:
-
-```{r q_from_a, cache = TRUE, fig.cap = 'Pair plots of $\\hat{Z} $ where $\\hat{Z}$ is the ASE of an adjacency matrix of a PABM and $Q$ is estimated by minimizing objective function (1).', eval = FALSE}
-XU.hat <- transform.embedding(Zhat, z, runif(4, -pi, pi))
-pairs(XU.hat, col = z, asp = 1)
-
-# X.hat <- XU.hat %*% t(U)
-# plot(abs(X.hat) > .25)
-```
-
-\end{comment}
+### Parameter estimation
 
 Figure \ref{fig:lambda_est} shows the medians and interquartile ranges of root 
 mean square errors for Algorithm 4 over 100 simulations using the same 
 parameters as before. Comparison against an MLE-based method 
-\cite{noroozi2019estimation} suggests similar performance.
+\cite{noroozi2019estimation} suggests similar performance, close to the rate 
+$n^{-1/2}$.
 
-```{r lambda_est, cache = FALSE, fig.cap = 'Log-log plot of the median and IQR RMSE from Algorithm 4 (red) compared against an MLE-based method (blue) using sample sizes from 64 to 1024. Simulations were repeated 100 times for each sample size.'}
+```{r lambda_est, cache = FALSE, fig.cap = 'Log-log plot of the median and IQR RMSE from Algorithm 4 (red) compared against an MLE-based method (blue) using sample sizes from 64 to 2048. Simulations were repeated 100 times for each sample size.'}
 rmse.df <- readr::read_csv('rmse.csv')
 
 rmse.df %>% 
@@ -699,6 +661,10 @@ rmse.df %>%
   scale_colour_brewer(palette = 'Set1') + 
   labs(y = 'RMSE', colour = NULL)
 ```
+
+## Higher values of $K$
+
+**TODO**
 
 # Discussion
 
