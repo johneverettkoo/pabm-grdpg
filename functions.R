@@ -335,6 +335,10 @@ lambda.rmse.mle <- function(P, A, z) {
         lambda.hat.lk <- 
           as.numeric((t(A.kl) %*% e.n.k) / 
                        as.numeric(sqrt(t(e.n.k) %*% A.kl %*% e.n.l)))
+        lambda.hat.kl <- dplyr::if_else(is.nan(lambda.hat.kl),
+                                        0, lambda.hat.kl)
+        lambda.hat.lk <- dplyr::if_else(is.nan(lambda.hat.lk), 
+                                        0, lambda.hat.lk)
         return(sum((lambdas[[1]] - lambda.hat.kl) ** 2) + 
                  sum((lambdas[[2]] - lambda.hat.lk) ** 2))
       }
