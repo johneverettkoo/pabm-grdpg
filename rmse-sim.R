@@ -50,12 +50,12 @@ rmse.df <- foreach(n = n.vec, .combine = dplyr::bind_rows) %do% {
                c(rep(0, n1), lambda22))
     P <- X %*% t(Y)
     A <- draw.graph(P)
-    lambda.matrix <- cbind(c(lambda11, lambda21),
-                           c(lambda12, lambda22))
+    # lambda.matrix <- cbind(c(lambda11, lambda21),
+    #                        c(lambda12, lambda22))
     Zhat <- embedding(A, p, q)
     Phat <- Zhat %*% Ipq %*% t(Zhat)
-    rmse <- lambda.rmse(lambda.matrix, Phat, z)
-    rmse.mle <- lambda.rmse.mle(lambda.matrix, A, z)
+    rmse <- lambda.rmse(P, Phat, z)
+    rmse.mle <- lambda.rmse.mle(P, A, z)
     dplyr::tibble(n = n, rmse = rmse, rmse.mle = rmse.mle) %>% 
       return()
   }, .parallel = TRUE) %>% 

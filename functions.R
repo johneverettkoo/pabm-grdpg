@@ -175,27 +175,55 @@ estimate.lambda.block <- function(P.block, within = FALSE) {
   }
 }
 
-lambda.rmse <- function(lambda.matrix, Phat, clustering) {
+# lambda.rmse <- function(lambda.matrix, Phat, clustering) {
+#   K <- max(clustering)
+#   n <- nrow(Phat)
+#   n.vector <- sapply(seq(K), function(k) sum(clustering == k))
+#   sapply(seq(K), function(k) {
+#     low.ind.k <- ifelse(k == 1, 1, sum(n.vector[seq(k - 1)]) + 1)
+#     high.ind.k <- sum(n.vector[seq(k)])
+#     sapply(seq(k), function(l) {
+#       P.block <- Phat[clustering == k, clustering == l]
+#       if (k == l) {
+#         lambda <- as.numeric(lambda.matrix[seq(low.ind.k, high.ind.k), l])
+#         lambda.hat <- estimate.lambda.block(P.block, TRUE)
+#         return(sum((lambda - lambda.hat) ** 2))
+#       } else {
+#         low.ind.l <- ifelse(l == 1, 1, sum(n.vector[seq(l = 1)]) + 1)
+#         high.ind.l <- sum(n.vector[seq(l)])
+#         lambda.kl <- as.numeric(lambda.matrix[seq(low.ind.k, high.ind.k), l])
+#         lambda.lk <- as.numeric(lambda.matrix[seq(low.ind.l, high.ind.l), k])
+#         lambda.hats <- estimate.lambda.block(P.block)
+#         return(sum((lambda.kl - lambda.hats[[1]]) ** 2) + 
+#                  sum((lambda.lk - lambda.hats[[2]]) ** 2))
+#       }
+#     }) %>% 
+#       sum() %>% 
+#       return()
+#   }) %>% 
+#     sum() %>% 
+#     magrittr::divide_by(n * K) %>% 
+#     sqrt() %>% 
+#     return()
+# }
+
+lambda.rmse <- function(P, Phat, clustering) {
   K <- max(clustering)
   n <- nrow(Phat)
   n.vector <- sapply(seq(K), function(k) sum(clustering == k))
   sapply(seq(K), function(k) {
-    low.ind.k <- ifelse(k == 1, 1, sum(n.vector[seq(k - 1)]) + 1)
-    high.ind.k <- sum(n.vector[seq(k)])
     sapply(seq(k), function(l) {
-      P.block <- Phat[clustering == k, clustering == l]
+      P.block <- P[clustering == k, clustering == l]
+      Phat.block <- Phat[clustering == k, clustering == l]
       if (k == l) {
-        lambda <- as.numeric(lambda.matrix[seq(low.ind.k, high.ind.k), l])
-        lambda.hat <- estimate.lambda.block(P.block, TRUE)
+        lambda <- estimate.lambda.block(P.block, TRUE)
+        lambda.hat <- estimate.lambda.block(Phat.block, TRUE)
         return(sum((lambda - lambda.hat) ** 2))
       } else {
-        low.ind.l <- ifelse(l == 1, 1, sum(n.vector[seq(l = 1)]) + 1)
-        high.ind.l <- sum(n.vector[seq(l)])
-        lambda.kl <- as.numeric(lambda.matrix[seq(low.ind.k, high.ind.k), l])
-        lambda.lk <- as.numeric(lambda.matrix[seq(low.ind.l, high.ind.l), k])
-        lambda.hats <- estimate.lambda.block(P.block)
-        return(sum((lambda.kl - lambda.hats[[1]]) ** 2) + 
-                 sum((lambda.lk - lambda.hats[[2]]) ** 2))
+        lambdas <- estimate.lambda.block(P.block)
+        lambda.hats <- estimate.lambda.block(Phat.block)
+        return(sum((lambdas[[1]] - lambda.hats[[1]]) ** 2) + 
+                 sum((lambdas[[2]] - lambda.hats[[2]]) ** 2))
       }
     }) %>% 
       sum() %>% 
@@ -235,39 +263,80 @@ ssc <- function(A,
   return(clustering)
 }
 
-lambda.rmse.mle <- function(lambda.matrix, A, z) {
+# lambda.rmse.mle <- function(lambda.matrix, A, z) {
+#   K <- max(z)
+#   n <- nrow(A)
+#   n.vector <- sapply(seq(K), function(k) sum(z == k))
+#   sapply(seq(K), function(k) {
+#     low.ind.k <- ifelse(k == 1, 1, sum(n.vector[seq(k - 1)]) + 1)
+#     high.ind.k <- sum(n.vector[seq(k)])
+#     n.k <- n.vector[k]
+#     e.n.k <- rep(1, n.k)
+#     sapply(seq(k), function(l) {
+#       if (k == l) {
+#         A.kk <- A[z == k, z == l]
+#         lambda.hat <- 
+#           as.numeric((A.kk %*% e.n.k) / 
+#                        as.numeric(sqrt(t(e.n.k) %*% A.kk %*% e.n.k)))
+#         lambda <- as.numeric(lambda.matrix[seq(low.ind.k, high.ind.k), l])
+#         return(sum((lambda - lambda.hat) ** 2))
+#       } else {
+#         n.l <- n.vector[l]
+#         e.n.l <- rep(1, n.l)
+#         low.ind.l <- ifelse(l == 1, 1, sum(n.vector[seq(l - 1)]) + 1)
+#         high.ind.l <- sum(n.vector[seq(l)])
+#         lambda.kl <- as.numeric(lambda.matrix[seq(low.ind.k, high.ind.k), l])
+#         lambda.lk <- as.numeric(lambda.matrix[seq(low.ind.l, high.ind.l), k])
+#         A.kl <- A[z == k, z == l]
+#         lambda.hat.kl <- 
+#           as.numeric((A.kl %*% e.n.l) / 
+#                        as.numeric(sqrt(t(e.n.k) %*% A.kl %*% e.n.l)))
+#         lambda.hat.lk <- 
+#           as.numeric((t(A.kl) %*% e.n.k) / 
+#                        as.numeric(sqrt(t(e.n.k) %*% A.kl %*% e.n.l)))
+#         return(sum((lambda.kl - lambda.hat.kl) ** 2) + 
+#                  sum((lambda.lk - lambda.hat.lk) ** 2))
+#       }
+#     }) %>% 
+#       sum() %>% 
+#       return()
+#   }) %>% 
+#     sum() %>% 
+#     magrittr::divide_by(n * K) %>% 
+#     sqrt() %>% 
+#     return()
+# }
+
+lambda.rmse.mle <- function(P, A, z) {
   K <- max(z)
   n <- nrow(A)
   n.vector <- sapply(seq(K), function(k) sum(z == k))
   sapply(seq(K), function(k) {
-    low.ind.k <- ifelse(k == 1, 1, sum(n.vector[seq(k - 1)]) + 1)
-    high.ind.k <- sum(n.vector[seq(k)])
     n.k <- n.vector[k]
     e.n.k <- rep(1, n.k)
     sapply(seq(k), function(l) {
       if (k == l) {
         A.kk <- A[z == k, z == l]
+        P.kk <- P[z == k, z == l]
         lambda.hat <- 
           as.numeric((A.kk %*% e.n.k) / 
                        as.numeric(sqrt(t(e.n.k) %*% A.kk %*% e.n.k)))
-        lambda <- as.numeric(lambda.matrix[seq(low.ind.k, high.ind.k), l])
+        lambda <- estimate.lambda.block(P.kk, TRUE)
         return(sum((lambda - lambda.hat) ** 2))
       } else {
         n.l <- n.vector[l]
         e.n.l <- rep(1, n.l)
-        low.ind.l <- ifelse(l == 1, 1, sum(n.vector[seq(l = 1)]) + 1)
-        high.ind.l <- sum(n.vector[seq(l)])
-        lambda.kl <- as.numeric(lambda.matrix[seq(low.ind.k, high.ind.k), l])
-        lambda.lk <- as.numeric(lambda.matrix[seq(low.ind.l, high.ind.l), k])
         A.kl <- A[z == k, z == l]
+        P.kl <- P[z == k, z == l]
+        lambdas <- estimate.lambda.block(P.kl)
         lambda.hat.kl <- 
           as.numeric((A.kl %*% e.n.l) / 
                        as.numeric(sqrt(t(e.n.k) %*% A.kl %*% e.n.l)))
         lambda.hat.lk <- 
           as.numeric((t(A.kl) %*% e.n.k) / 
                        as.numeric(sqrt(t(e.n.k) %*% A.kl %*% e.n.l)))
-        return(sum((lambda.kl - lambda.hat.kl) ** 2) + 
-                 sum((lambda.lk - lambda.hat.lk) ** 2))
+        return(sum((lambdas[[1]] - lambda.hat.kl) ** 2) + 
+                 sum((lambdas[[2]] - lambda.hat.lk) ** 2))
       }
     }) %>% 
       sum() %>% 
@@ -282,4 +351,35 @@ lambda.rmse.mle <- function(lambda.matrix, A, z) {
 clust.acc <- function(clust1, clust2) {
   n <- length(clust1)
   (1 - fossil::rand.index(clust1, clust2)) * choose(n, 2) / n
+}
+
+generate.P.beta <- function(n, K = 2, a1 = 2, b1 = 1, a2 = 1, b2 = 2) {
+  clustering <- sample(seq(K), n, replace = TRUE)
+  clustering <- sort(clustering)
+  n.vector <- sapply(seq(K), function(k) sum(clustering == k))
+  
+  P <- matrix(NA, n, n)
+  for (k in seq(K)) {
+    n.k <- n.vector[k]
+    low.ind.k <- ifelse(k == 1, 1, sum(n.vector[seq(k - 1)]) + 1)
+    high.ind.k <- sum(n.vector[seq(k)])
+    for (l in seq(k)) {
+      n.l <- n.vector[l]
+      if (k == l) {
+        lambda <- rbeta(n.k, a1, b1)
+        P.kk <- lambda %*% t(lambda)
+        P[low.ind.k:high.ind.k, low.ind.k:high.ind.k] <- P.kk
+      } else {
+        low.ind.l <- ifelse(l == 1, 1, sum(n.vector[seq(l - 1)]) + 1)
+        high.ind.l <- sum(n.vector[seq(l)])
+        lambda.kl <- rbeta(n.k, a2, b2)
+        lambda.lk <- rbeta(n.l, a2, b2)
+        P.kl <- lambda.kl %*% t(lambda.lk)
+        P.lk <- lambda.lk %*% t(lambda.kl)
+        P[low.ind.k:high.ind.k, low.ind.l:high.ind.l] <- P.kl
+        P[low.ind.l:high.ind.l, low.ind.k:high.ind.k] <- P.lk
+      }
+    }
+  }
+  return(list(P = P, clustering = clustering))
 }
