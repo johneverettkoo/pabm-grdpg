@@ -543,12 +543,13 @@ Note that if $Q$ can be properly estimated, the asymptotic results from
 
 ## Case $K = 2$
 
-For these examples, we will set the following parameters:
+For these examples, we set the following parameters:
 
-* $K = 2$
+* Number of underlying clusters $K = 2$
 * Mixture parameter $\alpha = .5$
-* $\lambda^{(kk)} \stackrel{iid}{\sim} Beta(2, 1)$
-* $\lambda^{(kl)} \stackrel{iid}{\sim} Beta(1, 2)$ for $k \neq l$
+* Within-cluster popularities $\lambda^{(kk)} \stackrel{iid}{\sim} Beta(2, 1)$
+* Between-cluster popularities 
+$\lambda^{(kl)} \stackrel{iid}{\sim} Beta(1, 2)$ for $k \neq l$
 
 ### Clustering
 
@@ -664,7 +665,77 @@ rmse.df %>%
 
 ## Higher values of $K$
 
-***TODO***
+For these examples, we set the following parameters:
+
+* Number of underlying clusters $K = 2, 4, 8$
+* Mixture parameters $\alpha_k = 1 / K$ for $k = 1, ..., K$
+* Within-cluster popularities $\lambda^{(kk)} \stackrel{iid}{\sim} Beta(2, 1)$
+* Between-cluster popularities 
+$\lambda^{(kl)} \stackrel{iid}{\sim} Beta(1, 2)$ for $k \neq l$
+
+### Clustering
+
+```{r clust_err_k, fig.cap = 'IQR of clustering error using Algorithm 2 (red) compared against subspace clustering (blue) for sample sizes from 64 to 2048 and number of clusters from 2 to 8. Simulations were repeated 100 times for each sample size. The $y$-axis is shown on a logarithmic scale.', fig.width = 8}
+clustering.df <- readr::read_csv('clustering-k.csv')
+clustering.df %>%
+  dplyr::group_by(K, n) %>%
+  dplyr::summarise(med.err = median(error),
+                   first.q = quantile(error, .25),
+                   third.q = quantile(error, .75),
+                   med.err.ssc = median(error.ssc),
+                   first.q.ssc = quantile(error.ssc, .25),
+                   third.q.ssc = quantile(error.ssc, .75)) %>%
+  dplyr::ungroup() %>% 
+  ggplot() +
+  scale_y_log10() +
+  # scale_x_log10() + 
+  labs(y = '1 - adjusted rand index', 
+       colour = NULL) +
+  geom_line(aes(x = n, y = med.err,
+                colour = 'Algorithm 2')) +
+  geom_errorbar(aes(x = n, ymin = first.q, ymax = third.q,
+                    colour = 'Algorithm 2')) + 
+  geom_line(aes(x = n, y = med.err.ssc,
+                colour = 'SSC')) + 
+  geom_errorbar(aes(x = n, ymin = first.q.ssc, ymax = third.q.ssc,
+                    colour = 'SSC')) + 
+  scale_colour_brewer(palette = 'Set1') + 
+  facet_wrap(~ K, labeller = 'label_both')
+```
+
+### Parameter estimation
+
+```{r lambda_est_k, cache = FALSE, fig.cap = 'Log-log plot of the median and IQR RMSE from Algorithm 4 (red) compared against an MLE-based method (blue) using sample sizes from 64 to 2048 and number of clusters from 2 to 8. Simulations were repeated 100 times for each sample size.', fig.width = 8}
+rmse.df <- readr::read_csv('rmse.csv') %>% 
+  dplyr::transmute(K = 2,
+                   n = n,
+                   rmse = rmse,
+                   rmse.mle = rmse.mle) %>% 
+  dplyr::bind_rows(readr::read_csv('rmse-k.csv'))
+
+rmse.df %>% 
+  na.omit() %>% 
+  dplyr::group_by(K, n) %>% 
+  dplyr::summarise(median.rmse = median(rmse),
+                   q1.rmse = quantile(rmse, .25),
+                   q3.rmse = quantile(rmse, .75),
+                   median.rmse.mle = median(rmse.mle),
+                   q1.rmse.mle = quantile(rmse.mle, .25),
+                   q3.rmse.mle = quantile(rmse.mle, .75)) %>% 
+  dplyr::ungroup() %>% 
+  ggplot() + 
+  scale_y_log10() + 
+  scale_x_log10() +
+  geom_line(aes(x = n, y = median.rmse, colour = 'Algorithm 4')) + 
+  geom_errorbar(aes(x = n, ymin = q1.rmse, ymax = q3.rmse,
+                    colour = 'Algorithm 4')) + 
+  geom_line(aes(x = n, y = median.rmse.mle, colour = 'MLE-based')) + 
+  geom_errorbar(aes(x = n, ymin = q1.rmse.mle, ymax = q3.rmse.mle,
+                   colour = 'MLE-based')) + 
+  scale_colour_brewer(palette = 'Set1') + 
+  labs(y = 'RMSE', colour = NULL) + 
+  facet_wrap(~ K, labeller = 'label_both')
+```
 
 # Real data examples
 
