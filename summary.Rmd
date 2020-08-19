@@ -1,5 +1,6 @@
 ---
 title: "Connecting the Popularity Adjusted Block Model to the Generalized Random Dot Product Graph for Clustering and Parameter Estimation"
+author: John Koo, Minh Tang, Michael Trosset
 output:
   pdf_document:
     citation_package: natbib
@@ -482,8 +483,8 @@ embedding of $A$.
   }
 \end{algorithm}
 
-**Theorem 5**. Under assumptions 1-6 as laid out by \citet{307cbeb9b1be48299388437423d94bf1}, the estimators outputted by 
-algorithm 4 converge to the true values as follows:
+**Theorem 5**. Under assumptions 1-6 as laid out by \citet{307cbeb9b1be48299388437423d94bf1}, the root mean square errors of the 
+estimators outputted by algorithm 4 converge to the true values as follows:
 
 $$\sqrt{\frac{1}{n K} \sum_{k, l = 1}^K 
 ||\hat{\lambda}^{(kl)} - \lambda^{(kl)}||^2} 
@@ -792,7 +793,7 @@ accuracy of 63\% and an adjusted Rand index of `r ari`\%. In comparison,
 \citet{noroozi2019estimation} achieved an adjusted Rand index of 73\% using 
 sparse subspace clustering.
 
-```{r butterfly, fig.height = 3, fig.width = 3, fig.cap = 'Adjacency matrix of the Leeds Butterfly dataset after sorting by the clustering outputted by Algorithm 2.', cache = TRUE}
+```{r butterfly, fig.height = 4, fig.width = 4, fig.cap = 'Adjacency matrix of the Leeds Butterfly dataset after sorting by the clustering outputted by Algorithm 2.', cache = TRUE}
 library(plot.matrix)
 plot(A.star, border = NA, key = NULL, 
      xlab = '', ylab = '', main = '',
