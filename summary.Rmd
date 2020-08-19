@@ -56,17 +56,22 @@ theme_set(theme_bw())
 
 # Introduction
 
-One popular probabilistic model for graphs with underlying communities is the 
+Statistical analysis on graphs and networks often involve the partitioning of a 
+graph into clusters. This is often motivated by the belief that there is an 
+underlying and unobserved community or cluster label for each vertex of the 
+graph, and edges between pairs of vertices are determined by drawing from a 
+probability distribution based on the communities assigned to each pair. 
+One such probabilistic model is the 
 Stochastic Block Model (SBM), which assumes that the edge probability from 
-one cluster to another follows a Beronulli distribution with a fixed 
-probability for each pair of communities. 
-The Popularity Adjusted Block Model (PABM) was introduced by 
+one vertex to another follows a Beronulli distribution with fixed probabilities 
+for each pair of community labels. 
+The Popularity Adjusted Block Model (PABM) was then introduced by 
 \citet*{307cbeb9b1be48299388437423d94bf1} as a generalization of the SBM to 
 address the heterogeneity of edge probabilities within and between communities 
-or clusters while still maintaining the community structure. 
+while still maintaining the community structure. 
 
-The Random Dot Product Graph (RDPG) \cite{athreya2017statistical} is another 
-probabilistic model with Beronulli edge probabilities. Under this model, each 
+The Random Dot Product Graph (RDPG) model \cite{athreya2017statistical} is 
+another graph model with Beronulli edge probabilities. Under this model, each 
 vertex of the graph can be represented by a point in latent space such that 
 the edge probability between any pair of vertices is given by their 
 corresponding dot product in the latent space. The SBM is equivalent to a 
@@ -75,42 +80,39 @@ the same position in the latent space. It has also been shown that similar
 probabilistic graph models, (such as the Mixed Membership Stochastic Block Model
 \cite{rubindelanchy2017statistical}). An analogous property exists for the 
 PABM not under the RDPG model but under the *Generalized* Random Dot Product 
-Graph model. 
+Graph (GRDPG) model. 
 
-## Previous work
-
-\citet*{noroozi2019estimation} proposed using sparse subspace clustering (SSC) 
-to identify the cluster memberships given either an edge probability matrix $P$ 
-or an adjacency matrix $A$. In the case that $P$ is known, the cluster 
-memberships can be identified exactly (up to permutation). A similar procedure 
-can be applied if $P$ is unknown and we have an observation $A$, but the 
-theoretical guarantees of this method applied to the PABM are unknown. In 
-particular, the method requires spherical Gaussian noise. The authors of this 
-paper then use point estimators for $\{\lambda^{(kl)}\}$ using cluster labels 
-obtained via SSC. 
+In this paper, we will only consider undirected graphs, that is the edge value 
+from vertices $i$ and $j$ is equal to the edge in the opposite direction, from 
+vertices $j$ and $i$. Furthermore, we will only consider unweighted graphs with 
+binary edge values. We will also assume that graphs are hollow, i.e., there 
+are no self-loops. 
 
 # Connecting the Popularity Adjusted Block Model to the Generalized Random Dot Product Graph
 
 ## The popularity adjusted block model (PABM) \cite{noroozi2019estimation}
 
-**Definition 1**.
-Let $G = (V, E)$ be an undirected, unweighted random graph with corresponding 
-affinity matrix $A \in \{0, 1\}^{n \times n}$. Then $A$ is a random matrix 
-with corresponding edge probability matrix $P$ such that 
+**Definition 1**. 
+Let $P \in [0, 1]^{n \times n}$ be an edge probability matrix for a set of $n$ 
+vertices, $V$. Each vertex has a community label $1, ..., K$, and the rows and 
+columns of $P$ are arranged by community label such that $n_k \times n_l$ block 
+$P^{(kl})$ describes the edge probabilities between vertices in communities 
+$k$ and $l$. 
+Let graph $G = (V, E)$ be an undirected, unweighted graph such 
+that its corresponding adjacency matrix $A \in \{0, 1\}^{n \times n}$ is a 
+realization of $Bernoulli(P)$, i.e., 
 $A_{ij} \stackrel{indep}{\sim} Bernoulli(P_{ij})$ for $i > j$ 
-($A_{ji} = A_{ij}$ and $A_{ii} = 0$). Let there exist $K$ underlying 
-communities in $G$, and let $n_{k}$ be the size of the $k$^th^ community in 
-$G$ such that $\sum_{k=1}^K n_k = n$.
+($A_{ij} = A_{ji}$ and $A_{ii} = 0$). 
 
-If $A$ and $P$ are organized such that $n_k \times n_l$ blocks $A^{(kl)}$ and 
-$P^{(kl)}$ describe the edges and edge probabilities between communities $k$ 
-and $l$, then $P^{(kl)} = \lambda^{(kl)} (\lambda^{(lk)})^\top$ for a set of 
-fixed vectors $\{\lambda^{(st)}\}_{s, t = 1, ..., K}$. Each $\lambda^{(st)}$ 
-for $s, t = 1, ..., K$ is a column vector of length $n_s$ (i.e., the community 
-corresponding to the first index provides the vector length).
+If each block $P^{(kl)}$ can be written as the outer product of two vectors 
+$\lambda^{(kl)} (\lambda^{(lk)})^\top$ for a set of fixed vectors 
+$\{\lambda^{(st)}\}_{s, t = 1}^K$ where each $\lambda^{(st)}$ is a column vector 
+of dimension $n_s$, then graph $G$ and its corresponding adjacency matrix $A$ 
+is a realization of a popularity adjusted block model with parameters 
+$\{\lambda^{(st)}\}_{s, t = 1}^K$. 
 
 We will use the notation $A \sim PABM(\{\lambda^{(kl)}\}_K)$ to denote a random 
-affinity matrix $A$ drawn from a PABM with parameters $\lambda^{(kl)}$ 
+adjacency matrix $A$ drawn from a PABM with parameters $\lambda^{(kl)}$ 
 consisting of $K$ underlying clusters/communities.
 
 ## The generalized random dot product graph (GRDPG) \cite{rubindelanchy2017statistical}
@@ -118,17 +120,17 @@ consisting of $K$ underlying clusters/communities.
 **Definition 2**.
 Let $X \in \mathbb{R}^{n \times d}$ be latent positions of the vertices of a 
 graph $G$. $X$ consists of row vectors $x_i^\top$. Let 
-$A \in \{0, 1\}^{n \times n}$ be the corresponding affinity matrix. 
+$A \in \{0, 1\}^{n \times n}$ be the corresponding adjacency matrix. 
 
 Fix $p$, $q$ such that $p + q = d$ and define 
 $I_{pq} = \begin{bmatrix} I_p & 0 \\ 0 & -I_q \end{bmatrix}$. 
 
 Then $G = (V, E)$ is a generalized random dot product graph with signature 
-$(p, q)$ and patent positions $X$ iff its random affinity matrix can be 
+$(p, q)$ and patent positions $X$ iff its random adjacency matrix can be 
 described as $A_{ij} \stackrel{indep}{\sim} Bernoulli(P_{ij})$ where 
 $P_{ij} = x_i^\top I_{pq} x_j$.
 
-We will use the notation $A \sim GRDPG_{p,q}(X)$ to denote a random affinity 
+We will use the notation $A \sim GRDPG_{p,q}(X)$ to denote a random adjacency 
 matrix $A$ drawn from latent positions $X$ and signature $(p, q)$.
 
 **Remark**. 
@@ -297,6 +299,18 @@ Two inference objectives arise from the PABM:
 Here, we will focus more on (1) and pose possible methods for (2). In our 
 methods, we assume that $K$, the number of clusters, is known beforehand and 
 does not require estimation.
+
+## Previous work
+
+\citet*{noroozi2019estimation} proposed using sparse subspace clustering (SSC) 
+to identify the cluster memberships given either an edge probability matrix $P$ 
+or an adjacency matrix $A$. In the case that $P$ is known, the cluster 
+memberships can be identified exactly (up to permutation). A similar procedure 
+can be applied if $P$ is unknown and we have an observation $A$, but the 
+theoretical guarantees of this method applied to the PABM are unknown. In 
+particular, the method requires spherical Gaussian noise. The authors of this 
+paper then use point estimators for $\{\lambda^{(kl)}\}$ using cluster labels 
+obtained via SSC. 
 
 ## Clustering
 
@@ -737,9 +751,50 @@ rmse.df %>%
   facet_wrap(~ K, labeller = 'label_both')
 ```
 
-# Real data examples
+# Real data example
 
-***TODO***
+```{r}
+library(mclust)
+import::here(cluster.pabm, .from = '~/dev/pabm-grdpg/functions.R')
+
+n.edges <- 20566
+
+butterfly <- R.matlab::readMat('~/Downloads/Raw_butterfly_network.mat')
+
+A <- butterfly$W.butterfly0
+z <- butterfly$labels
+
+keep <- c(6, 2, 9, 4)
+A <- A[z %in% keep, z %in% keep]
+z <- z[z %in% keep]
+n <- length(z)
+K <- 4
+
+delta <- quantile(A[upper.tri(A)], 1 - n.edges / (n * (n - 1) / 2))
+A <- (A > delta) * 1
+
+z.hat <- cluster.pabm(A, K)
+A.star <- A[order(z.hat), order(z.hat)]
+```
+
+For the real data example, we applied Algorithm 2 to the Leeds Butterfly 
+dataset \cite{Wang_2018} consisting of visual similarity measurements among 832 
+butterflies across 10 species. The graph was modified to match the example 
+from \citet{noroozi2019estimation}: Only the 4 most frequent species were 
+considered, and the similarities were discretized to $\{0, 1}\$ via 
+thresholding. Fig. \ref{fig:butterfly} shows a sorted adjacency matrix sorted 
+by the resultant the clustering. 
+
+Comparing against the ground truth species labels, Algorithm 2 achieves an 
+accuracy of 63\% and an adjusted Rand index of 79\%. In comparison, 
+\citet{noroozi2019estimation} achieved an adjusted Rand index of 73\%. 
+
+```{r butterfly, fig.height = 5, fig.width = 4, fig.cap = 'Adjacency matrix of the Leeds Butterfly dataset after sorting by the clustering outputted by Algorithm 2.'}
+library(plot.matrix)
+plot(A.star, border = NA, key = NULL, 
+     xlab = '', ylab = '', main = '',
+     axis.row = NULL, axis.col = NULL)
+```
 
 # Discussion
 
