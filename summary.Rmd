@@ -775,25 +775,28 @@ A <- (A > delta) * 1
 
 z.hat <- cluster.pabm(A, K)
 A.star <- A[order(z.hat), order(z.hat)]
+
+ari <- round(fossil::adj.rand.index(z, z.hat) * 100)
 ```
 
 For the real data example, we applied Algorithm 2 to the Leeds Butterfly 
 dataset \cite{Wang_2018} consisting of visual similarity measurements among 832 
 butterflies across 10 species. The graph was modified to match the example 
 from \citet{noroozi2019estimation}: Only the 4 most frequent species were 
-considered, and the similarities were discretized to $\{0, 1}\$ via 
+considered, and the similarities were discretized to $\{0, 1\}$ via 
 thresholding. Fig. \ref{fig:butterfly} shows a sorted adjacency matrix sorted 
 by the resultant the clustering. 
 
 Comparing against the ground truth species labels, Algorithm 2 achieves an 
-accuracy of 63\% and an adjusted Rand index of 79\%. In comparison, 
-\citet{noroozi2019estimation} achieved an adjusted Rand index of 73\%. 
+accuracy of 63\% and an adjusted Rand index of `r ari`\%. In comparison, 
+\citet{noroozi2019estimation} achieved an adjusted Rand index of 73\% using 
+sparse subspace clustering.
 
-```{r butterfly, fig.height = 5, fig.width = 4, fig.cap = 'Adjacency matrix of the Leeds Butterfly dataset after sorting by the clustering outputted by Algorithm 2.'}
+```{r butterfly, fig.height = 3, fig.width = 3, fig.cap = 'Adjacency matrix of the Leeds Butterfly dataset after sorting by the clustering outputted by Algorithm 2.', cache = TRUE}
 library(plot.matrix)
 plot(A.star, border = NA, key = NULL, 
      xlab = '', ylab = '', main = '',
-     axis.row = NULL, axis.col = NULL)
+     axis.row = NULL, axis.col = NULL, asp = 1)
 ```
 
 # Discussion
