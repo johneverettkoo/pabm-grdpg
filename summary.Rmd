@@ -49,6 +49,7 @@ options(xtable.comment = FALSE,
 import::from(magrittr, `%>%`)
 library(plot.matrix)
 library(ggplot2)
+library(plot.matrix)
 
 theme_set(theme_bw())
 ```
@@ -215,7 +216,7 @@ $\{\lambda^{(kl)}\}_K$ and $U \in \mathbb{R}^{K^2 \times K^2}$ that is fixed
 for each $K$ such that $A \sim GRDPG_{K (K+1) / 2, K (K-1) / 2}(XU)$ and 
 $A \sim PABM(\{(\lambda^{(kl)}\})_K)$ are equivalent.
 
-*Proof*
+*Proof*. 
 Let $\Lambda^{(k)} = 
 \begin{bmatrix} \lambda^{(k,1)} & \cdots & \lambda^{(k, K)} \end{bmatrix}
 \in \mathbb{R}^{n_k \times K}$.  
@@ -483,76 +484,33 @@ embedding of $A$.
   }
 \end{algorithm}
 
-**Theorem 5**. Under assumptions 1-6 as laid out by \citet{307cbeb9b1be48299388437423d94bf1}, the root mean square errors of the 
-estimators outputted by algorithm 4 converge to the true values as follows:
+**Theorem 5**. Under regularity and sparsity assumptions, and under the further 
+assumption that $K$ is fixed, 
 
-$$\sqrt{\frac{1}{n K} \sum_{k, l = 1}^K 
-||\hat{\lambda}^{(kl)} - \lambda^{(kl)}||^2} 
-\stackrel{P}{\to} 0$$
+$$\max_{k, l \in \{1, ..., K\}} 
+||\hat{\lambda}^{(kl)} - \lambda^{(kl)}|| = 
+O_P \bigg(\frac{(\log n_k)^c}{\sqrt{n_k}} \bigg)$$
 
-*Proof*. ***TODO***
+*Proof (sketch)*.  
+Let $P$ and $A$ be organized by cluster such that the elements of blocks 
+$P^{(kl)}$ and $A^{(kl)}$ correspond to edges between clusters $k$ and $l$. 
+By definition, $P^{(kl)} = \lambda^{(kl)} (\lambda^{(lk)})^\top$. This implies 
+that $P^{(kl)} = \sigma_{kl}^2 u^{(kl)} (v^{(kl)})^\top$ has one singular value 
+and one pair of singular vectors. By convention, we can let 
+$\lambda^{(kl)} = \sigma_{kl} u^{(kl)}$. Let 
+$\hat{U}^{(kl)} \hat{\Sigma}^{(kl)} (\hat{V}^{kl})^\top$ be the singular value 
+decomposition of $A^{(kl)}$, and let 
+$\hat{\sigma}_{kl} \hat{u}^{(kl)} (\hat{v}^{(kl)})^\top$ be its one-dimensional 
+approximation. Then 
+$\hat{\lambda}^{(kl)} = \hat{\sigma}_{kl} \hat{u}^{(kl)}$.[^alg4] Thus 
+$\hat{\lambda}^{(kl)}$ is a one-dimensional adjacency embedding approximation 
+of $\lambda^{(kl)}$.  
+Then by Theorem 5 from \citet{rubindelanchy2017statistical}, the adjacency 
+embedding $\hat{\lambda}^{(kl)}$ approximates $\lambda^{(kl)}$ at rate 
+$\frac{(\log n_k)^c}{n_k^{1/2}}$.
 
-The convergence rate of algorithm 4 is the same as that of the methods 
-described by \citet{307cbeb9b1be48299388437423d94bf1}.
-
-\begin{comment}
-
-### Using Adjacency Spectral Embedding
-
-For this section, we will focus on the case $K = 2$. Under this condition, the 
-PABM is equivalent to the GRDPG with signature $(3, 1)$. 
-
-The adjacency spectral embeddings of both $A$ and $P$ are not unique. In 
-particular, let $Z$ be the ASE of $P$. Then $P = Z I_{3, 1} Z^\top$. However, 
-for any $Q \in \mathbb{O}(3, 1)$, 
-$(ZQ) I_{3, 1} (ZQ)^\top = Z (Q I_{3, 1} Q^\top) Z^\top = Z I_{3, 1} Z^\top = P$,
-so $ZQ$ is also a valid ASE Of $P$. If we can find $Q \in \mathbb{O}(3, 1)$ 
-such that $ZQ = XU$, we can compute the parameters $\{\lambda^{(kl)}\}$ 
-directly. Furthermore, if we instead use the ASE of the adjacency matrix $A$, 
-$\exists Q \in \mathbb{O}(3, 1)$ such that $\max\limits_i ||Q \hat{z}_i - XU||$ 
-is minimized (and goes to zero under a probabilistic model for
-$\{\lambda^{(kl)}\}$'s). 
-
-Thus if we can identify $Q$ such that the $ZQ = XU$ in the case of embedding 
-$P$ or $\hat{Z} Q - XU$ is minimized in the case of embedding $A$, we can 
-identify or estimate the PABM parameters directly from the embedding. $XU$ is 
-unknown, but we can still obtain an embedding $ZQ$ that follows the properties 
-of $XU$, which will yield estimates $\{\hat{\lambda}^{(kl)}\}$ that are valid 
-in that they will produce the edge probability matrix $P$.[^lambdas] 
-
-[^lambdas]: Note that the set $\{\lambda^{(kl)}\}_K$ that produces a unique 
-$P$ is not unique \citep{noroozi2019estimation}.
-
-In particular, we can note the following properties of $XU$:
-
-1. If row $i$ is in cluster 1, then its second index is 0. If it is in cluster 
-2, its first index is 0.
-2. If row $i$ is in cluster 1, then its third and fourth indices are equal. If 
-it is in cluster 2, the fourth index is the negative of its third index.
-3. If rows $i$ and $j$ are in different clusters, their dot product is 0.
-
-If we have cluster memberships (either known *a priori* or estimated using a 
-clustering method), then we can estimate $XU$ by picking
-$Q \in \mathbb{O}(3, 1)$ such that $ZQ$ best fits these properties. 
-
-$\mathbb{O}(3, 1)$ happens to be the Lorentz group, and each 
-$Q \in \mathbb{O}(3, 1)$ can be represented as the product of six matrices that 
-depend on a total of four parameters \cite{10.1088/978-1-6817-4254-0}. This 
-lends itself as an optimization problem:
-
-\begin{equation}
-\begin{split}
-  \min_{\theta, \phi, \psi, \tau} & ||\xi^{(1, 2)}||^2 + ||\xi^{(2, 1)}||^2 + 
-  ||\xi^{(1, 3)} - \xi^{(1, 4)}||^2 + ||\xi^{(2, 3)} + \xi^{(2, 4)}||^2 \\
-  \text{s.t. } & \Xi = Z Q(\theta, \phi, \psi, \tau) \\
-  & \xi^{(i, j)} \text{ is the } j^{th} \text{ column of } \Xi \text{ with rows from the } i^{th} \text{ cluster}
-\end{split}
-\end{equation}
-
-Note that if $Q$ can be properly estimated, the asymptotic results from 
-\citet{rubindelanchy2017statistical} can be applied here.
-
-\end{comment}
+[^alg4]: Note that this estimator is similar to but slightly worse than the 
+estimator from Algorithm 4. 
 
 # Simulated Examples
 
@@ -752,7 +710,7 @@ rmse.df %>%
   facet_wrap(~ K, labeller = 'label_both')
 ```
 
-# Real data example
+# Real data examples
 
 ```{r}
 library(mclust)
@@ -791,13 +749,21 @@ by the resultant the clustering.
 Comparing against the ground truth species labels, Algorithm 2 achieves an 
 accuracy of 63\% and an adjusted Rand index of `r ari`\%. In comparison, 
 \citet{noroozi2019estimation} achieved an adjusted Rand index of 73\% using 
-sparse subspace clustering.
+sparse subspace clustering on the same dataset.
 
-```{r butterfly, fig.height = 4, fig.width = 4, fig.cap = 'Adjacency matrix of the Leeds Butterfly dataset after sorting by the clustering outputted by Algorithm 2.', cache = TRUE}
-library(plot.matrix)
-plot(A.star, border = NA, key = NULL, 
-     xlab = '', ylab = '', main = '',
-     axis.row = NULL, axis.col = NULL, asp = 1)
+```{r}
+plot.A <- function(A, margins = c(0, 0, 0, 0)) {
+  default.mar <- par()$mar
+  par(mar = margins)
+  plot(A, border = NA, key = NULL, 
+       xlab = '', ylab = '', main = '',
+       axis.row = NULL, axis.col = NULL, asp = 1)
+  par(mar = default.mar)
+}
+```
+
+```{r butterfly, fig.height = 2, fig.width = 2, fig.cap = 'Adjacency matrix of the Leeds Butterfly dataset after sorting by the clustering outputted by Algorithm 2.', cache = TRUE}
+plot.A(A.star)
 ```
 
 # Discussion
