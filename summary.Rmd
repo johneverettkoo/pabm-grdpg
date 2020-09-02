@@ -13,7 +13,7 @@ header-includes:
 - \usepackage{float}
 - \usepackage{mathtools}
 - \usepackage{natbib}
-- \usepackage[linesnumbered,vlined,ruled]{algorithm2e} 
+- \usepackage[linesnumbered,ruled,vlined]{algorithm2e} 
 - \setcitestyle{numbers,square}
 - \usepackage{verbatim}
 bibliography: misc.bib
@@ -55,47 +55,52 @@ theme_set(theme_bw())
 ```
 
 \newcommand{\diag}{\text{diag}}
+\newcommand{\tr}{\text{Tr}}
 
 # Introduction
 
-Statistical analysis on graphs and networks often involve the partitioning of a 
-graph into clusters. This is often motivated by the belief that there is an 
-underlying and unobserved community or cluster label for each vertex of the 
-graph, and edges between pairs of vertices are determined by drawing from a 
-probability distribution based on the communities assigned to each pair. 
-One such probabilistic model is the 
-Stochastic Block Model (SBM), which assumes that the edge probability from 
+Statistical analysis on graphs or networks often involves the partitioning of 
+a graph into disconnected subgraphs or clusters. This is often motivated by the 
+belief that there exist underlying and unobserved communities to which each 
+vertex of the graph belongs, and edges between pairs of vertices are determined 
+by drawing from a probability distribution based on the community relationships 
+between each pair. The goal of this analysis then is population community 
+detection, or the recovery of the true underlying community labels for each 
+vertex, up to permutation (with some additional parameter estimation being of 
+possible interest), assuming some probabilistic graph model. One such model is 
+the Stochastic Block Model (SBM), which assumes that the edge probability from 
 one vertex to another follows a Beronulli distribution with fixed probabilities 
-for each pair of community labels. 
-The Popularity Adjusted Block Model (PABM) was then introduced by 
-\citet*{307cbeb9b1be48299388437423d94bf1} as a generalization of the SBM to 
-address the heterogeneity of edge probabilities within and between communities 
-while still maintaining the community structure. 
+for each pair of community labels. The Popularity Adjusted Block Model (PABM) 
+was then introduced by \citet*{307cbeb9b1be48299388437423d94bf1} as a 
+generalization of the SBM to address the heterogeneity of edge probabilities 
+within and between communities while still maintaining the community structure. 
 
 The Random Dot Product Graph (RDPG) model \cite{athreya2017statistical} is 
 another graph model with Beronulli edge probabilities. Under this model, each 
-vertex of the graph can be represented by a point in latent space such that 
-the edge probability between any pair of vertices is given by their 
+vertex of the graph can be represented by a point in a latent Euclidean space 
+such that the edge probability between any pair of vertices is given by their 
 corresponding dot product in the latent space. The SBM is equivalent to a 
-special case of the RDPG model in which all vertices in a given community share 
+special case of the RDPG model in which all vertices of a given community share 
 the same position in the latent space. It has also been shown that similar 
-probabilistic graph models, (such as the Mixed Membership Stochastic Block Model
-\cite{rubindelanchy2017statistical}). An analogous property exists for the 
-PABM not under the RDPG model but under the *Generalized* Random Dot Product 
-Graph (GRDPG) model. 
+probabilistic graph models, such as the Mixed Membership Stochastic Block 
+Model, can be represented in this way \cite{rubindelanchy2017statistical}. An 
+analogous property exists for the PABM, not under the RDPG model but under the *Generalized* Random Dot Product Graph (GRDPG) model. This relationship will be 
+explored in this paper and exploited to construct algorithms for community 
+detection and parameter estimation for the PABM. 
 
-In this paper, we will only consider undirected graphs, that is the edge value 
-from vertices $i$ and $j$ is equal to the edge in the opposite direction, from 
-vertices $j$ and $i$. Furthermore, we will only consider unweighted graphs with 
-binary edge values. We will also assume that graphs are hollow, i.e., there 
-are no self-loops. 
+In this paper, we will only consider undirected graphs, that is the edge weight 
+from vertex $i$ to vertex $j$ is equal to the edge weight in the opposite 
+direction, from vertex $j$ to vertex $i$. Furthermore, we will only consider 
+unweighted graphs with binary ($0, 1$) edge weights We will also assume that 
+graphs are hollow, i.e., there are no edges from a vertex to itself. 
 
 # Connecting the Popularity Adjusted Block Model to the Generalized Random Dot Product Graph
 
-## The popularity adjusted block model (PABM) \cite{noroozi2019estimation}
+## The popularity adjusted block model (PABM) \cite{noroozi2019estimation} and the generalized random dot product graph \cite{rubindelanchy2017statistical}
 
 **Definition 1**. 
-Let $P \in [0, 1]^{n \times n}$ be an edge probability matrix for a set of $n$ 
+Let $P \in [0, 1]^{n \times n}$ be a symmetric edge probability matrix for a 
+set of $n$ 
 vertices, $V$. Each vertex has a community label $1, ..., K$, and the rows and 
 columns of $P$ are arranged by community label such that $n_k \times n_l$ block 
 $P^{(kl})$ describes the edge probabilities between vertices in communities 
@@ -117,31 +122,26 @@ We will use the notation $A \sim PABM(\{\lambda^{(kl)}\}_K)$ to denote a random
 adjacency matrix $A$ drawn from a PABM with parameters $\lambda^{(kl)}$ 
 consisting of $K$ underlying clusters/communities.
 
-## The generalized random dot product graph (GRDPG) \cite{rubindelanchy2017statistical}
-
 **Definition 2**.
-Let $X \in \mathbb{R}^{n \times d}$ be latent positions of the vertices of a 
-graph $G$. $X$ consists of row vectors $x_i^\top$. Let 
-$A \in \{0, 1\}^{n \times n}$ be the corresponding adjacency matrix. 
-
-Fix $p$, $q$ such that $p + q = d$ and define 
-$I_{pq} = \begin{bmatrix} I_p & 0 \\ 0 & -I_q \end{bmatrix}$. 
-
-Then $G = (V, E)$ is a generalized random dot product graph with signature 
-$(p, q)$ and patent positions $X$ iff its random adjacency matrix can be 
-described as $A_{ij} \stackrel{indep}{\sim} Bernoulli(P_{ij})$ where 
-$P_{ij} = x_i^\top I_{pq} x_j$.
+Let $P \in [0, 1]^{n \times n}$ be a symmetric edge probability matrix for a 
+set of $n$ vertices, $V$. If $\exists X \in \mathbb{R}^{n \times d}$ such that 
+$P = X I_{pq} X^\top$ for some $d, p, q \in \mathbb{N}$ and $p + q = d$, then 
+graph $G = (V, E)$ with adjacency matrix $A$ such that $A_{ij} \stackrel{indep}{\sim} Bernoulli(P_{ij})$ for $i > j$ ($A_{ij} = A_{ji}$ and $A_{ii} = 0$) is a draw from the generalized random dot product graph model with latent positions $X$ and signature $(p, q)$. More precisely, if vertices $i$ and $j$ have latent positions $x_i$ and $x_j$ respectively, then the edge probability between the two is $P_{ij} = x_i^\top I_{pq} x_j$, and $X$ contains the latent positions as rows $x_i^\top$. 
 
 We will use the notation $A \sim GRDPG_{p,q}(X)$ to denote a random adjacency 
 matrix $A$ drawn from latent positions $X$ and signature $(p, q)$.
 
+**Definition 3**. The indefinite orthogonal group with signature $(p, q)$ is 
+the set $\{Q \in \mathbb{R}^{d \times d} : Q I_{pq} Q^{\top} = I_{pq}\}$, 
+denoted as $\mathbb{O}(p, q)$ \cite{rubindelanchy2017statistical}.
+
 **Remark**. 
-Like the RDPG, the latent positions of a GRDPG are not unique. More 
-specifically, if $P_{ij} = x_i^\top I_{pq} x_j$, then we also have for any 
-$Q \in \{R : R^\top I_{pq} R = I_{pq} \}$, 
+Like the RDPG, the latent positions of a GRDPG are not unique 
+\cite{rubindelanchy2017statistical}. 
+More specifically, if $P_{ij} = x_i^\top I_{pq} x_j$, then we also have for any 
+$Q \in \mathbb{O}(p, q)$, 
 $(Q x_i)^\top I_{pq} (Q x_j) = x_i^\top (Q^\top I_{pq} Q) x_j = 
-x_i^\top I_{pq} x_j = P_{ij}$ (this is the indefinite orthogonal group, 
-$\mathbb{O}(p, q)$).
+x_i^\top I_{pq} x_j = P_{ij}$. 
 Unlike in the RDPG case, transforming the latent positions by multiplication 
 with $Q \in \mathbb{O}(p, q)$ does not necessarily maintain interpoint angles or 
 distances. 
@@ -271,11 +271,8 @@ $\Pi = \begin{bmatrix}
 
 Another way to look at this is:
 
-* Positions 1, 5, 9 are fixed
-* The cycles of order 2 are
-    * $(2, 4)$
-    * $(3, 7)$
-    * $(6, 8)$
+* Positions 1, 5, 9 are fixed.
+* The cycles of order 2 are $(2, 4)$, $(3, 7)$, and $(6, 8)$.
     
 Therefore, we can decompose $\Pi = U I_{6, 3} U^\top$ where the first three 
 columns of $U$ consist of $e_1$, $e_5$, and $e_9$ corresponding to the fixed 
@@ -466,16 +463,11 @@ embedding of $A$.
   \caption{PABM parameter estimation using the adjacency matrix.}
   \KwData{Adjacency matrix $A$, cluster assignments $1, ..., K$}
   \KwResult{PABM parameter estimates $\{\hat{\lambda}^{(kl)}\}_K$.}
-  Assign $p \leftarrow K (K + 1) / 2$ and $q \leftarrow K (K - 1) / 2$.\;
-  Compute $\hat{Z}$, the adjacency spectral embedding of $A$ using signature
-  $(p, q)$.\;
-  Compute $\hat{P} = \hat{Z} I_{pq} \hat{Z}^\top$, the estimate of the edge 
-  probability matrix based on the adjacency spectral embedding.\;
-  Arrange the rows and columns of $\hat{P}$ by cluster such that each 
-  $\hat{P}^{(kl)}$ block consists of estimated edge probabilities between 
+  Arrange the rows and columns of $A$ by cluster such that each 
+  $A^{(kl)}$ block consists of estimated edge probabilities between 
   clusters $k$ and $l$.\;
   \For{$k, l = 1, ..., K$, $k \leq l$} {
-    Compute $\hat{P}^{(kl)} = U \Sigma V^\top$, the SVD of the $kl^{th}$ 
+    Compute $A^{(kl)} = U \Sigma V^\top$, the SVD of the $kl^{th}$ 
     block.\;
     Assign $u^{(kl)}$ and $v^{(kl)}$ as the first columns of $U$ and $V$. 
     Assign $\sigma^2 \leftarrow \Sigma_{11}$.\;
@@ -485,32 +477,56 @@ embedding of $A$.
 \end{algorithm}
 
 **Theorem 5**. Under regularity and sparsity assumptions, and under the further 
-assumption that $K$ is fixed, 
+assumption that $K$ is fixed and community labels are known, 
 
 $$\max_{k, l \in \{1, ..., K\}} 
 ||\hat{\lambda}^{(kl)} - \lambda^{(kl)}|| = 
 O_P \bigg(\frac{(\log n_k)^c}{\sqrt{n_k}} \bigg)$$
 
-*Proof (sketch)*.  
-Let $P$ and $A$ be organized by cluster such that the elements of blocks 
-$P^{(kl)}$ and $A^{(kl)}$ correspond to edges between clusters $k$ and $l$. 
-By definition, $P^{(kl)} = \lambda^{(kl)} (\lambda^{(lk)})^\top$. This implies 
-that $P^{(kl)} = \sigma_{kl}^2 u^{(kl)} (v^{(kl)})^\top$ has one singular value 
-and one pair of singular vectors. By convention, we can let 
-$\lambda^{(kl)} = \sigma_{kl} u^{(kl)}$. Let 
-$\hat{U}^{(kl)} \hat{\Sigma}^{(kl)} (\hat{V}^{kl})^\top$ be the singular value 
-decomposition of $A^{(kl)}$, and let 
-$\hat{\sigma}_{kl} \hat{u}^{(kl)} (\hat{v}^{(kl)})^\top$ be its one-dimensional 
-approximation. Then 
-$\hat{\lambda}^{(kl)} = \hat{\sigma}_{kl} \hat{u}^{(kl)}$.[^alg4] Thus 
-$\hat{\lambda}^{(kl)}$ is a one-dimensional adjacency embedding approximation 
-of $\lambda^{(kl)}$.  
-Then by Theorem 5 from \citet{rubindelanchy2017statistical}, the adjacency 
-embedding $\hat{\lambda}^{(kl)}$ approximates $\lambda^{(kl)}$ at rate 
-$\frac{(\log n_k)^c}{n_k^{1/2}}$.
+*Proof (sketch)*. 
+Let $P$ and $A$ be organized by community such that the elements of blocks 
+$P^{(kl)}$ and $A^{(kl)}$ correspond to the edges between clusters $k$ and $l$. 
 
-[^alg4]: Note that this estimator is similar to but slightly worse than the 
-estimator from Algorithm 4. 
+* *Case $k = l$*. $P^{(kk)}$ and $A^{(kk)}$ represent within-community edge 
+probabilities and edges for community $k$.  
+By definition, 
+$P^{(kk)} = \lambda^{(kk)} (\lambda^{(kk)})^\top$. This implies that the 
+signular value decomposition 
+$P^{(kk)} = \sigma_{kk}^2 u^{(kk)} (u^{(kk)})^\top$ has one singular value and 
+one pair of singular vectors ($P^{(kk)}$ is symmetric, so the left and right 
+singular vectors are identical). Then $\lambda^{(kk)} = \sigma_{kk} u^{(kk)}$.  
+Let $\hat{U}^{(kk)} \hat{\Sigma}^{(kk)} (\hat{U}^{(kk)})^\top$ be the singular 
+value decomposition of $A^{(kk)}$, and let 
+$\hat{\sigma}_{kk}^2 \hat{u}^{(kk)} (\hat{u}^{(kk)})^\top$ be its 
+one-dimensional approximation. Define 
+$\hat{\lambda}^{(kk)} = \hat{\sigma}_{kk} \hat{u}^{(kk)}$. Then 
+$\hat{\lambda}^{(kk)}$ is the adjacency spectral embedding approximation of 
+$\lambda^{(kk)}$.  
+Then by Theorem 5 from \citet{rubindelanchy2017statistical}, the adjacency 
+spectral embedding $\hat{\lambda}^{(kk)}$ approximates $\lambda^{(kk)}$ at rate 
+$\frac{(\log n_k)^c}{\sqrt{n_k}}$.
+
+* *Case $k \neq l$*. $P^{(kl)}$ and $A^{(kl)}$ represent edge probabilities and 
+edges between communities $k$ and $l$.  
+Let $R^{(kl)} = P^{(kl)} P^{(lk)}$. By definition, 
+$P^{(kl)} P^{(lk)} = 
+\lambda^{(kl)} (\lambda^{(lk)})^\top \lambda^{(lk)} (\lambda^{(kl)})^\top$. 
+Noting that the two middle terms compose a scalar, we can rewrite 
+$R^{(kk)} = c \lambda^{(kl)} (\lambda^{(kl)})^\top$, where $c = \tr(P^{(lk)})$. 
+As in the $k = l$ case, we note that the singular value decomposition 
+$R^{(kl)} = \sigma_{kl}^2 u^{(kl)} (u^{(kl)})^\top$ is one-dimensional and 
+$\lambda^{(kl)} = \sigma_{kl} u^{(kl)} / c$.  
+Let $B^{(kl)} = A^{(kl)} A^{(lk)}$, and let 
+$\hat{U}^{(kl)} \hat{\Sigma}^{(kl)} (\hat{U}^{(kl)})^\top$ be the singular 
+value decomposition of $B^{(kl)}$. Let 
+$\hat{\sigma}_{kl}^2 \hat{u}^{kl} (\hat{u}^{(kl)})^\top$ be the one-dimensional 
+approximation of $B^{(kl)}$ based on the singular value decomposition. Define 
+$\hat{\lambda}^{(kl)} = \hat{\sigma}_{kl} \hat{u}^{(kl)} / \tr(A^{(lk)})$. Then 
+$\hat{\lambda}^{(kl)}$ is the adjacency spectral embedding approximation of 
+$\lambda^{(kl)}$.  
+Then by Theorem 5 from \citet{rubindelanchy2017statistical}, the adjacency 
+spectral embedding $\hat{\lambda}^{(kl)}$ approximates $\lambda^{(kl)}$ at rate 
+$\frac{(\log n_k)^c}{\sqrt{n_k}}$.
 
 # Simulated Examples
 
@@ -738,13 +754,13 @@ A.star <- A[order(z.hat), order(z.hat)]
 ari <- round(fossil::adj.rand.index(z, z.hat) * 100)
 ```
 
-For the real data example, we applied Algorithm 2 to the Leeds Butterfly 
+In the first real data example, we applied Algorithm 2 to the Leeds Butterfly 
 dataset \cite{Wang_2018} consisting of visual similarity measurements among 832 
 butterflies across 10 species. The graph was modified to match the example 
 from \citet{noroozi2019estimation}: Only the 4 most frequent species were 
 considered, and the similarities were discretized to $\{0, 1\}$ via 
 thresholding. Fig. \ref{fig:butterfly} shows a sorted adjacency matrix sorted 
-by the resultant the clustering. 
+by the resultant clustering. 
 
 Comparing against the ground truth species labels, Algorithm 2 achieves an 
 accuracy of 63\% and an adjusted Rand index of `r ari`\%. In comparison, 
@@ -765,6 +781,57 @@ plot.A <- function(A, margins = c(0, 0, 0, 0)) {
 ```{r butterfly, fig.height = 2, fig.width = 2, fig.cap = 'Adjacency matrix of the Leeds Butterfly dataset after sorting by the clustering outputted by Algorithm 2.', cache = TRUE}
 plot.A(A.star)
 ```
+
+```{r}
+# this portion is from the code provided by Sengupta and Chen
+
+setwd('~/Downloads/codes_and_data')
+library("igraph")
+library("clue")
+
+##### Data input and pre-processing #####
+foo=read.table("BritishMPcomm.txt",header=T)
+mat=read.table("politicsuk-retweets.mtx",header=F)
+mat = mat[-1,]
+A = matrix(0,nrow(foo),nrow(foo))
+for (k in 1:nrow(mat)){ #adjacency matrix with 5 parties
+  edgei = mat[k,1]
+  edgej = mat[k,2]
+  i = which(foo[,1]==edgei)
+  j = which(foo[,1]==edgej)
+  A[i,j]<-1;A[j,i]<-1
+}
+b.true <- foo[,2]
+levels(b.true) <- 1:5
+b.true <- as.numeric(b.true)
+nodes1 = which(b.true==1); nodes2 = which(b.true==2)
+nodes = c(nodes1, nodes2)
+A <- A[nodes,nodes] # Select only the two big communities
+G<-graph.adjacency(A, mode="undirected")
+foo1 <- clusters(G, mode="strong") 
+nodes2 <- which(foo1$membership==1) # largest connected component (basically 31 nodes are disconnected)
+A <- A[nodes2,nodes2] # form network with 329 nodes
+b.true <- b.true[nodes2]
+```
+
+```{r}
+zhat <- cluster.pabm(A, 2, use.all = TRUE, normalize = FALSE)
+clust.acc <- mean(zhat == b.true)
+```
+
+```{r mp, cache = TRUE, fig.width = 2, fig.height = 2, fig.cap = 'Adjacency matrix of the British MPs dataset after sorting by the clustering outputted by Algorithm 2.'}
+plot.A(A[order(zhat), order(zhat)])
+```
+
+In the second example, we applied Algorithm 2 to the British MPs Twitter 
+network \cite{greene2013producing}. The original data consists of 419 vertices, 
+each corresponding to a British MP belonging to one of five political parties. 
+For this data analysis, we subsetted the data as described by 
+\citet{307cbeb9b1be48299388437423d94bf1} for their analysis of the same 
+dataset, resulting in 329 vertices and two parties ($n = 329, K = 2$). 
+\citet{307cbeb9b1be48299388437423d94bf1} were able to obtain a classification 
+accuracy of `r round(328 / 329 * 100, 1)`\%. Algorithm 2 obtained a lower 
+classification accuracy of `r round(clust.acc * 100, 1)`\%. 
 
 # Discussion
 
