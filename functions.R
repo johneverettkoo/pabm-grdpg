@@ -1,5 +1,6 @@
 embedding <- function(A, p = NULL, q = NULL,
                       eps = 1e-6) {
+  n <- nrow(A)
   eigen.A <- eigen(A, symmetric = TRUE)
   if (is.null(p) | is.null(q)) {
     keep <- (abs(eigen.A$values) > eps)
@@ -59,15 +60,26 @@ normalized.laplacian <- function(W) {
   return(I - D.neg.sqrt %*% W %*% D.neg.sqrt)
 }
 
-cluster.pabm <- function(A, K) {
+graph.laplacian <- function(W) {
+  D <- diag(colSums(W))
+  L <- D - W
+  return(L)
+}
+
+cluster.pabm <- function(A, K, normalize = TRUE, use.all = FALSE) {
+  n <- nrow(A)
   p <- K * (K + 1) / 2
   q <- K * (K - 1) / 2
   V <- eigen(A, symmetric = TRUE)$vectors[, c(seq(p), seq(n, n - q + 1))]
-  V <- V / mean(V)
+  if (normalize) V <- V / mean(V)
   B <- abs(V %*% t(V))
   # L <- graph.laplacian(B)
   L <- normalized.laplacian(B)
-  eigenmap <- eigen(L, symmetric = TRUE)$vectors[, seq(n - 1, n - K)]
+  if (use.all) {
+    eigenmap <- eigen(L, symmetric = TRUE)$vectors[, seq(n, n - K)]
+  } else {
+    eigenmap <- eigen(L, symmetric = TRUE)$vectors[, seq(n - 1, n - K)]
+  }
   clustering <- mclust::Mclust(eigenmap, K)$classification
 }
 

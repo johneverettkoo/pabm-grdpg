@@ -120,7 +120,7 @@ $\{\lambda^{(st)}\}_{s, t = 1}^K$.
 
 We will use the notation $A \sim PABM(\{\lambda^{(kl)}\}_K)$ to denote a random 
 adjacency matrix $A$ drawn from a PABM with parameters $\lambda^{(kl)}$ 
-consisting of $K$ underlying clusters/communities.
+consisting of $K$ underlying communities.
 
 **Definition 2**.
 Let $P \in [0, 1]^{n \times n}$ be a symmetric edge probability matrix for a 
@@ -292,18 +292,18 @@ $XU = \begin{bmatrix}
 
 Two inference objectives arise from the PABM:
 
-1. Cluster membership identification (up to permutation).
+1. Community membership identification (up to permutation).
 2. Parameter estimation (estimating $\lambda^{(kl)}$'s).
 
 Here, we will focus more on (1) and pose possible methods for (2). In our 
-methods, we assume that $K$, the number of clusters, is known beforehand and 
+methods, we assume that $K$, the number of communities, is known beforehand and 
 does not require estimation.
 
 ## Previous work
 
 \citet*{noroozi2019estimation} proposed using sparse subspace clustering (SSC) 
-to identify the cluster memberships given either an edge probability matrix $P$ 
-or an adjacency matrix $A$. In the case that $P$ is known, the cluster 
+to identify the community memberships given either an edge probability matrix $P$ 
+or an adjacency matrix $A$. In the case that $P$ is known, the community 
 memberships can be identified exactly (up to permutation). A similar procedure 
 can be applied if $P$ is unknown and we have an observation $A$, but the 
 theoretical guarantees of this method applied to the PABM are unknown. In 
@@ -311,13 +311,13 @@ particular, the method requires spherical Gaussian noise. The authors of this
 paper then use point estimators for $\{\lambda^{(kl)}\}$ using cluster labels 
 obtained via SSC. 
 
-## Clustering
+## Community detection
 
 ### Using edge probability matrix $P$
 
 We previously stated one possible set of latent positions that result in the 
 edge probability matrix of a PABM, $P = (XU) I_{pq} (XU)^\top$. If we have 
-(or can estimate) $XU$ directly, then both the clustering and parameter 
+(or can estimate) $XU$ directly, then both the community detection and parameter 
 identification problem are trivial since $U$ is orthonormal and fixed for each 
 value of $K$. However, direct identification or estimation of $XU$ is not 
 possible \cite{rubindelanchy2017statistical}. 
@@ -332,13 +332,13 @@ $\langle z_i, z_j \rangle \neq \langle Q z_i, Q z_j \rangle$. This prevents
 us from using the properties of $XU$ directly. In particular, if 
 $Q \in \mathbb{O}(n)$, then we could use the fact that 
 $\langle z_i, z_j \rangle = \langle Q z_i, Q z_j \rangle = 0$ if vertices $i$ 
-and $j$ are in different clusters. 
+and $j$ are in different communities. 
 
 We can note from the explicit form of $XU$ that it represents points in 
-$\mathbb{R}^{K^2}$ such that points within each cluster lie on $K$-dimensional 
+$\mathbb{R}^{K^2}$ such that points within each community lie on $K$-dimensional 
 subspaces. Furthermore, the subspaces are orthogonal to each other. 
 Multiplication by $Q \in \mathbb{O}(p, q)$ removes the orthogonality property 
-but retains the property that each cluster is represented by a $K$-dimensional 
+but retains the property that each community is represented by a $K$-dimensional 
 subspace. Using this property, previous work proposes the use of subspace 
 clustering while acknowledging some of its shortcomings 
 \cite{noroozi2019estimation} \cite{soltanolkotabi2014}. 
@@ -346,26 +346,26 @@ clustering while acknowledging some of its shortcomings
 **Theorem 3.** 
 Let $P = V D V^\top$ be the spectral decomposition of the edge probability
 matrix. Let $B = V V^\top$. Then $B_{ij} = 0$ if vertices $i$ and $j$ are 
-of different clusters.
+of different communities.
 
 *Proof (sketch)*
 By projection, $V V^\top = X (X^\top X)^{-1} X^\top$ where $X$ is defined as 
 in Theorem 2. Since $X$ is block diagonal with each block corresponding 
-to one cluster, $X (X^\top X)^{-1} X^\top$ is also a block diagonal matrix 
-with each block corresponding to a cluster and zeros elsewhere. Therefore, 
-if vertices $i$ and $j$ belong to different clusters, then the $ij$^th^ element 
-of $X (X^\top X)^{-1} X^\top = V V^\top = B$ is 0.
+to one community, $X (X^\top X)^{-1} X^\top$ is also a block diagonal matrix 
+with each block corresponding to a community and zeros elsewhere. Therefore, 
+if vertices $i$ and $j$ belong to different communities, then the $ij$^th^ 
+element of $X (X^\top X)^{-1} X^\top = V V^\top = B$ is 0.
 
 \begin{algorithm}[H]
   \DontPrintSemicolon
   \SetAlgoLined
-  \KwData{Edge probability matrix $P$, number of clusters $K$}
-  \KwResult{Cluster assignments $1, ..., K$}
+  \KwData{Edge probability matrix $P$, number of communities $K$}
+  \KwResult{Community labels $1, ..., K$}
     Compute the spectral decomposition $P = V D V^\top$.\;
     Compute the inner product matrix $B = |V V^\top|$, applying $|\cdot|$ 
     entry-wise.\;
     Construct graph $G$ using $B$ as edge similarities.\;
-    Identify the connected components of $G$ and map each to cluster labels 
+    Identify the connected components of $G$ and map each to community labels 
     $1, ..., K.$\;
   \caption{PABM clustering on the edge probability matrix.}
 \end{algorithm}
@@ -375,9 +375,9 @@ of $X (X^\top X)^{-1} X^\top = V V^\top = B$ is 0.
 The adjacency embedding of $A$ approaches latent positions that form $P$ as 
 the number of vertices $n$ increases. More 
 precisely, let $\{\lambda^{(kl)}\}_K \sim \mathcal{F}_K$ for some joint 
-distribution consisting of $K$ underlying clusters $\mathcal{F}_K$. Then the 
+distribution consisting of $K$ underlying communities $\mathcal{F}_K$. Then the 
 latent positions $XU \sim \mathcal{G}_K$ for some related joint distribution 
-with $K$ underlying clusters $\mathcal{G}_K$. Denote $Z_n$ as a sample of size 
+with $K$ underlying communities $\mathcal{G}_K$. Denote $Z_n$ as a sample of size 
 $n$ from $\mathcal{G}_K$ and adjacency matrix $A_n$ as one draw from edge 
 probability matrix $P_n = Z_n I_{pq} Z_n^\top$. Let $\hat{Z}_n$ be the 
 adjacency embedding of $A_n$ with rows $(\hat{z}_i^{(n)})^\top$. Then by
@@ -393,7 +393,7 @@ result.
 of $K^2$ eigenvectors of $A_n$ corresponding to the $K (K+1) / 2$ most positive 
 eigenvalues and $K (K-1) / 2$ most negative eigenvalues with rows
 $(\hat{v}_i^{(n)})^\top$. Let $(i, j)$ correspond to pairs belonging to 
-different clusters. Then for some $c > 0$, 
+different communities. Then for some $c > 0$, 
 
 $$\max\limits_{i, j} ||(\hat{v}^{(n)}_i)^\top \hat{v}_j^{(n)}|| = O_P\bigg( \frac{(\log n)^c}{n \sqrt{\rho_n}}\bigg)$$
 where $\lim\limits_{n \to 0} \rho_n = 0$ is a sparsity parameter introduced 
@@ -409,8 +409,8 @@ This leads to the following algorithm:
 \begin{algorithm}[H]
   \DontPrintSemicolon
   \SetAlgoLined
-  \KwData{Adjacency matrix $A$, number of clusters $K$}
-  \KwResult{Cluster assignments $1, ..., K$}
+  \KwData{Adjacency matrix $A$, number of communities $K$}
+  \KwResult{Community assignments $1, ..., K$}
     Compute the eigenvectors of $A$ that correspond to the $K (K+1) / 2$ most 
     positive eigenvalues and $K (K-1) / 2$ most negative eigenvalues. Construct 
     $V$ using these eigenvectors as its columns.\;
@@ -418,7 +418,7 @@ This leads to the following algorithm:
     Construct graph $G$ using $B$ as its similarity matrix.\;
     Partition $G$ into $K$ disconnected components 
     (e.g., using edge thresholding or spectral clustering).\;
-    Map each partition to the cluster labels $1, ..., K$.\;
+    Map each partition to the community labels $1, ..., K$.\;
   \caption{PABM clustering on the adjacency matrix.}
 \end{algorithm}
 
@@ -428,7 +428,7 @@ misclassified vertices, up to permutation, outputted by algorithm 2 goes to 0.
 ## Parameter estimation
 
 For any $P$ edge probability matrix for the PABM such that the rows and 
-columns are organized by cluster, the $kl$^th^ block is an outer product 
+columns are organized by community, the $kl$^th^ block is an outer product 
 of two vectors, i.e., $P^{(kl)} = \lambda^{(kl)} (\lambda^{(lk)})^\top$. 
 Therefore, given $P^{(kl)}$, $\lambda%{(kl)}$ and $\lambda^{(lk)}$ are 
 solvable exactly (up to multiplication by $-1$) using singular value 
@@ -442,10 +442,10 @@ $\lambda^{(lk)} = \pm \sigma v$.
   \DontPrintSemicolon
   \SetAlgoLined
   \caption{PABM parameter estimation using the edge probability matrix.}
-  \KwData{Edge probability matrix $P$, cluster assignments $1, ..., K$.}
+  \KwData{Edge probability matrix $P$, community assignments $1, ..., K$.}
   \KwResult{PABM parameters $\{\lambda^{(kl)}\}_K$}
-  Arrange the rows and columns of $P$ by cluster such that each $P^{(kl)}$ 
-  block consists of edge probabilities between clusters $k$ and $l$.\; 
+  Arrange the rows and columns of $P$ by community such that each $P^{(kl)}$ 
+  block consists of edge probabilities between communities $k$ and $l$.\; 
   \For{$k, l = 1, ..., K$, $k \geq l$} {
     Compute $P^{(kl)} = (\sigma^{(kl)})^2 u^{(kl)} (v^{(kl)})^\top$, the SVD of 
     the $kl^{th}$ block.\;
@@ -461,11 +461,11 @@ embedding of $A$.
   \DontPrintSemicolon
   \SetAlgoLined
   \caption{PABM parameter estimation using the adjacency matrix.}
-  \KwData{Adjacency matrix $A$, cluster assignments $1, ..., K$}
+  \KwData{Adjacency matrix $A$, community assignments $1, ..., K$}
   \KwResult{PABM parameter estimates $\{\hat{\lambda}^{(kl)}\}_K$.}
-  Arrange the rows and columns of $A$ by cluster such that each 
+  Arrange the rows and columns of $A$ by community such that each 
   $A^{(kl)}$ block consists of estimated edge probabilities between 
-  clusters $k$ and $l$.\;
+  communities $k$ and $l$.\;
   \For{$k, l = 1, ..., K$, $k \leq l$} {
     Compute $A^{(kl)} = U \Sigma V^\top$, the SVD of the $kl^{th}$ 
     block.\;
@@ -485,7 +485,8 @@ O_P \bigg(\frac{(\log n_k)^c}{\sqrt{n_k}} \bigg)$$
 
 *Proof (sketch)*. 
 Let $P$ and $A$ be organized by community such that the elements of blocks 
-$P^{(kl)}$ and $A^{(kl)}$ correspond to the edges between clusters $k$ and $l$. 
+$P^{(kl)}$ and $A^{(kl)}$ correspond to the edges between communities $k$ and 
+$l$. 
 
 * *Case $k = l$*. $P^{(kk)}$ and $A^{(kk)}$ represent within-community edge 
 probabilities and edges for community $k$.  
@@ -534,20 +535,20 @@ $\frac{(\log n_k)^c}{\sqrt{n_k}}$.
 
 For these examples, we set the following parameters:
 
-* Number of underlying clusters $K = 2$
+* Number of underlying communities $K = 2$
 * Mixture parameter $\alpha = .5$
-* Within-cluster popularities $\lambda^{(kk)} \stackrel{iid}{\sim} Beta(2, 1)$
-* Between-cluster popularities 
+* Within-group popularities $\lambda^{(kk)} \stackrel{iid}{\sim} Beta(2, 1)$
+* Between-group popularities 
 $\lambda^{(kl)} \stackrel{iid}{\sim} Beta(1, 2)$ for $k \neq l$
 
-### Clustering
+### Community detection
 
 In this part, we will assess Algorithm 2's performance for sample sizes 
 $n = 64, 128, 256, 512, 1024, 2048$. For each sample size $n$, $100$ sets of 
 $\lambda^{(kl)}$'s are drawn and for each set of parameters, one adjacency 
-matrix $A$ is drawn and clustered. We will not consider clustering using the 
+matrix $A$ is drawn and clustered. We will not consider community detection using the 
 edge probability matrix $P$ since this will always result exact recovery of the
-original clusters (up to permutation).
+original communities (up to permutation).
 
 ```{r clust_err_sim, fig.cap = 'IQR clustering error using Algorithm 2 (red) compared against subspace clustering (blue) for sample sizes from 64 to 2048. Simulations were repeated 100 times for each sample size. The $y$-axis is shown on a logarithmic scale.', cache = FALSE}
 clustering.df <- readr::read_csv('clustering.csv')
@@ -656,13 +657,13 @@ rmse.df %>%
 
 For these examples, we set the following parameters:
 
-* Number of underlying clusters $K = 2, 4, 8$
+* Number of underlying communities $K = 2, 4, 8$
 * Mixture parameters $\alpha_k = 1 / K$ for $k = 1, ..., K$
-* Within-cluster popularities $\lambda^{(kk)} \stackrel{iid}{\sim} Beta(2, 1)$
-* Between-cluster popularities 
+* Within-group popularities $\lambda^{(kk)} \stackrel{iid}{\sim} Beta(2, 1)$
+* Between-group popularities 
 $\lambda^{(kl)} \stackrel{iid}{\sim} Beta(1, 2)$ for $k \neq l$
 
-### Clustering
+### Community detection
 
 ```{r clust_err_k, fig.cap = 'IQR of clustering error using Algorithm 2 (red) compared against subspace clustering (blue) for sample sizes from 64 to 2048 and number of clusters from 2 to 8. Simulations were repeated 100 times for each sample size. The $y$-axis is shown on a logarithmic scale.', fig.width = 8}
 clustering.df <- readr::read_csv('clustering-k.csv')
