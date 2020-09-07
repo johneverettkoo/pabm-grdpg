@@ -158,7 +158,7 @@ Let $X = \begin{bmatrix}
 0 & 0 & 1 / \sqrt{2} & 1 / \sqrt{2} \\
 0 & 0 & 1 / \sqrt{2} & - 1 / \sqrt{2} \\
 0 & 1 & 0 & 0 \end{bmatrix}$, as in Definition 1. 
-Then $A \sim GRDPG_{3, 1}(X U)$ and $A \sim PABM(\{(\lambda^{(kl)}\}_K)$ are 
+Then $A \sim GRDPG_{3, 1}(X U)$ and $A \sim PABM(\{(\lambda^{(kl)}\}_2)$ are 
 equivalent.
 
 *Proof*.
@@ -508,26 +508,52 @@ spectral embedding $\hat{\lambda}^{(kk)}$ approximates $\lambda^{(kk)}$ at rate
 $\frac{(\log n_k)^c}{\sqrt{n_k}}$.
 
 * *Case $k \neq l$*. $P^{(kl)}$ and $A^{(kl)}$ represent edge probabilities and 
-edges between communities $k$ and $l$.  
-Let $R^{(kl)} = P^{(kl)} P^{(lk)}$. By definition, 
-$P^{(kl)} P^{(lk)} = 
-\lambda^{(kl)} (\lambda^{(lk)})^\top \lambda^{(lk)} (\lambda^{(kl)})^\top$. 
-Noting that the two middle terms compose a scalar, we can rewrite 
-$R^{(kk)} = c \lambda^{(kl)} (\lambda^{(kl)})^\top$, where $c = \tr(P^{(lk)})$. 
-As in the $k = l$ case, we note that the singular value decomposition 
-$R^{(kl)} = \sigma_{kl}^2 u^{(kl)} (u^{(kl)})^\top$ is one-dimensional and 
-$\lambda^{(kl)} = \sigma_{kl} u^{(kl)} / c$.  
-Let $B^{(kl)} = A^{(kl)} A^{(lk)}$, and let 
-$\hat{U}^{(kl)} \hat{\Sigma}^{(kl)} (\hat{U}^{(kl)})^\top$ be the singular 
-value decomposition of $B^{(kl)}$. Let 
-$\hat{\sigma}_{kl}^2 \hat{u}^{kl} (\hat{u}^{(kl)})^\top$ be the one-dimensional 
-approximation of $B^{(kl)}$ based on the singular value decomposition. Define 
-$\hat{\lambda}^{(kl)} = \hat{\sigma}_{kl} \hat{u}^{(kl)} / \tr(A^{(lk)})$. Then 
-$\hat{\lambda}^{(kl)}$ is the adjacency spectral embedding approximation of 
-$\lambda^{(kl)}$.  
-Then by Theorem 5 from \citet{rubindelanchy2017statistical}, the adjacency 
-spectral embedding $\hat{\lambda}^{(kl)}$ approximates $\lambda^{(kl)}$ at rate 
-$\frac{(\log n_k)^c}{\sqrt{n_k}}$.
+edges between communities $k$ and $l$. Note that $P^{(kl)} = (P^{(lk)})^\top$.  
+By definition, $P^{(kl)} = \lambda^{(kl)} (\lambda^{(lk)})^\top$. As in the 
+$k = l$ case, we note that the singular value decomposition 
+$P^{(kl)} = \sigma_{kl}^2 u^{(kl)} (v^{(kl)})^\top$ is one-dimensional and 
+$\lambda^{(kl)} = \sigma_{kl} u^{(kl)}$. (We can also note that the SVD of 
+$P^{(lk)} = \sigma_{kl}^2 v^{(kl)} (u^{(kl)})^\top$, i.e., 
+$\sigma_{kl} = \sigma_{lk}$, $u^{(kl)} = v^{(lk)}$, and 
+$v^{(kl)} = u^{(lk)}$.)  
+Now consider the Hermitian dilation 
+$M^{(kl)} = 2 \begin{bmatrix} 0 & P^{(kl)} \\ P^{(lk)} & 0 \end{bmatrix}$, 
+which is a symmetric $(n_k + n_l) \times (n_k + n_l)$ matrix. It can be shown 
+that the eigendecomposition of $M^{(kl)}$ is  
+$M^{(kl)} = 
+\begin{bmatrix} u^{(kl)} & -u^{(kl)} \\ v^{(kl)} & v^{(kl)} \end{bmatrix} \times 
+\begin{bmatrix} \sigma^2_{kl} & 0 \\ 0 & -\sigma^2_{kl} \end{bmatrix} \times
+\begin{bmatrix} u^{(kl)} & -u^{(kl)} \\ v^{(kl)} & v^{(kl)} \end{bmatrix}^\top$.  
+Thus treating $M^{(kl)}$ as the edge probability matrix of a GRDPG, we have 
+latent positions in $\mathbb{R}^2$ given by 
+$\begin{bmatrix} 
+  \sigma_{kl} u^{(kl)} & \sigma_{kl} u^{(kl)} \\ 
+  \sigma_{kl} v^{(kl)} & -\sigma_{kl} v^{(kl)} 
+\end{bmatrix} = 
+\begin{bmatrix} 
+  \lambda^{(kl)} & \lambda^{(kl)} \\ 
+  \lambda^{(lk)} & -\lambda^{(lk)} 
+\end{bmatrix}$.  
+Now consider $M' = \begin{bmatrix} 0 & A^{(kl)} \\ A^{(lk)} & 0 \end{bmatrix}$. 
+Then $M' = M + E'$ where 
+$E' = \begin{bmatrix} 0 & E \\ E^\top & 0 \end{bmatrix}$ and $E$ is the 
+$n_k \times n_l$ matrix of independent noise (to generate the Bernoulli entries 
+in $A^{(kl)}$.  
+Then $M'$ is an adjacency matrix drawn from $M^{(kl)}$, so its adjacency 
+spectral embedding, given by 
+$\begin{bmatrix} 
+  \hat{\lambda}^{(kl)} & \hat{\lambda}^{(kl)} \\ 
+  \hat{\lambda}^{(lk)} & -\hat{\lambda}^{(lk)} 
+\end{bmatrix}$ 
+where each $\hat{\lambda}^{(kl)}$ is defined as in Algorithm 4, approximates 
+the latent positions of $M^{(kl)}$ by the rate in Theorem 5 of 
+\citet{rubindelanchy2017statistical}.  
+In this case, the indefinite orthogonal transformation $W_*$ in the GRDPG 
+result \cite{rubindelanchy2017statistical} is of the form 
+$\hat{U}^\top \hat{U}$. The eigenvalues of $M$ are distinct since the signature 
+for this GRDPG is $(1, 1)$, and $\hat{U}^\top \hat{U}$ is block diagonal, 
+resulting in $W_* = I$. Therefore, the adjacency spectral embedding of $M'$ is 
+a direct estimation of the specific latent positions outlined for $M^{(kl)}$. 
 
 # Simulated Examples
 
