@@ -553,7 +553,8 @@ result \cite{rubindelanchy2017statistical} is of the form
 $\hat{U}^\top \hat{U}$. The eigenvalues of $M$ are distinct since the signature 
 for this GRDPG is $(1, 1)$, and $\hat{U}^\top \hat{U}$ is block diagonal, 
 resulting in $W_* = I$. Therefore, the adjacency spectral embedding of $M'$ is 
-a direct estimation of the specific latent positions outlined for $M^{(kl)}$. 
+a direct estimation of the specific latent positions outlined for $M^{(kl)}$, 
+up to sign flip. 
 
 # Simulated Examples
 
