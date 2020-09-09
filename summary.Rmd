@@ -858,8 +858,10 @@ For this data analysis, we subsetted the data as described by
 \citet{307cbeb9b1be48299388437423d94bf1} for their analysis of the same 
 dataset, resulting in 329 vertices and two parties ($n = 329, K = 2$). 
 \citet{307cbeb9b1be48299388437423d94bf1} were able to obtain a classification 
-accuracy of `r round(328 / 329 * 100, 1)`\%. Algorithm 2 obtained a lower 
-classification accuracy of `r round(clust.acc * 100, 1)`\%. 
+accuracy of `r round(328 / 329 * 100, 1)`\% via modularity maximization. 
+Algorithm 2 obtained a lower 
+classification accuracy of `r round(clust.acc * 100, 1)`\%. We can also note 
+that Algorithm 2 had a much shorter runtime than modularity maximization.
 
 # Discussion
 

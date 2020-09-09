@@ -66,15 +66,23 @@ graph.laplacian <- function(W) {
   return(L)
 }
 
-cluster.pabm <- function(A, K, normalize = TRUE, use.all = FALSE) {
+cluster.pabm <- function(A, K, 
+                         normalize = TRUE, 
+                         use.all = FALSE,
+                         laplacian = 'normalized') {
   n <- nrow(A)
   p <- K * (K + 1) / 2
   q <- K * (K - 1) / 2
   V <- eigen(A, symmetric = TRUE)$vectors[, c(seq(p), seq(n, n - q + 1))]
-  if (normalize) V <- V / mean(V)
+  if (normalize) {
+    V <- sweep(V, 2, abs(A.eigen$values[c(seq(p), seq(n, n - q + 1))]) ** .5, `*`)
+  }
   B <- abs(V %*% t(V))
-  # L <- graph.laplacian(B)
-  L <- normalized.laplacian(B)
+  if (laplacian == 'graph') {
+    L <- graph.laplacian(B)
+  } else {
+    L <- normalized.laplacian(B)
+  }
   if (use.all) {
     eigenmap <- eigen(L, symmetric = TRUE)$vectors[, seq(n, n - K)]
   } else {
