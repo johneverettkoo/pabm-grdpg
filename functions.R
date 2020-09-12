@@ -75,7 +75,8 @@ cluster.pabm <- function(A, K,
   q <- K * (K - 1) / 2
   V <- eigen(A, symmetric = TRUE)$vectors[, c(seq(p), seq(n, n - q + 1))]
   if (normalize) {
-    V <- sweep(V, 2, abs(A.eigen$values[c(seq(p), seq(n, n - q + 1))]) ** .5, `*`)
+    v.norm <- apply(V, 2, function(v) sum(v ** 2))
+    V <- sweep(V, 1, v.norm, `/`)
   }
   B <- abs(V %*% t(V))
   if (laplacian == 'graph') {
@@ -294,11 +295,6 @@ lambda.rmse.mle <- function(P, A, z) {
     magrittr::divide_by(n * K) %>% 
     sqrt() %>% 
     return()
-}
-
-clust.acc <- function(clust1, clust2) {
-  n <- length(clust1)
-  (1 - fossil::rand.index(clust1, clust2)) * choose(n, 2) / n
 }
 
 generate.P.beta <- function(n, K = 2, a1 = 2, b1 = 1, a2 = 1, b2 = 2) {
