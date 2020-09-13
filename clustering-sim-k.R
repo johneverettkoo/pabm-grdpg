@@ -5,6 +5,7 @@
 import::from(magrittr, `%>%`)
 import::from(foreach, foreach, `%do%`, `%dopar%`)
 library(mclust)
+library(ggplot2)
 source('http://pages.iu.edu/~mtrosset/Courses/675/stress.r')
 setwd('~/dev/pabm-grdpg')
 import::here(embedding, draw.graph, 
@@ -38,7 +39,7 @@ clustering.df <- foreach(K = K.vec, .combine = dplyr::bind_rows) %do% {
       P <- Pz$P
       z <- Pz$clustering
       A <- draw.graph(P)
-      clustering <- cluster.pabm(A, K)
+      clustering <- cluster.pabm(A, K, use.all = TRUE)
       error <- 1 - fossil::adj.rand.index(z, clustering)
       clustering.ssc <- ssc(A, K, sparsity)
       error.ssc <- 1 - fossil::adj.rand.index(z, clustering.ssc)
@@ -60,7 +61,7 @@ clustering.df %>%
                    first.q.ssc = quantile(error.ssc, .25),
                    third.q.ssc = quantile(error.ssc, .75)) %>%
   ggplot() +
-  # scale_y_log10() +
+  scale_y_log10() +
   # scale_x_log10() +
   labs(y = 'error') +
   geom_line(aes(x = n, y = med.err)) +

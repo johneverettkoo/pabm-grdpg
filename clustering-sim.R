@@ -5,6 +5,7 @@
 import::from(magrittr, `%>%`)
 import::from(foreach, foreach, `%do%`, `%dopar%`)
 library(mclust)
+library(ggplot2)
 source('http://pages.iu.edu/~mtrosset/Courses/675/stress.r')
 setwd('~/dev/pabm-grdpg')
 import::here(embedding, draw.graph, draw.pabm.beta.2,
@@ -50,23 +51,24 @@ clustering.df <- foreach(n = n.vec, .combine = dplyr::bind_rows) %do% {
     return()
 }
 
-# clustering.df %>%
-#   dplyr::group_by(n) %>%
-#   dplyr::summarise(med.err = median(error),
-#                    first.q = quantile(error, .25),
-#                    third.q = quantile(error, .75),
-#                    med.err.ssc = median(error.ssc),
-#                    first.q.ssc = quantile(error.ssc, .25),
-#                    third.q.ssc = quantile(error.ssc, .75)) %>%
-#   ggplot() +
-#   # scale_y_log10() +
-#   # scale_x_log10() +
-#   labs(y = 'error') +
-#   geom_line(aes(x = n, y = med.err)) +
-#   geom_errorbar(aes(x = n, ymin = first.q, ymax = third.q)) +
-#   geom_line(aes(x = n, y = med.err.ssc, colour = 'ssc')) +
-#   geom_errorbar(aes(x = n, ymin = first.q.ssc, ymax = third.q.ssc,
-#                     colour = 'ssc'))
+clustering.df %>%
+  dplyr::group_by(n) %>%
+  dplyr::summarise(med.err = median(error),
+                   first.q = quantile(error, .25),
+                   third.q = quantile(error, .75),
+                   med.err.ssc = median(error.ssc),
+                   first.q.ssc = quantile(error.ssc, .25),
+                   third.q.ssc = quantile(error.ssc, .75)) %>%
+  ggplot() +
+  scale_y_log10() +
+  # scale_x_log10() +
+  labs(y = 'error') +
+  geom_line(aes(x = n, y = med.err)) +
+  geom_errorbar(aes(x = n, ymin = first.q, ymax = third.q)) +
+  geom_line(aes(x = n, y = med.err.ssc, colour = 'ssc')) +
+  geom_errorbar(aes(x = n, ymin = first.q.ssc, ymax = third.q.ssc,
+                    colour = 'ssc'))
 
 # export as csv
 readr::write_csv(clustering.df, 'clustering.csv')
+
