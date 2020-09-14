@@ -32,6 +32,7 @@ abstract: |
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(echo = FALSE, 
+                      # eval = FALSE,
                       comment = NA, 
                       warning = FALSE, 
                       message = FALSE, 
@@ -84,7 +85,8 @@ special case of the RDPG model in which all vertices of a given community share
 the same position in the latent space. It has also been shown that similar 
 probabilistic graph models, such as the Mixed Membership Stochastic Block 
 Model, can be represented in this way \cite{rubindelanchy2017statistical}. An 
-analogous property exists for the PABM, not under the RDPG model but under the *Generalized* Random Dot Product Graph (GRDPG) model. This relationship will be 
+analogous property exists for the PABM, not under the RDPG model but under the 
+*Generalized* Random Dot Product Graph (GRDPG) model. This relationship will be 
 explored in this paper and exploited to construct algorithms for community 
 detection and parameter estimation for the PABM. 
 
@@ -791,7 +793,7 @@ thresholding. Fig. \ref{fig:butterfly} shows a sorted adjacency matrix sorted
 by the resultant clustering. 
 
 Comparing against the ground truth species labels, Algorithm 2 achieves an 
-accuracy of 63\% and an adjusted Rand index of `r ari`\%. In comparison, 
+accuracy of 63\% and an adjusted Rand index of 73\%. In comparison, 
 \citet{noroozi2019estimation} achieved an adjusted Rand index of 73\% using 
 sparse subspace clustering on the same dataset.
 
@@ -860,7 +862,7 @@ dataset, resulting in 329 vertices and two parties ($n = 329, K = 2$).
 \citet{307cbeb9b1be48299388437423d94bf1} were able to obtain a classification 
 accuracy of `r round(328 / 329 * 100, 1)`\% via modularity maximization. 
 Algorithm 2 obtained a lower 
-classification accuracy of `r round(clust.acc * 100, 1)`\%. We can also note 
+classification accuracy of 99.1\%. We can also note 
 that Algorithm 2 had a much shorter runtime than modularity maximization.
 
 # Discussion
