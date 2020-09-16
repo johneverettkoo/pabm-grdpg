@@ -871,8 +871,10 @@ dblp.acc <- 1 - mean(zhat.dblp == z.dblp)
 ```
 
 In the second example, we applied Algorithm 2 to the British MPs Twitter 
-network \cite{greene2013producing}, the Political Blogs network and the DBLP n
-etwork. For this data analysis, we subsetted the data as described by 
+network \cite{greene2013producing}, the Political Blogs network 
+\cite{10.1145/1134271.1134277}, and the DBLP network \cite{NIPS2009_3855} 
+\cite{10.1007/978-3-642-15880-3_42}. For this data analysis, we subsetted the 
+data as described by 
 \citet{307cbeb9b1be48299388437423d94bf1} for their analysis of the same 
 networks. Our methods underperformed compared to modularity maximization, 
 although performance is comparable for the British MPs and DBLP networks. In 
