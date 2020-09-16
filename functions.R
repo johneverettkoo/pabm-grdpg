@@ -68,20 +68,32 @@ graph.laplacian <- function(W) {
 
 cluster.pabm <- function(A, K, 
                          normalize = TRUE, 
-                         use.all = FALSE,
+                         use.all = TRUE,
+                         p = NULL, q = NULL, 
                          laplacian = 'normalized') {
   n <- nrow(A)
-  p <- K * (K + 1) / 2
-  q <- K * (K - 1) / 2
-  V <- eigen(A, symmetric = TRUE)$vectors[, c(seq(p), seq(n, n - q + 1))]
+  if (is.null(p)) {
+    p <- K * (K + 1) / 2
+  }
+  if (is.null(q)) {
+    q <- K * (K - 1) / 2
+  }
+  if (p * q > 0) {
+    indices <- c(seq(p), seq(n, n - q + 1))
+  } else if (p == 0) {
+    indices <- seq(n, n - q + q)
+  } else if (q == 0) {
+    indices <- seq(p)
+  }
+  V <- eigen(A, symmetric = TRUE)$vectors[, indices]
   if (normalize) {
-    v.norm <- apply(V, 2, function(v) sum(v ** 2))
+    v.norm <- sqrt(apply(V, 1, function(v) sum(v ** 2)))
     V <- sweep(V, 1, v.norm, `/`)
   }
   B <- abs(V %*% t(V))
   if (laplacian == 'graph') {
     L <- graph.laplacian(B)
-  } else {
+  } else if (laplacian == 'normalized') {
     L <- normalized.laplacian(B)
   }
   if (use.all) {
