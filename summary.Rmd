@@ -50,6 +50,7 @@ options(xtable.comment = FALSE,
 import::from(magrittr, `%>%`)
 library(plot.matrix)
 library(ggplot2)
+library(mclust)
 
 theme_set(theme_bw())
 ```
@@ -547,8 +548,8 @@ $\begin{bmatrix}
   \hat{\lambda}^{(lk)} & -\hat{\lambda}^{(lk)} 
 \end{bmatrix}$ 
 where each $\hat{\lambda}^{(kl)}$ is defined as in Algorithm 4, approximates 
-the latent positions of $M^{(kl)}$ by the rate in Theorem 5 of 
-\citet{rubindelanchy2017statistical}.  
+the latent positions of $M^{(kl)}$ up to indefinite orthogonal transformation 
+by the rate given in Theorem 5 of \citet{rubindelanchy2017statistical}.  
 In this case, the indefinite orthogonal transformation $W_*$ in the GRDPG 
 result \cite{rubindelanchy2017statistical} is of the form 
 $U^\top \hat{U}$. The eigenvalues of $M$ are distinct since the signature 
@@ -758,7 +759,6 @@ rmse.df %>%
 # Real data examples
 
 ```{r}
-library(mclust)
 import::here(cluster.pabm, .from = '~/dev/pabm-grdpg/functions.R')
 
 n.edges <- 20566
@@ -780,7 +780,7 @@ A <- (A > delta) * 1
 z.hat <- cluster.pabm(A, K)
 A.star <- A[order(z.hat), order(z.hat)]
 
-ari <- round(fossil::adj.rand.index(z, z.hat) * 100)
+# ari <- round(fossil::adj.rand.index(z, z.hat) * 100)
 ```
 
 In the first real data example, we applied Algorithm 2 to the Leeds Butterfly 
@@ -818,7 +818,7 @@ plot.A <- function(A, labels) {
     tibble::as_tibble() %>% 
     tibble::rowid_to_column(var = 'X') %>% 
     tidyr::gather(key = 'Y', value = 'Z', -1) %>% 
-    dplyr::mutate(Y = as.numeric(gsub('V', '', Y))) %>% 
+    dplyr::mutate(Y = rev(as.numeric(gsub('V', '', Y)))) %>% 
     ggplot() + 
     geom_tile(aes(x = X, y = Y, fill = Z)) + 
     coord_fixed() + 
@@ -833,7 +833,7 @@ plot.A <- function(A, labels) {
           axis.ticks.y = element_blank()) + 
     scale_x_continuous(expand = c(0, 0)) + 
     scale_y_continuous(expand = c(0, 0)) + 
-    scale_fill_gradient(low = 'yellow', high = 'red')
+    scale_fill_gradient(low = 'red', high = 'yellow')
 }
 ```
 
@@ -896,7 +896,7 @@ dplyr::tibble(network = c('British MPs', 'Political blogs', 'DBLP'),
                                'and Algorithm 2.'))
 ```
 
-```{r mp, cache = TRUE, fig.width = 8, fig.height = 2, fig.cap = 'Adjacency matrices of (from left to right) the British MPs, Political Blogs, and DBLP networks after sorting by the clustering outputted by Algorithm 2.'}
+```{r mp, cache = TRUE, fig.width = 8, fig.height = 2, fig.cap = 'Adjacency matrices of (from left to right) the British MPs, Political Blogs, and DBLP networks after sorting by the clustering outputted by Algorithm 2.', fig.dpi = 25}
 gridExtra::grid.arrange(plot.A(A.bmp, zhat.bmp),
                         plot.A(A.pb, zhat.pb),
                         plot.A(A.dblp, zhat.dblp),
