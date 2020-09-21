@@ -643,7 +643,7 @@ with $n$:
 densities.df <- readr::read_csv('densities.csv')
 
 ggplot(densities.df) + 
-  geom_density(aes(x = inner.prods, colour = factor(n))) + 
+  geom_density(aes(x = inner.prods * sqrt(n), colour = factor(n))) + 
   labs(x = 'between cluster inner products',
        colour = 'n') + 
   scale_colour_brewer(palette = 'Set1')
@@ -778,7 +778,6 @@ delta <- quantile(A[upper.tri(A)], 1 - n.edges / (n * (n - 1) / 2))
 A <- (A > delta) * 1
 
 z.hat <- cluster.pabm(A, K)
-A.star <- A[order(z.hat), order(z.hat)]
 
 # ari <- round(fossil::adj.rand.index(z, z.hat) * 100)
 ```
@@ -812,9 +811,15 @@ sparse subspace clustering on the same dataset.
 #           revC = TRUE)
 # }
 
-plot.A <- function(A, labels) {
+plot.A <- function(A, labels, max.size = 500) {
   # https://www.r-graph-gallery.com/79-levelplot-with-ggplot2.html
-  A[order(labels), order(labels)] %>% 
+  A <- A[order(labels), order(labels)]
+  n <- nrow(A)
+  if (n > max.size) {
+    ind <- sort(sample(seq(n), max.size))
+    A <- A[ind, ind]
+  }
+  A %>% 
     tibble::as_tibble() %>% 
     tibble::rowid_to_column(var = 'X') %>% 
     tidyr::gather(key = 'Y', value = 'Z', -1) %>% 
@@ -837,8 +842,8 @@ plot.A <- function(A, labels) {
 }
 ```
 
-```{r butterfly, fig.height = 2, fig.width = 2, fig.cap = 'Adjacency matrix of the Leeds Butterfly dataset after sorting by the clustering outputted by Algorithm 2.', cache = TRUE}
-plot.A(A.star)
+```{r butterfly, fig.height = 2, fig.width = 2, fig.cap = 'Adjacency matrix of the Leeds Butterfly dataset after sorting by the clustering outputted by Algorithm 2.', cache = FALSE}
+plot.A(A, z.hat)
 ```
 
 ```{r}
@@ -859,11 +864,11 @@ z.dblp <- dblp$z
 ```
 
 ```{r, cache = TRUE}
-zhat.bmp <- cluster.pabm(A.bmp, 2, use.all = TRUE, normalize = TRUE)
+zhat.bmp <- cluster.pabm(A.bmp, 2, use.all = TRUE, normalize = FALSE)
 bmp.acc <- mean(zhat.bmp == z.bmp)
 
-zhat.pb <- cluster.pabm(A.pb, 2, use.all = TRUE, normalize = TRUE, 
-                        p = 2, q = 0)
+zhat.pb <- cluster.pabm(A.pb, 2, use.all = TRUE, normalize = FALSE, 
+                        p = 2, q = 0, d.eigenmap = 2)
 pb.acc <- mean(zhat.pb == z.pb)
 
 zhat.dblp <- cluster.pabm(A.dblp, 2, use.all = TRUE, normalize = FALSE)
@@ -896,12 +901,11 @@ dplyr::tibble(network = c('British MPs', 'Political blogs', 'DBLP'),
                                'and Algorithm 2.'))
 ```
 
-```{r mp, cache = TRUE, fig.width = 8, fig.height = 2, fig.cap = 'Adjacency matrices of (from left to right) the British MPs, Political Blogs, and DBLP networks after sorting by the clustering outputted by Algorithm 2.', fig.dpi = 25}
+```{r mp, cache = TRUE, fig.width = 8, fig.height = 2, fig.cap = 'Adjacency matrices of (from left to right) the British MPs, Political Blogs, and DBLP networks after sorting by the clustering outputted by Algorithm 2.', fig.dpi = 10}
 gridExtra::grid.arrange(plot.A(A.bmp, zhat.bmp),
                         plot.A(A.pb, zhat.pb),
                         plot.A(A.dblp, zhat.dblp),
                         ncol = 3)
-
 ```
 
 # Discussion

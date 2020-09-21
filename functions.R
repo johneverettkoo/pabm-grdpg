@@ -69,7 +69,7 @@ graph.laplacian <- function(W) {
 cluster.pabm <- function(A, K, 
                          normalize = TRUE, 
                          use.all = TRUE,
-                         p = NULL, q = NULL, 
+                         p = NULL, q = NULL, d.eigenmap = K + 1, 
                          laplacian = 'normalized') {
   n <- nrow(A)
   if (is.null(p)) {
@@ -87,7 +87,7 @@ cluster.pabm <- function(A, K,
   }
   V <- eigen(A, symmetric = TRUE)$vectors[, indices]
   if (normalize) {
-    v.norm <- sqrt(apply(V, 1, function(v) sum(v ** 2)))
+    v.norm <- sqrt(rowSums(V ** 2))
     V <- sweep(V, 1, v.norm, `/`)
   }
   B <- abs(V %*% t(V))
@@ -97,9 +97,9 @@ cluster.pabm <- function(A, K,
     L <- normalized.laplacian(B)
   }
   if (use.all) {
-    eigenmap <- eigen(L, symmetric = TRUE)$vectors[, seq(n, n - K)]
+    eigenmap <- eigen(L, symmetric = TRUE)$vectors[, seq(n, n - d.eigenmap + 1)]
   } else {
-    eigenmap <- eigen(L, symmetric = TRUE)$vectors[, seq(n - 1, n - K)]
+    eigenmap <- eigen(L, symmetric = TRUE)$vectors[, seq(n - 1, n - d.eigenmap + 1)]
   }
   clustering <- mclust::Mclust(eigenmap, K)$classification
 }
