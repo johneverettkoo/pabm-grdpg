@@ -339,3 +339,33 @@ generate.P.beta <- function(n, K = 2, a1 = 2, b1 = 1, a2 = 1, b2 = 2) {
   }
   return(list(P = P, clustering = clustering))
 }
+
+plot.A <- function(A, labels, max.size = 500) {
+  # https://www.r-graph-gallery.com/79-levelplot-with-ggplot2.html
+  A <- A[order(labels), order(labels)]
+  n <- nrow(A)
+  if (n > max.size) {
+    ind <- sort(sample(seq(n), max.size))
+    A <- A[ind, ind]
+  }
+  A %>% 
+    tibble::as_tibble() %>% 
+    tibble::rowid_to_column(var = 'X') %>% 
+    tidyr::gather(key = 'Y', value = 'Z', -1) %>% 
+    dplyr::mutate(Y = rev(as.numeric(gsub('V', '', Y)))) %>% 
+    ggplot() + 
+    geom_tile(aes(x = X, y = Y, fill = Z)) + 
+    coord_fixed() + 
+    labs(x = NULL, y = NULL) + 
+    theme_void() + 
+    theme(legend.position = 'none',
+          axis.title.x = element_blank(),
+          axis.text.x = element_blank(),
+          axis.ticks.x = element_blank(),
+          axis.title.y = element_blank(),
+          axis.text.y = element_blank(),
+          axis.ticks.y = element_blank()) + 
+    scale_x_continuous(expand = c(0, 0)) + 
+    scale_y_continuous(expand = c(0, 0)) + 
+    scale_fill_gradient(low = 'red', high = 'yellow')
+}

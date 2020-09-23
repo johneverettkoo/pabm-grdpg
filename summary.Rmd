@@ -759,7 +759,7 @@ rmse.df %>%
 # Real data examples
 
 ```{r}
-import::here(cluster.pabm, .from = '~/dev/pabm-grdpg/functions.R')
+import::here(cluster.pabm, plot.A, .from = '~/dev/pabm-grdpg/functions.R')
 
 n.edges <- 20566
 
@@ -794,53 +794,6 @@ Comparing against the ground truth species labels, Algorithm 2 achieves an
 accuracy of 63\% and an adjusted Rand index of 73\%. In comparison, 
 \citet{noroozi2019estimation} achieved an adjusted Rand index of 73\% using 
 sparse subspace clustering on the same dataset.
-
-```{r}
-# plot.A <- function(A, margins = c(0, 0, 0, 0)) {
-#   default.mar <- par()$mar
-#   par(mar = margins)
-#   plot(A, border = NA, key = NULL, 
-#        xlab = '', ylab = '', main = '',
-#        axis.row = NULL, axis.col = NULL, asp = 1)
-#   par(mar = default.mar)
-# }
-
-# plot.A <- function(A, labels) {
-#   heatmap(A[order(labels), order(labels)],
-#           margins = c(0, 0),
-#           revC = TRUE)
-# }
-
-plot.A <- function(A, labels, max.size = 500) {
-  # https://www.r-graph-gallery.com/79-levelplot-with-ggplot2.html
-  A <- A[order(labels), order(labels)]
-  n <- nrow(A)
-  if (n > max.size) {
-    ind <- sort(sample(seq(n), max.size))
-    A <- A[ind, ind]
-  }
-  A %>% 
-    tibble::as_tibble() %>% 
-    tibble::rowid_to_column(var = 'X') %>% 
-    tidyr::gather(key = 'Y', value = 'Z', -1) %>% 
-    dplyr::mutate(Y = rev(as.numeric(gsub('V', '', Y)))) %>% 
-    ggplot() + 
-    geom_tile(aes(x = X, y = Y, fill = Z)) + 
-    coord_fixed() + 
-    labs(x = NULL, y = NULL) + 
-    theme_void() + 
-    theme(legend.position = 'none',
-          axis.title.x = element_blank(),
-          axis.text.x = element_blank(),
-          axis.ticks.x = element_blank(),
-          axis.title.y = element_blank(),
-          axis.text.y = element_blank(),
-          axis.ticks.y = element_blank()) + 
-    scale_x_continuous(expand = c(0, 0)) + 
-    scale_y_continuous(expand = c(0, 0)) + 
-    scale_fill_gradient(low = 'red', high = 'yellow')
-}
-```
 
 ```{r butterfly, fig.height = 2, fig.width = 2, fig.cap = 'Adjacency matrix of the Leeds Butterfly dataset after sorting by the clustering outputted by Algorithm 2.', cache = FALSE}
 plot.A(A, z.hat)
@@ -909,6 +862,14 @@ gridExtra::grid.arrange(plot.A(A.bmp, zhat.bmp),
                         plot.A(A.pb, zhat.pb),
                         plot.A(A.dblp, zhat.dblp),
                         ncol = 3)
+```
+
+In the third example, 
+
+```{r, cache = TRUE, fig.cap = 'Adjacency matrix of the Karnataka villages data, arranged by the clustering produced by Algorithm 2.'}
+A.hh <- readRDS('data/village-hh-59.rds')
+zhat.hh <- cluster.pabm(A.hh, 6)
+plot.A(A.hh, zhat.hh)
 ```
 
 # Discussion
