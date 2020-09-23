@@ -866,13 +866,16 @@ z.dblp <- dblp$z
 ```{r, cache = TRUE}
 zhat.bmp <- cluster.pabm(A.bmp, 2, use.all = TRUE, normalize = FALSE)
 bmp.acc <- mean(zhat.bmp == z.bmp)
+bmp.acc <- ifelse(bmp.acc < .5, 1 - bmp.acc, bmp.acc)
 
 zhat.pb <- cluster.pabm(A.pb, 2, use.all = TRUE, normalize = FALSE, 
                         p = 2, q = 0, d.eigenmap = 2)
 pb.acc <- mean(zhat.pb == z.pb)
+pb.acc <- ifelse(pb.acc < .5, 1 - pb.acc, pb.acc)
 
 zhat.dblp <- cluster.pabm(A.dblp, 2, use.all = TRUE, normalize = FALSE)
-dblp.acc <- 1 - mean(zhat.dblp == z.dblp)
+dblp.acc <- mean(zhat.dblp == z.dblp)
+dblp.acc <- ifelse(dblp.acc < .5, 1 - dblp.acc, dblp.acc)
 ```
 
 In the second example, we applied Algorithm 2 to the British MPs Twitter 
