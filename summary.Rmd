@@ -643,8 +643,8 @@ with $n$:
 densities.df <- readr::read_csv('densities.csv')
 
 ggplot(densities.df) + 
-  geom_density(aes(x = inner.prods * sqrt(n), colour = factor(n))) + 
-  labs(x = 'between cluster inner products',
+  geom_density(aes(x = inner.prods * n, colour = factor(n))) + 
+  labs(x = expression(n * v[i]^T * v[j]),
        colour = 'n') + 
   scale_colour_brewer(palette = 'Set1')
 ```
@@ -866,7 +866,7 @@ gridExtra::grid.arrange(plot.A(A.bmp, zhat.bmp),
 
 In the third example, 
 
-```{r, cache = TRUE, fig.cap = 'Adjacency matrix of the Karnataka villages data, arranged by the clustering produced by Algorithm 2.'}
+```{r, cache = TRUE, fig.cap = 'Adjacency matrix of the Karnataka villages data, arranged by the clustering produced by Algorithm 2.', fig.height = 2}
 A.hh <- readRDS('data/village-hh-59.rds')
 zhat.hh <- cluster.pabm(A.hh, 6)
 plot.A(A.hh, zhat.hh)
