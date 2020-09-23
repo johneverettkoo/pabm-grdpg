@@ -98,7 +98,7 @@ graphs are hollow, i.e., there are no edges from a vertex to itself.
 
 # Connecting the Popularity Adjusted Block Model to the Generalized Random Dot Product Graph
 
-## The popularity adjusted block model (PABM) \cite{noroozi2019estimation} and the generalized random dot product graph \cite{rubindelanchy2017statistical}
+## The popularity adjusted block model (PABM) \cite{307cbeb9b1be48299388437423d94bf1} and the generalized random dot product graph \cite{rubindelanchy2017statistical}
 
 **Definition 1**. 
 Let $P \in [0, 1]^{n \times n}$ be a symmetric edge probability matrix for a 
