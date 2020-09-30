@@ -695,8 +695,14 @@ $\lambda^{(kl)} \stackrel{iid}{\sim} Beta(1, 2)$ for $k \neq l$
 
 ### Community detection
 
-```{r clust_err_k, fig.cap = 'IQR of clustering error using Algorithm 2 (red) compared against subspace clustering (blue) for sample sizes from 64 to 2048 and number of clusters from 2 to 8. Simulations were repeated 100 times for each sample size. The $y$-axis is shown on a logarithmic scale.', fig.width = 8}
+```{r clust_err_k, fig.cap = 'IQR of clustering error using Algorithm 2 (red) compared against subspace clustering (green) and modularity maximization (blue) for sample sizes from 64 to 2048 and number of clusters from 2 to 8. Simulations were repeated 100 times for each sample size. The $y$-axis is shown on a logarithmic scale.', fig.width = 8}
 clustering.df <- readr::read_csv('clustering-k.csv')
+mod.max.df <- readr::read_csv('mod-max-k.csv') %>% 
+  dplyr::group_by(K, n) %>% 
+  dplyr::summarise(med.err.mm = median(error.mm),
+                   first.q.mm = quantile(error.mm, .25),
+                   third.q.mm = quantile(error.mm, .75)) %>% 
+  dplyr::ungroup()
 clustering.df %>%
   dplyr::group_by(K, n) %>%
   dplyr::summarise(med.err = median(error),
@@ -719,6 +725,12 @@ clustering.df %>%
                 colour = 'SSC')) + 
   geom_errorbar(aes(x = n, ymin = first.q.ssc, ymax = third.q.ssc,
                     colour = 'SSC')) + 
+  geom_line(data = mod.max.df,
+            aes(x = n, y = med.err.mm,
+                colour = 'modularity maximization')) + 
+  geom_errorbar(data = mod.max.df,
+                aes(x = n, ymin = first.q.mm, ymax = third.q.mm,
+                    colour = 'modularity maximization')) + 
   scale_colour_brewer(palette = 'Set1') + 
   facet_wrap(~ K, labeller = 'label_both')
 ```
@@ -867,7 +879,7 @@ gridExtra::grid.arrange(plot.A(A.bmp, zhat.bmp),
 
 In the third example, 
 
-```{r, cache = FALSE, fig.cap = 'Adjacency matrix of the Karnataka villages data, arranged by the clustering produced by Algorithm 2.', fig.height = 2}
+```{r, cache = FALSE, fig.cap = 'Adjacency matrix of the Karnataka villages data, arranged by the clustering produced by Algorithm 2 (left) and results of \\citet{fosdick2016multiresolution} (right).', fig.height = 2}
 hh <- readRDS('data/village-hh-59.rds')
 A.hh <- hh$A
 z.hh <- hh$z
