@@ -57,6 +57,7 @@ theme_set(theme_bw())
 
 \newcommand{\diag}{\text{diag}}
 \newcommand{\tr}{\text{Tr}}
+\newcommand{\blockdiag}{\text{blockdiag}}
 
 # Introduction
 
@@ -223,9 +224,9 @@ Let $\Lambda^{(k)} =
 \begin{bmatrix} \lambda^{(k,1)} & \cdots & \lambda^{(k, K)} \end{bmatrix}
 \in \mathbb{R}^{n_k \times K}$.  
 Let $X$ be a block diagonal matrix 
-$X = \diag(\Lambda^{(1)}, ..., \Lambda^{(K)}) \in \mathbb{R}^{n \times K^2}$.  
+$X = \blockdiag(\Lambda^{(1)}, ..., \Lambda^{(K)}) \in \mathbb{R}^{n \times K^2}$.  
 Let $L^{(k)}$ be a block diagonal matrix of column vectors $\lambda^{(lk)}$ for 
-$l = 1, ..., K$. $L^{(k)} = \diag(\lambda^{(1k)}, ..., \lambda^{(Kk)}) \in 
+$l = 1, ..., K$. $L^{(k)} = \blockdiag(\lambda^{(1k)}, ..., \lambda^{(Kk)}) \in 
 \mathbb{R}^{n \times K}$.  
 Let $Y = \begin{bmatrix} L^{(1)} & \cdots & L^{(K)} \end{bmatrix} \in 
 \mathbb{R}^{n \times K^2}$.  
@@ -857,7 +858,7 @@ dplyr::tibble(network = c('British MPs', 'Political blogs', 'DBLP'),
                                'and Algorithm 2.'))
 ```
 
-```{r mp, cache = TRUE, fig.width = 8, fig.height = 2, fig.cap = 'Adjacency matrices of (from left to right) the British MPs, Political Blogs, and DBLP networks after sorting by the clustering outputted by Algorithm 2.', fig.dpi = 10}
+```{r mp, cache = FALSE, fig.width = 8, fig.height = 2, fig.cap = 'Adjacency matrices of (from left to right) the British MPs, Political Blogs, and DBLP networks after sorting by the clustering outputted by Algorithm 2.', fig.dpi = 10}
 gridExtra::grid.arrange(plot.A(A.bmp, zhat.bmp),
                         plot.A(A.pb, zhat.pb),
                         plot.A(A.dblp, zhat.dblp),
@@ -866,10 +867,19 @@ gridExtra::grid.arrange(plot.A(A.bmp, zhat.bmp),
 
 In the third example, 
 
-```{r, cache = TRUE, fig.cap = 'Adjacency matrix of the Karnataka villages data, arranged by the clustering produced by Algorithm 2.', fig.height = 2}
-A.hh <- readRDS('data/village-hh-59.rds')
-zhat.hh <- cluster.pabm(A.hh, 6)
-plot.A(A.hh, zhat.hh)
+```{r, cache = FALSE, fig.cap = 'Adjacency matrix of the Karnataka villages data, arranged by the clustering produced by Algorithm 2.', fig.height = 2}
+hh <- readRDS('data/village-hh-59.rds')
+A.hh <- hh$A
+z.hh <- hh$z
+K <- 6
+zhat.hh <- cluster.pabm(A.hh, K, 
+                        use.all = TRUE, normalize = FALSE, p = K, q = 0)
+
+zhat.mres <- readRDS('data/mres-result.rds')
+
+gridExtra::grid.arrange(plot.A(A.hh, zhat.hh), 
+                        plot.A(A.hh, zhat.mres),
+                        ncol = 2)
 ```
 
 # Discussion
