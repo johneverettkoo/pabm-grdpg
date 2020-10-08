@@ -97,9 +97,11 @@ cluster.pabm <- function(A, K,
     L <- normalized.laplacian(B)
   }
   if (use.all) {
-    eigenmap <- eigen(L, symmetric = TRUE)$vectors[, seq(n, n - d.eigenmap + 1)]
+    eigenmap <- 
+      eigen(L, symmetric = TRUE)$vectors[, seq(n, n - d.eigenmap + 1)]
   } else {
-    eigenmap <- eigen(L, symmetric = TRUE)$vectors[, seq(n - 1, n - d.eigenmap + 1)]
+    eigenmap <- 
+      eigen(L, symmetric = TRUE)$vectors[, seq(n - 1, n - d.eigenmap + 1)]
   }
   clustering <- mclust::Mclust(eigenmap, K)$classification
 }
@@ -340,15 +342,15 @@ generate.P.beta <- function(n, K = 2, a1 = 2, b1 = 1, a2 = 1, b2 = 2) {
   return(list(P = P, clustering = clustering))
 }
 
-plot.A <- function(A, labels, lines = TRUE, max.size = 500) {
+plot.A <- function(A, z, lines = TRUE, max.size = 500) {
   # https://www.r-graph-gallery.com/79-levelplot-with-ggplot2.html
-  A <- A[order(labels), order(labels)]
-  labels <- sort(labels)
+  A <- A[order(z), order(z)]
+  z <- sort(z)
   n <- nrow(A)
   if (n > max.size) {
     ind <- sort(sample(seq(n), max.size))
     A <- A[ind, ind]
-    labels <- labels[ind]
+    z <- z[ind]
   }
   out.plot <- A %>% 
     tibble::as_tibble() %>% 
@@ -372,11 +374,11 @@ plot.A <- function(A, labels, lines = TRUE, max.size = 500) {
     scale_fill_gradient(low = 'red', high = 'yellow')
   
   if (lines) {
-    positions.x <- which(diff(labels) != 0)
-    positions.y <- which(diff(rev(labels)) != 0)
+    positions.x <- which(diff(z) != 0)
+    positions.y <- which(diff(rev(z)) != 0)
     out.plot <- out.plot + 
-      geom_hline(yintercept = positions.y) + 
-      geom_vline(xintercept = positions.x)
+      geom_hline(yintercept = positions.y + .5) + 
+      geom_vline(xintercept = positions.x + .5)
   }
   
   return(out.plot)

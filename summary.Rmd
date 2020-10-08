@@ -688,7 +688,9 @@ rmse.df %>%
 For these examples, we set the following parameters:
 
 * Number of underlying communities $K = 2, 4, 8$
-* Mixture parameters $\alpha_k = 1 / K$ for $k = 1, ..., K$
+* Mixture parameters $\alpha_K = 1 / K$ for $k = 1, ..., K$
+* Community labels 
+$z_k \stackrel{iid}{\sim} Multinomial(\alpha_K, ..., \alpha_K)$
 * Within-group popularities $\lambda^{(kk)} \stackrel{iid}{\sim} Beta(2, 1)$
 * Between-group popularities 
 $\lambda^{(kl)} \stackrel{iid}{\sim} Beta(1, 2)$ for $k \neq l$
@@ -772,7 +774,7 @@ rmse.df %>%
 # Real data examples
 
 ```{r}
-import::here(cluster.pabm, plot.A, .from = '~/dev/pabm-grdpg/functions.R')
+import::here(cluster.pabm, ssc, plot.A, .from = '~/dev/pabm-grdpg/functions.R')
 
 n.edges <- 20566
 
@@ -877,21 +879,34 @@ gridExtra::grid.arrange(plot.A(A.bmp, zhat.bmp),
                         ncol = 3)
 ```
 
-In the third example, 
+In the third example, we consider the Karantaka villages data studied by 
+\citet{DVN/U3BIHX_2013}. For this example, we chose the `visitgo` network from 
+village 12 at the household level. The label of interest is the religious 
+affiliation. The network was truncated to religions "1" and "2", and vertices 
+of degree 0 were removed. The resulting network has 141 vertices.
 
-```{r, cache = FALSE, fig.cap = 'Adjacency matrix of the Karnataka villages data, arranged by the clustering produced by Algorithm 2 (left) and results of \\citet{fosdick2016multiresolution} (right).', fig.height = 2}
-hh <- readRDS('data/village-hh-59.rds')
+```{r, cache = FALSE, fig.cap = 'Adjacency matrix of the Karnataka villages data, arranged by the clustering produced by Algorithm 2 (left) and sparse subspace clustering (right).', fig.height = 2, fig.width = 6, eval = TRUE}
+hh <- readRDS('data/village-hh-12.rds')
 A.hh <- hh$A
 z.hh <- hh$z
-K <- 6
-zhat.hh <- cluster.pabm(A.hh, K, 
-                        use.all = TRUE, normalize = FALSE, p = K, q = 0)
+K <- 2
+zhat.hh <- cluster.pabm(A.hh, K,
+                        use.all = TRUE, normalize = FALSE, p = 3, q = 1)
+zhat.hh.ssc <- ssc(A.hh, K, lambda = .1)
 
-zhat.mres <- readRDS('data/mres-result.rds')
-
-gridExtra::grid.arrange(plot.A(A.hh, zhat.hh), 
-                        plot.A(A.hh, zhat.mres),
+gridExtra::grid.arrange(plot.A(A.hh, zhat.hh),
+                        plot.A(A.hh, zhat.hh.ssc),
                         ncol = 2)
+```
+
+```{r, eval = TRUE}
+hh.acc <- mean(zhat.hh == z.hh)
+hh.acc <- ifelse(hh.acc < .5, 1 - hh.acc, hh.acc)
+hh.acc.ssc <- mean(zhat.hh.ssc == z.hh)
+hh.acc.ssc <- ifelse(hh.acc.ssc < .5, 1 - hh.acc.ssc, hh.acc.ssc)
+
+knitr::kable(data.frame(method = c('Algorithm 2', 'SSC'),
+                        accuracy = round(c(hh.acc, hh.acc.ssc), 3)))
 ```
 
 # Discussion
