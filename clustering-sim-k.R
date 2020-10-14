@@ -14,23 +14,36 @@ import::here(embedding, draw.graph,
              cluster.pabm, ssc,
              .from = 'functions.R')
 
+cluster.acc <- function(yhat, yobs) {
+  table(yhat, yobs) %>% 
+    as.matrix() %>% 
+    apply(1, max) %>% 
+    sum() %>% 
+    magrittr::divide_by(length(yhat)) %>% 
+    return()
+}
+
 # parallel backend
-doMC::registerDoMC(parallel::detectCores())
+doMC::registerDoMC(parallel::detectCores() / 4)
 
 # simulation parameters
-K.vec <- c(2, 4, 8)
+K.vec <- c(2, 3, 4)
 a1 <- 2
 b1 <- 1
 a2 <- 1
 b2 <- 2
 sparsity <- .01
-n.vec <- c(64, 128, 256, 512, 1024, 2048)
-iter <- 100
+n.vec <- c(128, 256, 512, 1024, 2048, 4096)
+iter <- 50
+# n.vec <- c(256, 512, 1024)
+# iter <- 10
+n.vec <- rev(n.vec)
+K.vec <- rev(K.vec)
 set.seed(314159)
 
 # clustering simulation
 clustering.df <- foreach(K = K.vec, .combine = dplyr::bind_rows) %do% {
-  foreach(n = n.vec, .combine = dplyr::bind_rows) %do% {
+  out.df <- foreach(n = n.vec, .combine = dplyr::bind_rows) %do% {
     print(paste('K =', K, ', n =', n))
     foreach(i = seq(iter), 
             .combine = dplyr::bind_rows, 
@@ -40,16 +53,17 @@ clustering.df <- foreach(K = K.vec, .combine = dplyr::bind_rows) %do% {
       z <- Pz$clustering
       A <- draw.graph(P)
       clustering <- cluster.pabm(A, K, use.all = TRUE)
-      error <- 1 - fossil::adj.rand.index(z, clustering)
+      error <- 1 - cluster.acc(clustering, z)
       clustering.ssc <- ssc(A, K, sparsity)
-      error.ssc <- 1 - fossil::adj.rand.index(z, clustering.ssc)
+      error.ssc <- 1 - cluster.acc(clustering.ssc, z)
       dplyr::tibble(K = K, n = n, error = error, 
                     error.ssc = error.ssc) %>% 
         return()
     } %>% 
       return()
-  } %>%
-    return()
+  }
+  gc()
+  return(out.df)
 }
 
 clustering.df %>%
