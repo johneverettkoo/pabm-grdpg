@@ -872,7 +872,7 @@ network \cite{greene2013producing}, the Political Blogs network
 data as described by 
 \citet{307cbeb9b1be48299388437423d94bf1} for their analysis of the same 
 networks. Our methods underperformed compared to modularity maximization, 
-although performance is comparable for the British MPs and DBLP networks. In 
+although performance is comparable. In 
 addition, Algorithm 2's runtime is much lower than that of modularity 
 maximization.
 
