@@ -104,6 +104,8 @@ cluster.pabm <- function(A, K,
       eigen(L, symmetric = TRUE)$vectors[, seq(n - 1, n - d.eigenmap + 1)]
   }
   clustering <- mclust::Mclust(eigenmap, K)$classification
+  
+  return(clustering)
 }
 
 rot.mat.2 <- function(angle, axis = 1) {
@@ -311,8 +313,14 @@ lambda.rmse.mle <- function(P, A, z) {
     return()
 }
 
-generate.P.beta <- function(n, K = 2, a1 = 2, b1 = 1, a2 = 1, b2 = 2) {
-  clustering <- sample(seq(K), n, replace = TRUE)
+generate.P.beta <- function(n, K = 2, a1 = 2, b1 = 1, a2 = 1, b2 = 2,
+                            unbalanced = FALSE) {
+  if (unbalanced) {
+    clustering <- rmultinom(n, 1, seq(K) ** -1) %>% 
+      apply(2, function(x) which(x == 1))
+  } else {
+    clustering <- sample(seq(K), n, replace = TRUE)
+  }
   clustering <- sort(clustering)
   n.vector <- sapply(seq(K), function(k) sum(clustering == k))
   
