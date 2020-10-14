@@ -585,7 +585,7 @@ $\lambda^{(kl)} \stackrel{iid}{\sim} Beta(1, 2)$ for $k \neq l$
 
 $50$ simulations were performed for each $(n, K)$ pair. 
 
-```{r clust_err_k, fig.cap = 'IQR of clustering error using Algorithm 2 (red) compared against subspace clustering (blue) for sample sizes from 64 to 2048 and number of clusters from 2 to 8. Simulations were repeated 50 times for each sample size. The $y$-axis is shown on a logarithmic scale.', fig.width = 10}
+```{r clust_err_k, fig.cap = 'IQR of clustering error using Algorithm 2 (red) compared against subspace clustering (blue) for sample sizes from 256 to 4096 and number of clusters from 2 to 4. Simulations were repeated 50 times for each sample size. The $y$-axis is shown on a logarithmic scale.', fig.width = 10}
 clustering.df <- readr::read_csv('clustering-k.csv')
 # mod.max.df <- readr::read_csv('mod-max-k.csv') %>% 
 #   dplyr::group_by(K, n) %>% 
@@ -658,7 +658,7 @@ clustering.df %>%
   scale_x_continuous(breaks = c(256, 512, 1024, 2048, 4096))
 ```
 
-```{r lambda_est_k, cache = FALSE, fig.cap = 'Log-log plot of the median and IQR RMSE from Algorithm 4 (red) compared against an MLE-based method (blue) using sample sizes from 64 to 2048 and number of clusters from 2 to 8. Simulations were repeated 50 times for each sample size.', fig.width = 10}
+```{r lambda_est_k, cache = FALSE, fig.cap = 'Log-log plot of the median and IQR RMSE from Algorithm 4 (red) compared against an MLE-based method (blue) using sample sizes from 256 to 4096 and number of clusters from 2 to 4. Simulations were repeated 50 times for each sample size.', fig.width = 10}
 rmse.df <- readr::read_csv('rmse.csv') %>% 
   dplyr::transmute(K = 2,
                    n = n,
@@ -709,7 +709,7 @@ $\lambda^{(kl)} \stackrel{iid}{\sim} Beta(1, 2)$ for $k \neq l$
 
 $50$ simulations were performed for each $(n, K)$ pair. 
 
-```{r clust_err_k_imba, fig.cap = 'IQR of clustering error using Algorithm 2 (red) compared against subspace clustering (blue) for sample sizes from 64 to 2048 and number of clusters from 2 to 8. Simulations were repeated 50 times for each sample size. The $y$-axis is shown on a logarithmic scale.', fig.width = 10}
+```{r clust_err_k_imba, fig.cap = 'IQR of clustering error using Algorithm 2 (red) compared against subspace clustering (blue) for sample sizes from 256 to 4096 and number of clusters from 2 to 4. Simulations were repeated 50 times for each sample size. The $y$-axis is shown on a logarithmic scale.', fig.width = 10}
 clustering.df <- readr::read_csv('clustering-k-imbalanced.csv')
 clustering.df %>%
   dplyr::group_by(K, n) %>%
