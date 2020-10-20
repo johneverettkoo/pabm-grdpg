@@ -561,6 +561,10 @@ up to sign flip.
 
 # Simulated Examples
 
+In these simulations, Algorithm 2 is compared against sparse subspace clustering \cite{soltanolkotabi2014} \cite{noroozi2019estimation} and modularity maximization \cite{307cbeb9b1be48299388437423d94bf1}, and Algorithm 3 is compared against an 
+MLE-based estimator \cite{noroozi2019estimation} and modularity maximization 
+\cite{307cbeb9b1be48299388437423d94bf1}. 
+
 ## Balanced communities
 
 In each simulation, community labels $z_1, ..., z_n$ were drawn 
