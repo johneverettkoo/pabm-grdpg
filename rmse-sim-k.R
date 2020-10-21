@@ -4,6 +4,7 @@
 # packgaes, functions, etc.
 import::from(magrittr, `%>%`)
 import::from(foreach, foreach, `%do%`)
+library(ggplot2)
 setwd('~/dev/pabm-grdpg')
 import::here(embedding, draw.graph, I.pq, generate.P.beta,
              estimate.lambda.block, lambda.rmse, lambda.rmse.mle,
