@@ -14,6 +14,12 @@ import::here(embedding, draw.graph,
              cluster.pabm, ssc,
              .from = 'functions.R')
 
+mod.max <- function(A) {
+  Ag <- graph_from_adjacency_matrix(A, mode = 'undirected')
+  clustering <- cluster_louvain(Ag)
+  return(membership(clustering))
+}
+
 cluster.acc <- function(yhat, yobs) {
   table(yhat, yobs) %>% 
     as.matrix() %>% 
@@ -24,7 +30,7 @@ cluster.acc <- function(yhat, yobs) {
 }
 
 # parallel backend
-doMC::registerDoMC(parallel::detectCores() / 4)
+doMC::registerDoMC(20)
 
 # simulation parameters
 K.vec <- c(2, 3, 4)
@@ -32,9 +38,9 @@ a1 <- 2
 b1 <- 1
 a2 <- 1
 b2 <- 2
-sparsity <- .01
+sparsity <- 1e-4
 n.vec <- c(128, 256, 512, 1024, 2048, 4096)
-iter <- 50
+iter <- 40
 # n.vec <- c(256, 512, 1024)
 # iter <- 10
 n.vec <- rev(n.vec)

@@ -6,6 +6,7 @@ import::from(magrittr, `%>%`)
 import::from(foreach, foreach, `%do%`, `%dopar%`)
 library(mclust)
 library(ggplot2)
+library(igraph)
 source('http://pages.iu.edu/~mtrosset/Courses/675/stress.r')
 setwd('~/dev/pabm-grdpg')
 import::here(embedding, draw.graph, 
@@ -13,6 +14,12 @@ import::here(embedding, draw.graph,
              normalized.laplacian,
              cluster.pabm, ssc,
              .from = 'functions.R')
+
+mod.max <- function(A) {
+  Ag <- graph_from_adjacency_matrix(A, mode = 'undirected')
+  clustering <- cluster_louvain(Ag)
+  return(membership(clustering))
+}
 
 cluster.acc <- function(yhat, yobs) {
   table(yhat, yobs) %>% 
@@ -24,7 +31,7 @@ cluster.acc <- function(yhat, yobs) {
 }
 
 # parallel backend
-doMC::registerDoMC(parallel::detectCores() / 4)
+doMC::registerDoMC(parallel::detectCores() / 2)
 
 # simulation parameters
 K.vec <- c(2, 3, 4)
@@ -32,9 +39,9 @@ a1 <- 2
 b1 <- 1
 a2 <- 1
 b2 <- 2
-sparsity <- .01
+sparsity <- 1e-4
 n.vec <- c(128, 256, 512, 1024, 2048, 4096)
-iter <- 50
+iter <- 40
 # n.vec <- c(256, 512, 1024)
 # iter <- 10
 n.vec <- rev(n.vec)
@@ -56,8 +63,12 @@ clustering.df <- foreach(K = K.vec, .combine = dplyr::bind_rows) %do% {
       error <- 1 - cluster.acc(clustering, z)
       clustering.ssc <- ssc(A, K, sparsity)
       error.ssc <- 1 - cluster.acc(clustering.ssc, z)
-      dplyr::tibble(K = K, n = n, error = error, 
-                    error.ssc = error.ssc) %>% 
+      clustering.mm <- mod.max(A)
+      error.mm <- 1 - cluster.acc(clustering.mm, z)
+      dplyr::tibble(K = K, n = n, 
+                    error = error, 
+                    error.ssc = error.ssc,
+                    error.mm = error.mm) %>% 
         return()
     } %>% 
       return()
@@ -66,6 +77,8 @@ clustering.df <- foreach(K = K.vec, .combine = dplyr::bind_rows) %do% {
   return(out.df)
 }
 
+gc()
+
 clustering.df %>%
   dplyr::group_by(K, n) %>%
   dplyr::summarise(med.err = median(error),
@@ -73,7 +86,10 @@ clustering.df %>%
                    third.q = quantile(error, .75),
                    med.err.ssc = median(error.ssc),
                    first.q.ssc = quantile(error.ssc, .25),
-                   third.q.ssc = quantile(error.ssc, .75)) %>%
+                   third.q.ssc = quantile(error.ssc, .75),
+                   med.err.mm = median(error.mm),
+                   first.q.mm = quantile(error.mm, .25),
+                   third.q.mm = quantile(error.mm, .75)) %>%
   ggplot() +
   scale_y_log10() +
   # scale_x_log10() +
@@ -83,6 +99,9 @@ clustering.df %>%
   geom_line(aes(x = n, y = med.err.ssc, colour = 'ssc')) +
   geom_errorbar(aes(x = n, ymin = first.q.ssc, ymax = third.q.ssc,
                     colour = 'ssc')) + 
+  geom_line(aes(x = n, y = med.err.mm, colour = 'mm')) + 
+  geom_errorbar(aes(x = n, ymin = first.q.mm, ymax = third.q.mm,
+                    colour = 'mm')) + 
   facet_wrap(~ K)
 
 # export as csv
