@@ -269,6 +269,7 @@ $\Pi = \begin{bmatrix}
 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1
 \end{bmatrix}$
 
@@ -561,9 +562,11 @@ up to sign flip.
 
 # Simulated Examples
 
-In these simulations, Algorithm 2 is compared against sparse subspace clustering \cite{soltanolkotabi2014} \cite{noroozi2019estimation} and modularity maximization \cite{307cbeb9b1be48299388437423d94bf1}, and Algorithm 3 is compared against an 
-MLE-based estimator \cite{noroozi2019estimation} and modularity maximization 
-\cite{307cbeb9b1be48299388437423d94bf1}. 
+In these simulations, Algorithm 2 is compared against sparse subspace 
+clustering \cite{soltanolkotabi2014} \cite{noroozi2019estimation} and 
+modularity maximization \cite{307cbeb9b1be48299388437423d94bf1} \cite{igraph}, 
+and Algorithm 4 is compared against an MLE-based estimator 
+\cite{noroozi2019estimation} \cite{307cbeb9b1be48299388437423d94bf1}. 
 
 ## Balanced communities
 
@@ -589,14 +592,8 @@ $\lambda^{(kl)} \stackrel{iid}{\sim} Beta(1, 2)$ for $k \neq l$
 
 $50$ simulations were performed for each $(n, K)$ pair. 
 
-```{r clust_err_k, fig.cap = 'IQR of clustering error using Algorithm 2 (red) compared against subspace clustering (blue) for sample sizes from 256 to 4096 and number of clusters from 2 to 4. Simulations were repeated 50 times for each sample size. The $y$-axis is shown on a logarithmic scale.', fig.width = 10}
+```{r clust_err_k, fig.cap = 'IQR of clustering error using Algorithm 2 (red) compared against modularity maximization (blue) and sparse subspace clustering (green) for sample sizes from 256 to 4096 and number of underlying communities from 2 to 4. Simulations were repeated 40 times for each sample size. The $y$-axis is shown on a logarithmic scale.', fig.width = 10}
 clustering.df <- readr::read_csv('clustering-k.csv')
-# mod.max.df <- readr::read_csv('mod-max-k.csv') %>% 
-#   dplyr::group_by(K, n) %>% 
-#   dplyr::summarise(med.err.mm = median(error.mm),
-#                    first.q.mm = quantile(error.mm, .25),
-#                    third.q.mm = quantile(error.mm, .75)) %>% 
-#   dplyr::ungroup()
 clustering.df %>%
   dplyr::group_by(K, n) %>%
   dplyr::summarise(med.err = median(error),
@@ -604,7 +601,10 @@ clustering.df %>%
                    third.q = quantile(error, .75),
                    med.err.ssc = median(error.ssc),
                    first.q.ssc = quantile(error.ssc, .25),
-                   third.q.ssc = quantile(error.ssc, .75)) %>%
+                   third.q.ssc = quantile(error.ssc, .75),
+                   med.err.mm = median(error.mm),
+                   first.q.mm = quantile(error.mm, .25),
+                   third.q.mm = quantile(error.mm, .75)) %>%
   dplyr::ungroup() %>% 
   ggplot() +
   # scale_x_log10() + 
@@ -618,12 +618,10 @@ clustering.df %>%
                 colour = 'SSC')) + 
   geom_errorbar(aes(x = n, ymin = first.q.ssc, ymax = third.q.ssc,
                     colour = 'SSC')) + 
-  # geom_line(data = mod.max.df,
-  #           aes(x = n, y = med.err.mm,
-  #               colour = 'modularity maximization')) + 
-  # geom_errorbar(data = mod.max.df,
-  #               aes(x = n, ymin = first.q.mm, ymax = third.q.mm,
-  #                   colour = 'modularity maximization')) + 
+  geom_line(aes(x = n, y = med.err.mm,
+                colour = 'modularity maximization')) +
+  geom_errorbar(aes(x = n, ymin = first.q.mm, ymax = third.q.mm,
+                    colour = 'modularity maximization')) +
   scale_colour_brewer(palette = 'Set1') + 
   facet_wrap(~ K, labeller = 'label_both') + 
   scale_x_continuous(breaks = c(256, 512, 1024, 2048, 4096)) +
@@ -633,7 +631,7 @@ clustering.df %>%
 Theorem 4 implies that algorithm 2 will result in not just in the error rate 
 converging to 0 but the error *count* as well (Fig. \ref{fig:clust_err_ct_sim}).
 
-```{r clust_err_ct_sim, fig.cap = 'IQR of counts of misclustered vertices using Algorithm 2 (red) compared against subspace clustering (blue) for sample sizes from 64 to 2048. Simulations were repeated 100 times for each sample size. The $y$-axis is shown on a logarithmic scale.', cache = FALSE, fig.width = 10}
+```{r clust_err_ct_sim, fig.cap = 'IQR of counts of misclustered vertices using Algorithm 2 (red) compared against subspace clustering (blue) for sample sizes from 128 to 4096. Simulations were repeated 40 times for each sample size. The $y$-axis is shown on a logarithmic scale.', cache = FALSE, fig.width = 10}
 clustering.df <- readr::read_csv('clustering-k.csv')
 clustering.df %>%
   dplyr::group_by(n, K) %>%
@@ -713,7 +711,7 @@ $\lambda^{(kl)} \stackrel{iid}{\sim} Beta(1, 2)$ for $k \neq l$
 
 $50$ simulations were performed for each $(n, K)$ pair. 
 
-```{r clust_err_k_imba, fig.cap = 'IQR of clustering error using Algorithm 2 (red) compared against subspace clustering (blue) for sample sizes from 256 to 4096 and number of clusters from 2 to 4. Simulations were repeated 50 times for each sample size. The $y$-axis is shown on a logarithmic scale.', fig.width = 10}
+```{r clust_err_k_imba, fig.cap = 'IQR of clustering error using Algorithm 2 (red) compared against subspace clustering (blue) for sample sizes from 128 to 4096 and number of clusters from 2 to 4. Simulations were repeated 50 times for each sample size. The $y$-axis is shown on a logarithmic scale.', fig.width = 10}
 clustering.df <- readr::read_csv('clustering-k-imbalanced.csv')
 clustering.df %>%
   dplyr::group_by(K, n) %>%

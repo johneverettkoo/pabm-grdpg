@@ -369,7 +369,7 @@ plot.A <- function(A, z, lines = TRUE, max.size = 500) {
     geom_tile(aes(x = X, y = Y, fill = Z)) + 
     coord_fixed() + 
     labs(x = NULL, y = NULL) + 
-    theme_void() +
+    # theme_void() +
     theme(legend.position = 'none',
           axis.title.x = element_blank(),
           axis.text.x = element_blank(),
@@ -379,14 +379,18 @@ plot.A <- function(A, z, lines = TRUE, max.size = 500) {
           axis.ticks.y = element_blank()) +
     scale_x_continuous(expand = c(0, 0)) + 
     scale_y_continuous(expand = c(0, 0)) + 
-    scale_fill_gradient(low = 'red', high = 'yellow')
+    scale_fill_gradient(low = 'white', high = 'black')
   
   if (lines) {
     positions.x <- which(diff(z) != 0)
     positions.y <- which(diff(rev(z)) != 0)
     out.plot <- out.plot + 
-      geom_hline(yintercept = positions.y + .5) + 
-      geom_vline(xintercept = positions.x + .5)
+      geom_hline(yintercept = positions.y + .5, 
+                 colour = 'red',
+                 size = .1) + 
+      geom_vline(xintercept = positions.x + .5, 
+                 colour = 'red',
+                 size = .1)
   }
   
   return(out.plot)
