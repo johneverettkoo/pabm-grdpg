@@ -583,16 +583,16 @@ For these examples, we set the following parameters:
 * Number of vertices $n = 256, 512, 1024, 2048, 4096$
 * Number of underlying communities $K = 2, 3, 4$
 * Mixture parameters $\alpha_k = 1 / K$ for $k = 1, ..., K$, (i.e., each 
-community has an equal probability of being drawn)
+community label has an equal probability of being drawn)
 * Community labels 
-$z_k \stackrel{iid}{\sim} Multinomial(\alpha_K, ..., \alpha_K)$
+$z_k \stackrel{iid}{\sim} Multinomial(\alpha_1, ..., \alpha_K)$
 * Within-group popularities $\lambda^{(kk)} \stackrel{iid}{\sim} Beta(2, 1)$
 * Between-group popularities 
 $\lambda^{(kl)} \stackrel{iid}{\sim} Beta(1, 2)$ for $k \neq l$
 
 $50$ simulations were performed for each $(n, K)$ pair. 
 
-```{r clust_err_k, fig.cap = 'IQR of clustering error using Algorithm 2 (red) compared against modularity maximization (blue) and sparse subspace clustering (green) for sample sizes from 128 to 4096 and number of underlying communities from 2 to 4. Simulations were repeated 40 times for each sample size. The $y$-axis is shown on a logarithmic scale.', fig.width = 10}
+```{r clust_err_k, fig.cap = 'IQR of clustering error using Algorithm 2 (red) compared against modularity maximization (blue) and sparse subspace clustering (green) for sample sizes from 128 to 4096 and number of underlying communities from 2 to 4. Simulations were repeated 50 times for each sample size. The $y$-axis is shown on a logarithmic scale.', fig.width = 10}
 clustering.df <- readr::read_csv('clustering-k.csv')
 clustering.df %>%
   dplyr::group_by(K, n) %>%
@@ -607,31 +607,31 @@ clustering.df %>%
                    third.q.mm = quantile(error.mm, .75)) %>%
   dplyr::ungroup() %>% 
   ggplot() +
-  # scale_x_log10() + 
+  scale_x_log10(breaks = c(128, 256, 512, 1024, 2048, 4096)) +
+  # scale_x_continuous(breaks = c(128, 256, 512, 1024, 2048, 4096)) + 
   labs(y = 'community detection error', 
        colour = NULL) +
   geom_line(aes(x = n, y = med.err,
                 colour = 'Algorithm 2')) +
   geom_errorbar(aes(x = n, ymin = first.q, ymax = third.q,
-                    colour = 'Algorithm 2')) + 
+                    colour = 'Algorithm 2'), width = .1) + 
   geom_line(aes(x = n, y = med.err.ssc,
                 colour = 'SSC')) + 
   geom_errorbar(aes(x = n, ymin = first.q.ssc, ymax = third.q.ssc,
-                    colour = 'SSC')) + 
+                    colour = 'SSC'), width = .1) + 
   geom_line(aes(x = n, y = med.err.mm,
                 colour = 'Modularity maximization')) +
   geom_errorbar(aes(x = n, ymin = first.q.mm, ymax = third.q.mm,
-                    colour = 'Modularity maximization')) +
+                    colour = 'Modularity maximization'), width = .1) +
   scale_colour_brewer(palette = 'Set1') + 
-  facet_wrap(~ K, labeller = 'label_both') + 
-  scale_x_continuous(breaks = c(128, 256, 512, 1024, 2048, 4096)) +
+  facet_wrap(~ K, labeller = 'label_both') +
   scale_y_log10()
 ```
 
 Theorem 4 implies that algorithm 2 will result in not just in the error rate 
 converging to 0 but the error *count* as well (Fig. \ref{fig:clust_err_ct_sim}).
 
-```{r clust_err_ct_sim, fig.cap = 'IQR of counts of misclustered vertices using Algorithm 2 (red) compared against subspace clustering (blue) for sample sizes from 128 to 4096. Simulations were repeated 40 times for each sample size. The $y$-axis is shown on a logarithmic scale.', cache = FALSE, fig.width = 10}
+```{r clust_err_ct_sim, fig.cap = 'IQR of counts of misclustered vertices using Algorithm 2 (red) compared against subspace clustering (blue) for sample sizes from 128 to 4096. Simulations were repeated 50 times for each sample size. The $y$-axis is shown on a logarithmic scale.', cache = FALSE, fig.width = 10}
 clustering.df <- readr::read_csv('clustering-k.csv')
 clustering.df %>%
   dplyr::group_by(n, K) %>%
@@ -646,25 +646,25 @@ clustering.df %>%
                    third.q.mm = quantile(error.mm, .75)) %>%
   dplyr::ungroup() %>% 
   ggplot() +
-  # scale_x_log10() + 
+  scale_x_log10(breaks = c(128, 256, 512, 1024, 2048, 4096)) +
+  # scale_x_continuous(breaks = c(128, 256, 512, 1024, 2048, 4096)) + 
   labs(y = 'misclustering count', 
        colour = NULL) +
   geom_line(aes(x = n, y = med.err * n,
                 colour = 'Algorithm 2')) +
   geom_errorbar(aes(x = n, ymin = first.q * n, ymax = third.q * n,
-                    colour = 'Algorithm 2')) + 
+                    colour = 'Algorithm 2'), width = .1) + 
   geom_line(aes(x = n, y = med.err.ssc * n,
                 colour = 'SSC')) + 
   geom_errorbar(aes(x = n, ymin = first.q.ssc * n, ymax = third.q.ssc * n,
-                    colour = 'SSC')) + 
+                    colour = 'SSC'), width = .1) + 
   geom_line(aes(x = n, y = med.err.mm * n,
                 colour = 'Modularity maximization')) + 
   geom_errorbar(aes(x = n, ymin = first.q.mm * n, ymax = third.q.mm * n,
-                    colour = 'Modularity maximization')) + 
+                    colour = 'Modularity maximization'), width = .1) + 
   scale_colour_brewer(palette = 'Set1') + 
   facet_wrap(~ K, labeller = 'label_both') + 
-  scale_y_log10() +
-  scale_x_continuous(breaks = c(128, 256, 512, 1024, 2048, 4096))
+  scale_y_log10()
 ```
 
 ```{r lambda_est_k, cache = FALSE, fig.cap = 'Log-log plot of the median and IQR RMSE from Algorithm 4 (red) compared against an MLE-based method (blue) using sample sizes from 128 to 4096 and number of clusters from 2 to 4. Simulations were repeated 50 times for each sample size.', fig.width = 10}
@@ -683,10 +683,10 @@ rmse.df %>%
   ggplot() +
   geom_line(aes(x = n, y = median.rmse, colour = 'Algorithm 4')) + 
   geom_errorbar(aes(x = n, ymin = q1.rmse, ymax = q3.rmse,
-                    colour = 'Algorithm 4')) + 
+                    colour = 'Algorithm 4'), width = .1) + 
   geom_line(aes(x = n, y = median.rmse.mle, colour = 'MLE-based')) + 
   geom_errorbar(aes(x = n, ymin = q1.rmse.mle, ymax = q3.rmse.mle,
-                   colour = 'MLE-based')) + 
+                   colour = 'MLE-based'), width = .1) + 
   scale_colour_brewer(palette = 'Set1') + 
   labs(y = 'RMSE', colour = NULL) + 
   facet_wrap(~ K, labeller = 'label_both') + 
@@ -728,24 +728,87 @@ clustering.df %>%
                    third.q.mm = quantile(error.mm, .75)) %>%
   dplyr::ungroup() %>% 
   ggplot() +
-  # scale_x_log10() + 
+  scale_x_log10(breaks = c(128, 256, 512, 1024, 2048, 4096)) +
+  # scale_x_continuous(breaks = c(128, 256, 512, 1024, 2048, 4096)) + 
   labs(y = 'community detection error', 
        colour = NULL) +
   geom_line(aes(x = n, y = med.err,
                 colour = 'Algorithm 2')) +
   geom_errorbar(aes(x = n, ymin = first.q, ymax = third.q,
-                    colour = 'Algorithm 2')) + 
+                    colour = 'Algorithm 2'), width = .1) + 
   geom_line(aes(x = n, y = med.err.ssc,
                 colour = 'SSC')) + 
   geom_errorbar(aes(x = n, ymin = first.q.ssc, ymax = third.q.ssc,
-                    colour = 'SSC')) + 
-  geom_line(aes(x = n, y = med.err.mm, colour = 'modularity maximization')) + 
+                    colour = 'SSC'), width = .1) + 
+  geom_line(aes(x = n, y = med.err.mm, colour = 'Modularity maximization')) + 
   geom_errorbar(aes(x = n, ymin = first.q.mm, ymax = third.q.mm, 
-                    colour = 'modularity maximization')) + 
+                    colour = 'Modularity maximization'), width = .1) + 
+  scale_colour_brewer(palette = 'Set1') + 
+  facet_wrap(~ K, labeller = 'label_both') +
+  scale_y_log10()
+```
+
+```{r clust_err_ct_sim_imba, fig.cap = 'IQR of counts of misclustered vertices using Algorithm 2 (red) compared against subspace clustering (blue) for sample sizes from 128 to 4096. Simulations were repeated 50 times for each sample size. The $y$-axis is shown on a logarithmic scale.', cache = FALSE, fig.width = 10}
+clustering.df <- readr::read_csv('clustering-k-imbalanced.csv')
+clustering.df %>%
+  dplyr::group_by(n, K) %>%
+  dplyr::summarise(med.err = median(error),
+                   first.q = quantile(error, .25),
+                   third.q = quantile(error, .75),
+                   med.err.ssc = median(error.ssc),
+                   first.q.ssc = quantile(error.ssc, .25),
+                   third.q.ssc = quantile(error.ssc, .75),
+                   med.err.mm = median(error.mm),
+                   first.q.mm = quantile(error.mm, .25),
+                   third.q.mm = quantile(error.mm, .75)) %>%
+  dplyr::ungroup() %>% 
+  ggplot() +
+  scale_x_log10(breaks = c(128, 256, 512, 1024, 2048, 4096)) +
+  # scale_x_continuous(breaks = c(128, 256, 512, 1024, 2048, 4096)) + 
+  labs(y = 'misclustering count', 
+       colour = NULL) +
+  geom_line(aes(x = n, y = med.err * n,
+                colour = 'Algorithm 2')) +
+  geom_errorbar(aes(x = n, ymin = first.q * n, ymax = third.q * n,
+                    colour = 'Algorithm 2'), width = .1) + 
+  geom_line(aes(x = n, y = med.err.ssc * n,
+                colour = 'SSC')) + 
+  geom_errorbar(aes(x = n, ymin = first.q.ssc * n, ymax = third.q.ssc * n,
+                    colour = 'SSC'), width = .1) + 
+  geom_line(aes(x = n, y = med.err.mm * n,
+                colour = 'Modularity maximization')) + 
+  geom_errorbar(aes(x = n, ymin = first.q.mm * n, ymax = third.q.mm * n,
+                    colour = 'Modularity maximization'), width = .1) + 
   scale_colour_brewer(palette = 'Set1') + 
   facet_wrap(~ K, labeller = 'label_both') + 
-  scale_x_continuous(breaks = c(128, 256, 512, 1024, 2048, 4096)) +
   scale_y_log10()
+```
+
+```{r lambda_est_k_imba, cache = FALSE, fig.cap = 'Log-log plot of the median and IQR RMSE from Algorithm 4 (red) compared against an MLE-based method (blue) using sample sizes from 128 to 4096 and number of clusters from 2 to 4. Simulations were repeated 50 times for each sample size.', fig.width = 10}
+rmse.df <- readr::read_csv('rmse-k-imbalanced.csv')
+
+rmse.df %>% 
+  na.omit() %>% 
+  dplyr::group_by(K, n) %>% 
+  dplyr::summarise(median.rmse = median(rmse),
+                   q1.rmse = quantile(rmse, .25),
+                   q3.rmse = quantile(rmse, .75),
+                   median.rmse.mle = median(rmse.mle),
+                   q1.rmse.mle = quantile(rmse.mle, .25),
+                   q3.rmse.mle = quantile(rmse.mle, .75)) %>% 
+  dplyr::ungroup() %>% 
+  ggplot() +
+  geom_line(aes(x = n, y = median.rmse, colour = 'Algorithm 4')) + 
+  geom_errorbar(aes(x = n, ymin = q1.rmse, ymax = q3.rmse,
+                    colour = 'Algorithm 4'), width = .1) + 
+  geom_line(aes(x = n, y = median.rmse.mle, colour = 'MLE-based')) + 
+  geom_errorbar(aes(x = n, ymin = q1.rmse.mle, ymax = q3.rmse.mle,
+                   colour = 'MLE-based'), width = .1) + 
+  scale_colour_brewer(palette = 'Set1') + 
+  labs(y = 'RMSE', colour = NULL) + 
+  facet_wrap(~ K, labeller = 'label_both') + 
+  scale_y_log10() + 
+  scale_x_log10(breaks = c(128, 256, 512, 1024, 2048, 4096))
 ```
 
 ## Additional experiments
@@ -867,21 +930,21 @@ addition, Algorithm 2's runtime is much lower than that of modularity
 maximization.
 
 ```{r}
-dplyr::tibble(network = c('British MPs', 'Political blogs', 'DBLP'),
-              vertices = c(nrow(A.bmp), nrow(A.pb), nrow(A.dblp)),
-              `error (mod. max.)` = c(round(1 / 329, 3),
+dplyr::tibble(Network = c('British MPs', 'Political blogs', 'DBLP'),
+              Vertices = c(nrow(A.bmp), nrow(A.pb), nrow(A.dblp)),
+              `Error (Mod. Max.)` = c(round(1 / 329, 3),
                                       round(61 / 1222, 3),
                                       round(62 / 2203, 3)),
-              `error (SSC)` = round(1 - c(bmp.acc.ssc,
+              `Error (SSC)` = round(1 - c(bmp.acc.ssc,
                                           pb.acc.ssc,
                                           dblp.acc.ssc), 3),
-              `error (alg. 2)` = round(1 - c(bmp.acc, 
+              `Error (Alg. 2)` = round(1 - c(bmp.acc, 
                                                   pb.acc,
                                                   dblp.acc), 3)) %>% 
   knitr::kable(caption = paste('Community detection error rates', 
                                'for modularity maximization,',
                                'sparse subspace clustering, ',
-                               'and Algorithm 2.'))
+                               'and Alg. 2.'))
 ```
 
 ```{r mp, cache = FALSE, fig.width = 8, fig.height = 2, fig.cap = 'Adjacency matrices of (from left to right) the British MPs, Political Blogs, and DBLP networks after sorting by the clustering outputted by Algorithm 2.', fig.dpi = 10}
@@ -937,9 +1000,9 @@ hh.acc.ssc <- ifelse(hh.acc.ssc < .5, 1 - hh.acc.ssc, hh.acc.ssc)
 hh.acc.mm <- mean(zhat.hh.mm == z.hh)
 hh.acc.mm <- ifelse(hh.acc.mm < .5, 1 - hh.acc.mm, hh.acc.mm)
 
-knitr::kable(data.frame(method = c('Algorithm 2', 'SSC', 
-                                   'Modularity maximization'),
-                        error = round(1 - c(hh.acc, hh.acc.ssc, hh.acc.mm), 3)),
+knitr::kable(data.frame(Method = c('Alg. 2', 'SSC', 
+                                   'Mod. Max.'),
+                        Error = round(1 - c(hh.acc, hh.acc.ssc, hh.acc.mm), 3)),
              caption = paste('Community detection error rates for identifying',
                              'household religion.'))
 ```
