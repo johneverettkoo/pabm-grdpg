@@ -31,7 +31,7 @@ cluster.acc <- function(yhat, yobs) {
 }
 
 # parallel backend
-doMC::registerDoMC(parallel::detectCores() / 2)
+doMC::registerDoMC(20)
 
 # simulation parameters
 K.vec <- c(2, 3, 4)
@@ -39,9 +39,9 @@ a1 <- 2
 b1 <- 1
 a2 <- 1
 b2 <- 2
-sparsity <- 1e-4
+sparsity <- 5e-4
 n.vec <- c(128, 256, 512, 1024, 2048, 4096)
-iter <- 40
+iter <- 50
 # n.vec <- c(256, 512, 1024)
 # iter <- 10
 n.vec <- rev(n.vec)
