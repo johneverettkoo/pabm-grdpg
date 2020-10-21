@@ -704,7 +704,7 @@ multinomial distribution. For these examples, we set the following parameters:
 * Mixture parameters $\alpha_k = \frac{k^{-1}}{\sum_{l=1}^K l^{-1}}$ for 
 $k = 1, ..., K$
 * Community labels 
-$z_k \stackrel{iid}{\sim} Multinomial(\alpha_K, ..., \alpha_K)$
+$z_k \stackrel{iid}{\sim} Multinomial(\alpha_1, ..., \alpha_K)$
 * Within-group popularities $\lambda^{(kk)} \stackrel{iid}{\sim} Beta(2, 1)$
 * Between-group popularities 
 $\lambda^{(kl)} \stackrel{iid}{\sim} Beta(1, 2)$ for $k \neq l$
@@ -737,38 +737,6 @@ clustering.df %>%
   scale_colour_brewer(palette = 'Set1') + 
   facet_wrap(~ K, labeller = 'label_both') + 
   scale_x_continuous(breaks = c(256, 512, 1024, 2048, 4096)) +
-  scale_y_log10()
-```
-
-## Replication and comparison of simulations from \citet*{307cbeb9b1be48299388437423d94bf1}
-
-```{r clust_err_sc, fig.cap = 'IQR of clustering error using Algorithm 2 (red) compared against modularity maximization (blue) for sample size equal to 400. Simulations were repeated 50 times for each sample size. The $y$-axis is shown on a logarithmic scale.', fig.height = 2, fig.width = 6}
-clustering.mm.df <- readr::read_csv('clustering-sim-sc.csv')
-clustering.ase.df <- readr::read_csv('clustering-sim-sc-ase.csv')
-clustering.df <- dplyr::bind_rows(
-  clustering.mm.df %>% 
-    dplyr::transmute(method = 'Modularity maximization',
-                     homophily = homophily,
-                     error = pa.err),
-  clustering.ase.df %>% 
-    dplyr::transmute(method = 'Algorithm 2',
-                     homophily = homophily,
-                     error = pa.err)
-)
-clustering.df %>%
-  dplyr::group_by(method, homophily) %>%
-  dplyr::summarise(med.err = median(error),
-                   first.q = quantile(error, .25),
-                   third.q = quantile(error, .75)) %>%
-  dplyr::ungroup() %>% 
-  ggplot() +
-  labs(y = 'community detection \nerror', 
-       colour = NULL) +
-  geom_line(aes(x = homophily, y = med.err, colour = method)) +
-  geom_errorbar(aes(x = homophily, ymin = first.q, ymax = third.q,
-                    colour = method)) + 
-  scale_colour_brewer(palette = 'Set1') + 
-  # coord_fixed(1) + 
   scale_y_log10()
 ```
 
@@ -865,6 +833,18 @@ pb.acc <- ifelse(pb.acc < .5, 1 - pb.acc, pb.acc)
 zhat.dblp <- cluster.pabm(A.dblp, 2, use.all = TRUE, normalize = FALSE)
 dblp.acc <- mean(zhat.dblp == z.dblp)
 dblp.acc <- ifelse(dblp.acc < .5, 1 - dblp.acc, dblp.acc)
+
+zhat.bmp.ssc <- ssc(A.bmp, 2, 1e-3)
+bmp.acc.ssc <- mean(zhat.bmp.ssc == z.bmp)
+bmp.acc.ssc <- ifelse(bmp.acc.ssc < .5, 1 - bmp.acc.ssc, bmp.acc.ssc)
+
+zhat.pb.ssc <- ssc(A.pb, 2, 1e-4)
+pb.acc.ssc <- mean(zhat.pb.ssc == z.pb)
+pb.acc.ssc <- ifelse(pb.acc.ssc < .5, 1 - pb.acc.ssc, pb.acc.ssc)
+
+zhat.dblp.ssc <- ssc(A.dblp, 2, 1e-2)
+dblp.acc.ssc <- mean(zhat.dblp.ssc == z.dblp)
+dblp.acc.ssc <- ifelse(dblp.acc.ssc < .5, 1 - dblp.acc.ssc, dblp.acc.ssc)
 ```
 
 In the second example, we applied Algorithm 2 to the British MPs Twitter 
@@ -881,15 +861,18 @@ maximization.
 ```{r}
 dplyr::tibble(network = c('British MPs', 'Political blogs', 'DBLP'),
               vertices = c(nrow(A.bmp), nrow(A.pb), nrow(A.dblp)),
-              `error (modularity maximization)` = c(round(1 / 329, 3),
-                                                    round(61 / 1222, 3),
-                                                    round(62 / 2203, 3)),
-              `error (algorithm 2)` = round(1 - c(bmp.acc, 
+              `error (mod. max.)` = c(round(1 / 329, 3),
+                                      round(61 / 1222, 3),
+                                      round(62 / 2203, 3)),
+              `error (SSC)` = round(1 - c(bmp.acc.ssc,
+                                          pb.acc.ssc,
+                                          dblp.acc.ssc), 3),
+              `error (alg. 2)` = round(1 - c(bmp.acc, 
                                                   pb.acc,
                                                   dblp.acc), 3)) %>% 
   knitr::kable(caption = paste('Community detection error rates', 
-                               'for modularity maximization',
-                               '(\\citet{307cbeb9b1be48299388437423d94bf1})',
+                               'for modularity maximization,',
+                               'sparse subspace clustering, ',
                                'and Algorithm 2.'))
 ```
 
