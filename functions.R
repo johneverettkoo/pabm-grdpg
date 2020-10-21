@@ -370,6 +370,7 @@ plot.A <- function(A, z, lines = TRUE, max.size = 500) {
     coord_fixed() + 
     labs(x = NULL, y = NULL) + 
     # theme_void() +
+    # ggthemes::theme_base() + 
     theme(legend.position = 'none',
           axis.title.x = element_blank(),
           axis.text.x = element_blank(),
