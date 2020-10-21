@@ -5,6 +5,7 @@
 import::from(magrittr, `%>%`)
 import::from(foreach, foreach, `%do%`, `%dopar%`)
 library(mclust)
+library(igraph)
 library(ggplot2)
 source('http://pages.iu.edu/~mtrosset/Courses/675/stress.r')
 setwd('~/dev/pabm-grdpg')
