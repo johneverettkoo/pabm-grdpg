@@ -474,7 +474,7 @@ embedding of $A$.
     Compute $A^{(kl)} = U \Sigma V^\top$, the SVD of the $kl^{th}$ 
     block.\;
     Assign $u^{(kl)}$ and $v^{(kl)}$ as the first columns of $U$ and $V$. 
-    Assign $\sigma^2 \leftarrow \Sigma_{11}$.\;
+    Assign $(\sigma^{(kl)})^2 \leftarrow \Sigma_{11}$.\;
     Assign $\hat{\lambda}^{(kl)} \leftarrow \pm \sigma^{(kl)} u^{(kl)}$ and 
     $\hat{\lambda}^{(lk)} \leftarrow \pm \sigma^{(kl)} v^{(kl)}$.
   }
@@ -619,9 +619,9 @@ clustering.df %>%
   geom_errorbar(aes(x = n, ymin = first.q.ssc, ymax = third.q.ssc,
                     colour = 'SSC')) + 
   geom_line(aes(x = n, y = med.err.mm,
-                colour = 'modularity maximization')) +
+                colour = 'Modularity maximization')) +
   geom_errorbar(aes(x = n, ymin = first.q.mm, ymax = third.q.mm,
-                    colour = 'modularity maximization')) +
+                    colour = 'Modularity maximization')) +
   scale_colour_brewer(palette = 'Set1') + 
   facet_wrap(~ K, labeller = 'label_both') + 
   scale_x_continuous(breaks = c(128, 256, 512, 1024, 2048, 4096)) +
@@ -640,7 +640,10 @@ clustering.df %>%
                    third.q = quantile(error, .75),
                    med.err.ssc = median(error.ssc),
                    first.q.ssc = quantile(error.ssc, .25),
-                   third.q.ssc = quantile(error.ssc, .75)) %>%
+                   third.q.ssc = quantile(error.ssc, .75),
+                   med.err.mm = median(error.mm),
+                   first.q.mm = quantile(error.mm, .25),
+                   third.q.mm = quantile(error.mm, .75)) %>%
   dplyr::ungroup() %>% 
   ggplot() +
   # scale_x_log10() + 
@@ -654,19 +657,18 @@ clustering.df %>%
                 colour = 'SSC')) + 
   geom_errorbar(aes(x = n, ymin = first.q.ssc * n, ymax = third.q.ssc * n,
                     colour = 'SSC')) + 
+  geom_line(aes(x = n, y = med.err.mm * n,
+                colour = 'Modularity maximization')) + 
+  geom_errorbar(aes(x = n, ymin = first.q.mm * n, ymax = third.q.mm * n,
+                    colour = 'Modularity maximization')) + 
   scale_colour_brewer(palette = 'Set1') + 
   facet_wrap(~ K, labeller = 'label_both') + 
   scale_y_log10() +
   scale_x_continuous(breaks = c(128, 256, 512, 1024, 2048, 4096))
 ```
 
-```{r lambda_est_k, cache = FALSE, fig.cap = 'Log-log plot of the median and IQR RMSE from Algorithm 4 (red) compared against an MLE-based method (blue) using sample sizes from 256 to 4096 and number of clusters from 2 to 4. Simulations were repeated 50 times for each sample size.', fig.width = 10}
-rmse.df <- readr::read_csv('rmse.csv') %>% 
-  dplyr::transmute(K = 2,
-                   n = n,
-                   rmse = rmse,
-                   rmse.mle = rmse.mle) %>% 
-  dplyr::bind_rows(readr::read_csv('rmse-k.csv'))
+```{r lambda_est_k, cache = FALSE, fig.cap = 'Log-log plot of the median and IQR RMSE from Algorithm 4 (red) compared against an MLE-based method (blue) using sample sizes from 128 to 4096 and number of clusters from 2 to 4. Simulations were repeated 50 times for each sample size.', fig.width = 10}
+rmse.df <- readr::read_csv('rmse-k.csv')
 
 rmse.df %>% 
   na.omit() %>% 
@@ -689,7 +691,7 @@ rmse.df %>%
   labs(y = 'RMSE', colour = NULL) + 
   facet_wrap(~ K, labeller = 'label_both') + 
   scale_y_log10() + 
-  scale_x_log10(breaks = c(64, 128, 256, 512, 1024, 2048))
+  scale_x_log10(breaks = c(128, 256, 512, 1024, 2048, 4096))
 ```
 
 ## Imbalanced communities
