@@ -20,7 +20,7 @@ a1 <- b2 <- 2
 a2 <- b1 <- 1
 n.vec <- c(128, 256, 512, 1024, 2048, 4096)
 n.vec <- rev(n.vec)
-iter <- 40
+iter <- 50
 set.seed(314159)
 
 # simulation
