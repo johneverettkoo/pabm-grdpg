@@ -14,9 +14,9 @@ embedding <- function(A, p = NULL, q = NULL,
 }
 
 draw.graph <- function(P) {
-  A <- apply(P, 1:2, function(p) rbinom(1, 1, p))
-  A[lower.tri(A)] <- 0
-  diag(A) <- 0
+  n <- nrow(P)
+  A <- matrix(0, nrow = n, ncol = n)
+  A[upper.tri(A)] <- rbinom(n * (n - 1) / 2, 1, P[upper.tri(P)])
   A <- A + t(A)
   return(A)
 }
@@ -243,28 +243,38 @@ lambda.rmse <- function(P, Phat, clustering) {
 ssc <- function(A, 
                 K = 2,
                 lambda = .01,
-                parallel = FALSE) {
+                parallel = FALSE,
+                normalize = FALSE) {
   p <- K * (K + 1) / 2
   q <- K * (K - 1) / 2
   
   Y <- t(embedding(A, p, q))
   
-  n <- nrow(Y)
   N <- ncol(Y)
   B <- plyr::aaply(seq(N), 1, function(i) {
     y <- Y[, i]
     X <- Y[, -i]
-    betahat <- glmnet::glmnet(X, y, lambda = lambda) %>% 
+    betahat <- glmnet::glmnet(X, y, lambda = lambda, intercept = FALSE) %>% 
       coef() %>% 
       as.numeric()
+    if (i != N) {
+      betahat <- c(betahat[seq(i)], 0, betahat[seq(i + 1, N)])
+    } else {
+      betahat <- c(betahat, 0)
+    }
+    betahat <- betahat[-1]
     return(betahat)
   }, .parallel = parallel) %>% 
     abs()
+  if (normalize) {
+    B <- sweep(B, 2, apply(B, 2, max), `/`)
+    B[is.nan(B)] <- 0
+  }
   W <- B + t(B)
   L <- normalized.laplacian(W)
   L.eigen <- eigen(L, symmetric = TRUE)
-  X <- diag(colSums(W) ** -.5) %*% L.eigen$vectors[, seq(N - 1, N - K)]
-  clustering <- mclust::Mclust(X, K)$classification
+  X <- L.eigen$vectors[, seq(N, N - K)]
+  clustering <- mclust::Mclust(X, K, verbose = FALSE)$classification
   return(clustering)
 }
 
