@@ -30,9 +30,6 @@ cluster.acc <- function(yhat, yobs) {
     return()
 }
 
-# parallel backend
-doMC::registerDoMC(24)
-
 # simulation parameters
 K.vec <- c(2, 3, 4)
 a1 <- 2
@@ -45,12 +42,15 @@ iter <- 50
 # n.vec <- c(256, 512, 1024)
 # iter <- 10
 n.vec <- rev(n.vec)
+cores.per.n <- 2 ** 12 * 20
 K.vec <- rev(K.vec)
 set.seed(314159)
 
 # clustering simulation
 clustering.df <- foreach(K = K.vec, .combine = dplyr::bind_rows) %do% {
   out.df <- foreach(n = n.vec, .combine = dplyr::bind_rows) %do% {
+    doMC::registerDoMC(min(parallel::detectCores(), 
+                           floor(cores.per.n / n)))
     print(paste('K =', K, ', n =', n))
     foreach(i = seq(iter), 
             .combine = dplyr::bind_rows, 
@@ -92,7 +92,7 @@ clustering.df %>%
                    third.q.mm = quantile(error.mm, .75)) %>%
   ggplot() +
   scale_y_log10() +
-  # scale_x_log10() +
+  scale_x_log10() +
   labs(y = 'error') +
   geom_line(aes(x = n, y = med.err)) +
   geom_errorbar(aes(x = n, ymin = first.q, ymax = third.q)) +
