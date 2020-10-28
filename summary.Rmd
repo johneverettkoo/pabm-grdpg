@@ -21,13 +21,13 @@ abstract: |
   In this paper, we connect two probabilistic models for graphs, the Popularity 
   Adjusted Block Model (PABM) and the Generalized Random Dot Product Graph 
   (GRDPG) and use properties established in this connection to aid in 
-  clustering and parameter estimation. In particular, we note that the PABM 
-  can be represented as latent positions such that points within the same 
-  cluster lie on a subspace, and the subspaces that represent each 
-  cluster are orthogonal to one another. Using this property as well as the 
+  community detection and parameter estimation. In particular, we note that the
+  PABM can be represented as latent positions such that points within the same 
+  community lie on a subspace, and the subspaces that represent each 
+  community are orthogonal to one another. Using this property as well as the 
   asymptotic properties of Adjacency Spectral Embedding (ASE) of the GRDPG, we 
-  are able to establish theoretical asymptotic results of our clustering and 
-  parameter estimation methods for the PABM. 
+  are able to establish theoretical asymptotic results of our community 
+  detection and parameter estimation methods for the PABM. 
 ---
 
 ```{r setup, include = FALSE}
@@ -58,6 +58,10 @@ theme_set(theme_bw())
 \newcommand{\diag}{\text{diag}}
 \newcommand{\tr}{\text{Tr}}
 \newcommand{\blockdiag}{\text{blockdiag}}
+\newcommand{\indep}{\stackrel{\text{indep}}{\sim}}
+\newcommand{\iid}{\stackrel{\text{iid}}{\sim}}
+\newcommand{\Bernoulli}{\text{Bernoulli}}
+\newcommand{\Betadist}{\text{Beta}}
 
 # Introduction
 
@@ -70,23 +74,42 @@ between each pair. The goal of this analysis then is population community
 detection, or the recovery of the true underlying community labels for each 
 vertex, up to permutation (with some additional parameter estimation being of 
 possible interest), assuming some probabilistic graph model. One such model is 
-the Stochastic Block Model (SBM), which assumes that the edge probability from 
-one vertex to another follows a Beronulli distribution with fixed probabilities 
-for each pair of community labels. The Popularity Adjusted Block Model (PABM) 
-was then introduced by \citet*{307cbeb9b1be48299388437423d94bf1} as a 
-generalization of the SBM to address the heterogeneity of edge probabilities 
-within and between communities while still maintaining the community structure. 
+the Stochastic Block Model (SBM), first proposed by 
+\citet{doi:10.1080/0022250X.1971.9989788}, which assumes that the edge 
+probability from one vertex to another follows a Beronulli distribution with 
+fixed probabilities for each pair of community labels. Other probabilistic 
+graph models have been proposed and studied, such as the Degree-Corrected Block 
+Model (DCBM), introduced by \citet{Karrer_2011} and the Mixed Membership 
+Stochastic Block Model (MMSBM), introduced by  \citet*{NIPS2008_3578}. The 
+Popularity Adjusted Block Model (PABM) was then introduced by 
+\citet*{307cbeb9b1be48299388437423d94bf1} as a generalization of the SBM to 
+address the heterogeneity of edge probabilities within and between communities 
+while still maintaining distinct community structure. 
 
-The Random Dot Product Graph (RDPG) model \cite{athreya2017statistical} is 
-another graph model with Beronulli edge probabilities. Under this model, each 
-vertex of the graph can be represented by a point in a latent Euclidean space 
-such that the edge probability between any pair of vertices is given by their 
-corresponding dot product in the latent space. The SBM is equivalent to a 
-special case of the RDPG model in which all vertices of a given community share 
-the same position in the latent space. It has also been shown that similar 
-probabilistic graph models, such as the Mixed Membership Stochastic Block 
-Model, can be represented in this way \cite{rubindelanchy2017statistical}. An 
-analogous property exists for the PABM, not under the RDPG model but under the 
+The underlying similarity among the SBM, PABM, and other such models is that 
+they involve a symmetric edge probability matrix $P \in [0, 1]^{n \times n}$ 
+where $n$ is the number of vertices in the graph. An undirected and unweighted 
+graph is then drawn from this edge probability matrix such that the existence 
+of an edge between each pair of vertices $i$ and $j$ is given by 
+$\Bernoulli(P_{ij})$. For example, for the SBM with two communities for which 
+the within-community edge probability is $\xi$ and the between-community edge 
+probability is $\eta$, the entries of $P$ consist of $\xi$ and $\eta$. 
+
+The Random Dot Product Graph (RDPG) model proposed by 
+\citet*{10.1007/978-3-540-77004-6_11} is another graph model with Bernoulli edge 
+probabilities. Under this model, each vertex of the graph can be represented by 
+a point in a latent Euclidean space such that the edge probability between any 
+pair of vertices is given by their corresponding dot product in the latent 
+space, i.e., given a latent positions $x_1, ..., x_n \in \mathbb{R}^d$, the 
+edge probability matrix is $P = X X^\top$ where 
+$X = \begin{bmatrix} x_1 & \cdots & x_n \end{bmatrix}^\top$. The SBM is 
+equivalent to a special case of the RDPG model in which all vertices of a 
+given community share the same position in the latent space 
+\cite{lyzinski2015perfect}. It has also been shown that similar 
+probabilistic graph models, including both the MMSBM and DCBM, can be 
+represented in this way \cite{rubindelanchy2017consistency} 
+\cite{lyzinski2015perfect}. An analogous 
+property exists for the PABM but not for the RDPG model but under the 
 *Generalized* Random Dot Product Graph (GRDPG) model. This relationship will be 
 explored in this paper and exploited to construct algorithms for community 
 detection and parameter estimation for the PABM. 
@@ -95,28 +118,39 @@ In this paper, we will only consider undirected graphs, that is the edge weight
 from vertex $i$ to vertex $j$ is equal to the edge weight in the opposite 
 direction, from vertex $j$ to vertex $i$. Furthermore, we will only consider 
 unweighted graphs with binary ($0, 1$) edge weights We will also assume that 
-graphs are hollow, i.e., there are no edges from a vertex to itself. 
+graphs are hollow, i.e., there are no edges from a vertex to itself. All such 
+graphs can be represented by a symmetric adjacency matrix 
+$A \in \{0, 1\}^{n \times n}$ for which $A_{ij} = 1$ if there exists an edge 
+between vertices $i$ and $j$ and $0$ otherwise, and $A$ is an element-wise 
+independent Bernoulli draw from a symmetric edge probability matrix 
+$P \in [0, 1]^{n \times n}$. 
 
 # Connecting the Popularity Adjusted Block Model to the Generalized Random Dot Product Graph
 
-## The popularity adjusted block model (PABM) \cite{307cbeb9b1be48299388437423d94bf1} and the generalized random dot product graph \cite{rubindelanchy2017statistical}
+## The popularity adjusted block model (PABM) and the generalized random dot product graph
 
-**Definition 1**. 
+**Definition 1** (Popularity Adjusted Block Model) 
+\cite{307cbeb9b1be48299388437423d94bf1}. 
 Let $P \in [0, 1]^{n \times n}$ be a symmetric edge probability matrix for a 
 set of $n$ 
 vertices, $V$. Each vertex has a community label $1, ..., K$, and the rows and 
 columns of $P$ are arranged by community label such that $n_k \times n_l$ block 
-$P^{(kl})$ describes the edge probabilities between vertices in communities 
-$k$ and $l$. 
+$P^{(kl)}$ describes the edge probabilities between vertices in communities 
+$k$ and $l$ ($P^{(lk)} = (P^{(kl)})^\top$). 
 Let graph $G = (V, E)$ be an undirected, unweighted graph such 
 that its corresponding adjacency matrix $A \in \{0, 1\}^{n \times n}$ is a 
-realization of $Bernoulli(P)$, i.e., 
-$A_{ij} \stackrel{indep}{\sim} Bernoulli(P_{ij})$ for $i > j$ 
+realization of $\Bernoulli(P)$, i.e., 
+$A_{ij} \indep \Bernoulli(P_{ij})$ for $i > j$ 
 ($A_{ij} = A_{ji}$ and $A_{ii} = 0$). 
 
-If each block $P^{(kl)}$ can be written as the outer product of two vectors 
-$\lambda^{(kl)} (\lambda^{(lk)})^\top$ for a set of fixed vectors 
-$\{\lambda^{(st)}\}_{s, t = 1}^K$ where each $\lambda^{(st)}$ is a column vector 
+If each block $P^{(kl)}$ can be written as the outer product of two vectors:
+
+\begin{equation}
+  P^{(kl)} = \lambda^{(kl)} (\lambda^{(lk)})^\top
+\end{equation}
+
+for a set of $K^2$ fixed vectors $\{\lambda^{(st)}\}_{s, t = 1}^K$ where each 
+$\lambda^{(st)}$ is a column vector 
 of dimension $n_s$, then graph $G$ and its corresponding adjacency matrix $A$ 
 is a realization of a popularity adjusted block model with parameters 
 $\{\lambda^{(st)}\}_{s, t = 1}^K$. 
@@ -125,11 +159,23 @@ We will use the notation $A \sim PABM(\{\lambda^{(kl)}\}_K)$ to denote a random
 adjacency matrix $A$ drawn from a PABM with parameters $\lambda^{(kl)}$ 
 consisting of $K$ underlying communities.
 
-**Definition 2**.
+**Definition 2** (Generalized Random Dot Product Graph) 
+\cite{rubindelanchy2017statistical}.
 Let $P \in [0, 1]^{n \times n}$ be a symmetric edge probability matrix for a 
 set of $n$ vertices, $V$. If $\exists X \in \mathbb{R}^{n \times d}$ such that 
-$P = X I_{pq} X^\top$ for some $d, p, q \in \mathbb{N}$ and $p + q = d$, then 
-graph $G = (V, E)$ with adjacency matrix $A$ such that $A_{ij} \stackrel{indep}{\sim} Bernoulli(P_{ij})$ for $i > j$ ($A_{ij} = A_{ji}$ and $A_{ii} = 0$) is a draw from the generalized random dot product graph model with latent positions $X$ and signature $(p, q)$. More precisely, if vertices $i$ and $j$ have latent positions $x_i$ and $x_j$ respectively, then the edge probability between the two is $P_{ij} = x_i^\top I_{pq} x_j$, and $X$ contains the latent positions as rows $x_i^\top$. 
+
+\begin{equation}
+  P = X I_{pq} X^\top
+\end{equation}
+
+for some $d, p, q \in \mathbb{N}$ and $p + q = d$, then 
+graph $G = (V, E)$ with adjacency matrix $A$ such that 
+$A_{ij} \indep \Bernoulli(P_{ij})$ for $i > j$ ($A_{ij} = A_{ji}$ and 
+$A_{ii} = 0$) is a draw from the generalized random dot product graph model 
+with latent positions $X$ and signature $(p, q)$. More precisely, if vertices 
+$i$ and $j$ have latent positions $x_i$ and $x_j$ respectively, then the edge 
+probability between the two is $P_{ij} = x_i^\top I_{pq} x_j$, and $X$ contains 
+the latent positions as rows $x_i^\top$. 
 
 We will use the notation $A \sim GRDPG_{p,q}(X)$ to denote a random adjacency 
 matrix $A$ drawn from latent positions $X$ and signature $(p, q)$.
@@ -145,94 +191,86 @@ More specifically, if $P_{ij} = x_i^\top I_{pq} x_j$, then we also have for any
 $Q \in \mathbb{O}(p, q)$, 
 $(Q x_i)^\top I_{pq} (Q x_j) = x_i^\top (Q^\top I_{pq} Q) x_j = 
 x_i^\top I_{pq} x_j = P_{ij}$. 
-Unlike in the RDPG case, transforming the latent positions by multiplication 
-with $Q \in \mathbb{O}(p, q)$ does not necessarily maintain interpoint angles or 
+Unlike in the RDPG case, transforming the latent positions via multiplication 
+by $Q \in \mathbb{O}(p, q)$ does not necessarily maintain interpoint angles or 
 distances. 
 
 ## Connecting the PABM to the GRDPG
 
-### Case where $K = 2$
+**Theorem 1** (Connecting the PABM to the GRDPG for $K = 2$). 
+Let 
 
-**Theorem 1**. 
-Let $X = \begin{bmatrix} 
+$$X = \begin{bmatrix} 
 \lambda^{(11)} & \lambda^{(12)} & 0 & 0 \\ 
 0 & 0 & \lambda^{(21)} & \lambda^{(22)} 
-\end{bmatrix}$, and let $U = \begin{bmatrix} 1 & 0 & 0 & 0 \\
+\end{bmatrix}$$
+
+$$U = \begin{bmatrix} 1 & 0 & 0 & 0 \\
 0 & 0 & 1 / \sqrt{2} & 1 / \sqrt{2} \\
 0 & 0 & 1 / \sqrt{2} & - 1 / \sqrt{2} \\
-0 & 1 & 0 & 0 \end{bmatrix}$, as in Definition 1. 
+0 & 1 & 0 & 0 \end{bmatrix}$$
+
+as in Definition 1. 
 Then $A \sim GRDPG_{3, 1}(X U)$ and $A \sim PABM(\{(\lambda^{(kl)}\}_2)$ are 
 equivalent.
 
-*Proof*.
-Let $X = \begin{bmatrix} 
-\lambda^{(11)} & \lambda^{(12)} & 0 & 0 \\ 
-0 & 0 & \lambda^{(21)} & \lambda^{(22)} 
-\end{bmatrix}$ and 
-$Y = \begin{bmatrix} \lambda^{(11)} & 0 & \lambda^{(12)} & 0 \\
-0 & \lambda^{(21)} & 0 & \lambda^{(22)} \end{bmatrix}$. 
-Then $P = X Y^\top$. 
+*Proof*. 
+This is given by straightforward matrix multiplication. It suffices to show 
+that 
 
-We can note that $Y = X \Pi$ where $\Pi$ is the permutation matrix 
-$\Pi = \begin{bmatrix} 1 & 0 & 0 & 0 \\ 0 & 0 & 1 & 0 \\ 
-0 & 1 & 0 & 0 \\ 0 & 0 & 0 & 1 \end{bmatrix}$. 
-Therefore, $P = X \Pi X^\top$. 
+$$X U I_{3, 1} U^\top X^\top = 
+\begin{bmatrix} 
+  \lambda^{(11)} (\lambda^{(11)})^\top & \lambda^{(12)} (\lambda^{(21)})^\top \\
+  \lambda^{(21)} (\lambda^{(12)})^\top & \lambda^{(22)} (\lambda^{(22)})^\top
+\end{bmatrix}$$
 
-Taking the spectral decomposition of $\Pi = U D U^\top$, we can see that 
-$P = (X U) D (X U)^\top$. We can then denote $\Sigma = |D|^{1/2}$, the 
-square root of the absolute values of the (diagonal) entries of $D$ and 
-obtain $P = (X U \Sigma) I_{pq} (X U \Sigma)^\top$ where $p$ and $q$ correspond 
-to the number of positive and negative eigenvalues of $\Pi$, respectively. 
-Therefore, the PABM with $K = 2$ is a special case of the GRDPG. We can however 
-expand upon this a bit further.
+**Remark**. While we can just perform the matrix multiplication to show the 
+equivalence, it is more illustrative to look at a few intermediate steps. Note 
+that the product of the three inner matrices results in a permutation matrix 
+with fixed points at positions $1$ and $4$ and a cycle of order 2 swappoing 
+positions $2$ and $3$: 
 
-The permutation described by $\Pi$ has two fixed points and one cycle of order 
-2. The two fixed points are at positions $1$ and $4$, so $\Pi$ has two 
-eigenvalues equal to $1$ and corresponding eigenvectors $e_1$ and $e_4$. The 
-cycle of order 2 switching positions $2$ and $3$ corresponds to eigenvalues 
-$1$ and $-1$ with corresponding eigenvalues $(e_2 + e_3) / \sqrt{2}$ and 
-$(e_2 - e_3) / \sqrt{2}$ respectively. Therefore, 
-$D = \begin{bmatrix} 
-1 & 0 & 0 & 0 \\ 
-0 & 1 & 0 & 0 \\
-0 & 0 & 1 & 0 \\
-0 & 0 & 0 & -1
-\end{bmatrix} = I_{3, 1}$ and 
-$U = \begin{bmatrix} 1 & 0 & 0 & 0 \\
-0 & 0 & 1 / \sqrt{2} & 1 / \sqrt{2} \\
-0 & 0 & 1 / \sqrt{2} & - 1 / \sqrt{2} \\
-0 & 1 & 0 & 0 \end{bmatrix}$.
+$$U I_{3, 1} U^\top = \begin{bmatrix} 
+  1 & 0 & 0 & 0 \\ 
+  0 & 0 & 1 & 0 \\ 
+  0 & 1 & 0 & 0 \\ 
+  0 & 0 & 0 & 1 
+\end{bmatrix} = \Pi$$
 
-Putting it all together, we get $P = (X U) I_{3, 1} (X U)^\top$. Therefore, 
-the PABM with $K = 2$ is a GRDPG with $p = 3$, $q = 1$, $d = K^2 = 4$, and 
-latent positions 
-$X U = \begin{bmatrix} 
-\lambda^{(11)} & 0 & \lambda^{(12)} / \sqrt{2} & \lambda^{(12)} / \sqrt{2} \\
-0 & \lambda^{(22)} & \lambda^{(21)} / \sqrt{2} & -\lambda^{(21)} / \sqrt{2}
-\end{bmatrix}$.
+Since $U$ is orthonormal and $I_{3, 1}$ is diagonal, $\Pi = U I_{3, 1} U^\top$ 
+is a spectral decomposition of this permutation matrix. Note that the two fixed 
+points result in eigenvalues of $+1$ with corresponding eigenvectors $e_i$ 
+where $i = 1, 4$ corresponding to the locations of the fixed points, and the 
+cycle of order two results in two eigenvalues $\pm 1$ with corresponding 
+eigenvectors $(e_i \pm e_j) / \sqrt{2}$ where $i = 2, j = 3$, pair that is 
+swapped.
 
-### Generalization to $K > 2$
-
-**Theorem 2**. There exists a block diagonal matrix 
+**Theorem 2** (Generalization to $K > 2$). There exists a block diagonal matrix 
 $X \in \mathbb{R}^{n \times K^2}$ defined by PABM parameters 
 $\{\lambda^{(kl)}\}_K$ and $U \in \mathbb{R}^{K^2 \times K^2}$ that is fixed 
 for each $K$ such that $A \sim GRDPG_{K (K+1) / 2, K (K-1) / 2}(XU)$ and 
 $A \sim PABM(\{(\lambda^{(kl)}\})_K)$ are equivalent.
 
 *Proof*. 
-Let $\Lambda^{(k)} = 
+Let 
+$$\Lambda^{(k)} = 
 \begin{bmatrix} \lambda^{(k,1)} & \cdots & \lambda^{(k, K)} \end{bmatrix}
-\in \mathbb{R}^{n_k \times K}$.  
-Let $X$ be a block diagonal matrix 
-$X = \blockdiag(\Lambda^{(1)}, ..., \Lambda^{(K)}) \in \mathbb{R}^{n \times K^2}$.  
-Let $L^{(k)}$ be a block diagonal matrix of column vectors $\lambda^{(lk)}$ for 
-$l = 1, ..., K$. $L^{(k)} = \blockdiag(\lambda^{(1k)}, ..., \lambda^{(Kk)}) \in 
-\mathbb{R}^{n \times K}$.  
-Let $Y = \begin{bmatrix} L^{(1)} & \cdots & L^{(K)} \end{bmatrix} \in 
-\mathbb{R}^{n \times K^2}$.  
-Then $P = X Y^\top$.  
-Similar to the $K = 2$ case, we again have $Y = X \Pi$ for a permutation matrix
-$\Pi$, so $P = X \Pi X^\top$.  
+\in \mathbb{R}^{n_k \times K}$$
+
+\begin{equation}
+X = \blockdiag(\Lambda^{(1)}, ..., \Lambda^{(K)}) \in \mathbb{R}^{n \times K^2}
+\end{equation}
+
+$$L^{(k)} = \blockdiag(\lambda^{(1k)}, ..., \lambda^{(Kk)}) \in 
+\mathbb{R}^{n \times K}$$
+
+$$Y = \begin{bmatrix} L^{(1)} & \cdots & L^{(K)} \end{bmatrix} \in 
+\mathbb{R}^{n \times K^2}$$
+
+Then $P = X Y^\top$.
+
+Similar to the $K = 2$ case, we have $Y = X \Pi$ for a permutation matrix
+$\Pi$, resulting in $P = X \Pi X^\top$.  
 The permutation described by $\Pi$ has $K$ fixed points, which correspond to 
 $K$ eigenvalues equal to $1$ with corresponding eigenvectors $e_k$ where 
 $k = r (K + 1) + 1$ for $r = 0, ..., K - 1$. It also has 
@@ -240,28 +278,48 @@ $\binom{K}{2} = K (K - 1) / 2$ cycles of order $2$. Each cycle corresponds to
 a pair of eigenvalues $+1$ and $-1$ and a pair of eigenvectors 
 $(e_s + e_t) / \sqrt{2}$ and $(e_s - e_t) / \sqrt{2}$.
 
-So $\Pi$ has $K (K + 1) / 2$ eigenvalues equal to $1$ and $K (K - 1) / 2$ 
+Then $\Pi$ has $K (K + 1) / 2$ eigenvalues equal to $1$ and $K (K - 1) / 2$ 
 eigenvalues equal to $-1$. $\Pi$ has the decomposed form 
-$\Pi = U I_{K (K + 1) / 2, K (K - 1) / 2} U^\top$, and we can describe the 
-PABM with $K$ communities as a GRDPG with latent positions $X U$ with signature 
-$\Big( K (K + 1) / 2, K (K - 1) / 2 \Big)$.
 
-**Example** for $K = 3$. Using the same notation as before:
+\begin{equation}
+\Pi = U I_{K (K + 1) / 2, K (K - 1) / 2} U^\top
+\end{equation}
 
-$X = \begin{bmatrix} 
+The edge probability matrix then can be written as:
+
+\begin{equation}
+P = X U I_{p, q} (X U)^\top
+\end{equation}
+
+\begin{equation}
+p = K (K + 1) / 2
+\end{equation}
+
+\begin{equation}
+q = K (K - 1) / 2
+\end{equation}
+
+and we can describe the PABM with $K$ communities as a GRDPG with latent 
+positions $X U$ with signature $\big( K (K + 1) / 2, K (K - 1) / 2 \big)$.
+
+**Example** ($K = 3$). Using the same notation as before:
+
+$$X = \begin{bmatrix} 
 \lambda^{(11)} & \lambda^{(12)} & \lambda^{(13)} & 0 & 0 & 0 & 0 & 0 & 0 \\
 0 & 0 & 0 & \lambda^{(21)} & \lambda^{(22)} & \lambda^{(23)} & 0 & 0 & 0 \\
 0 & 0 & 0 & 0 & 0 & 0 & \lambda^{(31)} & \lambda^{(32)} & \lambda^{(33)}
-\end{bmatrix}$
+\end{bmatrix}$$
 
-$Y = \begin{bmatrix} 
+$$Y = \begin{bmatrix} 
 \lambda^{(11)} & 0 & 0 & \lambda^{(12)} & 0 & 0 & \lambda^{(13)} & 0 & 0 \\
 0 & \lambda^{(21)} & 0 & 0 & \lambda^{(22)} & 0 & 0 & \lambda^{(23)} & 0 \\
 0 & 0 & \lambda^{(31)} & 0 & 0 & \lambda^{(32)} & 0 & 0 & \lambda^{(33)}
-\end{bmatrix}$
+\end{bmatrix}$$
 
-Then $P = X Y^\top$ and $Y = X \Pi$ where 
-$\Pi = \begin{bmatrix} 
+Then $P = X Y^\top$ and $Y = X \Pi$ where $\Pi$ is a permutation matrix 
+consisting of $3$ fixed points and $3$ cycles of order 2:
+
+$$\Pi = \begin{bmatrix} 
 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
@@ -271,9 +329,7 @@ $\Pi = \begin{bmatrix}
 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1
-\end{bmatrix}$
-
-Another way to look at this is:
+\end{bmatrix}$$
 
 * Positions 1, 5, 9 are fixed.
 * The cycles of order 2 are $(2, 4)$, $(3, 7)$, and $(6, 8)$.
@@ -286,11 +342,17 @@ $(e_k - e_l) / \sqrt{2}$, where pairs $(k, l)$ correspond to the cycles of
 order 2 described above.
 
 The latent positions are the rows of  
-$XU = \begin{bmatrix}
-\lambda^{(11)} & 0 & 0 & \lambda^{(12)} / \sqrt{2} & \lambda^{(13)} / \sqrt{2} & 0 & \lambda^{(12)} / \sqrt{2} & \lambda^{(13)} / \sqrt{2} & 0 \\
-0 & \lambda^{(22)} & 0 & \lambda^{(21)} / \sqrt{2} & 0 & \lambda^{(23)} / \sqrt{2} & -\lambda^{(21)} / \sqrt{2} & 0 & \lambda^{(23)} / \sqrt{2} \\
-0 & 0 & \lambda^{(33)} & 0 & \lambda^{(31)} / \sqrt{2} & \lambda^{(32)} / \sqrt{2} & 0 & -\lambda^{(31)} / \sqrt{2} & -\lambda^{(32)} / \sqrt{2}
-\end{bmatrix}$.
+$$XU = \begin{bmatrix}
+  \lambda^{(11)} & 0 & 0 & 
+  \lambda^{(12)} / \sqrt{2} & \lambda^{(13)} / \sqrt{2} & 0 & 
+  \lambda^{(12)} / \sqrt{2} & \lambda^{(13)} / \sqrt{2} & 0 \\
+  0 & \lambda^{(22)} & 0 & 
+  \lambda^{(21)} / \sqrt{2} & 0 & \lambda^{(23)} / \sqrt{2} & 
+  -\lambda^{(21)} / \sqrt{2} & 0 & \lambda^{(23)} / \sqrt{2} \\
+  0 & 0 & \lambda^{(33)} & 
+  0 & \lambda^{(31)} / \sqrt{2} & \lambda^{(32)} / \sqrt{2} & 
+  0 & -\lambda^{(31)} / \sqrt{2} & -\lambda^{(32)} / \sqrt{2}
+\end{bmatrix}$$
 
 # Methods
 
@@ -299,21 +361,24 @@ Two inference objectives arise from the PABM:
 1. Community membership identification (up to permutation).
 2. Parameter estimation (estimating $\lambda^{(kl)}$'s).
 
-Here, we will focus more on (1) and pose possible methods for (2). In our 
-methods, we assume that $K$, the number of communities, is known beforehand and 
-does not require estimation.
+In our methods, we assume that $K$, the number of communities, is known 
+beforehand and does not require estimation.
 
-## Previous work
+## Related work
+
+\citet*{307cbeb9b1be48299388437423d94bf1}, who first proposed the PABM, used 
+modularity maximization for clustering and parameter estimation. They were able 
+to show that as the sample size increases, the proportion of misclassified 
+community labels (up to permutation) goes to 0. 
 
 \citet*{noroozi2019estimation} proposed using sparse subspace clustering (SSC) 
-to identify the community memberships given either an edge probability matrix $P$ 
-or an adjacency matrix $A$. In the case that $P$ is known, the community 
-memberships can be identified exactly (up to permutation). A similar procedure 
-can be applied if $P$ is unknown and we have an observation $A$, but the 
-theoretical guarantees of this method applied to the PABM are unknown. In 
-particular, the method requires spherical Gaussian noise. The authors of this 
-paper then use point estimators for $\{\lambda^{(kl)}\}$ using cluster labels 
-obtained via SSC. 
+to identify the community memberships given either an edge probability matrix 
+$P$ or an adjacency matrix $A$. In the case that $P$ is known, the community 
+memberships can be identified exactly (up to permutation). This is supported by 
+our Theorem 2, which shows that the ASE of edge probability matrix $P$ consists 
+of $K$ $K$-dimensional subspaces lying in $\mathbb{R}^{K^2}$. A similar 
+procedure can be applied if $P$ is unknown and we have an observation $A$, but 
+the theoretical guarantees of this method applied to the PABM are unknown. 
 
 ## Community detection
 
@@ -344,16 +409,47 @@ subspaces. Furthermore, the subspaces are orthogonal to each other.
 Multiplication by $Q \in \mathbb{O}(p, q)$ removes the orthogonality property 
 but retains the property that each community is represented by a $K$-dimensional 
 subspace. Using this property, previous work proposes the use of subspace 
-clustering while acknowledging some of its shortcomings 
-\cite{noroozi2019estimation} \cite{soltanolkotabi2014}. 
+clustering \cite{noroozi2019estimation} \cite{soltanolkotabi2014}. 
+
+**Lemma 1.** 
+Let $P = V D V^\top$ be the spectral decomposition of the edge probability 
+matrix for a PABM. Then $V V^\top = X (X^\top X)^{-1} X^\top$ where $X$ is 
+defined as in equation (3).
+
+*Proof*. 
+By Theorem 2, $P = X U I_{p, q} U^\top X^\top$, where $X$ is defined as in equation (3) and $p$ and $q$ are defined as in equations (6) and (7). Alternatively, the spectral decomposition can be written as $P = V D V^\top = V |D|^{1/2} I_{p, q} |D|^{1/2} V^\top$ for the same $(p, q)$ and $|\cdot|^{1/2}$ is applied entry-wise. Thus for some $Q \in \mathbb{O}(p, q)$, 
+
+$$X U Q = V |D|^{1/2}$$
+
+Therefore, using the fact that $U U^\top = I$ and $V^\top V = I$,
+
+$$(V |D|^{1/2}) ((V |D|^{1/2})^\top (V |D|^{1/2}))^{-1} (V |D|^{1/2})^\top = 
+(X U Q) ((X U Q)^\top (X U Q))^{-1} (X U Q)^\top$$
+
+The righthand side becomes
+
+$$\begin{split}
+  (X U Q) ((X U Q)^\top (X U Q))^{-1} (X U Q)^\top & 
+    = X U Q Q^{-1} U^\top (X^\top X)^{-1} U (Q^\top)^{-1} Q^\top U^\top X^\top \\
+  & = X U U^\top (X^\top X)^{-1} U U^\top X^\top \\
+  & = X (X^\top X)^{-1} X^\top
+\end{split}$$
+
+The lefthand side becomes:
+
+$$\begin{split}
+  (V |D|^{1/2}) ((V |D|^{1/2})^\top (V |D|^{1/2}))^{-1} (V |D|^{1/2})^\top & =
+    V |D|^{1/2} |D|^{-1/2} (V^\top V)^{-1} |D|^{-1/2} |D|^{1/2} V^\top \\
+  & = V V^\top
+\end{split}$$
 
 **Theorem 3.** 
 Let $P = V D V^\top$ be the spectral decomposition of the edge probability
 matrix. Let $B = V V^\top$. Then $B_{ij} = 0$ if vertices $i$ and $j$ are 
 of different communities.
 
-*Proof (sketch)*
-By projection, $V V^\top = X (X^\top X)^{-1} X^\top$ where $X$ is defined as 
+*Proof*.
+By Lemma 1, $V V^\top = X (X^\top X)^{-1} X^\top$ where $X$ is defined as 
 in Theorem 2. Since $X$ is block diagonal with each block corresponding 
 to one community, $X (X^\top X)^{-1} X^\top$ is also a block diagonal matrix 
 with each block corresponding to a community and zeros elsewhere. Therefore, 
@@ -385,9 +481,12 @@ with $K$ underlying communities $\mathcal{G}_K$. Denote $Z_n$ as a sample of siz
 $n$ from $\mathcal{G}_K$ and adjacency matrix $A_n$ as one draw from edge 
 probability matrix $P_n = Z_n I_{pq} Z_n^\top$. Let $\hat{Z}_n$ be the 
 adjacency embedding of $A_n$ with rows $(\hat{z}_i^{(n)})^\top$. Then by
-\citet*{rubindelanchy2017statistical}, 
+\citet{rubindelanchy2017statistical}, 
 
-$$\max\limits_{i \in \{1, ..., n\}} ||Q_n \hat{z}_i^{(n)} - z_i^{(n)}|| = O_P\bigg(\frac{(\log n)^c}{n^{1/2}} \bigg)$$
+\begin{equation}
+  \max\limits_{i \in \{1, ..., n\}} ||Q_n \hat{z}_i^{(n)} - z_i^{(n)}|| = 
+  O_P\bigg(\frac{(\log n)^c}{n^{1/2}} \bigg)
+\end{equation}
 
 for some $c>0$ and sequence of $Q_n \in \mathbb{O}(p, q)$. In addition, 
 \citeauthor{rubindelanchy2017statistical} produce a central limit theorem 
@@ -399,14 +498,14 @@ eigenvalues and $K (K-1) / 2$ most negative eigenvalues with rows
 $(\hat{v}_i^{(n)})^\top$. Let $(i, j)$ correspond to pairs belonging to 
 different communities. Then for some $c > 0$, 
 
-$$\max\limits_{i, j} ||(\hat{v}^{(n)}_i)^\top \hat{v}_j^{(n)}|| = O_P\bigg( \frac{(\log n)^c}{n \sqrt{\rho_n}}\bigg)$$
+\begin{equation}
+  \max\limits_{i, j} ||(\hat{v}^{(n)}_i)^\top \hat{v}_j^{(n)}|| = 
+    O_P\bigg( \frac{(\log n)^c}{n \sqrt{\rho_n}}\bigg)
+\end{equation}
+
 where $\lim\limits_{n \to 0} \rho_n = 0$ is a sparsity parameter introduced 
 by \citet{307cbeb9b1be48299388437423d94bf1}. More precisely, 
-$\rho_n = o(\log n / \sqrt{n})$.
-
-In addition, by the central limit theorem, 
-$(\hat{v}^{(n)}_i)^\top \hat{v}_j^{(n)}$ converge to a normal distribution 
-centered at $0$. 
+$\rho_n = o(\log n / \sqrt{n})$ \cite{rubindelanchy2017statistical}.
 
 This leads to the following algorithm: 
 
@@ -458,8 +557,8 @@ $\lambda^{(lk)} = \pm \sigma v$.
   }
 \end{algorithm}
 
-A similar method can be applied using $\hat{Z}$, the adjacency spectral 
-embedding of $A$.
+Given the adjacency matrix $A$ instead of edge probability matrix $P$, we can 
+simply use plug-in estimators: 
 
 \begin{algorithm}[H]
   \DontPrintSemicolon
@@ -483,16 +582,18 @@ embedding of $A$.
 **Theorem 5**. Under regularity and sparsity assumptions, and under the further 
 assumption that $K$ is fixed and community labels are known, 
 
-$$\max_{k, l \in \{1, ..., K\}} 
+\begin{equation}
+\max_{k, l \in \{1, ..., K\}} 
 ||\hat{\lambda}^{(kl)} - \lambda^{(kl)}|| = 
-O_P \bigg(\frac{(\log n_k)^c}{\sqrt{n_k}} \bigg)$$
+O_P \bigg(\frac{(\log n_k)^c}{\sqrt{n_k}} \bigg)
+\end{equation}
 
 *Proof (sketch)*. 
 Let $P$ and $A$ be organized by community such that the elements of blocks 
 $P^{(kl)}$ and $A^{(kl)}$ correspond to the edges between communities $k$ and 
 $l$. 
 
-* *Case $k = l$*. $P^{(kk)}$ and $A^{(kk)}$ represent within-community edge 
+*Case $k = l$*. $P^{(kk)}$ and $A^{(kk)}$ represent within-community edge 
 probabilities and edges for community $k$.  
 By definition, 
 $P^{(kk)} = \lambda^{(kk)} (\lambda^{(kk)})^\top$. This implies that the 
@@ -511,7 +612,7 @@ Then by Theorem 5 from \citet{rubindelanchy2017statistical}, the adjacency
 spectral embedding $\hat{\lambda}^{(kk)}$ approximates $\lambda^{(kk)}$ at rate 
 $\frac{(\log n_k)^c}{\sqrt{n_k}}$.
 
-* *Case $k \neq l$*. $P^{(kl)}$ and $A^{(kl)}$ represent edge probabilities and 
+*Case $k \neq l$*. $P^{(kl)}$ and $A^{(kl)}$ represent edge probabilities and 
 edges between communities $k$ and $l$. Note that $P^{(kl)} = (P^{(lk)})^\top$.  
 By definition, $P^{(kl)} = \lambda^{(kl)} (\lambda^{(lk)})^\top$. As in the 
 $k = l$ case, we note that the singular value decomposition 
@@ -521,34 +622,47 @@ $P^{(lk)} = \sigma_{kl}^2 v^{(kl)} (u^{(kl)})^\top$, i.e.,
 $\sigma_{kl} = \sigma_{lk}$, $u^{(kl)} = v^{(lk)}$, and 
 $v^{(kl)} = u^{(lk)}$.)  
 Now consider the Hermitian dilation 
-$M^{(kl)} = 2 \begin{bmatrix} 0 & P^{(kl)} \\ P^{(lk)} & 0 \end{bmatrix}$, 
+
+$$M^{(kl)} = 2 \begin{bmatrix} 0 & P^{(kl)} \\ P^{(lk)} & 0 \end{bmatrix}$$
+
 which is a symmetric $(n_k + n_l) \times (n_k + n_l)$ matrix. It can be shown 
-that the eigendecomposition of $M^{(kl)}$ is  
-$M^{(kl)} = 
+that the eigendecomposition of $M^{(kl)}$ is
+
+$$M^{(kl)} = 
 \begin{bmatrix} u^{(kl)} & -u^{(kl)} \\ v^{(kl)} & v^{(kl)} \end{bmatrix} \times 
 \begin{bmatrix} \sigma^2_{kl} & 0 \\ 0 & -\sigma^2_{kl} \end{bmatrix} \times
-\begin{bmatrix} u^{(kl)} & -u^{(kl)} \\ v^{(kl)} & v^{(kl)} \end{bmatrix}^\top$.  
+\begin{bmatrix} u^{(kl)} & -u^{(kl)} \\ v^{(kl)} & v^{(kl)} \end{bmatrix}^\top$$
+
 Thus treating $M^{(kl)}$ as the edge probability matrix of a GRDPG, we have 
 latent positions in $\mathbb{R}^2$ given by 
-$\begin{bmatrix} 
+
+$$\begin{bmatrix} 
   \sigma_{kl} u^{(kl)} & \sigma_{kl} u^{(kl)} \\ 
   \sigma_{kl} v^{(kl)} & -\sigma_{kl} v^{(kl)} 
 \end{bmatrix} = 
 \begin{bmatrix} 
   \lambda^{(kl)} & \lambda^{(kl)} \\ 
   \lambda^{(lk)} & -\lambda^{(lk)} 
-\end{bmatrix}$.  
-Now consider $\hat{M}^{(kl)} = \begin{bmatrix} 0 & A^{(kl)} \\ A^{(lk)} & 0 \end{bmatrix}$. 
+\end{bmatrix}$$
+
+Now consider 
+
+$$\hat{M}^{(kl)} = \begin{bmatrix} 0 & A^{(kl)} \\ A^{(lk)} & 0 \end{bmatrix}$$ 
 Then $\hat{M}^{(kl)} = M^{(kl)} + E'$ where 
-$E' = \begin{bmatrix} 0 & E \\ E^\top & 0 \end{bmatrix}$ and $E$ is the 
+
+$$E' = \begin{bmatrix} 0 & E \\ E^\top & 0 \end{bmatrix}$$
+
+and $E$ is the 
 $n_k \times n_l$ matrix of independent noise (to generate the Bernoulli entries 
 in $A^{(kl)}$.  
 Then $\hat{M}^{(kl)}$ is an adjacency matrix drawn from $M^{(kl)}$, so its adjacency 
 spectral embedding, given by 
-$\begin{bmatrix} 
+
+$$\begin{bmatrix} 
   \hat{\lambda}^{(kl)} & \hat{\lambda}^{(kl)} \\ 
   \hat{\lambda}^{(lk)} & -\hat{\lambda}^{(lk)} 
-\end{bmatrix}$ 
+\end{bmatrix}$$
+
 where each $\hat{\lambda}^{(kl)}$ is defined as in Algorithm 4, approximates 
 the latent positions of $M^{(kl)}$ up to indefinite orthogonal transformation 
 by the rate given in Theorem 5 of \citet{rubindelanchy2017statistical}.  
@@ -567,6 +681,14 @@ clustering \cite{soltanolkotabi2014} \cite{noroozi2019estimation} and
 modularity maximization \cite{307cbeb9b1be48299388437423d94bf1} \cite{igraph}, 
 and Algorithm 4 is compared against an MLE-based estimator 
 \cite{noroozi2019estimation} \cite{307cbeb9b1be48299388437423d94bf1}. 
+
+Both Algorithm 2 and Sparse Subspace Clustering produce an affinity matrix $B$ 
+for which $B_{ij} \to 0$ if vertices $i$ and $j$ belong in different 
+communities. Spectral clustering was performed on $B$ to obtain the final 
+community estimates. 
+
+For estimating $\{\lambda^{(kl)}_K$, both methods usethe ground truth community 
+labels. 
 
 ## Balanced communities
 
@@ -592,7 +714,11 @@ $\lambda^{(kl)} \stackrel{iid}{\sim} Beta(1, 2)$ for $k \neq l$
 
 $50$ simulations were performed for each $(n, K)$ pair. 
 
-```{r clust_err_k, fig.cap = 'IQR of clustering error using Algorithm 2 (red) compared against modularity maximization (blue) and sparse subspace clustering (green) for sample sizes from 128 to 4096 and number of underlying communities from 2 to 4. Simulations were repeated 50 times for each sample size. The $y$-axis is shown on a logarithmic scale.', fig.width = 10}
+Fig \ref{fig:clust_err_k} show that for large $n$, Algorithm 2 results in 
+a misclustering rate of 0. Sparse Subspace Clustering produces similar results 
+for $K > 2$. 
+
+```{r clust_err_k, fig.cap = 'IQR of clustering error using Algorithm 2 (red) compared against modularity maximization (blue) and sparse subspace clustering (green) for sample sizes from 128 to 4096 and number of underlying communities from 2 to 4. Simulations were repeated 50 times for each sample size.', fig.width = 10}
 clustering.df <- readr::read_csv('clustering-k.csv')
 clustering.df %>%
   dplyr::group_by(K, n) %>%
@@ -630,8 +756,9 @@ clustering.df %>%
 
 Theorem 4 implies that algorithm 2 will result in not just in the error rate 
 converging to 0 but the error *count* as well (Fig. \ref{fig:clust_err_ct_sim}).
+We explore this in Fig \ref{fig:clust_err_ct_sim}.
 
-```{r clust_err_ct_sim, fig.cap = 'IQR of counts of misclustered vertices using Algorithm 2 (red) compared against subspace clustering (blue) for sample sizes from 128 to 4096. Simulations were repeated 50 times for each sample size. The $y$-axis is shown on a logarithmic scale.', cache = FALSE, fig.width = 10}
+```{r clust_err_ct_sim, fig.cap = 'IQR of counts of misclustered vertices using Algorithm 2 (red) compared against subspace clustering (blue) for sample sizes from 128 to 4096. Simulations were repeated 50 times for each sample size.', cache = FALSE, fig.width = 10}
 clustering.df <- readr::read_csv('clustering-k.csv')
 clustering.df %>%
   dplyr::group_by(n, K) %>%
@@ -667,7 +794,12 @@ clustering.df %>%
   scale_y_log10()
 ```
 
-```{r lambda_est_k, cache = FALSE, fig.cap = 'Log-log plot of the median and IQR RMSE from Algorithm 4 (red) compared against an MLE-based method (blue) using sample sizes from 128 to 4096 and number of clusters from 2 to 4. Simulations were repeated 50 times for each sample size.', fig.width = 10}
+Given ground truth community labels, Algorithm 5 and the MLE-based plug-in 
+estimators \cite{307cbeb9b1be48299388437423d94bf1} \cite{noroozi2019estimation} 
+perform similarly, with root mean square error decaying at rate approximately 
+$n^{-1/2}$. 
+
+```{r lambda_est_k, cache = FALSE, fig.cap = 'Median and IQR RMSE from Algorithm 4 (red) compared against an MLE-based method (blue) using sample sizes from 128 to 4096 and number of clusters from 2 to 4. Simulations were repeated 50 times for each sample size.', fig.width = 10}
 rmse.df <- readr::read_csv('rmse-k.csv')
 
 rmse.df %>% 
@@ -713,7 +845,14 @@ $\lambda^{(kl)} \stackrel{iid}{\sim} Beta(1, 2)$ for $k \neq l$
 
 $50$ simulations were performed for each $(n, K)$ pair. 
 
-```{r clust_err_k_imba, fig.cap = 'IQR of clustering error using Algorithm 2 (red) compared against modularity maximization (blue) and subspace clustering (green) for sample sizes from 128 to 4096 and number of clusters from 2 to 4. Simulations were repeated 50 times for each sample size. The $y$-axis is shown on a logarithmic scale.', fig.width = 10}
+Fig \ref{fig:clust_err_k_imba} and \ref{fig:clust_err_ct_k_imba} show 
+similar results as in the balanced communities case, with both Algorithm 2 and 
+Sparse Subspace Clustering resulting in no misclustered vertices for a 
+sufficiently large sample size. However, Fig \ref{fig:lambda_est_k_imba} 
+suggests that while Algorithm 5 retains $\sqrt{n}$ efficiency, the MLE-based 
+plug-in estimator fails to do so. 
+
+```{r clust_err_k_imba, fig.cap = 'IQR of clustering error using Algorithm 2 (red) compared against modularity maximization (blue) and subspace clustering (green) for sample sizes from 128 to 4096 and number of clusters from 2 to 4. Simulations were repeated 50 times for each sample size.', fig.width = 10}
 clustering.df <- readr::read_csv('clustering-k-imbalanced.csv')
 clustering.df %>%
   dplyr::group_by(K, n) %>%
@@ -748,7 +887,7 @@ clustering.df %>%
   scale_y_log10()
 ```
 
-```{r clust_err_ct_sim_imba, fig.cap = 'IQR of counts of misclustered vertices using Algorithm 2 (red) compared against subspace clustering (blue) for sample sizes from 128 to 4096. Simulations were repeated 50 times for each sample size. The $y$-axis is shown on a logarithmic scale.', cache = FALSE, fig.width = 10}
+```{r clust_err_ct_sim_imba, fig.cap = 'IQR of counts of misclustered vertices using Algorithm 2 (red) compared against subspace clustering (blue) for sample sizes from 128 to 4096. Simulations were repeated 50 times for each sample size.', cache = FALSE, fig.width = 10}
 clustering.df <- readr::read_csv('clustering-k-imbalanced.csv')
 clustering.df %>%
   dplyr::group_by(n, K) %>%
@@ -784,7 +923,7 @@ clustering.df %>%
   scale_y_log10()
 ```
 
-```{r lambda_est_k_imba, cache = FALSE, fig.cap = 'Log-log plot of the median and IQR RMSE from Algorithm 4 (red) compared against an MLE-based method (blue) using sample sizes from 128 to 4096 and number of clusters from 2 to 4. Simulations were repeated 50 times for each sample size.', fig.width = 10}
+```{r lambda_est_k_imba, cache = FALSE, fig.cap = 'Median and IQR RMSE from Algorithm 4 (red) compared against an MLE-based method (blue) using sample sizes from 128 to 4096 and number of clusters from 2 to 4. Simulations were repeated 50 times for each sample size.', fig.width = 10}
 rmse.df <- readr::read_csv('rmse-k-imbalanced.csv')
 
 rmse.df %>% 
@@ -854,6 +993,11 @@ A <- (A > delta) * 1
 
 z.hat <- cluster.pabm(A, K)
 
+# z.hat.mm <- A %>% 
+#   igraph::graph_from_adjacency_matrix(mode = 'undirected') %>% 
+#   igraph::cluster_louvain() %>% 
+#   igraph::membership()
+
 # ari <- round(fossil::adj.rand.index(z, z.hat) * 100)
 ```
 
@@ -905,17 +1049,18 @@ zhat.dblp <- cluster.pabm(A.dblp, 2, use.all = TRUE, normalize = FALSE)
 dblp.acc <- mean(zhat.dblp == z.dblp)
 dblp.acc <- ifelse(dblp.acc < .5, 1 - dblp.acc, dblp.acc)
 
-zhat.bmp.ssc <- ssc(A.bmp, 2, 1e-3)
+zhat.bmp.ssc <- ssc(A.bmp, 2, 1e-3, normalize = TRUE)
 bmp.acc.ssc <- mean(zhat.bmp.ssc == z.bmp)
 bmp.acc.ssc <- ifelse(bmp.acc.ssc < .5, 1 - bmp.acc.ssc, bmp.acc.ssc)
 
-zhat.pb.ssc <- ssc(A.pb, 2, 1e-4)
+zhat.pb.ssc <- ssc(A.pb, 2, .008, normalize = TRUE)
 pb.acc.ssc <- mean(zhat.pb.ssc == z.pb)
 pb.acc.ssc <- ifelse(pb.acc.ssc < .5, 1 - pb.acc.ssc, pb.acc.ssc)
 
-zhat.dblp.ssc <- ssc(A.dblp, 2, 1e-2)
+zhat.dblp.ssc <- ssc(A.dblp, 2, 1e-2, normalize = FALSE)
 dblp.acc.ssc <- mean(zhat.dblp.ssc == z.dblp)
 dblp.acc.ssc <- ifelse(dblp.acc.ssc < .5, 1 - dblp.acc.ssc, dblp.acc.ssc)
+
 ```
 
 In the second example, we applied Algorithm 2 to the British MPs Twitter 
@@ -955,54 +1100,74 @@ gridExtra::grid.arrange(plot.A(A.bmp, zhat.bmp),
 ```
 
 In the third example, we consider the Karantaka villages data studied by 
-\citet{DVN/U3BIHX_2013}. For this example, we chose the `visitgo` network from 
-village 12 at the household level. The label of interest is the religious 
-affiliation. The network was truncated to religions "1" and "2", and vertices 
-of degree 0 were removed. The resulting network has 141 vertices.
+\citet{DVN/U3BIHX_2013}. For this example, we chose the `visitgo` networks from 
+villages 12, 31, and 46 at the household level. The label of interest is the 
+religious affiliation. The networks were truncated to religions "1" and "2", 
+and vertices of degree 0 were removed. 
 
 ```{r, cache = FALSE, fig.cap = 'Adjacency matrix of the Karnataka villages data, arranged by the clustering produced by Algorithm 2 (left), sparse subspace clustering (middle), and modularity maximization (right).', fig.height = 2, fig.width = 8, eval = TRUE}
-hh <- readRDS('data/village-hh-12.rds')
-A.hh <- hh$A
-z.hh <- hh$z
 K <- 2
-zhat.hh <- cluster.pabm(A.hh, K,
-                        use.all = TRUE, normalize = FALSE, p = 3, q = 1)
-zhat.hh.ssc <- ssc(A.hh, K, lambda = .1)
+hh.12 <- readRDS('data/village-hh-12.rds')
+hh.31 <- readRDS('data/village-hh-31.rds')
+hh.46 <- readRDS('data/village-hh-46.rds')
 
 # this part of code taken from sengupta & chen
 setwd('~/dev/pabm-grdpg/codes_and_data')
 require(MASS);require("clue")
 source("EPalgosim.R") 
 source("functions.R")
-b.can = EPalgo(A.hh,eps=0) # EP algorithm (no perturbation)
-Q.PA.can = rep(NA, ncol(b.can))	# array to store Q values
-for (i in 1:ncol(b.can)){
-  #check if any cluster is empty
-  foo = rep(NA, max(z.hh))
-  for (clus in 1:max(z.hh)) {foo[clus]=sum(b.can[,i]==clus)}
-  if (min(foo)==0) {stop('Empty groups are not allowed')} 
-  Q.PA.can[i] = Q.PA(A.hh, b=b.can[,i])   # fit PABM
-} # end of i for loop
-foo1 = order(-Q.PA.can)[1] 
-zhat.hh.mm = b.can[,foo1]   # community assignment that maximises Q.PA
+mm <- function(A.hh) {
+  b.can = EPalgo(A.hh,eps=0) # EP algorithm (no perturbation)
+  Q.PA.can = rep(NA, ncol(b.can))	# array to store Q values
+  for (i in 1:ncol(b.can)){
+    #check if any cluster is empty
+    foo = rep(NA, 2)
+    for (clus in 1:2) {foo[clus]=sum(b.can[,i]==clus)}
+    if (min(foo)==0) {stop('Empty groups are not allowed')} 
+    Q.PA.can[i] = Q.PA(A.hh, b=b.can[,i])   # fit PABM
+  } # end of i for loop
+  foo1 = order(-Q.PA.can)[1] 
+  return(b.can[,foo1])   # community assignment that maximises Q.PA
+}
 
-gridExtra::grid.arrange(plot.A(A.hh, zhat.hh),
-                        plot.A(A.hh, zhat.hh.ssc),
-                        plot.A(A.hh, zhat.hh.mm),
+A.hh.12 <- hh.12$A
+z.hh.12 <- hh.12$z
+zhat.hh.12 <- cluster.pabm(A.hh.12, K,
+                           use.all = TRUE, normalize = FALSE, p = 3, q = 1)
+zhat.hh.ssc.12 <- ssc(A.hh.12, K, lambda = .1)
+zhat.hh.mm.12 <- mm(A.hh.12)
+
+A.hh.31 <- hh.31$A
+z.hh.31 <- hh.31$z
+zhat.hh.31 <- cluster.pabm(A.hh.31, K,
+                           use.all = TRUE, normalize = FALSE, p = 3, q = 1)
+zhat.hh.ssc.31 <- ssc(A.hh.31, K, lambda = .05)
+zhat.hh.mm.31 <- mm(A.hh.31)
+
+A.hh.46 <- hh.46$A
+z.hh.46 <- hh.46$z
+zhat.hh.46 <- cluster.pabm(A.hh.46, K,
+                           use.all = TRUE, normalize = FALSE, p = 2, q = 0)
+zhat.hh.ssc.46 <- ssc(A.hh.46, K, lambda = .0005)
+zhat.hh.mm.46 <- mm(A.hh.46)
+
+gridExtra::grid.arrange(plot.A(A.hh.12, zhat.hh.12),
+                        plot.A(A.hh.31, zhat.hh.31),
+                        plot.A(A.hh.46, zhat.hh.46),
                         nrow = 1)
 ```
 
 ```{r, eval = TRUE}
-hh.acc <- mean(zhat.hh == z.hh)
-hh.acc <- ifelse(hh.acc < .5, 1 - hh.acc, hh.acc)
-hh.acc.ssc <- mean(zhat.hh.ssc == z.hh)
-hh.acc.ssc <- ifelse(hh.acc.ssc < .5, 1 - hh.acc.ssc, hh.acc.ssc)
-hh.acc.mm <- mean(zhat.hh.mm == z.hh)
-hh.acc.mm <- ifelse(hh.acc.mm < .5, 1 - hh.acc.mm, hh.acc.mm)
+hh.acc.12 <- mean(zhat.hh.12 == z.hh.12)
+hh.acc.12 <- ifelse(hh.acc.12 < .5, 1 - hh.acc.12, hh.acc.12)
+hh.acc.ssc.12 <- mean(zhat.hh.ssc.12 == z.hh.12)
+hh.acc.ssc.12 <- ifelse(hh.acc.ssc.12 < .5, 1 - hh.acc.ssc.12, hh.acc.ssc.12)
+hh.acc.mm.12 <- mean(zhat.hh.mm.12 == z.hh.12)
+hh.acc.mm.12 <- ifelse(hh.acc.mm.12 < .5, 1 - hh.acc.mm.12, hh.acc.mm.12)
 
 knitr::kable(data.frame(Method = c('Alg. 2', 'SSC', 
                                    'Mod. Max.'),
-                        Error = round(1 - c(hh.acc, hh.acc.ssc, hh.acc.mm), 3)),
+                        Error = round(1 - c(hh.acc.12, hh.acc.ssc.12, hh.acc.mm.12), 3)),
              caption = paste('Community detection error rates for identifying',
                              'household religion.'))
 ```
