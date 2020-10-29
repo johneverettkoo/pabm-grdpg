@@ -687,7 +687,7 @@ for which $B_{ij} \to 0$ if vertices $i$ and $j$ belong in different
 communities. Spectral clustering was performed on $B$ to obtain the final 
 community estimates. 
 
-For estimating $\{\lambda^{(kl)}_K$, both methods usethe ground truth community 
+For estimating $\{\lambda^{(kl)}\}_K$, both methods usethe ground truth community 
 labels. 
 
 ## Balanced communities
@@ -702,15 +702,15 @@ edge probability matrix $P$.
 
 For these examples, we set the following parameters:
 
-* Number of vertices $n = 256, 512, 1024, 2048, 4096$
+* Number of vertices $n = 128, 256, 512, 1024, 2048, 4096$
 * Number of underlying communities $K = 2, 3, 4$
 * Mixture parameters $\alpha_k = 1 / K$ for $k = 1, ..., K$, (i.e., each 
 community label has an equal probability of being drawn)
 * Community labels 
-$z_k \stackrel{iid}{\sim} Multinomial(\alpha_1, ..., \alpha_K)$
-* Within-group popularities $\lambda^{(kk)} \stackrel{iid}{\sim} Beta(2, 1)$
+$z_k \iid Multinomial(\alpha_1, ..., \alpha_K)$
+* Within-group popularities $\lambda^{(kk)} \iid Beta(2, 1)$
 * Between-group popularities 
-$\lambda^{(kl)} \stackrel{iid}{\sim} Beta(1, 2)$ for $k \neq l$
+$\lambda^{(kl)} \iid Beta(1, 2)$ for $k \neq l$
 
 $50$ simulations were performed for each $(n, K)$ pair. 
 
@@ -735,7 +735,7 @@ clustering.df %>%
   ggplot() +
   scale_x_log10(breaks = c(128, 256, 512, 1024, 2048, 4096)) +
   # scale_x_continuous(breaks = c(128, 256, 512, 1024, 2048, 4096)) + 
-  labs(y = 'community detection error', 
+  labs(y = 'community detection error rate', 
        colour = NULL) +
   geom_line(aes(x = n, y = med.err,
                 colour = 'Algorithm 2')) +
@@ -775,7 +775,7 @@ clustering.df %>%
   ggplot() +
   scale_x_log10(breaks = c(128, 256, 512, 1024, 2048, 4096)) +
   # scale_x_continuous(breaks = c(128, 256, 512, 1024, 2048, 4096)) + 
-  labs(y = 'misclustering count', 
+  labs(y = 'community detection error count', 
        colour = NULL) +
   geom_line(aes(x = n, y = med.err * n,
                 colour = 'Algorithm 2')) +
@@ -833,19 +833,19 @@ section with the exception of the mixture parameters
 $\{\alpha_1, ..., \alpha_K\}$ used to draw community labels from the 
 multinomial distribution. For these examples, we set the following parameters:
 
-* Number of vertices $n = 256, 512, 1024, 2048, 4096$
+* Number of vertices $n = 128, 256, 512, 1024, 2048, 4096$
 * Number of underlying communities $K = 2, 3, 4$
 * Mixture parameters $\alpha_k = \frac{k^{-1}}{\sum_{l=1}^K l^{-1}}$ for 
 $k = 1, ..., K$
 * Community labels 
-$z_k \stackrel{iid}{\sim} Multinomial(\alpha_1, ..., \alpha_K)$
-* Within-group popularities $\lambda^{(kk)} \stackrel{iid}{\sim} Beta(2, 1)$
+$z_k \iid Multinomial(\alpha_1, ..., \alpha_K)$
+* Within-group popularities $\lambda^{(kk)} \iid Beta(2, 1)$
 * Between-group popularities 
-$\lambda^{(kl)} \stackrel{iid}{\sim} Beta(1, 2)$ for $k \neq l$
+$\lambda^{(kl)} \iid Beta(1, 2)$ for $k \neq l$
 
 $50$ simulations were performed for each $(n, K)$ pair. 
 
-Fig \ref{fig:clust_err_k_imba} and \ref{fig:clust_err_ct_k_imba} show 
+Fig \ref{fig:clust_err_k_imba} and \ref{fig:clust_err_ct_sim_imba} show 
 similar results as in the balanced communities case, with both Algorithm 2 and 
 Sparse Subspace Clustering resulting in no misclustered vertices for a 
 sufficiently large sample size. However, Fig \ref{fig:lambda_est_k_imba} 
@@ -869,7 +869,7 @@ clustering.df %>%
   ggplot() +
   scale_x_log10(breaks = c(128, 256, 512, 1024, 2048, 4096)) +
   # scale_x_continuous(breaks = c(128, 256, 512, 1024, 2048, 4096)) + 
-  labs(y = 'community detection error', 
+  labs(y = 'community detection error rate', 
        colour = NULL) +
   geom_line(aes(x = n, y = med.err,
                 colour = 'Algorithm 2')) +
@@ -904,7 +904,7 @@ clustering.df %>%
   ggplot() +
   scale_x_log10(breaks = c(128, 256, 512, 1024, 2048, 4096)) +
   # scale_x_continuous(breaks = c(128, 256, 512, 1024, 2048, 4096)) + 
-  labs(y = 'misclustering count', 
+  labs(y = 'community detection error count', 
        colour = NULL) +
   geom_line(aes(x = n, y = med.err * n,
                 colour = 'Algorithm 2')) +
@@ -1105,7 +1105,7 @@ villages 12, 31, and 46 at the household level. The label of interest is the
 religious affiliation. The networks were truncated to religions "1" and "2", 
 and vertices of degree 0 were removed. 
 
-```{r, cache = FALSE, fig.cap = 'Adjacency matrix of the Karnataka villages data, arranged by the clustering produced by Algorithm 2 (left), sparse subspace clustering (middle), and modularity maximization (right).', fig.height = 2, fig.width = 8, eval = TRUE}
+```{r, cache = FALSE, fig.cap = 'Adjacency matrix of the Karnataka villages data, arranged by the clustering produced by Algorithm 2 (left). The villages studied here are, from left to right, 12, 31, and 46.', fig.height = 2, fig.width = 8, eval = TRUE}
 K <- 2
 hh.12 <- readRDS('data/village-hh-12.rds')
 hh.31 <- readRDS('data/village-hh-31.rds')
@@ -1165,11 +1165,27 @@ hh.acc.ssc.12 <- ifelse(hh.acc.ssc.12 < .5, 1 - hh.acc.ssc.12, hh.acc.ssc.12)
 hh.acc.mm.12 <- mean(zhat.hh.mm.12 == z.hh.12)
 hh.acc.mm.12 <- ifelse(hh.acc.mm.12 < .5, 1 - hh.acc.mm.12, hh.acc.mm.12)
 
-knitr::kable(data.frame(Method = c('Alg. 2', 'SSC', 
-                                   'Mod. Max.'),
-                        Error = round(1 - c(hh.acc.12, hh.acc.ssc.12, hh.acc.mm.12), 3)),
-             caption = paste('Community detection error rates for identifying',
-                             'household religion.'))
+hh.acc.31 <- mean(zhat.hh.31 == z.hh.31)
+hh.acc.31 <- ifelse(hh.acc.31 < .5, 1 - hh.acc.31, hh.acc.31)
+hh.acc.ssc.31 <- mean(zhat.hh.ssc.31 == z.hh.31)
+hh.acc.ssc.31 <- ifelse(hh.acc.ssc.31 < .5, 1 - hh.acc.ssc.31, hh.acc.ssc.31)
+hh.acc.mm.31 <- mean(zhat.hh.mm.31 == z.hh.31)
+hh.acc.mm.31 <- ifelse(hh.acc.mm.31 < .5, 1 - hh.acc.mm.31, hh.acc.mm.31)
+
+hh.acc.46 <- mean(zhat.hh.46 == z.hh.46)
+hh.acc.46 <- ifelse(hh.acc.46 < .5, 1 - hh.acc.46, hh.acc.46)
+hh.acc.ssc.46 <- mean(zhat.hh.ssc.46 == z.hh.46)
+hh.acc.ssc.46 <- ifelse(hh.acc.ssc.46 < .5, 1 - hh.acc.ssc.46, hh.acc.ssc.46)
+hh.acc.mm.46 <- mean(zhat.hh.mm.46 == z.hh.46)
+hh.acc.mm.46 <- ifelse(hh.acc.mm.46 < .5, 1 - hh.acc.mm.46, hh.acc.mm.46)
+
+knitr::kable(dplyr::tibble(
+  Method = c('Alg. 2', 'SSC', 'Mod. Max.'),
+  `Error (Village 12)` = round(1 - c(hh.acc.12, hh.acc.ssc.12, hh.acc.mm.12), 3),
+  `Error (Village 31)` = round(1 - c(hh.acc.31, hh.acc.ssc.31, hh.acc.mm.31), 3),
+  `Error (Village 46)` = round(1 - c(hh.acc.46, hh.acc.ssc.46, hh.acc.mm.46), 3)),
+  caption = paste('Community detection error rates for identifying',
+                  'household religion.'))
 ```
 
 # Discussion
