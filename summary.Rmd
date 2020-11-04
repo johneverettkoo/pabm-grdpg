@@ -685,10 +685,62 @@ and Algorithm 4 is compared against an MLE-based estimator
 Both Algorithm 2 and Sparse Subspace Clustering produce an affinity matrix $B$ 
 for which $B_{ij} \to 0$ if vertices $i$ and $j$ belong in different 
 communities. Spectral clustering was performed on $B$ to obtain the final 
-community estimates. 
+community estimates. More specifically, clustering was performed on a 
+normalized Laplacian eigenmap of dimension $K + 1$ by fitting Gaussian Mixture 
+Model. 
 
-For estimating $\{\lambda^{(kl)}\}_K$, both methods usethe ground truth community 
-labels. 
+For estimating $\{\lambda^{(kl)}\}_K$, both methods use the ground truth 
+community labels. 
+
+### Sparse subspace Clustering and Modularity Maximization
+
+**TODO** find citations for these
+
+For each simulation, the popularity vectors $\{\lambda^{(kl)}\}_K$ are drawn 
+from a joint distribution, the edge probability matrix $P$ is constructed using 
+the popularity vectors, and finally an unweighted and undirected adjacency 
+matrix $A$ is drawn from $P$. Three community detection methods are applied to 
+$A$: Algorithm 2 from this paper, Sparse Subspace Clustering, and Modularity 
+Maximization. The latter two algorithms are detailed as follows:
+
+\begin{algorithm}[H]
+  \DontPrintSemicolon
+  \SetAlgoLined
+  \caption{Sparse Subspace Clustering.}
+  \KwData{Adjacency matrix $A$, number of communities $K$.}
+  \KwResult{Community assignments $1, ..., K$.}
+  Embed $A$ in $d$ dimensions using ASE to obtain 
+  $\hat{Y} \in \mathbb{R}^{n \times d}$.\;
+  Fit a sparse linear regression model to each row of $\hat{Y}$ using the 
+  remaining $n - 1$ rows of $Y$ as predictors. The models must exclude the 
+  intercept term.\;
+  Construct $n \times n$ symmetric matrix $C$ such that $c_{ij}$ is the $j^{th}$
+  coefficient for the $i^{th}$ model.\;
+  Normalize the columns of $|C|$ to obtain $\tilde{C}$.\;
+  Compute the affinity matrix $B = \tilde{C} + \tilde{C}^\top$.\;
+  Construct graph $G$ using $B$ as its similarity matrix.\;
+  Partition $G$ into $K$ disconnected components (e.g., using edge thresholding 
+  or spectral clustering).\;
+  Map each partition to the community labels $1, ..., K$\;
+\end{algorithm}
+
+\begin{algorithm}[H]
+  \DontPrintSemicolon
+  \SetAlgoLined
+  \caption{Modularity Maximization (Louvain Method)}
+  \KwData{Adjacency matrix $A$, number of communities $K$.}
+  \KwResult{Community assignments $1, ..., K$}
+  Initialize the clustering by assigning to each vertex a unique community 
+  label.\;
+  For each vertex $v_i$, reassign the label to match one of its neighboring 
+  vertices, and compute the change in modularity for each reassignment.\;
+  Reassign $v_i$ to the community that results in the most positive change in 
+  modularity, if possible. If modularity does not increase by changing the 
+  label, skip the vertex.\;
+  Group vertices with the same label and treat as one vertex.\;
+  Repeat steps (3) and (4) until termination or the desired number of 
+  communities is estimated.
+\end{algorithm}
 
 ## Balanced communities
 
