@@ -59,7 +59,7 @@ clustering.df <- foreach(K = K.vec, .combine = dplyr::bind_rows) %do% {
       P <- Pz$P
       z <- Pz$clustering
       A <- draw.graph(P)
-      clustering <- cluster.pabm(A, K, use.all = TRUE)
+      clustering <- cluster.pabm(A, K, use.all = TRUE, normalize = FALSE)
       error <- 1 - cluster.acc(clustering, z)
       clustering.ssc <- ssc(A, K, sparsity, normalize = TRUE)
       error.ssc <- 1 - cluster.acc(clustering.ssc, z)
