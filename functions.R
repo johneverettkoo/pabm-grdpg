@@ -244,7 +244,7 @@ ssc <- function(A,
                 K = 2,
                 lambda = .01,
                 parallel = FALSE,
-                normalize = FALSE) {
+                normalize = TRUE) {
   p <- K * (K + 1) / 2
   q <- K * (K - 1) / 2
   
@@ -405,4 +405,46 @@ plot.A <- function(A, z, lines = TRUE, max.size = 500) {
   }
   
   return(out.plot)
+}
+
+mod.max.exchange <- function(A, init.clust) {
+  K <- max(init.clust)
+  n <- nrow(A)
+  indices <- seq(n)
+  clustering <- init.clust
+  clusters <- seq(K)
+  current.modularity <- Q.PA(A, clustering)
+  prev.modularity <- current.modularity - 1
+  print(current.modularity)
+  
+  iter <- 0
+  
+  while (prev.modularity != current.modularity) {
+    prev.modularity <- current.modularity
+    # indices <- sample(indices)
+    for (i in indices) {
+      current.label <- clustering[i]
+      neighbors <- which(A[i, ] == 1)
+      neighboring.labels <- unique(clustering[neighbors])
+      if ((length(neighboring.labels) > 1) | 
+          (neighboring.labels[1] != current.label)) {
+        # print(i)
+        for (k in neighboring.labels) {
+          if (k != current.label) {
+            proposed.clustering <- clustering
+            proposed.clustering[i] <- k
+            proposed.modularity <- Q.PA(A, proposed.clustering)
+            if (proposed.modularity > current.modularity) {
+              clustering <- proposed.clustering
+              current.modularity <- proposed.modularity
+            }
+          }
+        }
+      }
+    }
+    iter <- iter + 1
+    print(iter)
+    print(current.modularity)
+  }
+  return(clustering)
 }

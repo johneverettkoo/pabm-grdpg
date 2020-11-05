@@ -371,7 +371,7 @@ modularity maximization for clustering and parameter estimation. They were able
 to show that as the sample size increases, the proportion of misclassified 
 community labels (up to permutation) goes to 0. 
 
-\citet*{noroozi2019estimation} proposed using sparse subspace clustering (SSC) 
+\citet*{noroozi2019estimation} proposed using sparse subspace clustering 
 to identify the community memberships given either an edge probability matrix 
 $P$ or an adjacency matrix $A$. In the case that $P$ is known, the community 
 memberships can be identified exactly (up to permutation). This is supported by 
@@ -682,7 +682,7 @@ modularity maximization \cite{307cbeb9b1be48299388437423d94bf1} \cite{igraph},
 and Algorithm 4 is compared against an MLE-based estimator 
 \cite{noroozi2019estimation} \cite{307cbeb9b1be48299388437423d94bf1}. 
 
-Both Algorithm 2 and Sparse Subspace Clustering produce an affinity matrix $B$ 
+Both Algorithm 2 and sparse subspace clustering produce an affinity matrix $B$ 
 for which $B_{ij} \to 0$ if vertices $i$ and $j$ belong in different 
 communities. Spectral clustering was performed on $B$ to obtain the final 
 community estimates. More specifically, clustering was performed on a 
@@ -692,7 +692,7 @@ Model.
 For estimating $\{\lambda^{(kl)}\}_K$, both methods use the ground truth 
 community labels. 
 
-### Sparse subspace Clustering and Modularity Maximization
+### Sparse subspace clustering and modularity maximization
 
 **TODO** find citations for these
 
@@ -700,13 +700,15 @@ For each simulation, the popularity vectors $\{\lambda^{(kl)}\}_K$ are drawn
 from a joint distribution, the edge probability matrix $P$ is constructed using 
 the popularity vectors, and finally an unweighted and undirected adjacency 
 matrix $A$ is drawn from $P$. Three community detection methods are applied to 
-$A$: Algorithm 2 from this paper, Sparse Subspace Clustering, and Modularity 
-Maximization. The latter two algorithms are detailed as follows:
+$A$: Algorithm 2 from this paper, sparse subspace clustering, and modularity 
+maximization. 
+
+Sparse subspace clustering is described by the following:
 
 \begin{algorithm}[H]
   \DontPrintSemicolon
   \SetAlgoLined
-  \caption{Sparse Subspace Clustering.}
+  \caption{Sparse subspace clustering.}
   \KwData{Adjacency matrix $A$, number of communities $K$.}
   \KwResult{Community assignments $1, ..., K$.}
   Embed $A$ in $d$ dimensions using ASE to obtain 
@@ -724,10 +726,16 @@ Maximization. The latter two algorithms are detailed as follows:
   Map each partition to the community labels $1, ..., K$\;
 \end{algorithm}
 
+For modularity maximization, \citet{307cbeb9b1be48299388437423d94bf1} used the 
+Extreme Points (EP) algorithm \cite{le2016}, which is specific to the case 
+$K = 2$. In our simulation studies, we used the EP algorithm for $K = 2$ and 
+the Louvain algorithm for $K > 2$. The Louvain algorithm is described by the 
+following: 
+
 \begin{algorithm}[H]
   \DontPrintSemicolon
   \SetAlgoLined
-  \caption{Modularity Maximization (Louvain Method)}
+  \caption{Modularity maximization (Louvain Method)}
   \KwData{Adjacency matrix $A$, number of communities $K$.}
   \KwResult{Community assignments $1, ..., K$}
   Initialize the clustering by assigning to each vertex a unique community 
@@ -767,7 +775,7 @@ $\lambda^{(kl)} \iid Beta(1, 2)$ for $k \neq l$
 $50$ simulations were performed for each $(n, K)$ pair. 
 
 Fig \ref{fig:clust_err_k} show that for large $n$, Algorithm 2 results in 
-a misclustering rate of 0. Sparse Subspace Clustering produces similar results 
+a misclustering rate of 0. Sparse subspace clustering produces similar results 
 for $K > 2$. 
 
 ```{r clust_err_k, fig.cap = 'IQR of clustering error using Algorithm 2 (red) compared against modularity maximization (blue) and sparse subspace clustering (green) for sample sizes from 128 to 4096 and number of underlying communities from 2 to 4. Simulations were repeated 50 times for each sample size.', fig.width = 10}
@@ -899,7 +907,7 @@ $50$ simulations were performed for each $(n, K)$ pair.
 
 Fig \ref{fig:clust_err_k_imba} and \ref{fig:clust_err_ct_sim_imba} show 
 similar results as in the balanced communities case, with both Algorithm 2 and 
-Sparse Subspace Clustering resulting in no misclustered vertices for a 
+sparse subspace clustering resulting in no misclustered vertices for a 
 sufficiently large sample size. However, Fig \ref{fig:lambda_est_k_imba} 
 suggests that while Algorithm 5 retains $\sqrt{n}$ efficiency, the MLE-based 
 plug-in estimator fails to do so. 
