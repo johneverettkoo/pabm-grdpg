@@ -83,7 +83,7 @@ clustering.df <- foreach(K = K.vec, .combine = dplyr::bind_rows) %do% {
       error <- 1 - cluster.acc(clustering, z)
       clustering.ssc <- ssc(A, K, sparsity, normalize = TRUE)
       error.ssc <- 1 - cluster.acc(clustering.ssc, z)
-      if (K == 2 & n < 4096) {
+      if (K == 2) {
         clustering.mm <- cluster.sg(A)
       } else {
         clustering.mm <- mod.max(A)

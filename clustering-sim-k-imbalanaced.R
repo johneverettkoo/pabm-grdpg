@@ -8,6 +8,9 @@ library(mclust)
 library(igraph)
 library(ggplot2)
 source('http://pages.iu.edu/~mtrosset/Courses/675/stress.r')
+setwd('~/dev/pabm-grdpg/codes_and_data')
+source('EPalgosim.R')
+source('functions.R')
 setwd('~/dev/pabm-grdpg')
 import::here(embedding, draw.graph, 
              generate.P.beta,
@@ -28,6 +31,23 @@ cluster.acc <- function(yhat, yobs) {
     sum() %>% 
     magrittr::divide_by(length(yhat)) %>% 
     return()
+}
+
+cluster.sg <- function(A) {
+  b.can = EPalgo(A,eps=0) # EP algorithm (no perturbation)
+  Q.PA.can = rep(NA, ncol(b.can))	# array to store Q values
+  Q.DC.can = rep(NA, ncol(b.can))	# array to store Q values
+  for (i in 1:ncol(b.can)){
+    #check if any cluster is empty
+    foo = rep(NA, 2)
+    for (clus in 1:2) {foo[clus]=sum(b.can[,i]==clus)}
+    if (min(foo)==0) {stop('Empty groups are not allowed')} 
+    Q.PA.can[i] = Q.PA(A, b=b.can[,i])   # fit PABM
+    Q.DC.can[i] = Q.DC(A, b=b.can[,i])   # fit DCBM
+  } # end of i for loop
+  foo1 = order(-Q.PA.can)[1] 
+  b.PA = b.can[,foo1]   # community assignment that maximises Q.PA
+  return(b.PA)
 }
 
 # simulation parameters
@@ -63,7 +83,11 @@ clustering.df <- foreach(K = K.vec, .combine = dplyr::bind_rows) %do% {
       error <- 1 - cluster.acc(clustering, z)
       clustering.ssc <- ssc(A, K, sparsity, normalize = TRUE)
       error.ssc <- 1 - cluster.acc(clustering.ssc, z)
-      clustering.mm <- mod.max(A)
+      if (K == 2) {
+        clustering.mm <- cluster.sg(A)
+      } else {
+        clustering.mm <- mod.max(A)
+      }
       error.mm <- 1 - cluster.acc(clustering.mm, z)
       dplyr::tibble(K = K, n = n, 
                     error = error, 
