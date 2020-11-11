@@ -729,15 +729,30 @@ Sparse subspace clustering is described by the following:
 For modularity maximization, \citet{307cbeb9b1be48299388437423d94bf1} used the 
 Extreme Points (EP) algorithm \cite{le2016}, which is specific to the case 
 $K = 2$. In our simulation studies, we used the EP algorithm for $K = 2$ and 
-the Louvain algorithm for $K > 2$. The Louvain algorithm is described by the 
-following: 
+the Louvain algorithm \cite{Blondel_2008} for $K > 2$. 
+
+The EP algorithm is described by the following:
 
 \begin{algorithm}[H]
   \DontPrintSemicolon
   \SetAlgoLined
-  \caption{Modularity maximization (Louvain Method)}
+  \caption{Modularity maximization (EP algorithm)}
+  \KwData{Adjacency matrix $A$, number of communities $K = 2$.}
+  \KwResult{Community assignments $1, ..., K$.}
+  Embed vertices of the graph described by $A$ into the subspace constructed 
+  by a low rank approximation of $A$ (e.g., by the first few eigenvectors of 
+  $A$).\;
+  Project the hypercube $[-1, 1]^n$ to $U_A$.\;
+\end{algorithm}
+
+The Louvain algorithm is described by the following: 
+
+\begin{algorithm}[H]
+  \DontPrintSemicolon
+  \SetAlgoLined
+  \caption{Modularity maximization (Louvain method)}
   \KwData{Adjacency matrix $A$, number of communities $K$.}
-  \KwResult{Community assignments $1, ..., K$}
+  \KwResult{Community assignments $1, ..., K$.}
   Initialize the clustering by assigning to each vertex a unique community 
   label.\;
   For each vertex $v_i$, reassign the label to match one of its neighboring 
