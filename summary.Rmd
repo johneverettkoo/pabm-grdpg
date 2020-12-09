@@ -105,10 +105,10 @@ edge probability matrix is $P = X X^\top$ where
 $X = \begin{bmatrix} x_1 & \cdots & x_n \end{bmatrix}^\top$. The SBM is 
 equivalent to a special case of the RDPG model in which all vertices of a 
 given community share the same position in the latent space 
-\cite{lyzinski2015perfect}. It has also been shown that similar 
+\cite{lyzinski2014}. It has also been shown that similar 
 probabilistic graph models, including both the MMSBM and DCBM, can be 
 represented in this way \cite{rubindelanchy2017consistency} 
-\cite{lyzinski2015perfect}. An analogous 
+\cite{lyzinski2014}. An analogous 
 property exists for the PABM but not for the RDPG model but under the 
 *Generalized* Random Dot Product Graph (GRDPG) model. This relationship will be 
 explored in this paper and exploited to construct algorithms for community 
