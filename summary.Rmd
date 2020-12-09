@@ -369,7 +369,9 @@ beforehand and does not require estimation.
 \citet*{307cbeb9b1be48299388437423d94bf1}, who first proposed the PABM, used 
 modularity maximization for clustering and parameter estimation. They were able 
 to show that as the sample size increases, the proportion of misclassified 
-community labels (up to permutation) goes to 0. 
+community labels (up to permutation) goes to 0. However, because modularity 
+maximization is NP-hard, the authors of this paper used an approximation 
+based on the Extreme Points algorithm \cite{le2016}.
 
 \citet*{noroozi2019estimation} proposed using sparse subspace clustering 
 to identify the community memberships given either an edge probability matrix 
@@ -378,7 +380,7 @@ memberships can be identified exactly (up to permutation). This is supported by
 our Theorem 2, which shows that the ASE of edge probability matrix $P$ consists 
 of $K$ $K$-dimensional subspaces lying in $\mathbb{R}^{K^2}$. A similar 
 procedure can be applied if $P$ is unknown and we have an observation $A$, but 
-the theoretical guarantees of this method applied to the PABM are unknown. 
+the theoretical guarantees of this method applied to the PABM are unknown.
 
 ## Community detection
 
