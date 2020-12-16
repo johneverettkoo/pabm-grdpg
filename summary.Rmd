@@ -18,7 +18,7 @@ header-includes:
 - \usepackage{verbatim}
 bibliography: misc.bib
 abstract: |
-  In this paper, we connect two probabilistic models for graphs, the Popularity 
+  In this paper, we connect two random graph models, the Popularity 
   Adjusted Block Model (PABM) and the Generalized Random Dot Product Graph 
   (GRDPG) and use properties established in this connection to aid in 
   community detection and parameter estimation. In particular, we note that the
@@ -73,11 +73,11 @@ by drawing from a probability distribution based on the community relationships
 between each pair. The goal of this analysis then is population community 
 detection, or the recovery of the true underlying community labels for each 
 vertex, up to permutation (with some additional parameter estimation being of 
-possible interest), assuming some probabilistic graph model. One such model is 
+possible interest), assuming some random graph model. One such model is 
 the Stochastic Block Model (SBM), first proposed by 
 \citet{doi:10.1080/0022250X.1971.9989788}, which assumes that the edge 
 probability from one vertex to another follows a Beronulli distribution with 
-fixed probabilities for each pair of community labels. Other probabilistic 
+fixed probabilities for each pair of community labels. Other random 
 graph models have been proposed and studied, such as the Degree-Corrected Block 
 Model (DCBM), introduced by \citet{Karrer_2011} and the Mixed Membership 
 Stochastic Block Model (MMSBM), introduced by  \citet*{NIPS2008_3578}. The 
@@ -106,7 +106,7 @@ $X = \begin{bmatrix} x_1 & \cdots & x_n \end{bmatrix}^\top$. The SBM is
 equivalent to a special case of the RDPG model in which all vertices of a 
 given community share the same position in the latent space 
 \cite{lyzinski2014}. It has also been shown that similar 
-probabilistic graph models, including both the MMSBM and DCBM, can be 
+random graph models, including both the MMSBM and DCBM, can be 
 represented in this way \cite{rubindelanchy2017consistency} 
 \cite{lyzinski2014}. An analogous 
 property exists for the PABM but not for the RDPG model but under the 
@@ -695,7 +695,7 @@ affinity matrix $A$ is required, and for this, we use spectral decomposition
 using the first $K (K + 1) / 2$ and last $K (K - 1) / 2$ eigenvectors. Then a 
 sparse linear regression model is fit to each row of the embedding data matrix 
 using the remaining rows as predictors, the rows of which are stored in 
-matrix $C$. Finally, an affinity matrix $B = |C| + |C^\top|$ is constructed, 
+matrix $C$. Finally, an affinity matrix $B = |C| + |C|^\top$ is constructed, 
 where $|\cdot|$ is applied entry-wise. If the data in the embedding lie 
 perfectly in $K$ subspaces, then $B_{ij} = 0$ for $i, j$ not in the same 
 subspace. If the embedding of $P$ is used, then this property holds, but it 
