@@ -448,3 +448,37 @@ mod.max.exchange <- function(A, init.clust) {
   }
   return(clustering)
 }
+
+ssc2 <- function(A, 
+                 K = 2,
+                 lambda = .01,
+                 parallel = FALSE,
+                 normalize = TRUE) {
+  
+  N <- ncol(A)
+  B <- plyr::aaply(seq(N), 1, function(i) {
+    y <- A[, i]
+    X <- A[, -i]
+    betahat <- glmnet::glmnet(X, y, lambda = lambda, intercept = FALSE) %>% 
+      coef() %>% 
+      as.numeric()
+    if (i != N) {
+      betahat <- c(betahat[seq(i)], 0, betahat[seq(i + 1, N)])
+    } else {
+      betahat <- c(betahat, 0)
+    }
+    betahat <- betahat[-1]
+    return(betahat)
+  }, .parallel = parallel) %>% 
+    abs()
+  if (normalize) {
+    B <- sweep(B, 2, apply(B, 2, max), `/`)
+    B[is.nan(B)] <- 0
+  }
+  W <- B + t(B)
+  L <- normalized.laplacian(W)
+  L.eigen <- eigen(L, symmetric = TRUE)
+  X <- L.eigen$vectors[, seq(N, N - K)]
+  clustering <- mclust::Mclust(X, K, verbose = FALSE)$classification
+  return(clustering)
+}
