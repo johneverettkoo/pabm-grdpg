@@ -736,7 +736,7 @@ Fig \ref{fig:clust_err_k} show that for large $n$, Algorithm 2 results in
 a misclustering rate of 0. Sparse subspace clustering produces similar results 
 for $K > 2$. 
 
-```{r clust_err_k, fig.cap = 'IQR of clustering error using Algorithm 2 (blue) compared against subspace clustering on the adjacency spectral embedding (green), the extreme points algorithm (red), and subspace clustering on the adjacency matrix (purple), for sample sizes from 128 to 4096 and number of underlying communities from 2 to 4. Communities are approximately balanced. Simulations were repeated 50 times for each sample size.', fig.width = 10}
+```{r clust_err_k, fig.cap = 'IQR of clustering error using Algorithm 2 (blue) compared against subspace clustering on the adjacency spectral embedding (purple), the extreme points algorithm (red), and subspace clustering on the adjacency matrix (green), for sample sizes from 128 to 4096 and number of underlying communities from 2 to 4. Communities are approximately balanced. Simulations were repeated 50 times for each sample size.', fig.width = 10}
 clustering.df <- readr::read_csv('clustering-k.csv')
 ssc.df <- readr::read_csv('clustering-ssc-k.csv')
 clustering.df %>%
@@ -789,7 +789,7 @@ Theorem 4 implies that algorithm 2 will result in not just in the error rate
 converging to 0 but the error *count* as well (Fig. \ref{fig:clust_err_ct_sim}).
 We explore this in Fig \ref{fig:clust_err_ct_sim}.
 
-```{r clust_err_ct_sim, fig.cap = 'IQR of counts of misclustered vertices using Algorithm 2 (blue) compared against subspace clustering on the adjacency spectral embedding (green), the extreme points algorithm (red), and subspace clustering on the adjacency matrix (purple), for sample sizes from 128 to 4096 and number of communities from 2 to 4. Communities are approximately balanced. Simulations were repeated 50 times for each sample size.', cache = FALSE, fig.width = 10}
+```{r clust_err_ct_sim, fig.cap = 'IQR of counts of misclustered vertices using Algorithm 2 (blue) compared against subspace clustering on the adjacency spectral embedding (purple), the extreme points algorithm (red), and subspace clustering on the adjacency matrix (green), for sample sizes from 128 to 4096 and number of communities from 2 to 4. Communities are approximately balanced. Simulations were repeated 50 times for each sample size.', cache = FALSE, fig.width = 10}
 clustering.df <- readr::read_csv('clustering-k.csv')
 ssc.df <- readr::read_csv('clustering-ssc-k.csv')
 clustering.df %>%
@@ -896,7 +896,7 @@ sufficiently large sample size. However, Fig \ref{fig:lambda_est_k_imba}
 suggests that while Algorithm 5 retains $\sqrt{n}$ efficiency, the MLE-based 
 plug-in estimator fails to do so. 
 
-```{r clust_err_k_imba, fig.cap = 'IQR of clustering error using Algorithm 2 (blue) compared against subspace clustering on the adjacency spectral embedding (green), the extreme points algorithm (red), and subspace clustering on the adjacency matrix (purple), for sample sizes from 128 to 4096 and number of underlying communities from 2 to 4. Communities are imbalanced. Simulations were repeated 50 times for each sample size.', fig.width = 10}
+```{r clust_err_k_imba, fig.cap = 'IQR of clustering error using Algorithm 2 (blue) compared against subspace clustering on the adjacency spectral embedding (purple), the extreme points algorithm (red), and subspace clustering on the adjacency matrix (green), for sample sizes from 128 to 4096 and number of underlying communities from 2 to 4. Communities are imbalanced. Simulations were repeated 50 times for each sample size.', fig.width = 10}
 clustering.df <- readr::read_csv('clustering-k-imbalanced.csv')
 ssc.df <- readr::read_csv('clustering-ssc-k-imbalanced.csv')
 clustering.df %>%
@@ -945,7 +945,7 @@ clustering.df %>%
   scale_y_log10()
 ```
 
-```{r clust_err_ct_sim_imba, fig.cap = 'IQR of counts of misclustered vertices using Algorithm 2 (blue) compared against subspace clustering on the adjacency spectral embedding (green), the extreme points algorithm (red), and subspace clustering on the adjacency matrix (purple), for sample sizes from 128 to 4096 and number of communities from 2 to 4. Communities are imbalanced. Simulations were repeated 50 times for each sample size.', cache = FALSE, fig.width = 10}
+```{r clust_err_ct_sim_imba, fig.cap = 'IQR of counts of misclustered vertices using Algorithm 2 (blue) compared against subspace clustering on the adjacency spectral embedding (purple), the extreme points algorithm (red), and subspace clustering on the adjacency matrix (green), for sample sizes from 128 to 4096 and number of communities from 2 to 4. Communities are imbalanced. Simulations were repeated 50 times for each sample size.', cache = FALSE, fig.width = 10}
 clustering.df <- readr::read_csv('clustering-k-imbalanced.csv')
 ssc.df <- readr::read_csv('clustering-ssc-k-imbalanced.csv')
 clustering.df %>%
