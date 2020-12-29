@@ -736,7 +736,7 @@ Fig \ref{fig:clust_err_k} show that for large $n$, Algorithm 2 results in
 a misclustering rate of 0. Sparse subspace clustering produces similar results 
 for $K > 2$. 
 
-```{r clust_err_k, fig.cap = 'IQR of clustering error using Algorithm 2 (blue) compared against subspace clustering on the adjacency spectral embedding (green), the extreme points algorithm (red), and subspace clustering on the adjacency matrix, for sample sizes from 128 to 4096 and number of underlying communities from 2 to 4. Simulations were repeated 50 times for each sample size.', fig.width = 10}
+```{r clust_err_k, fig.cap = 'IQR of clustering error using Algorithm 2 (blue) compared against subspace clustering on the adjacency spectral embedding (green), the extreme points algorithm (red), and subspace clustering on the adjacency matrix (purple), for sample sizes from 128 to 4096 and number of underlying communities from 2 to 4. Communities are approximately balanced. Simulations were repeated 50 times for each sample size.', fig.width = 10}
 clustering.df <- readr::read_csv('clustering-k.csv')
 ssc.df <- readr::read_csv('clustering-ssc-k.csv')
 clustering.df %>%
@@ -769,17 +769,17 @@ clustering.df %>%
   geom_errorbar(aes(x = n, ymin = first.q, ymax = third.q,
                     colour = 'OSC'), width = .1) + 
   geom_line(aes(x = n, y = med.err.ssc,
-                colour = 'SSC-A')) + 
+                colour = 'SSC-ASE')) + 
   geom_errorbar(aes(x = n, ymin = first.q.ssc, ymax = third.q.ssc,
-                    colour = 'SSC-A'), width = .1) + 
+                    colour = 'SSC-ASE'), width = .1) + 
   geom_line(aes(x = n, y = med.err.mm,
                 colour = 'MM-EP')) + 
   geom_errorbar(aes(x = n, ymin = first.q.mm, ymax = third.q.mm,
                     colour = 'MM-EP'), width = .1) + 
   geom_line(aes(x = n, y = med.err.ssc2,
-                colour = 'SSC-W')) + 
+                colour = 'SSC-A')) + 
   geom_errorbar(aes(x = n, ymin = first.q.ssc2, ymax = third.q.ssc2,
-                    colour = 'SSC-W'), width = .1) + 
+                    colour = 'SSC-A'), width = .1) + 
   scale_colour_brewer(palette = 'Set1') + 
   facet_wrap(~ K, labeller = 'label_both') + 
   scale_y_log10()
@@ -789,7 +789,7 @@ Theorem 4 implies that algorithm 2 will result in not just in the error rate
 converging to 0 but the error *count* as well (Fig. \ref{fig:clust_err_ct_sim}).
 We explore this in Fig \ref{fig:clust_err_ct_sim}.
 
-```{r clust_err_ct_sim, fig.cap = 'IQR of counts of misclustered vertices using Algorithm 2 (blue) compared against subspace clustering on the adjacency spectral embedding (green), the extreme points algorithm (red), and subspace clustering on the adjacency matrix, for sample sizes from 128 to 4096. Simulations were repeated 50 times for each sample size.', cache = FALSE, fig.width = 10}
+```{r clust_err_ct_sim, fig.cap = 'IQR of counts of misclustered vertices using Algorithm 2 (blue) compared against subspace clustering on the adjacency spectral embedding (green), the extreme points algorithm (red), and subspace clustering on the adjacency matrix (purple), for sample sizes from 128 to 4096 and number of communities from 2 to 4. Communities are approximately balanced. Simulations were repeated 50 times for each sample size.', cache = FALSE, fig.width = 10}
 clustering.df <- readr::read_csv('clustering-k.csv')
 ssc.df <- readr::read_csv('clustering-ssc-k.csv')
 clustering.df %>%
@@ -822,17 +822,17 @@ clustering.df %>%
   geom_errorbar(aes(x = n, ymin = first.q * n, ymax = third.q * n,
                     colour = 'OSC'), width = .1) + 
   geom_line(aes(x = n, y = med.err.ssc * n,
-                colour = 'SSC-A')) + 
+                colour = 'SSC-ASE')) + 
   geom_errorbar(aes(x = n, ymin = first.q.ssc * n, ymax = third.q.ssc * n,
-                    colour = 'SSC-A'), width = .1) + 
+                    colour = 'SSC-ASE'), width = .1) + 
   geom_line(aes(x = n, y = med.err.mm * n,
                 colour = 'MM-EP')) + 
   geom_errorbar(aes(x = n, ymin = first.q.mm * n, ymax = third.q.mm * n,
                     colour = 'MM-EP'), width = .1) + 
   geom_line(aes(x = n, y = med.err.ssc2 * n,
-                colour = 'SSC-W')) + 
+                colour = 'SSC-A')) + 
   geom_errorbar(aes(x = n, ymin = first.q.ssc2 * n, ymax = third.q.ssc2 * n,
-                    colour = 'SSC-W'), width = .1) + 
+                    colour = 'SSC-A'), width = .1) + 
   scale_colour_brewer(palette = 'Set1') + 
   facet_wrap(~ K, labeller = 'label_both') + 
   scale_y_log10()
@@ -896,43 +896,9 @@ sufficiently large sample size. However, Fig \ref{fig:lambda_est_k_imba}
 suggests that while Algorithm 5 retains $\sqrt{n}$ efficiency, the MLE-based 
 plug-in estimator fails to do so. 
 
-```{r clust_err_k_imba, fig.cap = 'IQR of clustering error using Algorithm 2 (red) compared against modularity maximization (blue) and subspace clustering (green) for sample sizes from 128 to 4096 and number of clusters from 2 to 4. Simulations were repeated 50 times for each sample size.', fig.width = 10}
+```{r clust_err_k_imba, fig.cap = 'IQR of clustering error using Algorithm 2 (blue) compared against subspace clustering on the adjacency spectral embedding (green), the extreme points algorithm (red), and subspace clustering on the adjacency matrix (purple), for sample sizes from 128 to 4096 and number of underlying communities from 2 to 4. Communities are imbalanced. Simulations were repeated 50 times for each sample size.', fig.width = 10}
 clustering.df <- readr::read_csv('clustering-k-imbalanced.csv')
-clustering.df %>%
-  dplyr::group_by(K, n) %>%
-  dplyr::summarise(med.err = median(error),
-                   first.q = quantile(error, .25),
-                   third.q = quantile(error, .75),
-                   med.err.ssc = median(error.ssc),
-                   first.q.ssc = quantile(error.ssc, .25),
-                   third.q.ssc = quantile(error.ssc, .75),
-                   med.err.mm = median(error.mm),
-                   first.q.mm = quantile(error.mm, .25),
-                   third.q.mm = quantile(error.mm, .75)) %>%
-  dplyr::ungroup() %>% 
-  ggplot() +
-  scale_x_log10(breaks = c(128, 256, 512, 1024, 2048, 4096)) +
-  # scale_x_continuous(breaks = c(128, 256, 512, 1024, 2048, 4096)) + 
-  labs(y = 'community detection error rate', 
-       colour = NULL) +
-  geom_line(aes(x = n, y = med.err,
-                colour = 'Algorithm 2')) +
-  geom_errorbar(aes(x = n, ymin = first.q, ymax = third.q,
-                    colour = 'Algorithm 2'), width = .1) + 
-  geom_line(aes(x = n, y = med.err.ssc,
-                colour = 'SSC')) + 
-  geom_errorbar(aes(x = n, ymin = first.q.ssc, ymax = third.q.ssc,
-                    colour = 'SSC'), width = .1) + 
-  geom_line(aes(x = n, y = med.err.mm, colour = 'Modularity maximization')) + 
-  geom_errorbar(aes(x = n, ymin = first.q.mm, ymax = third.q.mm, 
-                    colour = 'Modularity maximization'), width = .1) + 
-  scale_colour_brewer(palette = 'Set1') + 
-  facet_wrap(~ K, labeller = 'label_both') +
-  scale_y_log10()
-```
-
-```{r clust_err_ct_sim_imba, fig.cap = 'IQR of counts of misclustered vertices using Algorithm 2 (red) compared against subspace clustering (blue) for sample sizes from 128 to 4096. Simulations were repeated 50 times for each sample size.', cache = FALSE, fig.width = 10}
-clustering.df <- readr::read_csv('clustering-k-imbalanced.csv')
+ssc.df <- readr::read_csv('clustering-ssc-k-imbalanced.csv')
 clustering.df %>%
   dplyr::group_by(n, K) %>%
   dplyr::summarise(med.err = median(error),
@@ -945,23 +911,84 @@ clustering.df %>%
                    first.q.mm = quantile(error.mm, .25),
                    third.q.mm = quantile(error.mm, .75)) %>%
   dplyr::ungroup() %>% 
+  dplyr::inner_join(
+    ssc.df %>% 
+      dplyr::group_by(n, K) %>% 
+      dplyr::summarise(med.err.ssc2 = median(error.ssc2),
+                       first.q.ssc2 = quantile(error.ssc2, .25),
+                       third.q.ssc2 = quantile(error.ssc2, .75)) %>% 
+      dplyr::ungroup()
+  ) %>% 
+  ggplot() +
+  scale_x_log10(breaks = c(128, 256, 512, 1024, 2048, 4096)) +
+  # scale_x_continuous(breaks = c(128, 256, 512, 1024, 2048, 4096)) + 
+  labs(y = 'community detection error count', 
+       colour = NULL) +
+  geom_line(aes(x = n, y = med.err,
+                colour = 'OSC')) +
+  geom_errorbar(aes(x = n, ymin = first.q, ymax = third.q,
+                    colour = 'OSC'), width = .1) + 
+  geom_line(aes(x = n, y = med.err.ssc,
+                colour = 'SSC-ASE')) + 
+  geom_errorbar(aes(x = n, ymin = first.q.ssc, ymax = third.q.ssc,
+                    colour = 'SSC-ASE'), width = .1) + 
+  geom_line(aes(x = n, y = med.err.mm,
+                colour = 'MM-EP')) + 
+  geom_errorbar(aes(x = n, ymin = first.q.mm, ymax = third.q.mm,
+                    colour = 'MM-EP'), width = .1) + 
+  geom_line(aes(x = n, y = med.err.ssc2,
+                colour = 'SSC-A')) + 
+  geom_errorbar(aes(x = n, ymin = first.q.ssc2, ymax = third.q.ssc2,
+                    colour = 'SSC-A'), width = .1) + 
+  scale_colour_brewer(palette = 'Set1') + 
+  facet_wrap(~ K, labeller = 'label_both') + 
+  scale_y_log10()
+```
+
+```{r clust_err_ct_sim_imba, fig.cap = 'IQR of counts of misclustered vertices using Algorithm 2 (blue) compared against subspace clustering on the adjacency spectral embedding (green), the extreme points algorithm (red), and subspace clustering on the adjacency matrix (purple), for sample sizes from 128 to 4096 and number of communities from 2 to 4. Communities are imbalanced. Simulations were repeated 50 times for each sample size.', cache = FALSE, fig.width = 10}
+clustering.df <- readr::read_csv('clustering-k-imbalanced.csv')
+ssc.df <- readr::read_csv('clustering-ssc-k-imbalanced.csv')
+clustering.df %>%
+  dplyr::group_by(n, K) %>%
+  dplyr::summarise(med.err = median(error),
+                   first.q = quantile(error, .25),
+                   third.q = quantile(error, .75),
+                   med.err.ssc = median(error.ssc),
+                   first.q.ssc = quantile(error.ssc, .25),
+                   third.q.ssc = quantile(error.ssc, .75),
+                   med.err.mm = median(error.mm),
+                   first.q.mm = quantile(error.mm, .25),
+                   third.q.mm = quantile(error.mm, .75)) %>%
+  dplyr::ungroup() %>% 
+  dplyr::inner_join(
+    ssc.df %>% 
+      dplyr::group_by(n, K) %>% 
+      dplyr::summarise(med.err.ssc2 = median(error.ssc2),
+                       first.q.ssc2 = quantile(error.ssc2, .25),
+                       third.q.ssc2 = quantile(error.ssc2, .75)) %>% 
+      dplyr::ungroup()
+  ) %>% 
   ggplot() +
   scale_x_log10(breaks = c(128, 256, 512, 1024, 2048, 4096)) +
   # scale_x_continuous(breaks = c(128, 256, 512, 1024, 2048, 4096)) + 
   labs(y = 'community detection error count', 
        colour = NULL) +
   geom_line(aes(x = n, y = med.err * n,
-                colour = 'Algorithm 2')) +
+                colour = 'OSC')) +
   geom_errorbar(aes(x = n, ymin = first.q * n, ymax = third.q * n,
-                    colour = 'Algorithm 2'), width = .1) + 
+                    colour = 'OSC'), width = .1) + 
   geom_line(aes(x = n, y = med.err.ssc * n,
-                colour = 'SSC')) + 
+                colour = 'SSC-ASE')) + 
   geom_errorbar(aes(x = n, ymin = first.q.ssc * n, ymax = third.q.ssc * n,
-                    colour = 'SSC'), width = .1) + 
+                    colour = 'SSC-ASE'), width = .1) + 
   geom_line(aes(x = n, y = med.err.mm * n,
-                colour = 'Modularity maximization')) + 
+                colour = 'MM-EP')) + 
   geom_errorbar(aes(x = n, ymin = first.q.mm * n, ymax = third.q.mm * n,
-                    colour = 'Modularity maximization'), width = .1) + 
+                    colour = 'MM-EP'), width = .1) + 
+  geom_line(aes(x = n, y = med.err.ssc2 * n,
+                colour = 'SSC-A')) + 
+  geom_errorbar(aes(x = n, ymin = first.q.ssc2 * n, ymax = third.q.ssc2 * n,
+                    colour = 'SSC-A'), width = .1) + 
   scale_colour_brewer(palette = 'Set1') + 
   facet_wrap(~ K, labeller = 'label_both') + 
   scale_y_log10()
