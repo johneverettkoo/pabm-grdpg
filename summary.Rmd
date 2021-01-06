@@ -769,17 +769,17 @@ clustering.df %>%
   geom_errorbar(aes(x = n, ymin = first.q, ymax = third.q,
                     colour = 'OSC'), width = .1) + 
   geom_line(aes(x = n, y = med.err.ssc,
-                colour = 'SSC-A')) + 
+                colour = 'SSC-ASE')) + 
   geom_errorbar(aes(x = n, ymin = first.q.ssc, ymax = third.q.ssc,
-                    colour = 'SSC-A'), width = .1) + 
+                    colour = 'SSC-ASE'), width = .1) + 
   geom_line(aes(x = n, y = med.err.mm,
                 colour = 'MM-EP')) + 
   geom_errorbar(aes(x = n, ymin = first.q.mm, ymax = third.q.mm,
                     colour = 'MM-EP'), width = .1) + 
   geom_line(aes(x = n, y = med.err.ssc2,
-                colour = 'SSC-ASE')) + 
+                colour = 'SSC-A')) + 
   geom_errorbar(aes(x = n, ymin = first.q.ssc2, ymax = third.q.ssc2,
-                    colour = 'SSC-ASE'), width = .1) + 
+                    colour = 'SSC-A'), width = .1) + 
   scale_colour_brewer(palette = 'Set1') + 
   facet_wrap(~ K, labeller = 'label_both') + 
   scale_y_log10()
@@ -822,17 +822,17 @@ clustering.df %>%
   geom_errorbar(aes(x = n, ymin = first.q * n, ymax = third.q * n,
                     colour = 'OSC'), width = .1) + 
   geom_line(aes(x = n, y = med.err.ssc * n,
-                colour = 'SSC-A')) + 
+                colour = 'SSC-ASE')) + 
   geom_errorbar(aes(x = n, ymin = first.q.ssc * n, ymax = third.q.ssc * n,
-                    colour = 'SSC-A'), width = .1) + 
+                    colour = 'SSC-ASE'), width = .1) + 
   geom_line(aes(x = n, y = med.err.mm * n,
                 colour = 'MM-EP')) + 
   geom_errorbar(aes(x = n, ymin = first.q.mm * n, ymax = third.q.mm * n,
                     colour = 'MM-EP'), width = .1) + 
   geom_line(aes(x = n, y = med.err.ssc2 * n,
-                colour = 'SSC-ASE')) + 
+                colour = 'SSC-A')) + 
   geom_errorbar(aes(x = n, ymin = first.q.ssc2 * n, ymax = third.q.ssc2 * n,
-                    colour = 'SSC-ASE'), width = .1) + 
+                    colour = 'SSC-A'), width = .1) + 
   scale_colour_brewer(palette = 'Set1') + 
   facet_wrap(~ K, labeller = 'label_both') + 
   scale_y_log10()
@@ -929,17 +929,17 @@ clustering.df %>%
   geom_errorbar(aes(x = n, ymin = first.q, ymax = third.q,
                     colour = 'OSC'), width = .1) + 
   geom_line(aes(x = n, y = med.err.ssc,
-                colour = 'SSC-A')) + 
+                colour = 'SSC-ASE')) + 
   geom_errorbar(aes(x = n, ymin = first.q.ssc, ymax = third.q.ssc,
-                    colour = 'SSC-A'), width = .1) + 
+                    colour = 'SSC-ASE'), width = .1) + 
   geom_line(aes(x = n, y = med.err.mm,
                 colour = 'MM-EP')) + 
   geom_errorbar(aes(x = n, ymin = first.q.mm, ymax = third.q.mm,
                     colour = 'MM-EP'), width = .1) + 
   geom_line(aes(x = n, y = med.err.ssc2,
-                colour = 'SSC-ASE')) + 
+                colour = 'SSC-A')) + 
   geom_errorbar(aes(x = n, ymin = first.q.ssc2, ymax = third.q.ssc2,
-                    colour = 'SSC-ASE'), width = .1) + 
+                    colour = 'SSC-A'), width = .1) + 
   scale_colour_brewer(palette = 'Set1') + 
   facet_wrap(~ K, labeller = 'label_both') + 
   scale_y_log10()
@@ -978,17 +978,17 @@ clustering.df %>%
   geom_errorbar(aes(x = n, ymin = first.q * n, ymax = third.q * n,
                     colour = 'OSC'), width = .1) + 
   geom_line(aes(x = n, y = med.err.ssc * n,
-                colour = 'SSC-A')) + 
+                colour = 'SSC-ASE')) + 
   geom_errorbar(aes(x = n, ymin = first.q.ssc * n, ymax = third.q.ssc * n,
-                    colour = 'SSC-A'), width = .1) + 
+                    colour = 'SSC-ASE'), width = .1) + 
   geom_line(aes(x = n, y = med.err.mm * n,
                 colour = 'MM-EP')) + 
   geom_errorbar(aes(x = n, ymin = first.q.mm * n, ymax = third.q.mm * n,
                     colour = 'MM-EP'), width = .1) + 
   geom_line(aes(x = n, y = med.err.ssc2 * n,
-                colour = 'SSC-ASE')) + 
+                colour = 'SSC-A')) + 
   geom_errorbar(aes(x = n, ymin = first.q.ssc2 * n, ymax = third.q.ssc2 * n,
-                    colour = 'SSC-ASE'), width = .1) + 
+                    colour = 'SSC-A'), width = .1) + 
   scale_colour_brewer(palette = 'Set1') + 
   facet_wrap(~ K, labeller = 'label_both') + 
   scale_y_log10()
