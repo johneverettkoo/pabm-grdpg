@@ -73,8 +73,9 @@ in $Y$ are orthogonal, so $\text{aff} (S_k, S_l) = 0$ $\forall k, l \leq K$.
 **Property 2**.
 By \citet{rubindelanchy2017statistical}, 
 $\max_i ||Q_n x_i^{(n)} - y_i^{(n)}|| = 
+\max_i ||z_i^{(n)}|| = \delta^{(n)} = 
 O_P \big(\frac{(\log n)^c}{n^{1/2}} \big)$. 
-Then $Z^{(n)} \to 0$, $\delta^{(n)} \to 0$, and 
+Then $||Z^{(n)}||_F \to 0$, $\delta^{(n)} \to 0$, and 
 $r(X^{(n, l)} Q^{(n, l)}) \to r(Y^{(n, l)})$. Here we assume 
 $r(Y^{(n, l)}) > 0$ $\forall n > K + 1$ and $l \leq K$. 
 
