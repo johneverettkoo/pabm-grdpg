@@ -1,0 +1,105 @@
+---
+title: "Sparse Subspace Clustering for the Popularity Adjusted Block Model"
+author: John Koo, Minh Tang, Michael Trosset
+output:
+  pdf_document:
+    citation_package: natbib
+    number_sections: yes
+# output: html_document
+fontsize: 12pt
+# geometry: "left=1cm,right=1cm,top=1cm,bottom=1.5cm"
+urlcolor: blue
+header-includes:
+- \usepackage{float}
+- \usepackage{mathtools}
+- \usepackage{natbib}
+- \usepackage[linesnumbered,ruled,vlined]{algorithm2e} 
+- \setcitestyle{numbers,square}
+- \usepackage{verbatim}
+bibliography: ssc.bib
+abstract: |
+  TODO
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = FALSE, 
+                      # eval = FALSE,
+                      comment = NA, 
+                      warning = FALSE, 
+                      message = FALSE, 
+                      fig.pos = 'H', 
+                      fig.align = 'center', 
+                      fig.height = 3, 
+                      fig.width = 5, 
+                      fig.dpi = 300)
+
+options(xtable.comment = FALSE, 
+        xtable.table.placement = 'H')
+```
+
+\newcommand{\diag}{\text{diag}}
+\newcommand{\tr}{\text{Tr}}
+\newcommand{\blockdiag}{\text{blockdiag}}
+\newcommand{\indep}{\stackrel{\text{indep}}{\sim}}
+\newcommand{\iid}{\stackrel{\text{iid}}{\sim}}
+\newcommand{\Bernoulli}{\text{Bernoulli}}
+\newcommand{\Betadist}{\text{Beta}}
+
+# Introduction
+
+## Notation
+
+$P$ denotes the edge probability matrix for the PABM. 
+$A_{ij} \indep Bernoulli(P_{ij})$ for $i > j$, and 
+$A_{ji} = A_{ij}, A_{ii} = 0$ $\forall i, j \leq n$ to make $A$ the edge weight 
+matrix for a hollow, unweighted, and undirected graph. $X$ is an ASE of $A$ 
+while $Y$ is constructed using the popularity vectors $\{\lambda^{(kl)}\}_K$ 
+and the projection matrix $\Pi$, which is an ASE of $P$. $Z = X Q - Y$ for 
+$Q = \arg\min\limits_{Q \in \mathbb{O}(p, q)} ||X Q - Y||_F$. Let 
+$x_i^\top, y_i^\top, z_i^\top$ be the rows of $X, Y, Z$. 
+$X^{(n)}$ represents the full $X$ matrix for a sample of size $n$. 
+$X^{(n, k)}$ represents the $k$^th^ block of $X^{(n)}$.
+
+# Main Results
+
+**Theorem 1**. 
+The subspace detection property holds for $Y$ with probability at least 
+$1 - \sum_k^K n_k e^{-\sqrt{K (n_k - 1}} - 
+K^{-2} \sum_{k \neq l} \frac{4 e^{-2 t}}{(n_k + 1) n_l}$.
+
+This falls out of Theorem 2.8 from \citet{soltanolkotabi2012}. The subspaces 
+in $Y$ are orthogonal, so $\text{aff} (S_k, S_l) = 0$ $\forall k, l \leq K$.
+
+**Property 2**.
+By \citet{rubindelanchy2017statistical}, 
+$\max_i ||Q_n x_i^{(n)} - y_i^{(n)}|| = 
+O_P \big(\frac{(\log n)^c}{n^{1/2}} \big)$. 
+Then $Z^{(n)} \to 0$, $\delta^{(n)} \to 0$, and 
+$r(X^{(n, l)} Q^{(n, l)}) \to r(Y^{(n, l)})$. Here we assume 
+$r(Y^{(n, l)}) > 0$ $\forall n > 3$ and $l \leq K$. 
+
+**Property 3**. 
+$P(\mu(Y^{(k)}) = 0) \geq 
+1 - \frac{1}{K} \sum_{k \neq l} \frac{4 e^{-2 t}}{(n_k + 1) n_l}$
+\cite{soltanolkotabi2012}.
+
+**Theorem 4**.
+***TODO*** Find property 3 for $X$ or $X Q$ (?).
+
+**Theorem 5**.
+The subspace detection property holds for $X^{(n)} Q^{(n)}$ as $n \to \infty$. 
+
+**Theorem 6**. 
+$\exists M \in \mathbb{N}$ such that $\mu(X^{(n, l)}) < r(X^{(n, l)})$ 
+$\forall n \geq M$.
+
+**Corollary**. 
+If $n \geq M$, $\exists \lambda > 0$ such that the LASSO subspace detection 
+property holds for $X^{(n)}$ with parameter $\lambda$.
+
+This falls out of Theorem 6 of \citet{pmlr-v28-wang13} and Theorem 6 of this 
+paper.
+
+**Theorem 7**.
+***TODO*** Find the probability for which the subspace detection property holds 
+for $X^{(n)}$ or $X^{(n)} Q^{(n)}$.

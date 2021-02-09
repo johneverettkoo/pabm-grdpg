@@ -341,7 +341,7 @@ Theorem 3 provides perfect community detection given $P$. Letting $|B|$ be the
 affinity matrix for graph $G$, $G$ is partitioned into $K$ disjoint subgraphs 
 that correspond to each community. Using $A$ introduces some error in the ASE, 
 resulting in points that lie near subspaces but not exactly on them. Using 
-results from \cite{rubindelaunchy2017statistical}, we can show that as $n$ 
+results from \cite{rubindelanchy2017statistical}, we can show that as $n$ 
 grows, the ASE of $A$ approaches the ASE of $P$ and $B_{ij} \to 0$ for $i$ and 
 $j$ in different clusters. 
 
