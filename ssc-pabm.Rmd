@@ -54,7 +54,7 @@ $A_{ij} \indep Bernoulli(P_{ij})$ for $i > j$, and
 $A_{ji} = A_{ij}, A_{ii} = 0$ $\forall i, j \leq n$ to make $A$ the edge weight 
 matrix for a hollow, unweighted, and undirected graph. $X$ is an ASE of $A$ 
 while $Y$ is constructed using the popularity vectors $\{\lambda^{(kl)}\}_K$ 
-and the projection matrix $\Pi$, which is an ASE of $P$. $Z = X Q - Y$ for 
+and the projection matrix $\Pi$ as an ASE of $P$. $Z = X Q - Y$ for 
 $Q = \arg\min\limits_{Q \in \mathbb{O}(p, q)} ||X Q - Y||_F$. Let 
 $x_i^\top, y_i^\top, z_i^\top$ be the rows of $X, Y, Z$. 
 $X^{(n)}$ represents the full $X$ matrix for a sample of size $n$. 
@@ -64,7 +64,7 @@ $X^{(n, k)}$ represents the $k$^th^ block of $X^{(n)}$.
 
 **Theorem 1**. 
 The subspace detection property holds for $Y$ with probability at least 
-$1 - \sum_k^K n_k e^{-\sqrt{K (n_k - 1}} - 
+$1 - \sum_k^K n_k e^{-\sqrt{K (n_k - 1)}} - 
 K^{-2} \sum_{k \neq l} \frac{4 e^{-2 t}}{(n_k + 1) n_l}$.
 
 This falls out of Theorem 2.8 from \citet{soltanolkotabi2012}. The subspaces 
