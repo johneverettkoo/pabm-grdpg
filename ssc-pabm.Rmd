@@ -99,7 +99,3 @@ property holds for $X^{(n)}$ with parameter $\lambda$.
 
 This falls out of Theorem 6 of \citet{pmlr-v28-wang13} and Theorem 6 of this 
 paper.
-
-**Theorem 7**.
-***TODO*** Find the probability for which the subspace detection property holds 
-for $X^{(n)}$ or $X^{(n)} Q^{(n)}$.
