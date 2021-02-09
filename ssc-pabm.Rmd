@@ -80,7 +80,7 @@ $r(X^{(n, l)} Q^{(n, l)}) \to r(Y^{(n, l)})$. Here we assume
 $r(Y^{(n, l)}) > 0$ $\forall n > K + 1$ and $l \leq K$. 
 
 **Property 3**. 
-$P(\mu(Y^{(k)}) = 0) \geq 
+$P(\mu(Y^{(n, k)}) = 0) \geq 
 1 - \frac{1}{K} \sum_{k \neq l} \frac{4 e^{-2 t}}{(n_k + 1) n_l}$
 \cite{soltanolkotabi2012}.
 
