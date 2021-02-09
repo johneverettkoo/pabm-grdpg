@@ -465,8 +465,8 @@ $\min_{c_i} ||c_i||_1$ subject to $x_i = X c_i$ and $\beta_i = 0$ is solved
 for each $i = 1, ..., n$. The solutions are collected collected into matrix 
 $C = \begin{bmatrix} c_1 & \cdots & c_n \end{bmatrix}^\top$ to construct an 
 affinity matrix $B = |C| + |C^\top|$. If each $x_i$ lie perfectly on one of $K$ 
-subspaces, $B$ describes an undirected graph consisting of $K$ subgraphs, i.e.,
-$B_{ij} = 0$ if $i, j$ are in different subspaces. 
+subspaces, $B$ describes an undirected graph consisting of $K$ disjoint 
+subgraphs, i.e., $B_{ij} = 0$ if $x_i, x_j$ are in different subspaces. 
 If $X$ instead represents points near $K$ subspaces with some noise, a final 
 graph partitioning step is performed (e.g., edge thresholding or spectral 
 clustering). For our simulations, we used spectral clustering by fitting a 
