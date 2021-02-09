@@ -611,7 +611,7 @@ clustering.df %>%
   scale_y_log10()
 ```
 
-Given ground truth community labels, Algorithm 5 and the MLE-based plug-in 
+Given ground truth community labels, Algorithm 2 and the MLE-based plug-in 
 estimators \cite{307cbeb9b1be48299388437423d94bf1} \cite{noroozi2019estimation} 
 perform similarly, with root mean square error decaying at rate approximately 
 $n^{-1/2}$. 
@@ -632,7 +632,7 @@ rmse.df %>%
   ggplot() +
   geom_line(aes(x = n, y = median.rmse, colour = 'Algorithm 4')) + 
   geom_errorbar(aes(x = n, ymin = q1.rmse, ymax = q3.rmse,
-                    colour = 'Algorithm 4'), width = .1) + 
+                    colour = 'Algorithm 2'), width = .1) + 
   geom_line(aes(x = n, y = median.rmse.mle, colour = 'MLE-based')) + 
   geom_errorbar(aes(x = n, ymin = q1.rmse.mle, ymax = q3.rmse.mle,
                    colour = 'MLE-based'), width = .1) + 
@@ -781,9 +781,9 @@ rmse.df %>%
                    q3.rmse.mle = quantile(rmse.mle, .75)) %>% 
   dplyr::ungroup() %>% 
   ggplot() +
-  geom_line(aes(x = n, y = median.rmse, colour = 'Algorithm 4')) + 
+  geom_line(aes(x = n, y = median.rmse, colour = 'Algorithm 2')) + 
   geom_errorbar(aes(x = n, ymin = q1.rmse, ymax = q3.rmse,
-                    colour = 'Algorithm 4'), width = .1) + 
+                    colour = 'Algorithm 2'), width = .1) + 
   geom_line(aes(x = n, y = median.rmse.mle, colour = 'MLE-based')) + 
   geom_errorbar(aes(x = n, ymin = q1.rmse.mle, ymax = q3.rmse.mle,
                    colour = 'MLE-based'), width = .1) + 
@@ -798,7 +798,7 @@ rmse.df %>%
 
 Using the same set of parameters for generating $P$ and $A$ as in the 
 balanced communities examples for $K = 2$, we generated one instance of $A$ for
-each $n$ and constructed $B$ according to algorithm 4 to verify that 
+each $n$ and constructed $B$ according to algorithm 2 to verify that 
 as $n \to \infty$, $(\hat{v}_i)^\top \hat{v_j} \stackrel{P}{\to} 0$ for $i, j$ 
 in different clusters. Furthermore, the distribution of these inner products 
 should be approximately normal. 
@@ -1123,8 +1123,13 @@ Let $P = V D V^\top$ be the spectral decomposition of the edge probability
 matrix for a PABM. Then $V V^\top = X (X^\top X)^{-1} X^\top$ where $X$ is 
 defined as in equation (6).
 
-**Proof of Lemma 1**. 
-By Theorem 2, $P = X U I_{p, q} U^\top X^\top$, where $X$ is defined as in equation (6) and $p$ and $q$ are defined as in equations (9) and (10). Alternatively, the spectral decomposition can be written as $P = V D V^\top = V |D|^{1/2} I_{p, q} |D|^{1/2} V^\top$ for the same $(p, q)$ and $|\cdot|^{1/2}$ is applied entry-wise. Thus for some $Q \in \mathbb{O}(p, q)$, 
+*Proof of Lemma 1*. 
+By Theorem 2, $P = X U I_{p, q} U^\top X^\top$, where $X$ is defined as in 
+equation (6) and $p$ and $q$ are defined as in equations (9) and (10).
+Alternatively, the spectral decomposition can be written as 
+$P = V D V^\top = V |D|^{1/2} I_{p, q} |D|^{1/2} V^\top$ for the same $(p, q)$ 
+and $|\cdot|^{1/2}$ is applied entry-wise. Thus for some 
+$Q \in \mathbb{O}(p, q)$, 
 
 $$X U Q = V |D|^{1/2}$$
 
@@ -1233,7 +1238,7 @@ $$\begin{bmatrix}
   \hat{\lambda}^{(lk)} & -\hat{\lambda}^{(lk)} 
 \end{bmatrix}$$
 
-where each $\hat{\lambda}^{(kl)}$ is defined as in Algorithm 4, approximates 
+where each $\hat{\lambda}^{(kl)}$ is defined as in Algorithm 2, approximates 
 the latent positions of $M^{(kl)}$ up to indefinite orthogonal transformation 
 by the rate given in Theorem 5 of \citet{rubindelanchy2017statistical}.  
 In this case, the indefinite orthogonal transformation $W_*$ in the GRDPG 
