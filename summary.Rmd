@@ -67,22 +67,21 @@ theme_set(theme_bw())
 
 Statistical analysis on graphs or networks often involves the partitioning of 
 a graph into disconnected subgraphs or clusters. This is often motivated by the 
-belief that there exist underlying and unobserved communities to which each 
+assumption that there exist underlying and unobserved communities to which each 
 vertex of the graph belongs, and edges between pairs of vertices are determined 
 by drawing from a probability distribution based on the community relationships 
-between each pair. The goal of this analysis then is population community 
+between each pair. The goal of the analysis then is population community 
 detection, or the recovery of the true underlying community labels for each 
 vertex, up to permutation (with some additional parameter estimation being of 
-possible interest), assuming some random graph model. One such model is 
-the Stochastic Block Model (SBM), first proposed by 
+possible interest), assuming some underlying probability model. One such model
+is the Stochastic Block Model (SBM), first proposed by 
 \citet{doi:10.1080/0022250X.1971.9989788}, which assumes that the edge 
 probability from one vertex to another follows a Beronulli distribution with 
 fixed probabilities for each pair of community labels. Other random 
 graph models have been proposed and studied, such as the Degree-Corrected Block 
-Model (DCBM), introduced by \citet{Karrer_2011} and the Mixed Membership 
-Stochastic Block Model (MMSBM), introduced by  \citet*{NIPS2008_3578}. The 
-Popularity Adjusted Block Model (PABM) was then introduced by 
-\citet*{307cbeb9b1be48299388437423d94bf1} as a generalization of the SBM to 
+Model (DCBM), introduced by \citet{Karrer_2011}, which is a generalization of 
+the SBM. The Popularity Adjusted Block Model (PABM) was then introduced by 
+\citet*{307cbeb9b1be48299388437423d94bf1} as a generalization of the DCBM to 
 address the heterogeneity of edge probabilities within and between communities 
 while still maintaining distinct community structure. 
 
@@ -96,19 +95,19 @@ the within-community edge probability is $\xi$ and the between-community edge
 probability is $\eta$, the entries of $P$ consist of $\xi$ and $\eta$. 
 
 The Random Dot Product Graph (RDPG) model proposed by 
-\citet*{10.1007/978-3-540-77004-6_11} is another graph model with Bernoulli edge 
-probabilities. Under this model, each vertex of the graph can be represented by 
-a point in a latent Euclidean space such that the edge probability between any 
-pair of vertices is given by their corresponding dot product in the latent 
-space, i.e., given a latent positions $x_1, ..., x_n \in \mathbb{R}^d$, the 
-edge probability matrix is $P = X X^\top$ where 
+\citet*{10.1007/978-3-540-77004-6_11} is another graph model with Bernoulli 
+edge probabilities. Under this model, each vertex of the graph can be
+represented by a point in some latent space such that the edge
+probability between any pair of vertices is given by their corresponding dot
+product in the latent space, i.e., given a latent positions
+$x_1, ..., x_n \in \mathbb{R}^d$, the edge probability matrix is 
+$P = X X^\top$ where 
 $X = \begin{bmatrix} x_1 & \cdots & x_n \end{bmatrix}^\top$. The SBM is 
 equivalent to a special case of the RDPG model in which all vertices of a 
 given community share the same position in the latent space 
 \cite{lyzinski2014}. It has also been shown that similar 
-random graph models, including both the MMSBM and DCBM, can be 
-represented in this way \cite{rubindelanchy2017consistency} 
-\cite{lyzinski2014}. An analogous 
+random graph models, including the DCBM, can be represented in this way
+\cite{rubindelanchy2017consistency} \cite{lyzinski2014}. An analogous 
 property exists for the PABM but not for the RDPG model but under the 
 *Generalized* Random Dot Product Graph (GRDPG) model. This relationship will be 
 explored in this paper and exploited to construct algorithms for community 
@@ -214,93 +213,11 @@ as in Definition 1.
 Then $A \sim GRDPG_{3, 1}(X U)$ and $A \sim PABM(\{(\lambda^{(kl)}\}_2)$ are 
 equivalent.
 
-*Proof*. 
-This is given by straightforward matrix multiplication. It suffices to show 
-that 
-
-$$X U I_{3, 1} U^\top X^\top = 
-\begin{bmatrix} 
-  \lambda^{(11)} (\lambda^{(11)})^\top & \lambda^{(12)} (\lambda^{(21)})^\top \\
-  \lambda^{(21)} (\lambda^{(12)})^\top & \lambda^{(22)} (\lambda^{(22)})^\top
-\end{bmatrix}$$
-
-**Remark**. While we can just perform the matrix multiplication to show the 
-equivalence, it is more illustrative to look at a few intermediate steps. Note 
-that the product of the three inner matrices results in a permutation matrix 
-with fixed points at positions $1$ and $4$ and a cycle of order 2 swappoing 
-positions $2$ and $3$: 
-
-$$U I_{3, 1} U^\top = \begin{bmatrix} 
-  1 & 0 & 0 & 0 \\ 
-  0 & 0 & 1 & 0 \\ 
-  0 & 1 & 0 & 0 \\ 
-  0 & 0 & 0 & 1 
-\end{bmatrix} = \Pi$$
-
-Since $U$ is orthonormal and $I_{3, 1}$ is diagonal, $\Pi = U I_{3, 1} U^\top$ 
-is a spectral decomposition of this permutation matrix. Note that the two fixed 
-points result in eigenvalues of $+1$ with corresponding eigenvectors $e_i$ 
-where $i = 1, 4$ corresponding to the locations of the fixed points, and the 
-cycle of order two results in two eigenvalues $\pm 1$ with corresponding 
-eigenvectors $(e_i \pm e_j) / \sqrt{2}$ where $i = 2, j = 3$, pair that is 
-swapped.
-
 **Theorem 2** (Generalization to $K > 2$). There exists a block diagonal matrix 
 $X \in \mathbb{R}^{n \times K^2}$ defined by PABM parameters 
 $\{\lambda^{(kl)}\}_K$ and $U \in \mathbb{R}^{K^2 \times K^2}$ that is fixed 
 for each $K$ such that $A \sim GRDPG_{K (K+1) / 2, K (K-1) / 2}(XU)$ and 
 $A \sim PABM(\{(\lambda^{(kl)}\})_K)$ are equivalent.
-
-*Proof*. 
-Let 
-$$\Lambda^{(k)} = 
-\begin{bmatrix} \lambda^{(k,1)} & \cdots & \lambda^{(k, K)} \end{bmatrix}
-\in \mathbb{R}^{n_k \times K}$$
-
-\begin{equation}
-X = \blockdiag(\Lambda^{(1)}, ..., \Lambda^{(K)}) \in \mathbb{R}^{n \times K^2}
-\end{equation}
-
-$$L^{(k)} = \blockdiag(\lambda^{(1k)}, ..., \lambda^{(Kk)}) \in 
-\mathbb{R}^{n \times K}$$
-
-$$Y = \begin{bmatrix} L^{(1)} & \cdots & L^{(K)} \end{bmatrix} \in 
-\mathbb{R}^{n \times K^2}$$
-
-Then $P = X Y^\top$.
-
-Similar to the $K = 2$ case, we have $Y = X \Pi$ for a permutation matrix
-$\Pi$, resulting in $P = X \Pi X^\top$.  
-The permutation described by $\Pi$ has $K$ fixed points, which correspond to 
-$K$ eigenvalues equal to $1$ with corresponding eigenvectors $e_k$ where 
-$k = r (K + 1) + 1$ for $r = 0, ..., K - 1$. It also has 
-$\binom{K}{2} = K (K - 1) / 2$ cycles of order $2$. Each cycle corresponds to 
-a pair of eigenvalues $+1$ and $-1$ and a pair of eigenvectors 
-$(e_s + e_t) / \sqrt{2}$ and $(e_s - e_t) / \sqrt{2}$.
-
-Then $\Pi$ has $K (K + 1) / 2$ eigenvalues equal to $1$ and $K (K - 1) / 2$ 
-eigenvalues equal to $-1$. $\Pi$ has the decomposed form 
-
-\begin{equation}
-\Pi = U I_{K (K + 1) / 2, K (K - 1) / 2} U^\top
-\end{equation}
-
-The edge probability matrix then can be written as:
-
-\begin{equation}
-P = X U I_{p, q} (X U)^\top
-\end{equation}
-
-\begin{equation}
-p = K (K + 1) / 2
-\end{equation}
-
-\begin{equation}
-q = K (K - 1) / 2
-\end{equation}
-
-and we can describe the PABM with $K$ communities as a GRDPG with latent 
-positions $X U$ with signature $\big( K (K + 1) / 2, K (K - 1) / 2 \big)$.
 
 **Example** ($K = 3$). Using the same notation as before:
 
@@ -367,31 +284,31 @@ beforehand and does not require estimation.
 ## Related work
 
 \citet*{307cbeb9b1be48299388437423d94bf1}, who first proposed the PABM, used 
-modularity maximization for clustering and parameter estimation. They were able 
-to show that as the sample size increases, the proportion of misclassified 
-community labels (up to permutation) goes to 0. However, because modularity 
-maximization is NP-hard, the authors of this paper used an approximation 
-based on the Extreme Points algorithm \cite{le2016}.
+a relaxed version of Modularity Maximization (MM) based on the Extreme Points
+(EP) algorithm \cite{le2016} for clustering and parameter estimation. They were
+able to show that as the sample size increases, the proportion of misclassified
+community labels (up to permutation) goes to 0. 
 
-\citet*{noroozi2019estimation} proposed using sparse subspace clustering 
-to identify the community memberships given either an edge probability matrix 
-$P$ or an adjacency matrix $A$. In the case that $P$ is known, the community 
-memberships can be identified exactly (up to permutation). This is supported by 
-our Theorem 2, which shows that the ASE of edge probability matrix $P$ consists 
-of $K$ $K$-dimensional subspaces lying in $\mathbb{R}^{K^2}$. A similar 
-procedure can be applied if $P$ is unknown and we have an observation $A$, but 
-the theoretical guarantees of this method applied to the PABM are unknown.
+\citet*{noroozi2019estimation} proposed using Sparse Subspace Clustering (SSC)
+on the adjacency matrix $A$ or edge probability matrix $P$ to identify the
+community memberships. They were able to show that their SSC procedure on $P$
+results in perfect community detection, although they were unable to determine
+error bounds for their procedure on $A$. This is somewhat consistent with
+Theorem 2, which shows that the ASE of edge probability matrix $P$ consists of
+$K$ $K$-dimensional subspaces in $\mathbb{R}^{K^2}$. 
+
+Much of the following is built on top of work from
+\citet{rubindelanchy2017statistical}, in particular, the properties of the ASE 
+of $A$.
 
 ## Community detection
 
-### Using edge probability matrix $P$
-
 We previously stated one possible set of latent positions that result in the 
 edge probability matrix of a PABM, $P = (XU) I_{pq} (XU)^\top$. If we have 
-(or can estimate) $XU$ directly, then both the community detection and parameter 
-identification problem are trivial since $U$ is orthonormal and fixed for each 
-value of $K$. However, direct identification or estimation of $XU$ is not 
-possible \cite{rubindelanchy2017statistical}. 
+(or can estimate) $XU$ directly, then both the community detection and 
+parameter identification problem are trivial since $U$ is orthonormal and 
+fixed for each value of $K$. However, direct identification or estimation of
+$XU$ is not possible \cite{rubindelanchy2017statistical}. 
 
 If we decompose $P = Z I_{pq} Z^\top$, then
 $\exists Q \in \mathbb{O}(p, q)$ such that $XU = Z Q$. Even if we start with 
@@ -405,111 +322,55 @@ $Q \in \mathbb{O}(n)$, then we could use the fact that
 $\langle z_i, z_j \rangle = \langle Q z_i, Q z_j \rangle = 0$ if vertices $i$ 
 and $j$ are in different communities. 
 
-We can note from the explicit form of $XU$ that it represents points in 
-$\mathbb{R}^{K^2}$ such that points within each community lie on $K$-dimensional 
-subspaces. Furthermore, the subspaces are orthogonal to each other. 
+The explicit form of $XU$ represents points in 
+$\mathbb{R}^{K^2}$ such that points within each community lie on 
+$K$-dimensional orthogonal subspaces. 
 Multiplication by $Q \in \mathbb{O}(p, q)$ removes the orthogonality property 
-but retains the property that each community is represented by a $K$-dimensional 
-subspace. Using this property, previous work proposes the use of subspace 
-clustering \cite{noroozi2019estimation} \cite{soltanolkotabi2014}. 
-
-**Lemma 1.** 
-Let $P = V D V^\top$ be the spectral decomposition of the edge probability 
-matrix for a PABM. Then $V V^\top = X (X^\top X)^{-1} X^\top$ where $X$ is 
-defined as in equation (3).
-
-*Proof*. 
-By Theorem 2, $P = X U I_{p, q} U^\top X^\top$, where $X$ is defined as in equation (3) and $p$ and $q$ are defined as in equations (6) and (7). Alternatively, the spectral decomposition can be written as $P = V D V^\top = V |D|^{1/2} I_{p, q} |D|^{1/2} V^\top$ for the same $(p, q)$ and $|\cdot|^{1/2}$ is applied entry-wise. Thus for some $Q \in \mathbb{O}(p, q)$, 
-
-$$X U Q = V |D|^{1/2}$$
-
-Therefore, using the fact that $U U^\top = I$ and $V^\top V = I$,
-
-$$(V |D|^{1/2}) ((V |D|^{1/2})^\top (V |D|^{1/2}))^{-1} (V |D|^{1/2})^\top = 
-(X U Q) ((X U Q)^\top (X U Q))^{-1} (X U Q)^\top$$
-
-The righthand side becomes
-
-$$\begin{split}
-  (X U Q) ((X U Q)^\top (X U Q))^{-1} (X U Q)^\top & 
-    = X U Q Q^{-1} U^\top (X^\top X)^{-1} U (Q^\top)^{-1} Q^\top U^\top X^\top \\
-  & = X U U^\top (X^\top X)^{-1} U U^\top X^\top \\
-  & = X (X^\top X)^{-1} X^\top
-\end{split}$$
-
-The lefthand side becomes:
-
-$$\begin{split}
-  (V |D|^{1/2}) ((V |D|^{1/2})^\top (V |D|^{1/2}))^{-1} (V |D|^{1/2})^\top & =
-    V |D|^{1/2} |D|^{-1/2} (V^\top V)^{-1} |D|^{-1/2} |D|^{1/2} V^\top \\
-  & = V V^\top
-\end{split}$$
+but retains the property that each community is represented by a 
+$K$-dimensional subspace. Therefore, the ASE of $P$ results in subspaces that 
+correspond to each community, suggesting the use of SSC. In this paper, we will 
+use a different and leave the properties of SSC on the ASE of $A$ as future
+work.
 
 **Theorem 3.** 
 Let $P = V D V^\top$ be the spectral decomposition of the edge probability
 matrix. Let $B = V V^\top$. Then $B_{ij} = 0$ if vertices $i$ and $j$ are 
-of different communities.
+from different communities.
 
-*Proof*.
-By Lemma 1, $V V^\top = X (X^\top X)^{-1} X^\top$ where $X$ is defined as 
-in Theorem 2. Since $X$ is block diagonal with each block corresponding 
-to one community, $X (X^\top X)^{-1} X^\top$ is also a block diagonal matrix 
-with each block corresponding to a community and zeros elsewhere. Therefore, 
-if vertices $i$ and $j$ belong to different communities, then the $ij$^th^ 
-element of $X (X^\top X)^{-1} X^\top = V V^\top = B$ is 0.
+Theorem 3 provides perfect community detection given $P$. Letting $|B|$ be the 
+affinity matrix for graph $G$, $G$ is partitioned into $K$ disjoint subgraphs 
+that correspond to each community. Using $A$ introduces some error in the ASE, 
+resulting in points that lie near subspaces but not exactly on them. Using 
+results from \cite{rubindelaunchy2017statistical}, we can show that as $n$ 
+grows, the ASE of $A$ approaches the ASE of $P$ and $B_{ij} \to 0$ for $i$ and 
+$j$ in different clusters. 
 
-\begin{algorithm}[H]
-  \DontPrintSemicolon
-  \SetAlgoLined
-  \KwData{Edge probability matrix $P$, number of communities $K$}
-  \KwResult{Community labels $1, ..., K$}
-    Compute the spectral decomposition $P = V D V^\top$.\;
-    Compute the inner product matrix $B = |V V^\top|$, applying $|\cdot|$ 
-    entry-wise.\;
-    Construct graph $G$ using $B$ as edge similarities.\;
-    Identify the connected components of $G$ and map each to community labels 
-    $1, ..., K.$\;
-  \caption{PABM clustering on the edge probability matrix.}
-\end{algorithm}
-
-### Using adjacency matrix $A$
-
-The adjacency embedding of $A$ approaches latent positions that form $P$ as 
+The ASE of $A$ approaches latent positions that form $P$ as 
 the number of vertices $n$ increases. More 
-precisely, let $\{\lambda^{(kl)}\}_K \sim \mathcal{F}_K$ for some joint 
-distribution consisting of $K$ underlying communities $\mathcal{F}_K$. Then the 
-latent positions $XU \sim \mathcal{G}_K$ for some related joint distribution 
-with $K$ underlying communities $\mathcal{G}_K$. Denote $Z_n$ as a sample of size 
-$n$ from $\mathcal{G}_K$ and adjacency matrix $A_n$ as one draw from edge 
-probability matrix $P_n = Z_n I_{pq} Z_n^\top$. Let $\hat{Z}_n$ be the 
-adjacency embedding of $A_n$ with rows $(\hat{z}_i^{(n)})^\top$. Then by
-\citet{rubindelanchy2017statistical}, 
+precisely, let each $\lambda^{(kl)}_i \sim \mathcal{F}^{(kl)}$ for $i = 1, .., n$ and $k, l = 1, ..., K$. Then the corresponding latent positions $XU \sim \mathcal{G}_K$ for some related joint distribution with $K$ underlying communities $\mathcal{G}_K$. Denote $Z_n$ as a sample of size $n$ from $\mathcal{G}_K$ and adjacency matrix $A_n$ as one draw from edge probability matrix $P_n = Z_n I_{pq} Z_n^\top$. Let $\hat{Z}_n$ be the adjacency embedding of $A_n$ with rows $(\hat{z}_i^{(n)})^\top$. Then by \citet{rubindelanchy2017statistical}, 
 
 \begin{equation}
   \max\limits_{i \in \{1, ..., n\}} ||Q_n \hat{z}_i^{(n)} - z_i^{(n)}|| = 
   O_P\bigg(\frac{(\log n)^c}{n^{1/2}} \bigg)
 \end{equation}
 
-for some $c>0$ and sequence of $Q_n \in \mathbb{O}(p, q)$. In addition, 
-\citeauthor{rubindelanchy2017statistical} produce a central limit theorem 
-result.
+for some $c > 0$ and sequence of $Q_n \in \mathbb{O}(p, q)$. 
 
 **Theorem 4**. Let $\hat{V}^{(n)} \in \mathbb{R}^{n \times K^2}$ be the matrix 
 of $K^2$ eigenvectors of $A_n$ corresponding to the $K (K+1) / 2$ most positive 
 eigenvalues and $K (K-1) / 2$ most negative eigenvalues with rows
 $(\hat{v}_i^{(n)})^\top$. Let $(i, j)$ correspond to pairs belonging to 
-different communities. Then for some $c > 0$, 
+different communities. Let $n \rho_n = \omega((\log n)^{4c}))$ as described in
+\cite{rubindelanchy2017statistical}. Then for some $c > 0$, 
 
 \begin{equation}
   \max\limits_{i, j} ||(\hat{v}^{(n)}_i)^\top \hat{v}_j^{(n)}|| = 
     O_P\bigg( \frac{(\log n)^c}{n \sqrt{\rho_n}}\bigg)
 \end{equation}
 
-where $\lim\limits_{n \to 0} \rho_n = 0$ is a sparsity parameter introduced 
-by \citet{307cbeb9b1be48299388437423d94bf1}. More precisely, 
-$\rho_n = o(\log n / \sqrt{n})$ \cite{rubindelanchy2017statistical}.
-
-This leads to the following algorithm: 
+Thus, as $n \to \infty$, the partitioning of $\hat{B}^{(n)}$ results in 
+perfect community detection. 
+This leads to the Orthogonal Spectral Clustering (OSE) algorithm (Alg. 1). 
 
 \begin{algorithm}[H]
   \DontPrintSemicolon
@@ -524,43 +385,24 @@ This leads to the following algorithm:
     Partition $G$ into $K$ disconnected components 
     (e.g., using edge thresholding or spectral clustering).\;
     Map each partition to the community labels $1, ..., K$.\;
-  \caption{PABM clustering on the adjacency matrix.}
+  \caption{Orthogonal Spectral Clustering.}
 \end{algorithm}
-
-Theorem 4 implies that as $n \to \infty$, the number (not just proportion) of 
-misclassified vertices, up to permutation, outputted by algorithm 2 goes to 0. 
 
 ## Parameter estimation
 
-For any $P$ edge probability matrix for the PABM such that the rows and 
+For any edge probability matrix $P$ for the PABM such that the rows and 
 columns are organized by community, the $kl$^th^ block is an outer product 
 of two vectors, i.e., $P^{(kl)} = \lambda^{(kl)} (\lambda^{(lk)})^\top$. 
-Therefore, given $P^{(kl)}$, $\lambda%{(kl)}$ and $\lambda^{(lk)}$ are 
+Therefore, given $P^{(kl)}$, $\lambda^{(kl)}$ and $\lambda^{(lk)}$ are 
 solvable exactly (up to multiplication by $-1$) using singular value 
-decomposition. More specifically, let $P = \sigma^2 u v^\top$ be the 
-singular value decomposition of $P$. $u \in \mathbb{R}^{n_k}$ and 
+decomposition. More specifically, let $P^{(kl)} = \sigma^2 u v^\top$ be the 
+singular value decomposition of $P^{(kl)}$. $u \in \mathbb{R}^{n_k}$ and 
 $v \in \mathbb{R}^{n_l}$ are vectors and 
 $\sigma^2 > 0$ is a scalar. Then $\lambda^{(kl)} = \pm \sigma u$ and 
-$\lambda^{(lk)} = \pm \sigma v$.
-
-\begin{algorithm}[H]
-  \DontPrintSemicolon
-  \SetAlgoLined
-  \caption{PABM parameter estimation using the edge probability matrix.}
-  \KwData{Edge probability matrix $P$, community assignments $1, ..., K$.}
-  \KwResult{PABM parameters $\{\lambda^{(kl)}\}_K$}
-  Arrange the rows and columns of $P$ by community such that each $P^{(kl)}$ 
-  block consists of edge probabilities between communities $k$ and $l$.\; 
-  \For{$k, l = 1, ..., K$, $k \geq l$} {
-    Compute $P^{(kl)} = (\sigma^{(kl)})^2 u^{(kl)} (v^{(kl)})^\top$, the SVD of 
-    the $kl^{th}$ block.\;
-    Assign $\lambda^{(kl)} \leftarrow \pm \sigma^{(kl)} u^{(kl)}$ and 
-    $\lambda^{(lk)} \leftarrow \pm \sigma^{(kl)} v^{(kl)}$.
-  }
-\end{algorithm}
-
+$\lambda^{(lk)} = \pm \sigma v$. 
 Given the adjacency matrix $A$ instead of edge probability matrix $P$, we can 
-simply use plug-in estimators: 
+simply use plug-in estimators (Alg. 2), which converge to the true parameters 
+(Theorem 5).
 
 \begin{algorithm}[H]
   \DontPrintSemicolon
@@ -590,7 +432,733 @@ assumption that $K$ is fixed and community labels are known,
 O_P \bigg(\frac{(\log n_k)^c}{\sqrt{n_k}} \bigg)
 \end{equation}
 
-*Proof*. 
+# Simulated Examples
+
+For each simulation, community labels are drawn from a multinomial 
+distribution, the popularity vectors $\{\lambda^{(kl)}\}_K$ are drawn 
+from two types of joint distributions depending on whether $k = l$, the edge
+probability matrix $P$ is constructed using 
+the popularity vectors, and finally an unweighted and undirected adjacency 
+matrix $A$ is drawn from $P$. OSE is then used for community detection, 
+and this method is compared against SSC \cite{noroozi2019estimation}
+\cite{soltanolkotabi2014} and MM \cite{igraph}
+\cite{307cbeb9b1be48299388437423d94bf1}. True 
+community labels are used with Algorithm 2 to estimate the popularity 
+vectors $\{\lambda^{(kl)}\}_K$, and this method is then compared against an
+MLE-based estimator described in \citet{noroozi2019estimation} and
+\citet{307cbeb9b1be48299388437423d94bf1}. 
+
+Modularity Maximization is NP-hard, so \citet{307cbeb9b1be48299388437423d94bf1} 
+used the Extreme Points (EP) algorithm \cite{le2016}, which is $O(n^{K - 1})$. 
+For these simulations, the EP algorithm was used for $K = 2$, and for $K > 2$, 
+the Louvain algorithm \cite{Blondel_2008} was used instead.
+
+Two implementations of SSC are shown here. The first method, denoted as 
+SSC-A, treats the columns of the adjacency matrix $A$ as points in
+$\mathbb{R}^n$. The second method, denoted as SSC-ASE, first embeds $A$ and 
+then performs SSC on the embedding. 
+
+SSC is performed by solving an optimization problem for each observed point.
+Given $X \in \mathbb{R}^{n \times d}$ with vectors 
+$x_i^\top \in \mathbb{R}^d$ as rows of $X$, the optimization problem 
+$\min_{c_i} ||c_i||_1$ subject to $x_i = X c_i$ and $\beta_i = 0$ is solved 
+for each $i = 1, ..., n$. The solutions are collected collected into matrix 
+$C = \begin{bmatrix} c_1 & \cdots & c_n \end{bmatrix}^\top$ to construct an 
+affinity matrix $B = |C| + |C^\top|$. If each $x_i$ lie perfectly on one of $K$ 
+subspaces, $B$ describes an undirected graph consisting of $K$ subgraphs, i.e.,
+$B_{ij} = 0$ if $i, j$ are in different subspaces. 
+If $X$ instead represents points near $K$ subspaces with some noise, a final 
+graph partitioning step is performed (e.g., edge thresholding or spectral 
+clustering). For our simulations, we used spectral clustering by fitting a 
+Gaussian Mixture Model on the $K$-dimensional Laplacian eigenmap of $B$.
+
+In practice, this is often done by solving the LASSO problems 
+
+\begin{equation}
+\min_{c_i} \frac{1}{2} ||x_i - X_{-i} c_i||^2_2 + \lambda ||c_i||_1
+\end{equation}
+
+for some sparsity parameter $\lambda > 0$. For our simulations, $\lambda$ was 
+chosen via a preliminary cross validation experiment. 
+
+## Balanced communities
+
+In each simulation, community labels $z_1, ..., z_n$ were drawn 
+from a multinomial distribution with mixture parameters 
+$\{\alpha_1, ..., \alpha_K\}$, then $\{\lambda^{(kl)}\}_K$ according to the 
+drawn community labels, $P$ was constructed using the drawn 
+$\{\lambda^{(kl)}\}_K$, and $A$ was drawn from $P$ by 
+$A_{ij} \stackrel{indep}{\sim} Bernoulli(P_{ij})$. Each simulation has a unique
+edge probability matrix $P$. 
+
+For these examples, we set the following parameters:
+
+* Number of vertices $n = 128, 256, 512, 1024, 2048, 4096$
+* Number of underlying communities $K = 2, 3, 4$
+* Mixture parameters $\alpha_k = 1 / K$ for $k = 1, ..., K$, (i.e., each 
+community label has an equal probability of being drawn)
+* Community labels 
+$z_k \iid Multinomial(\alpha_1, ..., \alpha_K)$
+* Within-group popularities $\lambda^{(kk)} \iid Beta(2, 1)$
+* Between-group popularities 
+$\lambda^{(kl)} \iid Beta(1, 2)$ for $k \neq l$
+
+$50$ simulations were performed for each $(n, K)$ pair. 
+
+Fig. \ref{fig:clust_err_k} show that for large $n$, OSE results in 
+a misclustering rate of 0. Sparse subspace clustering produces similar results 
+for $K > 2$. 
+
+```{r clust_err_k, fig.cap = 'IQR of clustering error using OSE (blue) compared against SSC on the ASE of A (purple), MM (red), and SSC on the adjacency matrix (green). Communities are approximately balanced. Simulations were repeated 50 times for each sample size.', fig.width = 10}
+clustering.df <- readr::read_csv('clustering-k.csv')
+ssc.df <- readr::read_csv('clustering-ssc-k.csv')
+clustering.df %>%
+  dplyr::group_by(n, K) %>%
+  dplyr::summarise(med.err = median(error),
+                   first.q = quantile(error, .25),
+                   third.q = quantile(error, .75),
+                   med.err.ssc = median(error.ssc),
+                   first.q.ssc = quantile(error.ssc, .25),
+                   third.q.ssc = quantile(error.ssc, .75),
+                   med.err.mm = median(error.mm),
+                   first.q.mm = quantile(error.mm, .25),
+                   third.q.mm = quantile(error.mm, .75)) %>%
+  dplyr::ungroup() %>% 
+  dplyr::inner_join(
+    ssc.df %>% 
+      dplyr::group_by(n, K) %>% 
+      dplyr::summarise(med.err.ssc2 = median(error.ssc2),
+                       first.q.ssc2 = quantile(error.ssc2, .25),
+                       third.q.ssc2 = quantile(error.ssc2, .75)) %>% 
+      dplyr::ungroup()
+  ) %>% 
+  ggplot() +
+  scale_x_log10(breaks = c(128, 256, 512, 1024, 2048, 4096)) +
+  # scale_x_continuous(breaks = c(128, 256, 512, 1024, 2048, 4096)) + 
+  labs(y = 'community detection error rate', 
+       colour = NULL) +
+  geom_line(aes(x = n, y = med.err,
+                colour = 'OSC')) +
+  geom_errorbar(aes(x = n, ymin = first.q, ymax = third.q,
+                    colour = 'OSC'), width = .1) + 
+  geom_line(aes(x = n, y = med.err.ssc,
+                colour = 'SSC-ASE')) + 
+  geom_errorbar(aes(x = n, ymin = first.q.ssc, ymax = third.q.ssc,
+                    colour = 'SSC-ASE'), width = .1) + 
+  geom_line(aes(x = n, y = med.err.mm,
+                colour = 'MM-EP')) + 
+  geom_errorbar(aes(x = n, ymin = first.q.mm, ymax = third.q.mm,
+                    colour = 'MM-EP'), width = .1) + 
+  geom_line(aes(x = n, y = med.err.ssc2,
+                colour = 'SSC-A')) + 
+  geom_errorbar(aes(x = n, ymin = first.q.ssc2, ymax = third.q.ssc2,
+                    colour = 'SSC-A'), width = .1) + 
+  scale_colour_brewer(palette = 'Set1') + 
+  facet_wrap(~ K, labeller = 'label_both') + 
+  scale_y_log10()
+```
+
+Theorem 4 implies that OSE will result in not just in the error rate 
+converging to 0 but the error *count* as well.
+We explore this in Fig. \ref{fig:clust_err_ct_sim}.
+
+```{r clust_err_ct_sim, fig.cap = 'IQR of counts of misclustered vertices using OSE (blue) compared against SSC on the ASE of A (purple), MM (red), and SSC on the adjacency matrix (green). Communities are approximately balanced. Simulations were repeated 50 times for each sample size.', cache = FALSE, fig.width = 10}
+clustering.df <- readr::read_csv('clustering-k.csv')
+ssc.df <- readr::read_csv('clustering-ssc-k.csv')
+clustering.df %>%
+  dplyr::group_by(n, K) %>%
+  dplyr::summarise(med.err = median(error),
+                   first.q = quantile(error, .25),
+                   third.q = quantile(error, .75),
+                   med.err.ssc = median(error.ssc),
+                   first.q.ssc = quantile(error.ssc, .25),
+                   third.q.ssc = quantile(error.ssc, .75),
+                   med.err.mm = median(error.mm),
+                   first.q.mm = quantile(error.mm, .25),
+                   third.q.mm = quantile(error.mm, .75)) %>%
+  dplyr::ungroup() %>% 
+  dplyr::inner_join(
+    ssc.df %>% 
+      dplyr::group_by(n, K) %>% 
+      dplyr::summarise(med.err.ssc2 = median(error.ssc2),
+                       first.q.ssc2 = quantile(error.ssc2, .25),
+                       third.q.ssc2 = quantile(error.ssc2, .75)) %>% 
+      dplyr::ungroup()
+  ) %>% 
+  ggplot() +
+  scale_x_log10(breaks = c(128, 256, 512, 1024, 2048, 4096)) +
+  # scale_x_continuous(breaks = c(128, 256, 512, 1024, 2048, 4096)) + 
+  labs(y = 'community detection error count', 
+       colour = NULL) +
+  geom_line(aes(x = n, y = med.err * n,
+                colour = 'OSC')) +
+  geom_errorbar(aes(x = n, ymin = first.q * n, ymax = third.q * n,
+                    colour = 'OSC'), width = .1) + 
+  geom_line(aes(x = n, y = med.err.ssc * n,
+                colour = 'SSC-ASE')) + 
+  geom_errorbar(aes(x = n, ymin = first.q.ssc * n, ymax = third.q.ssc * n,
+                    colour = 'SSC-ASE'), width = .1) + 
+  geom_line(aes(x = n, y = med.err.mm * n,
+                colour = 'MM-EP')) + 
+  geom_errorbar(aes(x = n, ymin = first.q.mm * n, ymax = third.q.mm * n,
+                    colour = 'MM-EP'), width = .1) + 
+  geom_line(aes(x = n, y = med.err.ssc2 * n,
+                colour = 'SSC-A')) + 
+  geom_errorbar(aes(x = n, ymin = first.q.ssc2 * n, ymax = third.q.ssc2 * n,
+                    colour = 'SSC-A'), width = .1) + 
+  scale_colour_brewer(palette = 'Set1') + 
+  facet_wrap(~ K, labeller = 'label_both') + 
+  scale_y_log10()
+```
+
+Given ground truth community labels, Algorithm 5 and the MLE-based plug-in 
+estimators \cite{307cbeb9b1be48299388437423d94bf1} \cite{noroozi2019estimation} 
+perform similarly, with root mean square error decaying at rate approximately 
+$n^{-1/2}$. 
+
+```{r lambda_est_k, cache = FALSE, fig.cap = 'Median and IQR RMSE from Algorithm 2 (red) compared against an MLE-based method (blue). Simulations were repeated 50 times for each sample size.', fig.width = 10}
+rmse.df <- readr::read_csv('rmse-k.csv')
+
+rmse.df %>% 
+  na.omit() %>% 
+  dplyr::group_by(K, n) %>% 
+  dplyr::summarise(median.rmse = median(rmse),
+                   q1.rmse = quantile(rmse, .25),
+                   q3.rmse = quantile(rmse, .75),
+                   median.rmse.mle = median(rmse.mle),
+                   q1.rmse.mle = quantile(rmse.mle, .25),
+                   q3.rmse.mle = quantile(rmse.mle, .75)) %>% 
+  dplyr::ungroup() %>% 
+  ggplot() +
+  geom_line(aes(x = n, y = median.rmse, colour = 'Algorithm 4')) + 
+  geom_errorbar(aes(x = n, ymin = q1.rmse, ymax = q3.rmse,
+                    colour = 'Algorithm 4'), width = .1) + 
+  geom_line(aes(x = n, y = median.rmse.mle, colour = 'MLE-based')) + 
+  geom_errorbar(aes(x = n, ymin = q1.rmse.mle, ymax = q3.rmse.mle,
+                   colour = 'MLE-based'), width = .1) + 
+  scale_colour_brewer(palette = 'Set1') + 
+  labs(y = 'RMSE', colour = NULL) + 
+  facet_wrap(~ K, labeller = 'label_both') + 
+  scale_y_log10() + 
+  scale_x_log10(breaks = c(128, 256, 512, 1024, 2048, 4096))
+```
+
+## Imbalanced communities
+
+Simulations performed in this section are similar to those in the previous 
+section with the exception of the mixture parameters 
+$\{\alpha_1, ..., \alpha_K\}$ used to draw community labels from the 
+multinomial distribution. For these examples, we set the following parameters:
+
+* Number of vertices $n = 128, 256, 512, 1024, 2048, 4096$
+* Number of underlying communities $K = 2, 3, 4$
+* Mixture parameters $\alpha_k = \frac{k^{-1}}{\sum_{l=1}^K l^{-1}}$ for 
+$k = 1, ..., K$
+* Community labels 
+$z_k \iid Multinomial(\alpha_1, ..., \alpha_K)$
+* Within-group popularities $\lambda^{(kk)} \iid Beta(2, 1)$
+* Between-group popularities 
+$\lambda^{(kl)} \iid Beta(1, 2)$ for $k \neq l$
+
+$50$ simulations were performed for each $(n, K)$ pair. 
+
+Fig. \ref{fig:clust_err_k_imba} and \ref{fig:clust_err_ct_sim_imba} show 
+similar results as in the balanced communities case, with both OSE and 
+SSC resulting in no misclustered vertices for a 
+sufficiently large sample size. However, Fig. \ref{fig:lambda_est_k_imba} 
+suggests that while Algorithm 2 retains $\sqrt{n}$ efficiency, the MLE-based 
+plug-in estimator is less efficient for this setup. 
+
+```{r clust_err_k_imba, fig.cap = 'IQR of clustering error using OSE (blue) compared against SSC on the ASE of A (purple), MM (red), and SSC on the adjacency matrix (green). Communities are imbalanced. Simulations were repeated 50 times for each sample size.', fig.width = 10}
+clustering.df <- readr::read_csv('clustering-k-imbalanced.csv')
+ssc.df <- readr::read_csv('clustering-ssc-k-imbalanced.csv')
+clustering.df %>%
+  dplyr::group_by(n, K) %>%
+  dplyr::summarise(med.err = median(error),
+                   first.q = quantile(error, .25),
+                   third.q = quantile(error, .75),
+                   med.err.ssc = median(error.ssc),
+                   first.q.ssc = quantile(error.ssc, .25),
+                   third.q.ssc = quantile(error.ssc, .75),
+                   med.err.mm = median(error.mm),
+                   first.q.mm = quantile(error.mm, .25),
+                   third.q.mm = quantile(error.mm, .75)) %>%
+  dplyr::ungroup() %>% 
+  dplyr::inner_join(
+    ssc.df %>% 
+      dplyr::group_by(n, K) %>% 
+      dplyr::summarise(med.err.ssc2 = median(error.ssc2),
+                       first.q.ssc2 = quantile(error.ssc2, .25),
+                       third.q.ssc2 = quantile(error.ssc2, .75)) %>% 
+      dplyr::ungroup()
+  ) %>% 
+  ggplot() +
+  scale_x_log10(breaks = c(128, 256, 512, 1024, 2048, 4096)) +
+  # scale_x_continuous(breaks = c(128, 256, 512, 1024, 2048, 4096)) + 
+  labs(y = 'community detection error rate', 
+       colour = NULL) +
+  geom_line(aes(x = n, y = med.err,
+                colour = 'OSC')) +
+  geom_errorbar(aes(x = n, ymin = first.q, ymax = third.q,
+                    colour = 'OSC'), width = .1) + 
+  geom_line(aes(x = n, y = med.err.ssc,
+                colour = 'SSC-ASE')) + 
+  geom_errorbar(aes(x = n, ymin = first.q.ssc, ymax = third.q.ssc,
+                    colour = 'SSC-ASE'), width = .1) + 
+  geom_line(aes(x = n, y = med.err.mm,
+                colour = 'MM-EP')) + 
+  geom_errorbar(aes(x = n, ymin = first.q.mm, ymax = third.q.mm,
+                    colour = 'MM-EP'), width = .1) + 
+  geom_line(aes(x = n, y = med.err.ssc2,
+                colour = 'SSC-A')) + 
+  geom_errorbar(aes(x = n, ymin = first.q.ssc2, ymax = third.q.ssc2,
+                    colour = 'SSC-A'), width = .1) + 
+  scale_colour_brewer(palette = 'Set1') + 
+  facet_wrap(~ K, labeller = 'label_both') + 
+  scale_y_log10()
+```
+
+```{r clust_err_ct_sim_imba, fig.cap = 'IQR of counts of misclustered vertices using OSE (blue) compared against SSC on the ASE of A (purple), MM (red), and SSC on the adjacency matrix (green). Communities are imbalanced. Simulations were repeated 50 times for each sample size.', cache = FALSE, fig.width = 10}
+clustering.df <- readr::read_csv('clustering-k-imbalanced.csv')
+ssc.df <- readr::read_csv('clustering-ssc-k-imbalanced.csv')
+clustering.df %>%
+  dplyr::group_by(n, K) %>%
+  dplyr::summarise(med.err = median(error),
+                   first.q = quantile(error, .25),
+                   third.q = quantile(error, .75),
+                   med.err.ssc = median(error.ssc),
+                   first.q.ssc = quantile(error.ssc, .25),
+                   third.q.ssc = quantile(error.ssc, .75),
+                   med.err.mm = median(error.mm),
+                   first.q.mm = quantile(error.mm, .25),
+                   third.q.mm = quantile(error.mm, .75)) %>%
+  dplyr::ungroup() %>% 
+  dplyr::inner_join(
+    ssc.df %>% 
+      dplyr::group_by(n, K) %>% 
+      dplyr::summarise(med.err.ssc2 = median(error.ssc2),
+                       first.q.ssc2 = quantile(error.ssc2, .25),
+                       third.q.ssc2 = quantile(error.ssc2, .75)) %>% 
+      dplyr::ungroup()
+  ) %>% 
+  ggplot() +
+  scale_x_log10(breaks = c(128, 256, 512, 1024, 2048, 4096)) +
+  # scale_x_continuous(breaks = c(128, 256, 512, 1024, 2048, 4096)) + 
+  labs(y = 'community detection error count', 
+       colour = NULL) +
+  geom_line(aes(x = n, y = med.err * n,
+                colour = 'OSC')) +
+  geom_errorbar(aes(x = n, ymin = first.q * n, ymax = third.q * n,
+                    colour = 'OSC'), width = .1) + 
+  geom_line(aes(x = n, y = med.err.ssc * n,
+                colour = 'SSC-ASE')) + 
+  geom_errorbar(aes(x = n, ymin = first.q.ssc * n, ymax = third.q.ssc * n,
+                    colour = 'SSC-ASE'), width = .1) + 
+  geom_line(aes(x = n, y = med.err.mm * n,
+                colour = 'MM-EP')) + 
+  geom_errorbar(aes(x = n, ymin = first.q.mm * n, ymax = third.q.mm * n,
+                    colour = 'MM-EP'), width = .1) + 
+  geom_line(aes(x = n, y = med.err.ssc2 * n,
+                colour = 'SSC-A')) + 
+  geom_errorbar(aes(x = n, ymin = first.q.ssc2 * n, ymax = third.q.ssc2 * n,
+                    colour = 'SSC-A'), width = .1) + 
+  scale_colour_brewer(palette = 'Set1') + 
+  facet_wrap(~ K, labeller = 'label_both') + 
+  scale_y_log10()
+```
+
+```{r lambda_est_k_imba, cache = FALSE, fig.cap = 'Median and IQR RMSE from Algorithm 2 (red) compared against an MLE-based method (blue). Simulations were repeated 50 times for each sample size.', fig.width = 10}
+rmse.df <- readr::read_csv('rmse-k-imbalanced.csv')
+
+rmse.df %>% 
+  na.omit() %>% 
+  dplyr::group_by(K, n) %>% 
+  dplyr::summarise(median.rmse = median(rmse),
+                   q1.rmse = quantile(rmse, .25),
+                   q3.rmse = quantile(rmse, .75),
+                   median.rmse.mle = median(rmse.mle),
+                   q1.rmse.mle = quantile(rmse.mle, .25),
+                   q3.rmse.mle = quantile(rmse.mle, .75)) %>% 
+  dplyr::ungroup() %>% 
+  ggplot() +
+  geom_line(aes(x = n, y = median.rmse, colour = 'Algorithm 4')) + 
+  geom_errorbar(aes(x = n, ymin = q1.rmse, ymax = q3.rmse,
+                    colour = 'Algorithm 4'), width = .1) + 
+  geom_line(aes(x = n, y = median.rmse.mle, colour = 'MLE-based')) + 
+  geom_errorbar(aes(x = n, ymin = q1.rmse.mle, ymax = q3.rmse.mle,
+                   colour = 'MLE-based'), width = .1) + 
+  scale_colour_brewer(palette = 'Set1') + 
+  labs(y = 'RMSE', colour = NULL) + 
+  facet_wrap(~ K, labeller = 'label_both') + 
+  scale_y_log10() + 
+  scale_x_log10(breaks = c(128, 256, 512, 1024, 2048, 4096))
+```
+
+## Additional experiments
+
+Using the same set of parameters for generating $P$ and $A$ as in the 
+balanced communities examples for $K = 2$, we generated one instance of $A$ for
+each $n$ and constructed $B$ according to algorithm 4 to verify that 
+as $n \to \infty$, $(\hat{v}_i)^\top \hat{v_j} \stackrel{P}{\to} 0$ for $i, j$ 
+in different clusters. Furthermore, the distribution of these inner products 
+should be approximately normal. 
+
+```{r, fig.cap = 'Between-cluster inner products of the eigenvectors of $A$ for varying sample sizes.', fig.height = 2, fig.width = 4}
+densities.df <- readr::read_csv('densities.csv')
+
+ggplot(densities.df) + 
+  geom_density(aes(x = inner.prods * n, colour = factor(n))) + 
+  labs(x = expression(n * v[i]^T * v[j]),
+       colour = 'n') + 
+  scale_x_continuous(breaks = seq(-5, 5)) + 
+  scale_colour_brewer(palette = 'Set1')
+```
+
+# Real data examples
+
+```{r}
+import::here(cluster.pabm, ssc, plot.A, .from = '~/dev/pabm-grdpg/functions.R')
+
+n.edges <- 20566
+
+butterfly <- R.matlab::readMat('data/Raw_butterfly_network.mat')
+
+A <- butterfly$W.butterfly0
+z <- butterfly$labels
+
+keep <- c(6, 2, 9, 4)
+A <- A[z %in% keep, z %in% keep]
+z <- z[z %in% keep]
+n <- length(z)
+K <- 4
+
+delta <- quantile(A[upper.tri(A)], 1 - n.edges / (n * (n - 1) / 2))
+A <- (A > delta) * 1
+
+z.hat <- cluster.pabm(A, K)
+
+# z.hat.mm <- A %>% 
+#   igraph::graph_from_adjacency_matrix(mode = 'undirected') %>% 
+#   igraph::cluster_louvain() %>% 
+#   igraph::membership()
+
+# ari <- round(fossil::adj.rand.index(z, z.hat) * 100)
+```
+
+In the first real data example, we applied OSE to the Leeds Butterfly 
+dataset \cite{Wang_2018} consisting of visual similarity measurements among 832 
+butterflies across 10 species. The graph was modified to match the example 
+from \citet{noroozi2019estimation}: Only the 4 most frequent species were 
+considered, and the similarities were discretized to $\{0, 1\}$ via 
+thresholding. Fig. \ref{fig:butterfly} shows a sorted adjacency matrix sorted 
+by the resultant clustering. 
+
+Comparing against the ground truth species labels, OSE achieves an 
+accuracy of 63\% and an adjusted Rand index of 73\%. In comparison, 
+\citet{noroozi2019estimation} achieved an adjusted Rand index of 73\% using 
+sparse subspace clustering on the same dataset.
+
+```{r butterfly, fig.height = 2, fig.width = 2, fig.cap = 'Adjacency matrix of the Leeds Butterfly dataset after sorting by the clustering outputted by OSE.', cache = FALSE}
+plot.A(A, z.hat)
+```
+
+```{r}
+# this portion is from the code provided by Sengupta and Chen
+# the data were generated by scripts from S&C, then saved as RDS files
+
+bmp <- readRDS('data/bmp.rds')
+A.bmp <- bmp$A
+z.bmp <- bmp$z
+
+pb <- readRDS('data/pb.rds')
+A.pb <- pb$A
+z.pb <- pb$z
+
+dblp <- readRDS('data/dblp.rds')
+A.dblp <- dblp$A
+z.dblp <- dblp$z
+```
+
+```{r, cache = TRUE}
+zhat.bmp <- cluster.pabm(A.bmp, 2, use.all = TRUE, normalize = FALSE)
+bmp.acc <- mean(zhat.bmp == z.bmp)
+bmp.acc <- ifelse(bmp.acc < .5, 1 - bmp.acc, bmp.acc)
+
+zhat.pb <- cluster.pabm(A.pb, 2, use.all = TRUE, normalize = FALSE, 
+                        p = 2, q = 0, d.eigenmap = 2)
+pb.acc <- mean(zhat.pb == z.pb)
+pb.acc <- ifelse(pb.acc < .5, 1 - pb.acc, pb.acc)
+
+zhat.dblp <- cluster.pabm(A.dblp, 2, use.all = TRUE, normalize = FALSE)
+dblp.acc <- mean(zhat.dblp == z.dblp)
+dblp.acc <- ifelse(dblp.acc < .5, 1 - dblp.acc, dblp.acc)
+
+zhat.bmp.ssc <- ssc(A.bmp, 2, 1e-3, normalize = TRUE)
+bmp.acc.ssc <- mean(zhat.bmp.ssc == z.bmp)
+bmp.acc.ssc <- ifelse(bmp.acc.ssc < .5, 1 - bmp.acc.ssc, bmp.acc.ssc)
+
+zhat.pb.ssc <- ssc(A.pb, 2, .008, normalize = TRUE)
+pb.acc.ssc <- mean(zhat.pb.ssc == z.pb)
+pb.acc.ssc <- ifelse(pb.acc.ssc < .5, 1 - pb.acc.ssc, pb.acc.ssc)
+
+zhat.dblp.ssc <- ssc(A.dblp, 2, 1e-2, normalize = FALSE)
+dblp.acc.ssc <- mean(zhat.dblp.ssc == z.dblp)
+dblp.acc.ssc <- ifelse(dblp.acc.ssc < .5, 1 - dblp.acc.ssc, dblp.acc.ssc)
+
+```
+
+In the second example, we applied OSE to the British MPs Twitter 
+network \cite{greene2013producing}, the Political Blogs network 
+\cite{10.1145/1134271.1134277}, and the DBLP network \cite{NIPS2009_3855} 
+\cite{10.1007/978-3-642-15880-3_42}. For this data analysis, we subsetted the 
+data as described by 
+\citet{307cbeb9b1be48299388437423d94bf1} for their analysis of the same 
+networks. Our methods underperformed compared to modularity maximization, 
+although performance is comparable. In 
+addition, OSE's runtime is much lower than that of modularity 
+maximization.
+
+```{r}
+dplyr::tibble(Network = c('British MPs', 'Political blogs', 'DBLP'),
+              Vertices = c(nrow(A.bmp), nrow(A.pb), nrow(A.dblp)),
+              `Error (Mod. Max.)` = c(round(1 / 329, 3),
+                                      round(61 / 1222, 3),
+                                      round(62 / 2203, 3)),
+              `Error (SSC)` = round(1 - c(bmp.acc.ssc,
+                                          pb.acc.ssc,
+                                          dblp.acc.ssc), 3),
+              `Error (OSE)` = round(1 - c(bmp.acc, 
+                                                  pb.acc,
+                                                  dblp.acc), 3)) %>% 
+  knitr::kable(caption = paste('Community detection error rates', 
+                               'for modularity maximization,',
+                               'sparse subspace clustering, ',
+                               'and OSE.'))
+```
+
+```{r mp, cache = FALSE, fig.width = 8, fig.height = 2, fig.cap = 'Adjacency matrices of (from left to right) the British MPs, Political Blogs, and DBLP networks after sorting by the clustering outputted by OSE.', fig.dpi = 10}
+gridExtra::grid.arrange(plot.A(A.bmp, zhat.bmp),
+                        plot.A(A.pb, zhat.pb),
+                        plot.A(A.dblp, zhat.dblp),
+                        ncol = 3)
+```
+
+In the third example, we consider the Karantaka villages data studied by 
+\citet{DVN/U3BIHX_2013}. For this example, we chose the `visitgo` networks from 
+villages 12, 31, and 46 at the household level. The label of interest is the 
+religious affiliation. The networks were truncated to religions "1" and "2", 
+and vertices of degree 0 were removed. 
+
+```{r, cache = FALSE, fig.cap = 'Adjacency matrix of the Karnataka villages data, arranged by the clustering produced by OSE (left). The villages studied here are, from left to right, 12, 31, and 46.', fig.height = 2, fig.width = 8, eval = TRUE}
+K <- 2
+hh.12 <- readRDS('data/village-hh-12.rds')
+hh.31 <- readRDS('data/village-hh-31.rds')
+hh.46 <- readRDS('data/village-hh-46.rds')
+
+# this part of code taken from sengupta & chen
+setwd('~/dev/pabm-grdpg/codes_and_data')
+require(MASS);require("clue")
+source("EPalgosim.R") 
+source("functions.R")
+mm <- function(A.hh) {
+  b.can = EPalgo(A.hh,eps=0) # EP algorithm (no perturbation)
+  Q.PA.can = rep(NA, ncol(b.can))	# array to store Q values
+  for (i in 1:ncol(b.can)){
+    #check if any cluster is empty
+    foo = rep(NA, 2)
+    for (clus in 1:2) {foo[clus]=sum(b.can[,i]==clus)}
+    if (min(foo)==0) {stop('Empty groups are not allowed')} 
+    Q.PA.can[i] = Q.PA(A.hh, b=b.can[,i])   # fit PABM
+  } # end of i for loop
+  foo1 = order(-Q.PA.can)[1] 
+  return(b.can[,foo1])   # community assignment that maximises Q.PA
+}
+
+A.hh.12 <- hh.12$A
+z.hh.12 <- hh.12$z
+zhat.hh.12 <- cluster.pabm(A.hh.12, K,
+                           use.all = TRUE, normalize = FALSE, p = 3, q = 1)
+zhat.hh.ssc.12 <- ssc(A.hh.12, K, lambda = .1)
+zhat.hh.mm.12 <- mm(A.hh.12)
+
+A.hh.31 <- hh.31$A
+z.hh.31 <- hh.31$z
+zhat.hh.31 <- cluster.pabm(A.hh.31, K,
+                           use.all = TRUE, normalize = FALSE, p = 3, q = 1)
+zhat.hh.ssc.31 <- ssc(A.hh.31, K, lambda = .05)
+zhat.hh.mm.31 <- mm(A.hh.31)
+
+A.hh.46 <- hh.46$A
+z.hh.46 <- hh.46$z
+zhat.hh.46 <- cluster.pabm(A.hh.46, K,
+                           use.all = TRUE, normalize = FALSE, p = 2, q = 0)
+zhat.hh.ssc.46 <- ssc(A.hh.46, K, lambda = .0005)
+zhat.hh.mm.46 <- mm(A.hh.46)
+
+gridExtra::grid.arrange(plot.A(A.hh.12, zhat.hh.12),
+                        plot.A(A.hh.31, zhat.hh.31),
+                        plot.A(A.hh.46, zhat.hh.46),
+                        nrow = 1)
+```
+
+```{r, eval = TRUE}
+hh.acc.12 <- mean(zhat.hh.12 == z.hh.12)
+hh.acc.12 <- ifelse(hh.acc.12 < .5, 1 - hh.acc.12, hh.acc.12)
+hh.acc.ssc.12 <- mean(zhat.hh.ssc.12 == z.hh.12)
+hh.acc.ssc.12 <- ifelse(hh.acc.ssc.12 < .5, 1 - hh.acc.ssc.12, hh.acc.ssc.12)
+hh.acc.mm.12 <- mean(zhat.hh.mm.12 == z.hh.12)
+hh.acc.mm.12 <- ifelse(hh.acc.mm.12 < .5, 1 - hh.acc.mm.12, hh.acc.mm.12)
+
+hh.acc.31 <- mean(zhat.hh.31 == z.hh.31)
+hh.acc.31 <- ifelse(hh.acc.31 < .5, 1 - hh.acc.31, hh.acc.31)
+hh.acc.ssc.31 <- mean(zhat.hh.ssc.31 == z.hh.31)
+hh.acc.ssc.31 <- ifelse(hh.acc.ssc.31 < .5, 1 - hh.acc.ssc.31, hh.acc.ssc.31)
+hh.acc.mm.31 <- mean(zhat.hh.mm.31 == z.hh.31)
+hh.acc.mm.31 <- ifelse(hh.acc.mm.31 < .5, 1 - hh.acc.mm.31, hh.acc.mm.31)
+
+hh.acc.46 <- mean(zhat.hh.46 == z.hh.46)
+hh.acc.46 <- ifelse(hh.acc.46 < .5, 1 - hh.acc.46, hh.acc.46)
+hh.acc.ssc.46 <- mean(zhat.hh.ssc.46 == z.hh.46)
+hh.acc.ssc.46 <- ifelse(hh.acc.ssc.46 < .5, 1 - hh.acc.ssc.46, hh.acc.ssc.46)
+hh.acc.mm.46 <- mean(zhat.hh.mm.46 == z.hh.46)
+hh.acc.mm.46 <- ifelse(hh.acc.mm.46 < .5, 1 - hh.acc.mm.46, hh.acc.mm.46)
+
+knitr::kable(dplyr::tibble(
+  Method = c('OSE', 'SSC', 'Mod. Max.'),
+  `Error (Village 12)` = round(1 - c(hh.acc.12, hh.acc.ssc.12, hh.acc.mm.12), 3),
+  `Error (Village 31)` = round(1 - c(hh.acc.31, hh.acc.ssc.31, hh.acc.mm.31), 3),
+  `Error (Village 46)` = round(1 - c(hh.acc.46, hh.acc.ssc.46, hh.acc.mm.46), 3)),
+  caption = paste('Community detection error rates for identifying',
+                  'household religion.'))
+```
+
+# Discussion
+
+# Proofs
+
+**Proof of Theorem 1**. 
+This is given by straightforward matrix multiplication. It suffices to show 
+that 
+
+$$X U I_{3, 1} U^\top X^\top = 
+\begin{bmatrix} 
+  \lambda^{(11)} (\lambda^{(11)})^\top & \lambda^{(12)} (\lambda^{(21)})^\top \\
+  \lambda^{(21)} (\lambda^{(12)})^\top & \lambda^{(22)} (\lambda^{(22)})^\top
+\end{bmatrix}$$
+
+*Remark*. While we can just perform the matrix multiplication to show the 
+equivalence, it is more illustrative to look at a few intermediate steps. Note 
+that the product of the three inner matrices results in a permutation matrix 
+with fixed points at positions $1$ and $4$ and a cycle of order 2 swappoing 
+positions $2$ and $3$: 
+
+$$U I_{3, 1} U^\top = \begin{bmatrix} 
+  1 & 0 & 0 & 0 \\ 
+  0 & 0 & 1 & 0 \\ 
+  0 & 1 & 0 & 0 \\ 
+  0 & 0 & 0 & 1 
+\end{bmatrix} = \Pi$$
+
+Since $U$ is orthonormal and $I_{3, 1}$ is diagonal, $\Pi = U I_{3, 1} U^\top$ 
+is a spectral decomposition of this permutation matrix. Note that the two fixed 
+points result in eigenvalues of $+1$ with corresponding eigenvectors $e_i$ 
+where $i = 1, 4$ corresponding to the locations of the fixed points, and the 
+cycle of order two results in two eigenvalues $\pm 1$ with corresponding 
+eigenvectors $(e_i \pm e_j) / \sqrt{2}$ where $i = 2, j = 3$, pair that is 
+swapped.
+
+**Proof of Theorem 2**. 
+Let 
+$$\Lambda^{(k)} = 
+\begin{bmatrix} \lambda^{(k,1)} & \cdots & \lambda^{(k, K)} \end{bmatrix}
+\in \mathbb{R}^{n_k \times K}$$
+
+\begin{equation}
+X = \blockdiag(\Lambda^{(1)}, ..., \Lambda^{(K)}) \in \mathbb{R}^{n \times K^2}
+\end{equation}
+
+$$L^{(k)} = \blockdiag(\lambda^{(1k)}, ..., \lambda^{(Kk)}) \in 
+\mathbb{R}^{n \times K}$$
+
+$$Y = \begin{bmatrix} L^{(1)} & \cdots & L^{(K)} \end{bmatrix} \in 
+\mathbb{R}^{n \times K^2}$$
+
+Then $P = X Y^\top$.
+
+Similar to the $K = 2$ case, we have $Y = X \Pi$ for a permutation matrix
+$\Pi$, resulting in $P = X \Pi X^\top$.  
+The permutation described by $\Pi$ has $K$ fixed points, which correspond to 
+$K$ eigenvalues equal to $1$ with corresponding eigenvectors $e_k$ where 
+$k = r (K + 1) + 1$ for $r = 0, ..., K - 1$. It also has 
+$\binom{K}{2} = K (K - 1) / 2$ cycles of order $2$. Each cycle corresponds to 
+a pair of eigenvalues $+1$ and $-1$ and a pair of eigenvectors 
+$(e_s + e_t) / \sqrt{2}$ and $(e_s - e_t) / \sqrt{2}$.
+
+Then $\Pi$ has $K (K + 1) / 2$ eigenvalues equal to $1$ and $K (K - 1) / 2$ 
+eigenvalues equal to $-1$. $\Pi$ has the decomposed form 
+
+\begin{equation}
+\Pi = U I_{K (K + 1) / 2, K (K - 1) / 2} U^\top
+\end{equation}
+
+The edge probability matrix then can be written as:
+
+\begin{equation}
+P = X U I_{p, q} (X U)^\top
+\end{equation}
+
+\begin{equation}
+p = K (K + 1) / 2
+\end{equation}
+
+\begin{equation}
+q = K (K - 1) / 2
+\end{equation}
+
+and we can describe the PABM with $K$ communities as a GRDPG with latent 
+positions $X U$ with signature $\big( K (K + 1) / 2, K (K - 1) / 2 \big)$.
+
+**Lemma 1.** 
+Let $P = V D V^\top$ be the spectral decomposition of the edge probability 
+matrix for a PABM. Then $V V^\top = X (X^\top X)^{-1} X^\top$ where $X$ is 
+defined as in equation (6).
+
+**Proof of Lemma 1**. 
+By Theorem 2, $P = X U I_{p, q} U^\top X^\top$, where $X$ is defined as in equation (6) and $p$ and $q$ are defined as in equations (9) and (10). Alternatively, the spectral decomposition can be written as $P = V D V^\top = V |D|^{1/2} I_{p, q} |D|^{1/2} V^\top$ for the same $(p, q)$ and $|\cdot|^{1/2}$ is applied entry-wise. Thus for some $Q \in \mathbb{O}(p, q)$, 
+
+$$X U Q = V |D|^{1/2}$$
+
+Therefore, using the fact that $U U^\top = I$ and $V^\top V = I$,
+
+$$(V |D|^{1/2}) ((V |D|^{1/2})^\top (V |D|^{1/2}))^{-1} (V |D|^{1/2})^\top = 
+(X U Q) ((X U Q)^\top (X U Q))^{-1} (X U Q)^\top$$
+
+The righthand side becomes
+
+$$\begin{split}
+  (X U Q) ((X U Q)^\top (X U Q))^{-1} (X U Q)^\top & 
+    = X U Q Q^{-1} U^\top (X^\top X)^{-1} U (Q^\top)^{-1} Q^\top U^\top X^\top \\
+  & = X U U^\top (X^\top X)^{-1} U U^\top X^\top \\
+  & = X (X^\top X)^{-1} X^\top
+\end{split}$$
+
+The lefthand side becomes:
+
+$$\begin{split}
+  (V |D|^{1/2}) ((V |D|^{1/2})^\top (V |D|^{1/2}))^{-1} (V |D|^{1/2})^\top & =
+    V |D|^{1/2} |D|^{-1/2} (V^\top V)^{-1} |D|^{-1/2} |D|^{1/2} V^\top \\
+  & = V V^\top
+\end{split}$$
+
+**Proof of Theorem 3**.
+By Lemma 1, $V V^\top = X (X^\top X)^{-1} X^\top$ where $X$ is defined as 
+in Theorem 2. Since $X$ is block diagonal with each block corresponding 
+to one community, $X (X^\top X)^{-1} X^\top$ is also a block diagonal matrix 
+with each block corresponding to a community and zeros elsewhere. Therefore, 
+if vertices $i$ and $j$ belong to different communities, then the $ij$^th^ 
+element of $X (X^\top X)^{-1} X^\top = V V^\top = B$ is 0.
+
+**Proof of Theorem 5**. 
 Let $P$ and $A$ be organized by community such that the elements of blocks 
 $P^{(kl)}$ and $A^{(kl)}$ correspond to the edges between communities $k$ and 
 $l$. 
@@ -675,590 +1243,5 @@ for this GRDPG is $(1, 1)$, and $U^\top \hat{U}$ is block diagonal,
 resulting in $W_* \stackrel{P}{\to} I$. Therefore, the adjacency spectral embedding of $\hat{M}^{(kl)}$ is 
 a direct estimation of the specific latent positions outlined for $M^{(kl)}$, 
 up to sign flip. 
-
-# Simulated Examples
-
-For each simulation, the popularity vectors $\{\lambda^{(kl)}\}_K$ are drawn 
-from a joint distribution, the edge probability matrix $P$ is constructed using 
-the popularity vectors, and finally an unweighted and undirected adjacency 
-matrix $A$ is drawn from $P$. Algorithm 2 is then used for community detection, 
-and this method is compared against sparse subspace clustering 
-\cite{soltanolkotabi2014} \cite{noroozi2019estimation} and modularity 
-maximization \cite{307cbeb9b1be48299388437423d94bf1} \cite{igraph}. True 
-community labels are used with Algorithm 4 to estimate the popularity 
-vectors, and this method is then compared against an MLE-based estimator 
-described in \citet{noroozi2019estimation} and
-\citet{307cbeb9b1be48299388437423d94bf1}. 
-
-Sparse subspace clustering is described as follows. First, an embedding of the 
-affinity matrix $A$ is required, and for this, we use spectral decomposition 
-using the first $K (K + 1) / 2$ and last $K (K - 1) / 2$ eigenvectors. Then a 
-sparse linear regression model is fit to each row of the embedding data matrix 
-using the remaining rows as predictors, the rows of which are stored in 
-matrix $C$. Finally, an affinity matrix $B = |C| + |C|^\top$ is constructed, 
-where $|\cdot|$ is applied entry-wise. If the data in the embedding lie 
-perfectly in $K$ subspaces, then $B_{ij} = 0$ for $i, j$ not in the same 
-subspace. If the embedding of $P$ is used, then this property holds, but it 
-is true in general for the embedding of $A$, in which case a final clustering 
-step is required. For these simulations, spectral clustering with the 
-normalized Laplacian and Gaussian mixture models is used for this final step. 
-
-Modularity maximization is NP-hard, so \citet{307cbeb9b1be48299388437423d94bf1} 
-used the Extreme Points (EP) algorithm \cite{le2016}, which is $O(n^{K - 1})$. 
-For these simulations, the EP algorithm was used for $K = 2$, and for $K > 2$, 
-the Louvain algorithm \cite{Blondel_2008} was used instead.
-
-## Balanced communities
-
-In each simulation, community labels $z_1, ..., z_n$ were drawn 
-from a multinomial distribution with mixture parameters 
-$\{\alpha_1, ..., \alpha_K\}$, then $\{\lambda^{(kl)}\}_K$ according to the 
-drawn community labels, $P$ was constructed using the drawn 
-$\{\lambda^{(kl)}\}_K$, and $A$ was drawn from $P$ by 
-$A_{ij} \stackrel{indep}{\sim} Bernoulli(P_{ij})$. Each simulation has a unique
-edge probability matrix $P$. 
-
-For these examples, we set the following parameters:
-
-* Number of vertices $n = 128, 256, 512, 1024, 2048, 4096$
-* Number of underlying communities $K = 2, 3, 4$
-* Mixture parameters $\alpha_k = 1 / K$ for $k = 1, ..., K$, (i.e., each 
-community label has an equal probability of being drawn)
-* Community labels 
-$z_k \iid Multinomial(\alpha_1, ..., \alpha_K)$
-* Within-group popularities $\lambda^{(kk)} \iid Beta(2, 1)$
-* Between-group popularities 
-$\lambda^{(kl)} \iid Beta(1, 2)$ for $k \neq l$
-
-$50$ simulations were performed for each $(n, K)$ pair. 
-
-Fig \ref{fig:clust_err_k} show that for large $n$, Algorithm 2 results in 
-a misclustering rate of 0. Sparse subspace clustering produces similar results 
-for $K > 2$. 
-
-```{r clust_err_k, fig.cap = 'IQR of clustering error using Algorithm 2 (blue) compared against subspace clustering on the adjacency spectral embedding (purple), the extreme points algorithm (red), and subspace clustering on the adjacency matrix (green), for sample sizes from 128 to 4096 and number of underlying communities from 2 to 4. Communities are approximately balanced. Simulations were repeated 50 times for each sample size.', fig.width = 10}
-clustering.df <- readr::read_csv('clustering-k.csv')
-ssc.df <- readr::read_csv('clustering-ssc-k.csv')
-clustering.df %>%
-  dplyr::group_by(n, K) %>%
-  dplyr::summarise(med.err = median(error),
-                   first.q = quantile(error, .25),
-                   third.q = quantile(error, .75),
-                   med.err.ssc = median(error.ssc),
-                   first.q.ssc = quantile(error.ssc, .25),
-                   third.q.ssc = quantile(error.ssc, .75),
-                   med.err.mm = median(error.mm),
-                   first.q.mm = quantile(error.mm, .25),
-                   third.q.mm = quantile(error.mm, .75)) %>%
-  dplyr::ungroup() %>% 
-  dplyr::inner_join(
-    ssc.df %>% 
-      dplyr::group_by(n, K) %>% 
-      dplyr::summarise(med.err.ssc2 = median(error.ssc2),
-                       first.q.ssc2 = quantile(error.ssc2, .25),
-                       third.q.ssc2 = quantile(error.ssc2, .75)) %>% 
-      dplyr::ungroup()
-  ) %>% 
-  ggplot() +
-  scale_x_log10(breaks = c(128, 256, 512, 1024, 2048, 4096)) +
-  # scale_x_continuous(breaks = c(128, 256, 512, 1024, 2048, 4096)) + 
-  labs(y = 'community detection error rate', 
-       colour = NULL) +
-  geom_line(aes(x = n, y = med.err,
-                colour = 'OSC')) +
-  geom_errorbar(aes(x = n, ymin = first.q, ymax = third.q,
-                    colour = 'OSC'), width = .1) + 
-  geom_line(aes(x = n, y = med.err.ssc,
-                colour = 'SSC-ASE')) + 
-  geom_errorbar(aes(x = n, ymin = first.q.ssc, ymax = third.q.ssc,
-                    colour = 'SSC-ASE'), width = .1) + 
-  geom_line(aes(x = n, y = med.err.mm,
-                colour = 'MM-EP')) + 
-  geom_errorbar(aes(x = n, ymin = first.q.mm, ymax = third.q.mm,
-                    colour = 'MM-EP'), width = .1) + 
-  geom_line(aes(x = n, y = med.err.ssc2,
-                colour = 'SSC-A')) + 
-  geom_errorbar(aes(x = n, ymin = first.q.ssc2, ymax = third.q.ssc2,
-                    colour = 'SSC-A'), width = .1) + 
-  scale_colour_brewer(palette = 'Set1') + 
-  facet_wrap(~ K, labeller = 'label_both') + 
-  scale_y_log10()
-```
-
-Theorem 4 implies that algorithm 2 will result in not just in the error rate 
-converging to 0 but the error *count* as well (Fig. \ref{fig:clust_err_ct_sim}).
-We explore this in Fig \ref{fig:clust_err_ct_sim}.
-
-```{r clust_err_ct_sim, fig.cap = 'IQR of counts of misclustered vertices using Algorithm 2 (blue) compared against subspace clustering on the adjacency spectral embedding (purple), the extreme points algorithm (red), and subspace clustering on the adjacency matrix (green), for sample sizes from 128 to 4096 and number of communities from 2 to 4. Communities are approximately balanced. Simulations were repeated 50 times for each sample size.', cache = FALSE, fig.width = 10}
-clustering.df <- readr::read_csv('clustering-k.csv')
-ssc.df <- readr::read_csv('clustering-ssc-k.csv')
-clustering.df %>%
-  dplyr::group_by(n, K) %>%
-  dplyr::summarise(med.err = median(error),
-                   first.q = quantile(error, .25),
-                   third.q = quantile(error, .75),
-                   med.err.ssc = median(error.ssc),
-                   first.q.ssc = quantile(error.ssc, .25),
-                   third.q.ssc = quantile(error.ssc, .75),
-                   med.err.mm = median(error.mm),
-                   first.q.mm = quantile(error.mm, .25),
-                   third.q.mm = quantile(error.mm, .75)) %>%
-  dplyr::ungroup() %>% 
-  dplyr::inner_join(
-    ssc.df %>% 
-      dplyr::group_by(n, K) %>% 
-      dplyr::summarise(med.err.ssc2 = median(error.ssc2),
-                       first.q.ssc2 = quantile(error.ssc2, .25),
-                       third.q.ssc2 = quantile(error.ssc2, .75)) %>% 
-      dplyr::ungroup()
-  ) %>% 
-  ggplot() +
-  scale_x_log10(breaks = c(128, 256, 512, 1024, 2048, 4096)) +
-  # scale_x_continuous(breaks = c(128, 256, 512, 1024, 2048, 4096)) + 
-  labs(y = 'community detection error count', 
-       colour = NULL) +
-  geom_line(aes(x = n, y = med.err * n,
-                colour = 'OSC')) +
-  geom_errorbar(aes(x = n, ymin = first.q * n, ymax = third.q * n,
-                    colour = 'OSC'), width = .1) + 
-  geom_line(aes(x = n, y = med.err.ssc * n,
-                colour = 'SSC-ASE')) + 
-  geom_errorbar(aes(x = n, ymin = first.q.ssc * n, ymax = third.q.ssc * n,
-                    colour = 'SSC-ASE'), width = .1) + 
-  geom_line(aes(x = n, y = med.err.mm * n,
-                colour = 'MM-EP')) + 
-  geom_errorbar(aes(x = n, ymin = first.q.mm * n, ymax = third.q.mm * n,
-                    colour = 'MM-EP'), width = .1) + 
-  geom_line(aes(x = n, y = med.err.ssc2 * n,
-                colour = 'SSC-A')) + 
-  geom_errorbar(aes(x = n, ymin = first.q.ssc2 * n, ymax = third.q.ssc2 * n,
-                    colour = 'SSC-A'), width = .1) + 
-  scale_colour_brewer(palette = 'Set1') + 
-  facet_wrap(~ K, labeller = 'label_both') + 
-  scale_y_log10()
-```
-
-Given ground truth community labels, Algorithm 5 and the MLE-based plug-in 
-estimators \cite{307cbeb9b1be48299388437423d94bf1} \cite{noroozi2019estimation} 
-perform similarly, with root mean square error decaying at rate approximately 
-$n^{-1/2}$. 
-
-```{r lambda_est_k, cache = FALSE, fig.cap = 'Median and IQR RMSE from Algorithm 4 (red) compared against an MLE-based method (blue) using sample sizes from 128 to 4096 and number of clusters from 2 to 4. Simulations were repeated 50 times for each sample size.', fig.width = 10}
-rmse.df <- readr::read_csv('rmse-k.csv')
-
-rmse.df %>% 
-  na.omit() %>% 
-  dplyr::group_by(K, n) %>% 
-  dplyr::summarise(median.rmse = median(rmse),
-                   q1.rmse = quantile(rmse, .25),
-                   q3.rmse = quantile(rmse, .75),
-                   median.rmse.mle = median(rmse.mle),
-                   q1.rmse.mle = quantile(rmse.mle, .25),
-                   q3.rmse.mle = quantile(rmse.mle, .75)) %>% 
-  dplyr::ungroup() %>% 
-  ggplot() +
-  geom_line(aes(x = n, y = median.rmse, colour = 'Algorithm 4')) + 
-  geom_errorbar(aes(x = n, ymin = q1.rmse, ymax = q3.rmse,
-                    colour = 'Algorithm 4'), width = .1) + 
-  geom_line(aes(x = n, y = median.rmse.mle, colour = 'MLE-based')) + 
-  geom_errorbar(aes(x = n, ymin = q1.rmse.mle, ymax = q3.rmse.mle,
-                   colour = 'MLE-based'), width = .1) + 
-  scale_colour_brewer(palette = 'Set1') + 
-  labs(y = 'RMSE', colour = NULL) + 
-  facet_wrap(~ K, labeller = 'label_both') + 
-  scale_y_log10() + 
-  scale_x_log10(breaks = c(128, 256, 512, 1024, 2048, 4096))
-```
-
-## Imbalanced communities
-
-Simulations performed in this section are similar to those in the previous 
-section with the exception of the mixture parameters 
-$\{\alpha_1, ..., \alpha_K\}$ used to draw community labels from the 
-multinomial distribution. For these examples, we set the following parameters:
-
-* Number of vertices $n = 128, 256, 512, 1024, 2048, 4096$
-* Number of underlying communities $K = 2, 3, 4$
-* Mixture parameters $\alpha_k = \frac{k^{-1}}{\sum_{l=1}^K l^{-1}}$ for 
-$k = 1, ..., K$
-* Community labels 
-$z_k \iid Multinomial(\alpha_1, ..., \alpha_K)$
-* Within-group popularities $\lambda^{(kk)} \iid Beta(2, 1)$
-* Between-group popularities 
-$\lambda^{(kl)} \iid Beta(1, 2)$ for $k \neq l$
-
-$50$ simulations were performed for each $(n, K)$ pair. 
-
-Fig \ref{fig:clust_err_k_imba} and \ref{fig:clust_err_ct_sim_imba} show 
-similar results as in the balanced communities case, with both Algorithm 2 and 
-sparse subspace clustering resulting in no misclustered vertices for a 
-sufficiently large sample size. However, Fig \ref{fig:lambda_est_k_imba} 
-suggests that while Algorithm 5 retains $\sqrt{n}$ efficiency, the MLE-based 
-plug-in estimator fails to do so. 
-
-```{r clust_err_k_imba, fig.cap = 'IQR of clustering error using Algorithm 2 (blue) compared against subspace clustering on the adjacency spectral embedding (purple), the extreme points algorithm (red), and subspace clustering on the adjacency matrix (green), for sample sizes from 128 to 4096 and number of underlying communities from 2 to 4. Communities are imbalanced. Simulations were repeated 50 times for each sample size.', fig.width = 10}
-clustering.df <- readr::read_csv('clustering-k-imbalanced.csv')
-ssc.df <- readr::read_csv('clustering-ssc-k-imbalanced.csv')
-clustering.df %>%
-  dplyr::group_by(n, K) %>%
-  dplyr::summarise(med.err = median(error),
-                   first.q = quantile(error, .25),
-                   third.q = quantile(error, .75),
-                   med.err.ssc = median(error.ssc),
-                   first.q.ssc = quantile(error.ssc, .25),
-                   third.q.ssc = quantile(error.ssc, .75),
-                   med.err.mm = median(error.mm),
-                   first.q.mm = quantile(error.mm, .25),
-                   third.q.mm = quantile(error.mm, .75)) %>%
-  dplyr::ungroup() %>% 
-  dplyr::inner_join(
-    ssc.df %>% 
-      dplyr::group_by(n, K) %>% 
-      dplyr::summarise(med.err.ssc2 = median(error.ssc2),
-                       first.q.ssc2 = quantile(error.ssc2, .25),
-                       third.q.ssc2 = quantile(error.ssc2, .75)) %>% 
-      dplyr::ungroup()
-  ) %>% 
-  ggplot() +
-  scale_x_log10(breaks = c(128, 256, 512, 1024, 2048, 4096)) +
-  # scale_x_continuous(breaks = c(128, 256, 512, 1024, 2048, 4096)) + 
-  labs(y = 'community detection error rate', 
-       colour = NULL) +
-  geom_line(aes(x = n, y = med.err,
-                colour = 'OSC')) +
-  geom_errorbar(aes(x = n, ymin = first.q, ymax = third.q,
-                    colour = 'OSC'), width = .1) + 
-  geom_line(aes(x = n, y = med.err.ssc,
-                colour = 'SSC-ASE')) + 
-  geom_errorbar(aes(x = n, ymin = first.q.ssc, ymax = third.q.ssc,
-                    colour = 'SSC-ASE'), width = .1) + 
-  geom_line(aes(x = n, y = med.err.mm,
-                colour = 'MM-EP')) + 
-  geom_errorbar(aes(x = n, ymin = first.q.mm, ymax = third.q.mm,
-                    colour = 'MM-EP'), width = .1) + 
-  geom_line(aes(x = n, y = med.err.ssc2,
-                colour = 'SSC-A')) + 
-  geom_errorbar(aes(x = n, ymin = first.q.ssc2, ymax = third.q.ssc2,
-                    colour = 'SSC-A'), width = .1) + 
-  scale_colour_brewer(palette = 'Set1') + 
-  facet_wrap(~ K, labeller = 'label_both') + 
-  scale_y_log10()
-```
-
-```{r clust_err_ct_sim_imba, fig.cap = 'IQR of counts of misclustered vertices using Algorithm 2 (blue) compared against subspace clustering on the adjacency spectral embedding (purple), the extreme points algorithm (red), and subspace clustering on the adjacency matrix (green), for sample sizes from 128 to 4096 and number of communities from 2 to 4. Communities are imbalanced. Simulations were repeated 50 times for each sample size.', cache = FALSE, fig.width = 10}
-clustering.df <- readr::read_csv('clustering-k-imbalanced.csv')
-ssc.df <- readr::read_csv('clustering-ssc-k-imbalanced.csv')
-clustering.df %>%
-  dplyr::group_by(n, K) %>%
-  dplyr::summarise(med.err = median(error),
-                   first.q = quantile(error, .25),
-                   third.q = quantile(error, .75),
-                   med.err.ssc = median(error.ssc),
-                   first.q.ssc = quantile(error.ssc, .25),
-                   third.q.ssc = quantile(error.ssc, .75),
-                   med.err.mm = median(error.mm),
-                   first.q.mm = quantile(error.mm, .25),
-                   third.q.mm = quantile(error.mm, .75)) %>%
-  dplyr::ungroup() %>% 
-  dplyr::inner_join(
-    ssc.df %>% 
-      dplyr::group_by(n, K) %>% 
-      dplyr::summarise(med.err.ssc2 = median(error.ssc2),
-                       first.q.ssc2 = quantile(error.ssc2, .25),
-                       third.q.ssc2 = quantile(error.ssc2, .75)) %>% 
-      dplyr::ungroup()
-  ) %>% 
-  ggplot() +
-  scale_x_log10(breaks = c(128, 256, 512, 1024, 2048, 4096)) +
-  # scale_x_continuous(breaks = c(128, 256, 512, 1024, 2048, 4096)) + 
-  labs(y = 'community detection error count', 
-       colour = NULL) +
-  geom_line(aes(x = n, y = med.err * n,
-                colour = 'OSC')) +
-  geom_errorbar(aes(x = n, ymin = first.q * n, ymax = third.q * n,
-                    colour = 'OSC'), width = .1) + 
-  geom_line(aes(x = n, y = med.err.ssc * n,
-                colour = 'SSC-ASE')) + 
-  geom_errorbar(aes(x = n, ymin = first.q.ssc * n, ymax = third.q.ssc * n,
-                    colour = 'SSC-ASE'), width = .1) + 
-  geom_line(aes(x = n, y = med.err.mm * n,
-                colour = 'MM-EP')) + 
-  geom_errorbar(aes(x = n, ymin = first.q.mm * n, ymax = third.q.mm * n,
-                    colour = 'MM-EP'), width = .1) + 
-  geom_line(aes(x = n, y = med.err.ssc2 * n,
-                colour = 'SSC-A')) + 
-  geom_errorbar(aes(x = n, ymin = first.q.ssc2 * n, ymax = third.q.ssc2 * n,
-                    colour = 'SSC-A'), width = .1) + 
-  scale_colour_brewer(palette = 'Set1') + 
-  facet_wrap(~ K, labeller = 'label_both') + 
-  scale_y_log10()
-```
-
-```{r lambda_est_k_imba, cache = FALSE, fig.cap = 'Median and IQR RMSE from Algorithm 4 (red) compared against an MLE-based method (blue) using sample sizes from 128 to 4096 and number of clusters from 2 to 4. Simulations were repeated 50 times for each sample size.', fig.width = 10}
-rmse.df <- readr::read_csv('rmse-k-imbalanced.csv')
-
-rmse.df %>% 
-  na.omit() %>% 
-  dplyr::group_by(K, n) %>% 
-  dplyr::summarise(median.rmse = median(rmse),
-                   q1.rmse = quantile(rmse, .25),
-                   q3.rmse = quantile(rmse, .75),
-                   median.rmse.mle = median(rmse.mle),
-                   q1.rmse.mle = quantile(rmse.mle, .25),
-                   q3.rmse.mle = quantile(rmse.mle, .75)) %>% 
-  dplyr::ungroup() %>% 
-  ggplot() +
-  geom_line(aes(x = n, y = median.rmse, colour = 'Algorithm 4')) + 
-  geom_errorbar(aes(x = n, ymin = q1.rmse, ymax = q3.rmse,
-                    colour = 'Algorithm 4'), width = .1) + 
-  geom_line(aes(x = n, y = median.rmse.mle, colour = 'MLE-based')) + 
-  geom_errorbar(aes(x = n, ymin = q1.rmse.mle, ymax = q3.rmse.mle,
-                   colour = 'MLE-based'), width = .1) + 
-  scale_colour_brewer(palette = 'Set1') + 
-  labs(y = 'RMSE', colour = NULL) + 
-  facet_wrap(~ K, labeller = 'label_both') + 
-  scale_y_log10() + 
-  scale_x_log10(breaks = c(128, 256, 512, 1024, 2048, 4096))
-```
-
-## Additional experiments
-
-Using the same set of parameters for generating $P$ and $A$ as in the 
-balanced communities examples for $K = 2$, we generated one instance of $A$ for
-each $n$ and constructed $B$ according to algorithm 4 to verify that 
-as $n \to \infty$, $(\hat{v}_i)^\top \hat{v_j} \stackrel{P}{\to} 0$ for $i, j$ 
-in different clusters. Furthermore, the distribution of these inner products 
-should be approximately normal. 
-
-```{r, fig.cap = 'Between-cluster inner products of the eigenvectors of $A$ for varying sample sizes.', fig.height = 2, fig.width = 4}
-densities.df <- readr::read_csv('densities.csv')
-
-ggplot(densities.df) + 
-  geom_density(aes(x = inner.prods * n, colour = factor(n))) + 
-  labs(x = expression(n * v[i]^T * v[j]),
-       colour = 'n') + 
-  scale_x_continuous(breaks = seq(-5, 5)) + 
-  scale_colour_brewer(palette = 'Set1')
-```
-
-# Real data examples
-
-```{r}
-import::here(cluster.pabm, ssc, plot.A, .from = '~/dev/pabm-grdpg/functions.R')
-
-n.edges <- 20566
-
-butterfly <- R.matlab::readMat('data/Raw_butterfly_network.mat')
-
-A <- butterfly$W.butterfly0
-z <- butterfly$labels
-
-keep <- c(6, 2, 9, 4)
-A <- A[z %in% keep, z %in% keep]
-z <- z[z %in% keep]
-n <- length(z)
-K <- 4
-
-delta <- quantile(A[upper.tri(A)], 1 - n.edges / (n * (n - 1) / 2))
-A <- (A > delta) * 1
-
-z.hat <- cluster.pabm(A, K)
-
-# z.hat.mm <- A %>% 
-#   igraph::graph_from_adjacency_matrix(mode = 'undirected') %>% 
-#   igraph::cluster_louvain() %>% 
-#   igraph::membership()
-
-# ari <- round(fossil::adj.rand.index(z, z.hat) * 100)
-```
-
-In the first real data example, we applied Algorithm 2 to the Leeds Butterfly 
-dataset \cite{Wang_2018} consisting of visual similarity measurements among 832 
-butterflies across 10 species. The graph was modified to match the example 
-from \citet{noroozi2019estimation}: Only the 4 most frequent species were 
-considered, and the similarities were discretized to $\{0, 1\}$ via 
-thresholding. Fig. \ref{fig:butterfly} shows a sorted adjacency matrix sorted 
-by the resultant clustering. 
-
-Comparing against the ground truth species labels, Algorithm 2 achieves an 
-accuracy of 63\% and an adjusted Rand index of 73\%. In comparison, 
-\citet{noroozi2019estimation} achieved an adjusted Rand index of 73\% using 
-sparse subspace clustering on the same dataset.
-
-```{r butterfly, fig.height = 2, fig.width = 2, fig.cap = 'Adjacency matrix of the Leeds Butterfly dataset after sorting by the clustering outputted by Algorithm 2.', cache = FALSE}
-plot.A(A, z.hat)
-```
-
-```{r}
-# this portion is from the code provided by Sengupta and Chen
-# the data were generated by scripts from S&C, then saved as RDS files
-
-bmp <- readRDS('data/bmp.rds')
-A.bmp <- bmp$A
-z.bmp <- bmp$z
-
-pb <- readRDS('data/pb.rds')
-A.pb <- pb$A
-z.pb <- pb$z
-
-dblp <- readRDS('data/dblp.rds')
-A.dblp <- dblp$A
-z.dblp <- dblp$z
-```
-
-```{r, cache = TRUE}
-zhat.bmp <- cluster.pabm(A.bmp, 2, use.all = TRUE, normalize = FALSE)
-bmp.acc <- mean(zhat.bmp == z.bmp)
-bmp.acc <- ifelse(bmp.acc < .5, 1 - bmp.acc, bmp.acc)
-
-zhat.pb <- cluster.pabm(A.pb, 2, use.all = TRUE, normalize = FALSE, 
-                        p = 2, q = 0, d.eigenmap = 2)
-pb.acc <- mean(zhat.pb == z.pb)
-pb.acc <- ifelse(pb.acc < .5, 1 - pb.acc, pb.acc)
-
-zhat.dblp <- cluster.pabm(A.dblp, 2, use.all = TRUE, normalize = FALSE)
-dblp.acc <- mean(zhat.dblp == z.dblp)
-dblp.acc <- ifelse(dblp.acc < .5, 1 - dblp.acc, dblp.acc)
-
-zhat.bmp.ssc <- ssc(A.bmp, 2, 1e-3, normalize = TRUE)
-bmp.acc.ssc <- mean(zhat.bmp.ssc == z.bmp)
-bmp.acc.ssc <- ifelse(bmp.acc.ssc < .5, 1 - bmp.acc.ssc, bmp.acc.ssc)
-
-zhat.pb.ssc <- ssc(A.pb, 2, .008, normalize = TRUE)
-pb.acc.ssc <- mean(zhat.pb.ssc == z.pb)
-pb.acc.ssc <- ifelse(pb.acc.ssc < .5, 1 - pb.acc.ssc, pb.acc.ssc)
-
-zhat.dblp.ssc <- ssc(A.dblp, 2, 1e-2, normalize = FALSE)
-dblp.acc.ssc <- mean(zhat.dblp.ssc == z.dblp)
-dblp.acc.ssc <- ifelse(dblp.acc.ssc < .5, 1 - dblp.acc.ssc, dblp.acc.ssc)
-
-```
-
-In the second example, we applied Algorithm 2 to the British MPs Twitter 
-network \cite{greene2013producing}, the Political Blogs network 
-\cite{10.1145/1134271.1134277}, and the DBLP network \cite{NIPS2009_3855} 
-\cite{10.1007/978-3-642-15880-3_42}. For this data analysis, we subsetted the 
-data as described by 
-\citet{307cbeb9b1be48299388437423d94bf1} for their analysis of the same 
-networks. Our methods underperformed compared to modularity maximization, 
-although performance is comparable. In 
-addition, Algorithm 2's runtime is much lower than that of modularity 
-maximization.
-
-```{r}
-dplyr::tibble(Network = c('British MPs', 'Political blogs', 'DBLP'),
-              Vertices = c(nrow(A.bmp), nrow(A.pb), nrow(A.dblp)),
-              `Error (Mod. Max.)` = c(round(1 / 329, 3),
-                                      round(61 / 1222, 3),
-                                      round(62 / 2203, 3)),
-              `Error (SSC)` = round(1 - c(bmp.acc.ssc,
-                                          pb.acc.ssc,
-                                          dblp.acc.ssc), 3),
-              `Error (Alg. 2)` = round(1 - c(bmp.acc, 
-                                                  pb.acc,
-                                                  dblp.acc), 3)) %>% 
-  knitr::kable(caption = paste('Community detection error rates', 
-                               'for modularity maximization,',
-                               'sparse subspace clustering, ',
-                               'and Alg. 2.'))
-```
-
-```{r mp, cache = FALSE, fig.width = 8, fig.height = 2, fig.cap = 'Adjacency matrices of (from left to right) the British MPs, Political Blogs, and DBLP networks after sorting by the clustering outputted by Algorithm 2.', fig.dpi = 10}
-gridExtra::grid.arrange(plot.A(A.bmp, zhat.bmp),
-                        plot.A(A.pb, zhat.pb),
-                        plot.A(A.dblp, zhat.dblp),
-                        ncol = 3)
-```
-
-In the third example, we consider the Karantaka villages data studied by 
-\citet{DVN/U3BIHX_2013}. For this example, we chose the `visitgo` networks from 
-villages 12, 31, and 46 at the household level. The label of interest is the 
-religious affiliation. The networks were truncated to religions "1" and "2", 
-and vertices of degree 0 were removed. 
-
-```{r, cache = FALSE, fig.cap = 'Adjacency matrix of the Karnataka villages data, arranged by the clustering produced by Algorithm 2 (left). The villages studied here are, from left to right, 12, 31, and 46.', fig.height = 2, fig.width = 8, eval = TRUE}
-K <- 2
-hh.12 <- readRDS('data/village-hh-12.rds')
-hh.31 <- readRDS('data/village-hh-31.rds')
-hh.46 <- readRDS('data/village-hh-46.rds')
-
-# this part of code taken from sengupta & chen
-setwd('~/dev/pabm-grdpg/codes_and_data')
-require(MASS);require("clue")
-source("EPalgosim.R") 
-source("functions.R")
-mm <- function(A.hh) {
-  b.can = EPalgo(A.hh,eps=0) # EP algorithm (no perturbation)
-  Q.PA.can = rep(NA, ncol(b.can))	# array to store Q values
-  for (i in 1:ncol(b.can)){
-    #check if any cluster is empty
-    foo = rep(NA, 2)
-    for (clus in 1:2) {foo[clus]=sum(b.can[,i]==clus)}
-    if (min(foo)==0) {stop('Empty groups are not allowed')} 
-    Q.PA.can[i] = Q.PA(A.hh, b=b.can[,i])   # fit PABM
-  } # end of i for loop
-  foo1 = order(-Q.PA.can)[1] 
-  return(b.can[,foo1])   # community assignment that maximises Q.PA
-}
-
-A.hh.12 <- hh.12$A
-z.hh.12 <- hh.12$z
-zhat.hh.12 <- cluster.pabm(A.hh.12, K,
-                           use.all = TRUE, normalize = FALSE, p = 3, q = 1)
-zhat.hh.ssc.12 <- ssc(A.hh.12, K, lambda = .1)
-zhat.hh.mm.12 <- mm(A.hh.12)
-
-A.hh.31 <- hh.31$A
-z.hh.31 <- hh.31$z
-zhat.hh.31 <- cluster.pabm(A.hh.31, K,
-                           use.all = TRUE, normalize = FALSE, p = 3, q = 1)
-zhat.hh.ssc.31 <- ssc(A.hh.31, K, lambda = .05)
-zhat.hh.mm.31 <- mm(A.hh.31)
-
-A.hh.46 <- hh.46$A
-z.hh.46 <- hh.46$z
-zhat.hh.46 <- cluster.pabm(A.hh.46, K,
-                           use.all = TRUE, normalize = FALSE, p = 2, q = 0)
-zhat.hh.ssc.46 <- ssc(A.hh.46, K, lambda = .0005)
-zhat.hh.mm.46 <- mm(A.hh.46)
-
-gridExtra::grid.arrange(plot.A(A.hh.12, zhat.hh.12),
-                        plot.A(A.hh.31, zhat.hh.31),
-                        plot.A(A.hh.46, zhat.hh.46),
-                        nrow = 1)
-```
-
-```{r, eval = TRUE}
-hh.acc.12 <- mean(zhat.hh.12 == z.hh.12)
-hh.acc.12 <- ifelse(hh.acc.12 < .5, 1 - hh.acc.12, hh.acc.12)
-hh.acc.ssc.12 <- mean(zhat.hh.ssc.12 == z.hh.12)
-hh.acc.ssc.12 <- ifelse(hh.acc.ssc.12 < .5, 1 - hh.acc.ssc.12, hh.acc.ssc.12)
-hh.acc.mm.12 <- mean(zhat.hh.mm.12 == z.hh.12)
-hh.acc.mm.12 <- ifelse(hh.acc.mm.12 < .5, 1 - hh.acc.mm.12, hh.acc.mm.12)
-
-hh.acc.31 <- mean(zhat.hh.31 == z.hh.31)
-hh.acc.31 <- ifelse(hh.acc.31 < .5, 1 - hh.acc.31, hh.acc.31)
-hh.acc.ssc.31 <- mean(zhat.hh.ssc.31 == z.hh.31)
-hh.acc.ssc.31 <- ifelse(hh.acc.ssc.31 < .5, 1 - hh.acc.ssc.31, hh.acc.ssc.31)
-hh.acc.mm.31 <- mean(zhat.hh.mm.31 == z.hh.31)
-hh.acc.mm.31 <- ifelse(hh.acc.mm.31 < .5, 1 - hh.acc.mm.31, hh.acc.mm.31)
-
-hh.acc.46 <- mean(zhat.hh.46 == z.hh.46)
-hh.acc.46 <- ifelse(hh.acc.46 < .5, 1 - hh.acc.46, hh.acc.46)
-hh.acc.ssc.46 <- mean(zhat.hh.ssc.46 == z.hh.46)
-hh.acc.ssc.46 <- ifelse(hh.acc.ssc.46 < .5, 1 - hh.acc.ssc.46, hh.acc.ssc.46)
-hh.acc.mm.46 <- mean(zhat.hh.mm.46 == z.hh.46)
-hh.acc.mm.46 <- ifelse(hh.acc.mm.46 < .5, 1 - hh.acc.mm.46, hh.acc.mm.46)
-
-knitr::kable(dplyr::tibble(
-  Method = c('Alg. 2', 'SSC', 'Mod. Max.'),
-  `Error (Village 12)` = round(1 - c(hh.acc.12, hh.acc.ssc.12, hh.acc.mm.12), 3),
-  `Error (Village 31)` = round(1 - c(hh.acc.31, hh.acc.ssc.31, hh.acc.mm.31), 3),
-  `Error (Village 46)` = round(1 - c(hh.acc.46, hh.acc.ssc.46, hh.acc.mm.46), 3)),
-  caption = paste('Community detection error rates for identifying',
-                  'household religion.'))
-```
-
-# Discussion
 
 # References
