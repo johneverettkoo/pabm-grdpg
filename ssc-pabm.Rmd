@@ -87,10 +87,7 @@ $P(\mu(Y^{(n, k)}) = 0) \geq
 **Theorem 4**.
 ***TODO*** Find property 3 for $X$ or $X Q$ (?).
 
-**Theorem 5**.
-The subspace detection property holds for $X^{(n)} Q^{(n)}$ as $n \to \infty$. 
-
-**Theorem 6**. 
+**Theorem 5**. 
 $\exists M \in \mathbb{N}$ such that $\mu(X^{(n, l)}) < r(X^{(n, l)})$ 
 $\forall n \geq M$.
 
