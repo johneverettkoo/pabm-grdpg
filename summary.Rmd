@@ -630,7 +630,7 @@ rmse.df %>%
                    q3.rmse.mle = quantile(rmse.mle, .75)) %>% 
   dplyr::ungroup() %>% 
   ggplot() +
-  geom_line(aes(x = n, y = median.rmse, colour = 'Algorithm 4')) + 
+  geom_line(aes(x = n, y = median.rmse, colour = 'Algorithm 2')) + 
   geom_errorbar(aes(x = n, ymin = q1.rmse, ymax = q3.rmse,
                     colour = 'Algorithm 2'), width = .1) + 
   geom_line(aes(x = n, y = median.rmse.mle, colour = 'MLE-based')) + 
