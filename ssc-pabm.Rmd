@@ -84,7 +84,8 @@ $r(Y^{(n, l)}) > 0$ $\forall n > K + 1$ and $l \leq K$.
 Let $r_k^{(n)} = r(U^{(n, k)})$ and $\hat{r}_k^{(n)} = r(\hat{U}^{(n, k)})$. 
 Then $|\hat{r}^{(n)}_k - r_k^{(n)}| = O_P(a_n)$. ($a_n \to 0$.)
 
-Alternatively, suppose $r_k^{(n)} > \alpha$ for some $\alpha > 0$. 
+Alternatively, suppose $r_k^{(n)} > \alpha$ for some $\alpha > 0$. Then 
+$P(\hat{r}_k^{(n)} > \alpha - a_n) > 1 - \epsilon(n)$.
 
 **Property 4**. 
 $P(\mu(Y^{(n, k)}) = 0) = 1$ \cite{soltanolkotabi2012}.
