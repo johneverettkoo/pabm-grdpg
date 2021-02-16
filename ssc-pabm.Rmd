@@ -58,7 +58,9 @@ and the projection matrix $\Pi$ as an ASE of $P$. $Z = X Q - Y$ for
 $Q = \arg\min\limits_{Q \in \mathbb{O}(p, q)} ||X Q - Y||_F$. Let 
 $x_i^\top, y_i^\top, z_i^\top$ be the rows of $X, Y, Z$. 
 $X^{(n)}$ represents the full $X$ matrix for a sample of size $n$. 
-$X^{(n, k)}$ represents the $k$^th^ block of $X^{(n)}$.
+$X^{(n, k)}$ represents the $k$^th^ block of $X^{(n)}$. Similarly, $P^{(k, l)}$ 
+is the $kl$^th^ block of $P$, $P^{(n)}$ specifies that $P$ is $n \times n$, and 
+$P^{(n, k, l)}$ is the $kl$^th^ block of $P^{(n)}$.
 
 # Main Results
 
@@ -78,17 +80,38 @@ Then $||Z^{(n)}||_F \to 0$, $\delta^{(n)} \to 0$, and
 $r(X^{(n, l)} Q^{(n, l)}) \to r(Y^{(n, l)})$. Here we assume 
 $r(Y^{(n, l)}) > 0$ $\forall n > K + 1$ and $l \leq K$. 
 
-**Property 3**. 
-$P(\mu(Y^{(n, k)}) = 0) \geq 
-1 - \frac{1}{K} \sum_{k \neq l} \frac{4 e^{-2 t}}{(n_k + 1) n_l}$
-\cite{soltanolkotabi2012}.
+**Theorem 3**. ***TODO***
+Let $r_k^{(n)} = r(U^{(n, k)})$ and $\hat{r}_k^{(n)} = r(\hat{U}^{(n, k)})$. 
+Then $|\hat{r}^{(n)}_k - r_k^{(n)}| = O_P(a_n)$. ($a_n \to 0$.)
 
-**Theorem 4**.
-***TODO*** Find property 3 for $X$ or $X Q$ (?).
+Alternatively, suppose $r_k^{(n)} > \alpha$ for some $\alpha > 0$. 
 
-**Theorem 5**. 
-$\exists M \in \mathbb{N}$ such that $\mu(X^{(n, l)}) < r(X^{(n, l)})$ 
-$\forall n \geq M$.
+**Property 4**. 
+$P(\mu(Y^{(n, k)}) = 0) = 1$ \cite{soltanolkotabi2012}.
+
+This also holds for $\mu(U^{(n, k)})$ where $U$ is the matrix of 
+eigenvectors of $P$.
+
+**Theorem 5**.
+Let $P^{(n)} = U^{(n)} \Lambda^{(n)} (U^{(n)})^\top$ be the spectral 
+decomposition of $P$. Let 
+$A^{(n)} = \hat{U}^{(n)} \hat{\Lambda}^{(n)} (\hat{U}^{(n)})^\top$ be the
+approximate spectral decomposition of $A^{(n)}$ where 
+$\hat{U}^{(n)} \in \mathbb{R}^{n \times K^2}$. Then for some $a, c > 0$,
+$P(\mu(\hat{U}^{(n, l)}) \leq 
+4 (\log n_l (n_k + 1) + \log K + t) \frac{1}{K^2} 
+a \frac{(\log n)^c}{n \sqrt{\rho_n}}) \geq 
+1 - \frac{1}{K^2} \sum_{k \neq l} \frac{4 e^{-2 t}}{(n_k + 1) n_l}$.
+
+Equivalently, we can say 
+$\mu(\hat{U}^{(n, l)}) = 
+O_P(\frac{\log n_l (n_k + 1) + \log K + t}{K^2} 
+\frac{(\log n)^c}{n \sqrt{\rho_n}})$  
+$= O_P(\frac{(\log n)^{c'}t}{n K^2 \sqrt{\rho_n}})$ if $n, t \gg K$.
+
+**Theorem 6**. 
+***TODO*** 
+$P(\hat{\mu}_k^{(n)} > \hat{r}_k^{(n)}) = ???$
 
 **Corollary**. 
 If $n \geq M$, $\exists \lambda > 0$ such that the LASSO subspace detection 

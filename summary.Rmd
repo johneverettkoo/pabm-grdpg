@@ -361,7 +361,7 @@ of $K^2$ eigenvectors of $A_n$ corresponding to the $K (K+1) / 2$ most positive
 eigenvalues and $K (K-1) / 2$ most negative eigenvalues with rows
 $(\hat{v}_i^{(n)})^\top$. Let $(i, j)$ correspond to pairs belonging to 
 different communities. Let $n \rho_n = \omega((\log n)^{4c}))$ as described in
-\cite{rubindelanchy2017statistical}. Then for some $c > 0$, 
+\citet{rubindelanchy2017statistical}. Then for some $c > 0$, 
 
 \begin{equation}
   \max\limits_{i, j} ||(\hat{v}^{(n)}_i)^\top \hat{v}_j^{(n)}|| = 
@@ -388,6 +388,13 @@ This leads to the Orthogonal Spectral Clustering (OSE) algorithm (Alg. 1).
   \caption{Orthogonal Spectral Clustering.}
 \end{algorithm}
 
+Theorems 3 and 4 also provide a very natural path toward SSC. We established in 
+theorem 2 that an ASE of the edge probability matrix $P$ can be constructed 
+such that the clusters lie on mutually orthogonal subspaces, and this property 
+can be recovered from the eigenvectors of $P$. Then theorems 3 and 4 provide 
+convergence rates for the eigenvectors of the edge weight matrix $A$ drawn 
+from $P$. 
+
 ## Parameter estimation
 
 For any edge probability matrix $P$ for the PABM such that the rows and 
@@ -402,7 +409,7 @@ $\sigma^2 > 0$ is a scalar. Then $\lambda^{(kl)} = \pm \sigma u$ and
 $\lambda^{(lk)} = \pm \sigma v$. 
 Given the adjacency matrix $A$ instead of edge probability matrix $P$, we can 
 simply use plug-in estimators (Alg. 2), which converge to the true parameters 
-(Theorem 5).
+(Theorem 6).
 
 \begin{algorithm}[H]
   \DontPrintSemicolon
@@ -423,7 +430,7 @@ simply use plug-in estimators (Alg. 2), which converge to the true parameters
   }
 \end{algorithm}
 
-**Theorem 5**. Under regularity and sparsity assumptions, and under the further 
+**Theorem 6**. Under regularity and sparsity assumptions, and under the further 
 assumption that $K$ is fixed and community labels are known, 
 
 \begin{equation}
@@ -1163,7 +1170,9 @@ with each block corresponding to a community and zeros elsewhere. Therefore,
 if vertices $i$ and $j$ belong to different communities, then the $ij$^th^ 
 element of $X (X^\top X)^{-1} X^\top = V V^\top = B$ is 0.
 
-**Proof of Theorem 5**. 
+**Proof of Theorem 5**.
+
+**Proof of Theorem 6**. 
 Let $P$ and $A$ be organized by community such that the elements of blocks 
 $P^{(kl)}$ and $A^{(kl)}$ correspond to the edges between communities $k$ and 
 $l$. 
