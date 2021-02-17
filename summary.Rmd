@@ -285,21 +285,43 @@ beforehand and does not require estimation.
 
 \citet*{307cbeb9b1be48299388437423d94bf1}, who first proposed the PABM, used 
 a relaxed version of Modularity Maximization (MM) based on the Extreme Points
-(EP) algorithm \cite{le2016} for clustering and parameter estimation. They were
-able to show that as the sample size increases, the proportion of misclassified
-community labels (up to permutation) goes to 0. 
+(EP) algorithm \cite{le2016} for community detection and parameter estimation. 
+They were able to show that as the sample size increases, the proportion of
+misclassified community labels (up to permutation) goes to 0. 
 
-\citet*{noroozi2019estimation} proposed using Sparse Subspace Clustering (SSC)
-on the adjacency matrix $A$ or edge probability matrix $P$ to identify the
-community memberships. They were able to show that their SSC procedure on $P$
-results in perfect community detection, although they were unable to determine
-error bounds for their procedure on $A$. This is somewhat consistent with
-Theorem 2, which shows that the ASE of edge probability matrix $P$ consists of
-$K$ $K$-dimensional subspaces in $\mathbb{R}^{K^2}$. 
+\citet*{noroozi2019estimation} used Sparse Subspace Clustering (SSC) for 
+community detection in the PABM. 
+SSC is performed by solving an optimization problem for each observed point.
+Given $X \in \mathbb{R}^{n \times d}$ with vectors 
+$x_i^\top \in \mathbb{R}^d$ as rows of $X$, the optimization problem 
+$\min_{c_i} ||c_i||_1$ subject to $x_i = X c_i$ and $\beta_i = 0$ is solved 
+for each $i = 1, ..., n$. The solutions are collected collected into matrix 
+$C = \begin{bmatrix} c_1 & \cdots & c_n \end{bmatrix}^\top$ to construct an 
+affinity matrix $B = |C| + |C^\top|$. If each $x_i$ lie perfectly on one of $K$ 
+subspaces, $B$ describes an undirected graph consisting of $K$ disjoint 
+subgraphs, i.e., $B_{ij} = 0$ if $x_i, x_j$ are in different subspaces. 
+If $X$ instead represents points near $K$ subspaces with some noise, a final 
+graph partitioning step is performed (e.g., edge thresholding or spectral 
+clustering). 
 
-Much of the following is built on top of work from
+In practice, SSC is often performed by solving the LASSO problems 
+
+\begin{equation}
+\min_{c_i} \frac{1}{2} ||x_i - X_{-i} c_i||^2_2 + \lambda ||c_i||_1
+\end{equation}
+
+for some sparsity parameter $\lambda > 0$. The $c_i$ vectors are then collected 
+into $C$ and $B$ as before.
+
+Theorem 2 suggests that SSC is appropriate for community detection for the 
+PABM. More precisely, theorem 2 says that each community consists of a
+$K$-dimensional subspace, and together the subspaces lie in $\mathbb{R}^{K^2}$. 
+The natural approach then is to perform SSC on the ASE of $P$ or $A$.
+\citet{noroozi2019estimation} instead applied SSC to $P$ and $A$ themselves. 
+
+Much of our work is built on top of work from 
 \citet{rubindelanchy2017statistical}, in particular, the properties of the ASE 
-of $A$.
+of $A$ in relation to the ASE of $P$ built on $\{\lambda^{(kl)}\}_K$.
 
 ## Community detection
 
@@ -346,8 +368,15 @@ grows, the ASE of $A$ approaches the ASE of $P$ and $B_{ij} \to 0$ for $i$ and
 $j$ in different clusters. 
 
 The ASE of $A$ approaches latent positions that form $P$ as 
-the number of vertices $n$ increases. More 
-precisely, let each $\lambda^{(kl)}_i \sim \mathcal{F}^{(kl)}$ for $i = 1, .., n$ and $k, l = 1, ..., K$. Then the corresponding latent positions $XU \sim \mathcal{G}_K$ for some related joint distribution with $K$ underlying communities $\mathcal{G}_K$. Denote $Z_n$ as a sample of size $n$ from $\mathcal{G}_K$ and adjacency matrix $A_n$ as one draw from edge probability matrix $P_n = Z_n I_{pq} Z_n^\top$. Let $\hat{Z}_n$ be the adjacency embedding of $A_n$ with rows $(\hat{z}_i^{(n)})^\top$. Then by \citet{rubindelanchy2017statistical}, 
+the number of vertices $n$ increases. More precisely, let each 
+$\lambda^{(kl)}_i \sim \mathcal{F}^{(kl)}$ for $i = 1, .., n$ and 
+$k, l = 1, ..., K$. Then the corresponding latent positions 
+$XU \sim \mathcal{G}_K$ for some related joint distribution with $K$ underlying
+communities $\mathcal{G}_K$. Denote $Z_n$ as a sample of size $n$ from
+$\mathcal{G}_K$ and adjacency matrix $A_n$ as one draw from edge probability 
+matrix $P_n = Z_n I_{pq} Z_n^\top$. Let $\hat{Z}_n$ be the adjacency embedding 
+of $A_n$ with rows $(\hat{z}_i^{(n)})^\top$. Then by
+\citet{rubindelanchy2017statistical}, 
 
 \begin{equation}
   \max\limits_{i \in \{1, ..., n\}} ||Q_n \hat{z}_i^{(n)} - z_i^{(n)}|| = 
@@ -382,18 +411,58 @@ This leads to the Orthogonal Spectral Clustering (OSE) algorithm (Alg. 1).
     $V$ using these eigenvectors as its columns.\;
     Compute $B = |V V^\top|$, applying $|\cdot|$ entry-wise.\;
     Construct graph $G$ using $B$ as its similarity matrix.\;
-    Partition $G$ into $K$ disconnected components 
+    Partition $G$ into $K$ disconnected subgraphs  
     (e.g., using edge thresholding or spectral clustering).\;
     Map each partition to the community labels $1, ..., K$.\;
   \caption{Orthogonal Spectral Clustering.}
 \end{algorithm}
 
-Theorems 3 and 4 also provide a very natural path toward SSC. We established in 
-theorem 2 that an ASE of the edge probability matrix $P$ can be constructed 
-such that the clusters lie on mutually orthogonal subspaces, and this property 
-can be recovered from the eigenvectors of $P$. Then theorems 3 and 4 provide 
-convergence rates for the eigenvectors of the edge weight matrix $A$ drawn 
-from $P$. 
+Theorems 2, 3, and 4 also provide a very natural path toward using SSC for 
+community detection for the PABM. We established in theorem 2 that an ASE of 
+the edge probability matrix $P$ can be constructed such that the communities 
+lie on mutually orthogonal subspaces, and this property can be recovered from
+the eigenvectors of $P$. Then theorems 3 and 4 show that this property holds 
+for the adjacency matrix $A$ drawn from $P$ as $n \to \infty$. 
+
+\begin{algorithm}[H]
+  \DontPrintSemicolon
+  \SetAlgoLined
+  \caption{Sparse Subspace Clustering using LASSO \cite{pmlr-v28-wang13}.}
+  \KwData{Adjacency matrix $A$, number of communities $K$, 
+  hyperparameter $\lambda$}
+  \KwResult{Community assignments $1, ..., K$}
+    Find $Z$, the ASE of $A$ using the $K (K + 1) / 2$ most positive 
+    and the $K (K - 1) / 2$ most negative eigenvalues and eigenvectors of 
+    $A$.\;
+    \For {$i = 1, ..., n$} {
+      Assign $z_i^\top$ as the $i^{th}$ row of $Z$. 
+      Assign $Z_{-i} = \begin{bmatrix} 
+      z_1 & \cdots & z_{i-1} & z_{i+1} & \cdots & z_n \end{bmatrix}^\top$.\;
+      Solve the LASSO problem 
+      $c_i = \arg\min_{\beta_i} 
+      \frac{1}{2} ||z_i - Z_{-i} \beta_i||_2^2 + \lambda ||\beta_i||_1$.\;
+      Assign $\tilde{c}_i = \begin{bmatrix} 
+      c_i^{(1)} & \cdots & c_i^{(i-1)} & 0 & c_i^{(i)} & \cdots & c_i^{(n-1)}
+      \end{bmatrix}^\top$ such that the superscript is the index of 
+      $\tilde{c}_i$.\;
+    }
+    Assign 
+    $C = \begin{bmatrix} \tilde{c}_1 & \cdots & \tilde{c}_n \end{bmatrix}$.\;
+    Compute $B = |C| + |C^\top|$.\;
+    Construct graph $G$ using $B$ as its similarity matrix.\;
+    Partition $G$ into $K$ disconnected subgraphs (e.g., using edge 
+    thresholding or spectral clustering).\;
+    Map each partition to the community labels $1, ..., K$. 
+\end{algorithm}
+
+**Theorem 5**. Let $P_n$ describe the edge probability matrix of the PABM with 
+$n$ vertices, and let $A_n \sim \Bernoulli(P_n)$. Let $Z_n$ be the ASE of 
+$P_n$, and let $Z_n^{(k)}$ correspond to the embedding points that correspond 
+to the $k$^th^ block. Let $\hat{Z}_n$ be the ASE of $A_n$ and $\hat{Z}_n^{(k)}$ 
+be the corresponding $k$^th^ block. If $r(Z_n^{(k)})$, the inradius of 
+$Z_n^{(k)}$ (as defined by \citet{soltanolkotabi2012}), is positive for each 
+$k$, then the SSC detection property holds for $\hat{Z}_n$ with probability 1 
+as $n \to \infty$. 
 
 ## Parameter estimation
 
@@ -408,8 +477,8 @@ $v \in \mathbb{R}^{n_l}$ are vectors and
 $\sigma^2 > 0$ is a scalar. Then $\lambda^{(kl)} = \pm \sigma u$ and 
 $\lambda^{(lk)} = \pm \sigma v$. 
 Given the adjacency matrix $A$ instead of edge probability matrix $P$, we can 
-simply use plug-in estimators (Alg. 2), which converge to the true parameters 
-(Theorem 6).
+simply use plug-in estimators (algorithm 3), which converge to the true 
+parameters (theorem 6).
 
 \begin{algorithm}[H]
   \DontPrintSemicolon
@@ -420,7 +489,7 @@ simply use plug-in estimators (Alg. 2), which converge to the true parameters
   Arrange the rows and columns of $A$ by community such that each 
   $A^{(kl)}$ block consists of estimated edge probabilities between 
   communities $k$ and $l$.\;
-  \For{$k, l = 1, ..., K$, $k \leq l$} {
+  \For {$k, l = 1, ..., K$, $k \leq l$} {
     Compute $A^{(kl)} = U \Sigma V^\top$, the SVD of the $kl^{th}$ 
     block.\;
     Assign $u^{(kl)}$ and $v^{(kl)}$ as the first columns of $U$ and $V$. 
@@ -450,7 +519,7 @@ matrix $A$ is drawn from $P$. OSE is then used for community detection,
 and this method is compared against SSC \cite{noroozi2019estimation}
 \cite{soltanolkotabi2014} and MM \cite{igraph}
 \cite{307cbeb9b1be48299388437423d94bf1}. True 
-community labels are used with Algorithm 2 to estimate the popularity 
+community labels are used with Algorithm 3 to estimate the popularity 
 vectors $\{\lambda^{(kl)}\}_K$, and this method is then compared against an
 MLE-based estimator described in \citet{noroozi2019estimation} and
 \citet{307cbeb9b1be48299388437423d94bf1}. 
@@ -462,31 +531,12 @@ the Louvain algorithm \cite{Blondel_2008} was used instead.
 
 Two implementations of SSC are shown here. The first method, denoted as 
 SSC-A, treats the columns of the adjacency matrix $A$ as points in
-$\mathbb{R}^n$. The second method, denoted as SSC-ASE, first embeds $A$ and 
-then performs SSC on the embedding. 
-
-SSC is performed by solving an optimization problem for each observed point.
-Given $X \in \mathbb{R}^{n \times d}$ with vectors 
-$x_i^\top \in \mathbb{R}^d$ as rows of $X$, the optimization problem 
-$\min_{c_i} ||c_i||_1$ subject to $x_i = X c_i$ and $\beta_i = 0$ is solved 
-for each $i = 1, ..., n$. The solutions are collected collected into matrix 
-$C = \begin{bmatrix} c_1 & \cdots & c_n \end{bmatrix}^\top$ to construct an 
-affinity matrix $B = |C| + |C^\top|$. If each $x_i$ lie perfectly on one of $K$ 
-subspaces, $B$ describes an undirected graph consisting of $K$ disjoint 
-subgraphs, i.e., $B_{ij} = 0$ if $x_i, x_j$ are in different subspaces. 
-If $X$ instead represents points near $K$ subspaces with some noise, a final 
-graph partitioning step is performed (e.g., edge thresholding or spectral 
-clustering). For our simulations, we used spectral clustering by fitting a 
-Gaussian Mixture Model on the $K$-dimensional Laplacian eigenmap of $B$.
-
-In practice, this is often done by solving the LASSO problems 
-
-\begin{equation}
-\min_{c_i} \frac{1}{2} ||x_i - X_{-i} c_i||^2_2 + \lambda ||c_i||_1
-\end{equation}
-
-for some sparsity parameter $\lambda > 0$. For our simulations, $\lambda$ was 
-chosen via a preliminary cross validation experiment. 
+$\mathbb{R}^n$, as described in \citet{noroozi2019estimation}. The second 
+method, denoted as SSC-ASE, first embeds $A$ and then performs SSC on the 
+embedding, as described in algorithm 2. The sparsity parameter $\lambda$ was 
+chosen via a preliminary cross-validation experiment. For the final clustering 
+step, a Gaussian Mixture Model was fit on the normalized Lapacian eigenmap of 
+the affinity matrix $B$. 
 
 ## Balanced communities
 
@@ -618,12 +668,12 @@ clustering.df %>%
   scale_y_log10()
 ```
 
-Given ground truth community labels, Algorithm 2 and the MLE-based plug-in 
+Given ground truth community labels, Algorithm 3 and the MLE-based plug-in 
 estimators \cite{307cbeb9b1be48299388437423d94bf1} \cite{noroozi2019estimation} 
 perform similarly, with root mean square error decaying at rate approximately 
 $n^{-1/2}$. 
 
-```{r lambda_est_k, cache = FALSE, fig.cap = 'Median and IQR RMSE from Algorithm 2 (red) compared against an MLE-based method (blue). Simulations were repeated 50 times for each sample size.', fig.width = 10}
+```{r lambda_est_k, cache = FALSE, fig.cap = 'Median and IQR RMSE from Algorithm 3 (red) compared against an MLE-based method (blue). Simulations were repeated 50 times for each sample size.', fig.width = 10}
 rmse.df <- readr::read_csv('rmse-k.csv')
 
 rmse.df %>% 
@@ -637,9 +687,9 @@ rmse.df %>%
                    q3.rmse.mle = quantile(rmse.mle, .75)) %>% 
   dplyr::ungroup() %>% 
   ggplot() +
-  geom_line(aes(x = n, y = median.rmse, colour = 'Algorithm 2')) + 
+  geom_line(aes(x = n, y = median.rmse, colour = 'Algorithm 3')) + 
   geom_errorbar(aes(x = n, ymin = q1.rmse, ymax = q3.rmse,
-                    colour = 'Algorithm 2'), width = .1) + 
+                    colour = 'Algorithm 3'), width = .1) + 
   geom_line(aes(x = n, y = median.rmse.mle, colour = 'MLE-based')) + 
   geom_errorbar(aes(x = n, ymin = q1.rmse.mle, ymax = q3.rmse.mle,
                    colour = 'MLE-based'), width = .1) + 
@@ -673,7 +723,7 @@ Fig. \ref{fig:clust_err_k_imba} and \ref{fig:clust_err_ct_sim_imba} show
 similar results as in the balanced communities case, with both OSE and 
 SSC resulting in no misclustered vertices for a 
 sufficiently large sample size. However, Fig. \ref{fig:lambda_est_k_imba} 
-suggests that while Algorithm 2 retains $\sqrt{n}$ efficiency, the MLE-based 
+suggests that while Algorithm 3 retains $\sqrt{n}$ efficiency, the MLE-based 
 plug-in estimator is less efficient for this setup. 
 
 ```{r clust_err_k_imba, fig.cap = 'IQR of clustering error using OSE (blue) compared against SSC on the ASE of A (purple), MM (red), and SSC on the adjacency matrix (green). Communities are imbalanced. Simulations were repeated 50 times for each sample size.', fig.width = 10}
@@ -774,7 +824,7 @@ clustering.df %>%
   scale_y_log10()
 ```
 
-```{r lambda_est_k_imba, cache = FALSE, fig.cap = 'Median and IQR RMSE from Algorithm 2 (red) compared against an MLE-based method (blue). Simulations were repeated 50 times for each sample size.', fig.width = 10}
+```{r lambda_est_k_imba, cache = FALSE, fig.cap = 'Median and IQR RMSE from Algorithm 3 (red) compared against an MLE-based method (blue). Simulations were repeated 50 times for each sample size.', fig.width = 10}
 rmse.df <- readr::read_csv('rmse-k-imbalanced.csv')
 
 rmse.df %>% 
@@ -788,9 +838,9 @@ rmse.df %>%
                    q3.rmse.mle = quantile(rmse.mle, .75)) %>% 
   dplyr::ungroup() %>% 
   ggplot() +
-  geom_line(aes(x = n, y = median.rmse, colour = 'Algorithm 2')) + 
+  geom_line(aes(x = n, y = median.rmse, colour = 'Algorithm 3')) + 
   geom_errorbar(aes(x = n, ymin = q1.rmse, ymax = q3.rmse,
-                    colour = 'Algorithm 2'), width = .1) + 
+                    colour = 'Algorithm 3'), width = .1) + 
   geom_line(aes(x = n, y = median.rmse.mle, colour = 'MLE-based')) + 
   geom_errorbar(aes(x = n, ymin = q1.rmse.mle, ymax = q3.rmse.mle,
                    colour = 'MLE-based'), width = .1) + 
@@ -805,7 +855,7 @@ rmse.df %>%
 
 Using the same set of parameters for generating $P$ and $A$ as in the 
 balanced communities examples for $K = 2$, we generated one instance of $A$ for
-each $n$ and constructed $B$ according to algorithm 2 to verify that 
+each $n$ and constructed $B$ according to Algorithm 3 to verify that 
 as $n \to \infty$, $(\hat{v}_i)^\top \hat{v_j} \stackrel{P}{\to} 0$ for $i, j$ 
 in different clusters. Furthermore, the distribution of these inner products 
 should be approximately normal. 
@@ -1128,11 +1178,11 @@ positions $X U$ with signature $\big( K (K + 1) / 2, K (K - 1) / 2 \big)$.
 **Lemma 1.** 
 Let $P = V D V^\top$ be the spectral decomposition of the edge probability 
 matrix for a PABM. Then $V V^\top = X (X^\top X)^{-1} X^\top$ where $X$ is 
-defined as in equation (6).
+defined as in equation (7).
 
 *Proof of Lemma 1*. 
 By Theorem 2, $P = X U I_{p, q} U^\top X^\top$, where $X$ is defined as in 
-equation (6) and $p$ and $q$ are defined as in equations (9) and (10).
+equation (7) and $p$ and $q$ are defined as in equations (10) and (11).
 Alternatively, the spectral decomposition can be written as 
 $P = V D V^\top = V |D|^{1/2} I_{p, q} |D|^{1/2} V^\top$ for the same $(p, q)$ 
 and $|\cdot|^{1/2}$ is applied entry-wise. Thus for some 
@@ -1247,7 +1297,7 @@ $$\begin{bmatrix}
   \hat{\lambda}^{(lk)} & -\hat{\lambda}^{(lk)} 
 \end{bmatrix}$$
 
-where each $\hat{\lambda}^{(kl)}$ is defined as in Algorithm 2, approximates 
+where each $\hat{\lambda}^{(kl)}$ is defined as in Algorithm 3, approximates 
 the latent positions of $M^{(kl)}$ up to indefinite orthogonal transformation 
 by the rate given in Theorem 5 of \citet{rubindelanchy2017statistical}.  
 In this case, the indefinite orthogonal transformation $W_*$ in the GRDPG 
