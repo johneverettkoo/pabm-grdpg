@@ -314,7 +314,7 @@ for some sparsity parameter $\lambda > 0$. The $c_i$ vectors are then collected
 into $C$ and $B$ as before.
 
 Theorem 2 suggests that SSC is appropriate for community detection for the 
-PABM. More precisely, theorem 2 says that each community consists of a
+PABM. More precisely, Theorem 2 says that each community consists of a
 $K$-dimensional subspace, and together the subspaces lie in $\mathbb{R}^{K^2}$. 
 The natural approach then is to perform SSC on the ASE of $P$ or $A$.
 \citet{noroozi2019estimation} instead applied SSC to $P$ and $A$ themselves. 
@@ -418,10 +418,10 @@ This leads to the Orthogonal Spectral Clustering (OSE) algorithm (Alg. 1).
 \end{algorithm}
 
 Theorems 2, 3, and 4 also provide a very natural path toward using SSC for 
-community detection for the PABM. We established in theorem 2 that an ASE of 
+community detection for the PABM. We established in Theorem 2 that an ASE of 
 the edge probability matrix $P$ can be constructed such that the communities 
 lie on mutually orthogonal subspaces, and this property can be recovered from
-the eigenvectors of $P$. Then theorems 3 and 4 show that this property holds 
+the eigenvectors of $P$. Then Theorems 3 and 4 show that this property holds 
 for the adjacency matrix $A$ drawn from $P$ as $n \to \infty$. 
 
 \begin{algorithm}[H]
@@ -478,7 +478,7 @@ $\sigma^2 > 0$ is a scalar. Then $\lambda^{(kl)} = \pm \sigma u$ and
 $\lambda^{(lk)} = \pm \sigma v$. 
 Given the adjacency matrix $A$ instead of edge probability matrix $P$, we can 
 simply use plug-in estimators (algorithm 3), which converge to the true 
-parameters (theorem 6).
+parameters (Theorem 6).
 
 \begin{algorithm}[H]
   \DontPrintSemicolon
@@ -1175,12 +1175,12 @@ q = K (K - 1) / 2
 and we can describe the PABM with $K$ communities as a GRDPG with latent 
 positions $X U$ with signature $\big( K (K + 1) / 2, K (K - 1) / 2 \big)$.
 
-**Lemma 1.** 
+**Lemma 3.1.** 
 Let $P = V D V^\top$ be the spectral decomposition of the edge probability 
 matrix for a PABM. Then $V V^\top = X (X^\top X)^{-1} X^\top$ where $X$ is 
 defined as in equation (7).
 
-*Proof of Lemma 1*. 
+*Proof of Lemma 3.1*. 
 By Theorem 2, $P = X U I_{p, q} U^\top X^\top$, where $X$ is defined as in 
 equation (7) and $p$ and $q$ are defined as in equations (10) and (11).
 Alternatively, the spectral decomposition can be written as 
@@ -1213,14 +1213,72 @@ $$\begin{split}
 \end{split}$$
 
 **Proof of Theorem 3**.
-By Lemma 1, $V V^\top = X (X^\top X)^{-1} X^\top$ where $X$ is defined as 
+By Lemma 3.1, $V V^\top = X (X^\top X)^{-1} X^\top$ where $X$ is defined as 
 in Theorem 2. Since $X$ is block diagonal with each block corresponding 
 to one community, $X (X^\top X)^{-1} X^\top$ is also a block diagonal matrix 
 with each block corresponding to a community and zeros elsewhere. Therefore, 
 if vertices $i$ and $j$ belong to different communities, then the $ij$^th^ 
 element of $X (X^\top X)^{-1} X^\top = V V^\top = B$ is 0.
 
-**Proof of Theorem 5**.
+**Lemma 5.1**. 
+Let $P_n = V_n \Lambda_n V_n^\top$ be defined as in Lemma 5.1. Let 
+$A_n \sim \Bernoulli(P_n)$ be the adjacency matrix drawn from $P_n$, and let 
+$A_n = \hat{V}_n \hat{\Lambda}_n \hat{V}_n^\top$ be its approximate spectral
+decomposition using the $K (K+1) / 2$ most positive and $K (K-1) / 2$ most 
+negative eigenvalues and their corresponding eigenvectors.
+Without loss of generality, order the rows of $V_n$ and $\hat{V}_n$ by 
+community, and let $V_n^{(k)}$ and $\hat{V}_n^{(k)}$ be the $n_k \times K^2$ 
+matrix of the rows of the $k$^th^ community in $V_n$ and $\hat{V}_n$ 
+respectively. Let $r_n^{(k)} = r(V_n^{(k)})$ and 
+$\hat{r}_n^{(k)} = r(\hat{V}_n^{(k)})$ be the inradius of points in $V_n$ and
+$\hat{V}_n$ as defined by \citet{soltanolkotabi2012} and 
+\citet{pmlr-v28-wang13}. Then 
+
+\begin{equation}
+\hat{r}_n^{(k)} \stackrel{p}{\to} r_n^{(k)}
+\end{equation}
+
+*Proof of Lemma 5.1*. 
+This falls directly out of Theorem 5 of \citet{rubindelanchy2017statistical}. 
+Since $\hat{V}_n^{(k)} \stackrel{p}{\to} V_n^{(k)}$ and $r(\cdot)$ is smooth, 
+$\hat{r}_n^{(k)} \stackrel{p}{\to} r_n^{(k)}$.
+
+**Lemma 5.2**. 
+Let $\mu_n^{(k)} = \mu(V_n^{(k)})$ be the subspace incoherence of $V_n^{(k)}$ 
+as defined by \citet{soltanolkotabi2012} (also note that 
+$\mu(\hat{V}_n^{(k)}) = \mu(V_n^{(k)})$ using the extension of this definition 
+by \citet{pmlr-v28-wang13}). 
+
+\begin{equation}
+\mu_n^{(k)} = 0
+\end{equation}
+
+with probability 1 $\forall n, k$. 
+
+*Proof of Lemma 5.2*. 
+Since $V_n^{(k)}$ is orthogonal to $V_n^{(l)}$ $\forall k \neq l$ (Lemma 3.1), 
+this falls directly out of Theorem 2.8 of \citet{soltanolkotabi2012}. 
+
+**Lemma 5.3**. 
+Let $(v_n^{(i)})^\top$ and $(\hat{v}_n^{(i)})^\top$ be the rows of $V_n$ and
+$\hat{V}_n$ respectively. By \cite{rubindelanchy2017statistical}, 
+
+\begin{equation}
+\delta_n = \max_i ||\hat{v}_n^{(i)} - v_n^{(i)}|| \stackrel{p}{\to} 0
+\end{equation}
+
+**Proof of Theorem 5**. 
+For ease of proving, we will consider $V_n$ and $\hat{V}_n$ instead of $Z_n$ 
+and $\hat{Z}_n$.  
+
+By (12) and (13), 
+
+\begin{equation}
+r(\hat{V}_n^{(k)}) - \mu(\hat{V}_n^{(k)}) = r_n^{(k)} \stackrel{p}{\to} r_n^{(k)} > 0
+\end{equation}
+
+Then by Theorem 6 of \citet{pmlr-v28-wang13}, (14) and (15) imply that  
+$\Pr(\lim\limits_{n \to \infty} \text{ SSC detection property holds for } \hat{V}_n) = 1 - \epsilon$.
 
 **Proof of Theorem 6**. 
 Let $P$ and $A$ be organized by community such that the elements of blocks 
