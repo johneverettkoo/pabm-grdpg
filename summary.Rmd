@@ -448,7 +448,7 @@ for the adjacency matrix $A$ drawn from $P$ as $n \to \infty$.
     }
     Assign 
     $C = \begin{bmatrix} \tilde{c}_1 & \cdots & \tilde{c}_n \end{bmatrix}$.\;
-    Compute $B = |C| + |C^\top|$.\;
+    Compute the affinity matrix $B = |C| + |C^\top|$.\;
     Construct graph $G$ using $B$ as its similarity matrix.\;
     Partition $G$ into $K$ disconnected subgraphs (e.g., using edge 
     thresholding or spectral clustering).\;
@@ -458,11 +458,8 @@ for the adjacency matrix $A$ drawn from $P$ as $n \to \infty$.
 **Theorem 5**. Let $P_n$ describe the edge probability matrix of the PABM with 
 $n$ vertices, and let $A_n \sim \Bernoulli(P_n)$. Let $Z_n$ be the ASE of 
 $P_n$, and let $Z_n^{(k)}$ correspond to the embedding points that correspond 
-to the $k$^th^ block. Let $\hat{Z}_n$ be the ASE of $A_n$ and $\hat{Z}_n^{(k)}$ 
-be the corresponding $k$^th^ block. If $r(Z_n^{(k)})$, the inradius of 
-$Z_n^{(k)}$ (as defined by \citet{soltanolkotabi2012}), is positive for each 
-$k$, then the SSC detection property holds for $\hat{Z}_n$ with probability 1 
-as $n \to \infty$. 
+to the $k$^th^ community. Let $\hat{Z}_n$ be the ASE of $A_n$ and $\hat{Z}_n^{(k)}$ 
+be the corresponding $k$^th^ block. Let $\hat{B}_n$ be the affinity matrix in the SSC algorithm with input $\hat{Z}_n$ such that $\hat{B}_n^{(ij)}$ is the $ij$^th^ element of $\hat{B}_n$. If $r(Z_n^{(k)})$, the inradius of $Z_n^{(k)}$ (as defined by \citet{soltanolkotabi2012}), is positive for each $k$, then $\hat{B}_n^{(ij)} \stackrel{p}{\to} 0$ $\forall i, j$ in different communities. 
 
 ## Parameter estimation
 
