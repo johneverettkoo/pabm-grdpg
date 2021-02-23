@@ -974,16 +974,16 @@ maximization.
 
 ```{r}
 dplyr::tibble(Network = c('British MPs', 'Political blogs', 'DBLP'),
-              Vertices = c(nrow(A.bmp), nrow(A.pb), nrow(A.dblp)),
-              `Error (Mod. Max.)` = c(round(1 / 329, 3),
-                                      round(61 / 1222, 3),
-                                      round(62 / 2203, 3)),
-              `Error (SSC)` = round(1 - c(bmp.acc.ssc,
-                                          pb.acc.ssc,
-                                          dblp.acc.ssc), 3),
-              `Error (OSC)` = round(1 - c(bmp.acc, 
-                                                  pb.acc,
-                                                  dblp.acc), 3)) %>% 
+              # Vertices = c(nrow(A.bmp), nrow(A.pb), nrow(A.dblp)),
+              `MM` = c(round(1 / 329, 3),
+                       round(61 / 1222, 3),
+                       round(62 / 2203, 3)),
+              `SSC-ASE` = round(1 - c(bmp.acc.ssc,
+                                      pb.acc.ssc,
+                                      dblp.acc.ssc), 3),
+              `OSC` = round(1 - c(bmp.acc, 
+                                  pb.acc,
+                                  dblp.acc), 3)) %>% 
   knitr::kable(caption = paste('Community detection error rates', 
                                'for modularity maximization,',
                                'sparse subspace clustering, ',
@@ -1046,7 +1046,7 @@ A.hh.46 <- hh.46$A
 z.hh.46 <- hh.46$z
 zhat.hh.46 <- cluster.pabm(A.hh.46, K,
                            use.all = TRUE, normalize = FALSE, p = 2, q = 0)
-zhat.hh.ssc.46 <- ssc(A.hh.46, K, lambda = .0005)
+zhat.hh.ssc.46 <- ssc(A.hh.46, K, lambda = .001)
 zhat.hh.mm.46 <- mm(A.hh.46)
 
 gridExtra::grid.arrange(plot.A(A.hh.12, zhat.hh.12),
@@ -1077,12 +1077,21 @@ hh.acc.ssc.46 <- ifelse(hh.acc.ssc.46 < .5, 1 - hh.acc.ssc.46, hh.acc.ssc.46)
 hh.acc.mm.46 <- mean(zhat.hh.mm.46 == z.hh.46)
 hh.acc.mm.46 <- ifelse(hh.acc.mm.46 < .5, 1 - hh.acc.mm.46, hh.acc.mm.46)
 
+# knitr::kable(dplyr::tibble(
+#   Method = c('OSC', 'SSC-ASE', 'Mod. Max.'),
+#   `Village 12` = round(1 - c(hh.acc.12, hh.acc.ssc.12, hh.acc.mm.12), 3),
+#   `Village 31` = round(1 - c(hh.acc.31, hh.acc.ssc.31, hh.acc.mm.31), 3),
+#   `Village 46` = round(1 - c(hh.acc.46, hh.acc.ssc.46, hh.acc.mm.46), 3)),
+#   caption = paste('Community detection error rates for identifying',
+#                   'household religion.'))
+
 knitr::kable(dplyr::tibble(
-  Method = c('OSC', 'SSC', 'Mod. Max.'),
-  `Error (Village 12)` = round(1 - c(hh.acc.12, hh.acc.ssc.12, hh.acc.mm.12), 3),
-  `Error (Village 31)` = round(1 - c(hh.acc.31, hh.acc.ssc.31, hh.acc.mm.31), 3),
-  `Error (Village 46)` = round(1 - c(hh.acc.46, hh.acc.ssc.46, hh.acc.mm.46), 3)),
-  caption = paste('Community detection error rates for identifying',
+  Network = c('Village 12', 'Village 31', 'Village 46'),
+  MM = round(1 - c(hh.acc.mm.12, hh.acc.mm.31, hh.acc.mm.46), 3),
+  `SSC-ASE` = round(1 - c(hh.acc.ssc.12, hh.acc.ssc.31, hh.acc.ssc.46), 3),
+  `OSC` = round(1 - c(hh.acc.12, hh.acc.31, hh.acc.46), 3)
+),
+caption = paste('Community detection error rates for identifying',
                   'household religion.'))
 ```
 
