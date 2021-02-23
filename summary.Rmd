@@ -399,7 +399,7 @@ different communities. Let $n \rho_n = \omega((\log n)^{4c}))$ as described in
 
 Thus, as $n \to \infty$, the partitioning of $\hat{B}^{(n)}$ results in 
 perfect community detection. 
-This leads to the Orthogonal Spectral Clustering (OSE) algorithm (Alg. 1). 
+This leads to the Orthogonal Spectral Clustering (OSC) algorithm (Alg. 1). 
 
 \begin{algorithm}[H]
   \DontPrintSemicolon
@@ -512,7 +512,7 @@ distribution, the popularity vectors $\{\lambda^{(kl)}\}_K$ are drawn
 from two types of joint distributions depending on whether $k = l$, the edge
 probability matrix $P$ is constructed using 
 the popularity vectors, and finally an unweighted and undirected adjacency 
-matrix $A$ is drawn from $P$. OSE is then used for community detection, 
+matrix $A$ is drawn from $P$. OSC is then used for community detection, 
 and this method is compared against SSC \cite{noroozi2019estimation}
 \cite{soltanolkotabi2014} and MM \cite{igraph}
 \cite{307cbeb9b1be48299388437423d94bf1}. True 
@@ -559,11 +559,11 @@ $\lambda^{(kl)} \iid Beta(1, 2)$ for $k \neq l$
 
 $50$ simulations were performed for each $(n, K)$ pair. 
 
-Fig. \ref{fig:clust_err_k} show that for large $n$, OSE results in 
+Fig. \ref{fig:clust_err_k} show that for large $n$, OSC results in 
 a misclustering rate of 0. Sparse subspace clustering produces similar results 
 for $K > 2$. 
 
-```{r clust_err_k, fig.cap = 'IQR of clustering error using OSE (blue) compared against SSC on the ASE of A (purple), MM (red), and SSC on the adjacency matrix (green). Communities are approximately balanced. Simulations were repeated 50 times for each sample size.', fig.width = 10}
+```{r clust_err_k, fig.cap = 'IQR of clustering error using OSC (blue) compared against SSC on the ASE of A (purple), MM (red), and SSC on the adjacency matrix (green). Communities are approximately balanced. Simulations were repeated 50 times for each sample size.', fig.width = 10}
 clustering.df <- readr::read_csv('clustering-k.csv')
 ssc.df <- readr::read_csv('clustering-ssc-k.csv')
 clustering.df %>%
@@ -612,11 +612,11 @@ clustering.df %>%
   scale_y_log10()
 ```
 
-Theorem 4 implies that OSE will result in not just in the error rate 
+Theorem 4 implies that OSC will result in not just in the error rate 
 converging to 0 but the error *count* as well.
 We explore this in Fig. \ref{fig:clust_err_ct_sim}.
 
-```{r clust_err_ct_sim, fig.cap = 'IQR of counts of misclustered vertices using OSE (blue) compared against SSC on the ASE of A (purple), MM (red), and SSC on the adjacency matrix (green). Communities are approximately balanced. Simulations were repeated 50 times for each sample size.', cache = FALSE, fig.width = 10}
+```{r clust_err_ct_sim, fig.cap = 'IQR of counts of misclustered vertices using OSC (blue) compared against SSC on the ASE of A (purple), MM (red), and SSC on the adjacency matrix (green). Communities are approximately balanced. Simulations were repeated 50 times for each sample size.', cache = FALSE, fig.width = 10}
 clustering.df <- readr::read_csv('clustering-k.csv')
 ssc.df <- readr::read_csv('clustering-ssc-k.csv')
 clustering.df %>%
@@ -717,13 +717,13 @@ $\lambda^{(kl)} \iid Beta(1, 2)$ for $k \neq l$
 $50$ simulations were performed for each $(n, K)$ pair. 
 
 Fig. \ref{fig:clust_err_k_imba} and \ref{fig:clust_err_ct_sim_imba} show 
-similar results as in the balanced communities case, with both OSE and 
+similar results as in the balanced communities case, with both OSC and 
 SSC resulting in no misclustered vertices for a 
 sufficiently large sample size. However, Fig. \ref{fig:lambda_est_k_imba} 
 suggests that while Algorithm 3 retains $\sqrt{n}$ efficiency, the MLE-based 
 plug-in estimator is less efficient for this setup. 
 
-```{r clust_err_k_imba, fig.cap = 'IQR of clustering error using OSE (blue) compared against SSC on the ASE of A (purple), MM (red), and SSC on the adjacency matrix (green). Communities are imbalanced. Simulations were repeated 50 times for each sample size.', fig.width = 10}
+```{r clust_err_k_imba, fig.cap = 'IQR of clustering error using OSC (blue) compared against SSC on the ASE of A (purple), MM (red), and SSC on the adjacency matrix (green). Communities are imbalanced. Simulations were repeated 50 times for each sample size.', fig.width = 10}
 clustering.df <- readr::read_csv('clustering-k-imbalanced.csv')
 ssc.df <- readr::read_csv('clustering-ssc-k-imbalanced.csv')
 clustering.df %>%
@@ -772,7 +772,7 @@ clustering.df %>%
   scale_y_log10()
 ```
 
-```{r clust_err_ct_sim_imba, fig.cap = 'IQR of counts of misclustered vertices using OSE (blue) compared against SSC on the ASE of A (purple), MM (red), and SSC on the adjacency matrix (green). Communities are imbalanced. Simulations were repeated 50 times for each sample size.', cache = FALSE, fig.width = 10}
+```{r clust_err_ct_sim_imba, fig.cap = 'IQR of counts of misclustered vertices using OSC (blue) compared against SSC on the ASE of A (purple), MM (red), and SSC on the adjacency matrix (green). Communities are imbalanced. Simulations were repeated 50 times for each sample size.', cache = FALSE, fig.width = 10}
 clustering.df <- readr::read_csv('clustering-k-imbalanced.csv')
 ssc.df <- readr::read_csv('clustering-ssc-k-imbalanced.csv')
 clustering.df %>%
@@ -899,7 +899,7 @@ z.hat <- cluster.pabm(A, K)
 # ari <- round(fossil::adj.rand.index(z, z.hat) * 100)
 ```
 
-In the first real data example, we applied OSE to the Leeds Butterfly 
+In the first real data example, we applied OSC to the Leeds Butterfly 
 dataset \cite{Wang_2018} consisting of visual similarity measurements among 832 
 butterflies across 10 species. The graph was modified to match the example 
 from \citet{noroozi2019estimation}: Only the 4 most frequent species were 
@@ -907,12 +907,12 @@ considered, and the similarities were discretized to $\{0, 1\}$ via
 thresholding. Fig. \ref{fig:butterfly} shows a sorted adjacency matrix sorted 
 by the resultant clustering. 
 
-Comparing against the ground truth species labels, OSE achieves an 
+Comparing against the ground truth species labels, OSC achieves an 
 accuracy of 63\% and an adjusted Rand index of 73\%. In comparison, 
 \citet{noroozi2019estimation} achieved an adjusted Rand index of 73\% using 
 sparse subspace clustering on the same dataset.
 
-```{r butterfly, fig.height = 2, fig.width = 2, fig.cap = 'Adjacency matrix of the Leeds Butterfly dataset after sorting by the clustering outputted by OSE.', cache = FALSE}
+```{r butterfly, fig.height = 2, fig.width = 2, fig.cap = 'Adjacency matrix of the Leeds Butterfly dataset after sorting by the clustering outputted by OSC.', cache = FALSE}
 plot.A(A, z.hat)
 ```
 
@@ -961,7 +961,7 @@ dblp.acc.ssc <- ifelse(dblp.acc.ssc < .5, 1 - dblp.acc.ssc, dblp.acc.ssc)
 
 ```
 
-In the second example, we applied OSE to the British MPs Twitter 
+In the second example, we applied OSC to the British MPs Twitter 
 network \cite{greene2013producing}, the Political Blogs network 
 \cite{10.1145/1134271.1134277}, and the DBLP network \cite{NIPS2009_3855} 
 \cite{10.1007/978-3-642-15880-3_42}. For this data analysis, we subsetted the 
@@ -969,7 +969,7 @@ data as described by
 \citet{307cbeb9b1be48299388437423d94bf1} for their analysis of the same 
 networks. Our methods underperformed compared to modularity maximization, 
 although performance is comparable. In 
-addition, OSE's runtime is much lower than that of modularity 
+addition, OSC's runtime is much lower than that of modularity 
 maximization.
 
 ```{r}
@@ -981,16 +981,16 @@ dplyr::tibble(Network = c('British MPs', 'Political blogs', 'DBLP'),
               `Error (SSC)` = round(1 - c(bmp.acc.ssc,
                                           pb.acc.ssc,
                                           dblp.acc.ssc), 3),
-              `Error (OSE)` = round(1 - c(bmp.acc, 
+              `Error (OSC)` = round(1 - c(bmp.acc, 
                                                   pb.acc,
                                                   dblp.acc), 3)) %>% 
   knitr::kable(caption = paste('Community detection error rates', 
                                'for modularity maximization,',
                                'sparse subspace clustering, ',
-                               'and OSE.'))
+                               'and OSC.'))
 ```
 
-```{r mp, cache = FALSE, fig.width = 8, fig.height = 2, fig.cap = 'Adjacency matrices of (from left to right) the British MPs, Political Blogs, and DBLP networks after sorting by the clustering outputted by OSE.', fig.dpi = 10}
+```{r mp, cache = FALSE, fig.width = 8, fig.height = 2, fig.cap = 'Adjacency matrices of (from left to right) the British MPs, Political Blogs, and DBLP networks after sorting by the clustering outputted by OSC.', fig.dpi = 10}
 gridExtra::grid.arrange(plot.A(A.bmp, zhat.bmp),
                         plot.A(A.pb, zhat.pb),
                         plot.A(A.dblp, zhat.dblp),
@@ -1003,7 +1003,7 @@ villages 12, 31, and 46 at the household level. The label of interest is the
 religious affiliation. The networks were truncated to religions "1" and "2", 
 and vertices of degree 0 were removed. 
 
-```{r, cache = FALSE, fig.cap = 'Adjacency matrix of the Karnataka villages data, arranged by the clustering produced by OSE (left). The villages studied here are, from left to right, 12, 31, and 46.', fig.height = 2, fig.width = 8, eval = TRUE}
+```{r, cache = FALSE, fig.cap = 'Adjacency matrix of the Karnataka villages data, arranged by the clustering produced by OSC (left). The villages studied here are, from left to right, 12, 31, and 46.', fig.height = 2, fig.width = 8, eval = TRUE}
 K <- 2
 hh.12 <- readRDS('data/village-hh-12.rds')
 hh.31 <- readRDS('data/village-hh-31.rds')
@@ -1078,7 +1078,7 @@ hh.acc.mm.46 <- mean(zhat.hh.mm.46 == z.hh.46)
 hh.acc.mm.46 <- ifelse(hh.acc.mm.46 < .5, 1 - hh.acc.mm.46, hh.acc.mm.46)
 
 knitr::kable(dplyr::tibble(
-  Method = c('OSE', 'SSC', 'Mod. Max.'),
+  Method = c('OSC', 'SSC', 'Mod. Max.'),
   `Error (Village 12)` = round(1 - c(hh.acc.12, hh.acc.ssc.12, hh.acc.mm.12), 3),
   `Error (Village 31)` = round(1 - c(hh.acc.31, hh.acc.ssc.31, hh.acc.mm.31), 3),
   `Error (Village 46)` = round(1 - c(hh.acc.46, hh.acc.ssc.46, hh.acc.mm.46), 3)),
@@ -1327,7 +1327,7 @@ Now consider the Hermitian dilation
 $$M^{(kl)} = 2 \begin{bmatrix} 0 & P^{(kl)} \\ P^{(lk)} & 0 \end{bmatrix}$$
 
 which is a symmetric $(n_k + n_l) \times (n_k + n_l)$ matrix. It can be shown 
-that the eigendecomposition of $M^{(kl)}$ is
+that the spectral decomposition of $M^{(kl)}$ is
 
 $$M^{(kl)} = 
 \begin{bmatrix} u^{(kl)} & -u^{(kl)} \\ v^{(kl)} & v^{(kl)} \end{bmatrix} \times 
