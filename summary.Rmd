@@ -1,5 +1,5 @@
 ---
-title: "Connecting the Popularity Adjusted Block Model to the Generalized Random Dot Product Graph for Clustering and Parameter Estimation"
+title: "Connecting the Popularity Adjusted Block Model to the Generalized Random Dot Product Graph for Community Detection and Parameter Estimation"
 author: John Koo, Minh Tang, Michael Trosset
 output:
   pdf_document:
@@ -92,7 +92,9 @@ graph is then drawn from this edge probability matrix such that the existence
 of an edge between each pair of vertices $i$ and $j$ is given by 
 $\Bernoulli(P_{ij})$. For example, for the SBM with two communities for which 
 the within-community edge probability is $\xi$ and the between-community edge 
-probability is $\eta$, the entries of $P$ consist of $\xi$ and $\eta$. 
+probability is $\eta$, the entries of $P$ consist of $P_{ij} = \xi$ if $i$ and 
+$j$ are in the same community and $i \neq j$, $P_{ij} = \eta$ if $i$ and $j$ 
+belong to separate communities, and $P_{ii} = 0$. 
 
 The Random Dot Product Graph (RDPG) model proposed by 
 \citet*{10.1007/978-3-540-77004-6_11} is another graph model with Bernoulli 
@@ -107,7 +109,7 @@ equivalent to a special case of the RDPG model in which all vertices of a
 given community share the same position in the latent space 
 \cite{lyzinski2014}. It has also been shown that similar 
 random graph models, including the DCBM, can be represented in this way
-\cite{rubindelanchy2017consistency} \cite{lyzinski2014}. An analogous 
+\cite{lyzinski2014} \cite{rubindelanchy2017consistency}. An analogous 
 property exists for the PABM but not for the RDPG model but under the 
 *Generalized* Random Dot Product Graph (GRDPG) model. This relationship will be 
 explored in this paper and exploited to construct algorithms for community 
@@ -116,7 +118,7 @@ detection and parameter estimation for the PABM.
 In this paper, we will only consider undirected graphs, that is the edge weight 
 from vertex $i$ to vertex $j$ is equal to the edge weight in the opposite 
 direction, from vertex $j$ to vertex $i$. Furthermore, we will only consider 
-unweighted graphs with binary ($0, 1$) edge weights We will also assume that 
+unweighted graphs with binary ($0$ or $1$) edge weights We will also assume that 
 graphs are hollow, i.e., there are no edges from a vertex to itself. All such 
 graphs can be represented by a symmetric adjacency matrix 
 $A \in \{0, 1\}^{n \times n}$ for which $A_{ij} = 1$ if there exists an edge 
@@ -326,6 +328,22 @@ of $A$ in relation to the ASE of $P$ built on $\{\lambda^{(kl)}\}_K$.
 
 ## Community detection
 
+\begin{algorithm}[t]
+  \DontPrintSemicolon
+  \SetAlgoLined
+  \KwData{Adjacency matrix $A$, number of communities $K$}
+  \KwResult{Community assignments $1, ..., K$}
+    Compute the eigenvectors of $A$ that correspond to the $K (K+1) / 2$ most 
+    positive eigenvalues and $K (K-1) / 2$ most negative eigenvalues. Construct 
+    $V$ using these eigenvectors as its columns.\;
+    Compute $B = |V V^\top|$, applying $|\cdot|$ entry-wise.\;
+    Construct graph $G$ using $B$ as its similarity matrix.\;
+    Partition $G$ into $K$ disconnected subgraphs  
+    (e.g., using edge thresholding or spectral clustering).\;
+    Map each partition to the community labels $1, ..., K$.\;
+  \caption{Orthogonal Spectral Clustering.}
+\end{algorithm}
+
 We previously stated one possible set of latent positions that result in the 
 edge probability matrix of a PABM, $P = (XU) I_{pq} (XU)^\top$. If we have 
 (or can estimate) $XU$ directly, then both the community detection and 
@@ -398,25 +416,8 @@ different communities. Let $n \rho_n = \omega((\log n)^{4c}))$ as described in
     O_P\bigg( \frac{(\log n)^c}{n \sqrt{\rho_n}}\bigg)
 \end{equation}
 
-Thus, as $n \to \infty$, the partitioning of $\hat{B}^{(n)}$ results in 
-perfect community detection. 
-This leads to the Orthogonal Spectral Clustering (OSC) algorithm (Alg. 1). 
-
-\begin{algorithm}[H]
-  \DontPrintSemicolon
-  \SetAlgoLined
-  \KwData{Adjacency matrix $A$, number of communities $K$}
-  \KwResult{Community assignments $1, ..., K$}
-    Compute the eigenvectors of $A$ that correspond to the $K (K+1) / 2$ most 
-    positive eigenvalues and $K (K-1) / 2$ most negative eigenvalues. Construct 
-    $V$ using these eigenvectors as its columns.\;
-    Compute $B = |V V^\top|$, applying $|\cdot|$ entry-wise.\;
-    Construct graph $G$ using $B$ as its similarity matrix.\;
-    Partition $G$ into $K$ disconnected subgraphs  
-    (e.g., using edge thresholding or spectral clustering).\;
-    Map each partition to the community labels $1, ..., K$.\;
-  \caption{Orthogonal Spectral Clustering.}
-\end{algorithm}
+Thus, as $n \to \infty$, the partitioning of $\hat{B}_n$, the affinity matrix 
+from OSE (Alg.1), results in perfect community detection with probability 1. 
 
 Theorems 2, 3, and 4 also provide a very natural path toward using SSC for 
 community detection for the PABM. We established in Theorem 2 that an ASE of 
@@ -425,7 +426,7 @@ lie on mutually orthogonal subspaces, and this property can be recovered from
 the eigenvectors of $P$. Then Theorems 3 and 4 show that this property holds 
 for the adjacency matrix $A$ drawn from $P$ as $n \to \infty$. 
 
-\begin{algorithm}[H]
+\begin{algorithm}[t]
   \DontPrintSemicolon
   \SetAlgoLined
   \caption{Sparse Subspace Clustering using LASSO \cite{pmlr-v28-wang13}.}
@@ -457,10 +458,11 @@ for the adjacency matrix $A$ drawn from $P$ as $n \to \infty$.
 \end{algorithm}
 
 **Theorem 5**. Let $P_n$ describe the edge probability matrix of the PABM with 
-$n$ vertices, and let $A_n \sim \Bernoulli(P_n)$. Let $Z_n$ be the ASE of 
-$P_n$, and let $Z_n^{(k)}$ correspond to the embedding points that correspond 
-to the $k$^th^ community. Let $\hat{Z}_n$ be the ASE of $A_n$ and $\hat{Z}_n^{(k)}$ 
-be the corresponding $k$^th^ block. Let $\hat{B}_n$ be the affinity matrix in the SSC algorithm with input $\hat{Z}_n$ such that $\hat{B}_n^{(ij)}$ is the $ij$^th^ element of $\hat{B}_n$. If $r(Z_n^{(k)})$, the inradius of $Z_n^{(k)}$ (as defined by \citet{soltanolkotabi2012}), is positive for each $k$, then $\hat{B}_n^{(ij)} \stackrel{p}{\to} 0$ $\forall i, j$ in different communities. 
+$n$ vertices, and let $A_n \sim \Bernoulli(P_n)$.  Let $\hat{Z}_n$ be the ASE 
+of $A_n$. Then $\exists \lambda > 0$ such that $\hat{B}_n$, the affinity matrix
+outputted by SSC using $\hat{Z}_n$ and $\lambda$, has $ij$^th^ entry
+$\hat{B}_n^{(ij)} \stackrel{a.s.}{\to} 0$ $\forall i, j$ in different 
+communities. 
 
 ## Parameter estimation
 
@@ -478,10 +480,10 @@ Given the adjacency matrix $A$ instead of edge probability matrix $P$, we can
 simply use plug-in estimators (algorithm 3), which converge to the true 
 parameters (Theorem 6).
 
-\begin{algorithm}[H]
+\begin{algorithm}[t]
   \DontPrintSemicolon
   \SetAlgoLined
-  \caption{PABM parameter estimation using the adjacency matrix.}
+  \caption{PABM parameter estimation.}
   \KwData{Adjacency matrix $A$, community assignments $1, ..., K$}
   \KwResult{PABM parameter estimates $\{\hat{\lambda}^{(kl)}\}_K$.}
   Arrange the rows and columns of $A$ by community such that each 
