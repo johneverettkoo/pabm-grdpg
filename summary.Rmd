@@ -1229,6 +1229,11 @@ with each block corresponding to a community and zeros elsewhere. Therefore,
 if vertices $i$ and $j$ belong to different communities, then the $ij$^th^ 
 element of $X (X^\top X)^{-1} X^\top = V V^\top = B$ is 0.
 
+**Definition 4** (Inradius) \cite{soltanolkotabi2012} 
+\cite{pmlr-v28-wang13}. 
+The inradius of a convex body $\mathcal{P}$, denoted by $r(\mathcal{P})$, is 
+defined as the radius of the largest Euclidean ball inscribed in $\mathcal{P}$.
+
 **Lemma 5.1**. 
 Let $P_n = V_n \Lambda_n V_n^\top$ be defined as in Lemma 5.1. Let 
 $A_n \sim \Bernoulli(P_n)$ be the adjacency matrix drawn from $P_n$, and let 
@@ -1238,68 +1243,57 @@ negative eigenvalues and their corresponding eigenvectors.
 Without loss of generality, order the rows of $V_n$ and $\hat{V}_n$ by 
 community, and let $V_n^{(k)}$ and $\hat{V}_n^{(k)}$ be the $n_k \times K^2$ 
 matrix of the rows of the $k$^th^ community in $V_n$ and $\hat{V}_n$ 
-respectively. Let $r_n^{(k)} = r(V_n^{(k)})$ and 
-$\hat{r}_n^{(k)} = r(\hat{V}_n^{(k)})$ be the inradius of points in $V_n$ and
-$\hat{V}_n$ as defined by \citet{soltanolkotabi2012} and 
-\citet{pmlr-v28-wang13}. Then 
+respectively. 
+Let $\mu_n^{(k)} = \mu(V_n^{(k)})$ be the subspace incoherence of $V_n^{(k)}$ 
+as defined by \citet{soltanolkotabi2012}. Then 
 
-\begin{equation} \label{eq:r-conv}
-\hat{r}_n^{(k)} \stackrel{p}{\to} r_n^{(k)}
+\begin{equation} \label{eq:mu-zero}
+\mu_n^{(k)} = 0
+\end{equation}
+
+with probability 1 $\forall n, k$. 
+
+Furthermore, Let $\hat{\mu}_n^{(k)} = \mu(\hat{V}_n^{(k)})$ using the 
+extended definition of $\mu(\cdot)$ from \citet{pmlr-v28-wang13}. Then 
+
+\begin{equation} \label{eq:mu-conv}
+\hat{\mu}_n^{(k)} \stackrel{a.s.}{\to} 0
 \end{equation}
 
 *Proof of Lemma 5.1*. 
-This falls directly out of Theorem 5 of \citet{rubindelanchy2017statistical}. 
-Since $\hat{V}_n^{(k)} \stackrel{p}{\to} V_n^{(k)}$ and $r(\cdot)$ is 
-continuous, $r(\hat{V}_n^{(k)}) \stackrel{p}{\to} r(V_n^{(k)})$.
-
-**Lemma 5.2**. 
-Let $\mu_n^{(k)} = \mu(V_n^{(k)})$ be the subspace incoherence of $V_n^{(k)}$ 
-as defined by \citet{soltanolkotabi2012}. Then 
-$\mu_n^{(k)} = 0$ 
-with probability 1 $\forall n, k$. 
-
-*Proof of Lemma 5.2*. 
-Since $V_n^{(k)}$ is orthogonal to $V_n^{(l)}$ $\forall k \neq l$ (Lemma 3.1), 
+For the first part, 
+since $V_n^{(k)}$ is orthogonal to $V_n^{(l)}$ $\forall k \neq l$ (Lemma 3.1), 
 this falls directly out of Theorem 2.8 of \citet{soltanolkotabi2012}. 
 
-**Lemma 5.3**. 
-Let $\hat{\mu}_n^{(k)} = \mu(\hat{V}_n^{(k)})$ using the extended definition of
-$\mu(\cdot)$ from \citet{pmlr-v28-wang13}. Then 
+For the second part, 
+this falls directly out of Theorem 5 of \citet{rubindelanchy2017statistical}. 
+Since $\hat{V}_n^{(k)} \stackrel{a.s.}{\to} V_n^{(k)}$ and $\mu(\cdot)$ is 
+continuous, $\mu(\hat{V}_n^{(k)}) \stackrel{a.s.}{\to} \mu(V_n^{(k)}) = 0$.
 
-\begin{equation} \label{eq:mu-conv}
-\hat{\mu}_n^{(k)} \stackrel{p}{\to} 0
-\end{equation}
-
-*Proof of Lemma 5.3*. 
-This falls directly out of Theorem 5 of \citet{rubindelanchy2017statistical}. 
-Since $\hat{V}_n^{(k)} \stackrel{p}{\to} V_n^{(k)}$ and $\mu(\cdot)$ is 
-continuous, $\mu(\hat{V}_n^{(k)}) \stackrel{p}{\to} \mu(V_n^{(k)}) = 0$.
-
-**Lemma 5.4**. 
+**Lemma 5.2**. 
 Let $(v_n^{(i)})^\top$ and $(\hat{v}_n^{(i)})^\top$ be the rows of $V_n$ and
 $\hat{V}_n$ respectively. By \citet{rubindelanchy2017statistical}, 
 
 \begin{equation} \label{eq:delta-conv}
-\delta_n = \max_i ||\hat{v}_n^{(i)} - v_n^{(i)}|| \stackrel{p}{\to} 0
+\delta_n = \max_i ||\hat{v}_n^{(i)} - v_n^{(i)}|| \stackrel{a.s.}{\to} 0
 \end{equation}
 
 **Proof of Theorem 5**. 
 For ease of proving, we will consider $V_n$ and $\hat{V}_n$ instead of $Z_n$ 
 and $\hat{Z}_n$.  
 
-By (\ref{eq:r-conv}) and (\ref{eq:mu-conv}), 
+By (\ref{eq:mu-zero}) and (\ref{eq:mu-conv}), 
 
 \begin{equation} \label{eq:thm5-proof}
-r(\hat{V}_n^{(k)}) - \mu(\hat{V}_n^{(k)}) \stackrel{p}{\to} 
-r_n^{(k)} - \mu_n^{(k)} = r_n^{(k)} > 0
+r(\hat{V}_n^{(k)}) - \mu(\hat{V}_n^{(k)}) \stackrel{a.s.}{\to} 
+r(\hat{V}_n^{(k)}) > 0
 \end{equation}
 
 for each $k = 1, ..., K$. 
 
-Then by Theorem 6 of \citet{pmlr-v28-wang13}, (\ref{eq:delta-conv}) and
-(\ref{eq:thm5-proof}) imply that $\forall \epsilon > 0$, $\exists N > 0$ such 
-that $\forall n > N$, 
-$\Pr(\text{SSC detection property holds for } \hat{V}_n) = 1 - \epsilon$.
+Then Theorem 6 of \citet{pmlr-v28-wang13}, (\ref{eq:delta-conv}) and
+(\ref{eq:thm5-proof}) imply that the SSC detection property holds as 
+$n \to infty$ with probability 1. 
 
 **Proof of Theorem 6**. 
 Let $P$ and $A$ be organized by community such that the elements of blocks 
@@ -1383,8 +1377,8 @@ In this case, the indefinite orthogonal transformation $W_*$ in the GRDPG
 result \cite{rubindelanchy2017statistical} is of the form 
 $U^\top \hat{U}$. The eigenvalues of $M$ are distinct since the signature 
 for this GRDPG is $(1, 1)$, and $U^\top \hat{U}$ is block diagonal, 
-resulting in $W_* \stackrel{P}{\to} I$. Therefore, the adjacency spectral embedding of $\hat{M}^{(kl)}$ is 
-a direct estimation of the specific latent positions outlined for $M^{(kl)}$, 
-up to sign flip. 
+resulting in $W_* \stackrel{a.s.}{\to} I$. Therefore, the adjacency spectral
+embedding of $\hat{M}^{(kl)}$ is a direct estimation of the specific latent 
+positions outlined for $M^{(kl)}$, up to sign flip. 
 
 # References
