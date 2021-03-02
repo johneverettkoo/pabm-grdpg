@@ -1293,7 +1293,7 @@ for each $k = 1, ..., K$.
 
 Then Theorem 6 of \citet{pmlr-v28-wang13}, (\ref{eq:delta-conv}) and
 (\ref{eq:thm5-proof}) imply that the SSC detection property holds as 
-$n \to infty$ with probability 1. 
+$n \to \infty$ with probability 1. 
 
 **Proof of Theorem 6**. 
 Let $P$ and $A$ be organized by community such that the elements of blocks 
