@@ -215,7 +215,8 @@ equivalent.
 
 **Theorem 2** (Generalization to $K > 2$). There exists a block diagonal matrix 
 $X \in \mathbb{R}^{n \times K^2}$ defined by PABM parameters 
-$\{\lambda^{(kl)}\}_K$ and $U \in \mathbb{R}^{K^2 \times K^2}$ that is fixed 
+$\{\lambda^{(kl)}\}_K$ and orthonormal matrix 
+$U \in \mathbb{R}^{K^2 \times K^2}$ that is fixed 
 for each $K$ such that $A \sim GRDPG_{K (K+1) / 2, K (K-1) / 2}(XU)$ and 
 $A \sim PABM(\{(\lambda^{(kl)}\})_K)$ are equivalent.
 
