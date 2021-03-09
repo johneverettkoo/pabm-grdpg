@@ -314,17 +314,23 @@ In practice, SSC is often performed by solving the LASSO problems
 \end{equation}
 
 for some sparsity parameter $\lambda > 0$. The $c_i$ vectors are then collected 
-into $C$ and $B$ as before.
+into $C$ and $B$ as before. The ability for this algorithm to identify the 
+communities exactly is called the SSC detection property.
 
 Theorem 2 suggests that SSC is appropriate for community detection for the 
 PABM. More precisely, Theorem 2 says that each community consists of a
 $K$-dimensional subspace, and together the subspaces lie in $\mathbb{R}^{K^2}$. 
 The natural approach then is to perform SSC on the ASE of $P$ or $A$.
-\citet{noroozi2019estimation} instead applied SSC to $P$ and $A$ themselves. 
+\citet{noroozi2019estimation} instead applied SSC to $P$ and $A$. 
 
-Much of our work is built on top of work from 
-\citet{rubindelanchy2017statistical}, in particular, the properties of the ASE 
-of $A$ in relation to the ASE of $P$ built on $\{\lambda^{(kl)}\}_K$.
+Using results from \citet{soltanolkotabi2012}, it can be easily shown that 
+the SSC detection property holds for $XU$, which is an ASE of $P$. More 
+specifically, if points lie exactly on mutually orthogonal subspaces, then the 
+SSC detection property will hold with probability 1, and this is exactly the 
+case for the PABM (Theorem 2). Much of our work is then built on \citet{ribindelanchy2017statistical}, who describe the convergence behavior of 
+the ASE of $A$ to the ASE of $P$, and \citet{pmlr-v28-wang13}, who show the 
+necessary conditions for the SSC detection property to hold in noisy cases 
+where the points lie near subspaces. 
 
 ## Community detection
 
