@@ -327,7 +327,7 @@ Using results from \citet{soltanolkotabi2012}, it can be easily shown that
 the SSC detection property holds for $XU$, which is an ASE of $P$. More 
 specifically, if points lie exactly on mutually orthogonal subspaces, then the 
 SSC detection property will hold with probability 1, and this is exactly the 
-case for the PABM (Theorem 2). Much of our work is then built on \citet{ribindelanchy2017statistical}, who describe the convergence behavior of 
+case for the PABM (Theorem 2). Much of our work is then built on \citet{rubindelanchy2017statistical}, who describe the convergence behavior of 
 the ASE of $A$ to the ASE of $P$, and \citet{pmlr-v28-wang13}, who show the 
 necessary conditions for the SSC detection property to hold in noisy cases 
 where the points lie near subspaces. 
