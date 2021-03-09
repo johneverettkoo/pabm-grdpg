@@ -1282,21 +1282,28 @@ $\hat{V}_n$ respectively. By \citet{rubindelanchy2017statistical},
 
 **Proof of Theorem 5**. 
 For ease of proving, we will consider $V_n$ and $\hat{V}_n$ instead of $Z_n$ 
-and $\hat{Z}_n$.  
+and $\hat{Z}_n$. 
 
-By (\ref{eq:mu-zero}) and (\ref{eq:mu-conv}), 
+The basis of this theorem is Theorem 6 from \citet{pmlr-v28-wang13}, which 
+states that the SSC detection property holds if the noise is small enough and 
+the subspace inradius is greater than the subspace incoherence for each 
+community $k$.
 
-\begin{equation} \label{eq:thm5-proof}
-r(V_n^{(k)}) - \mu(\hat{V}_n^{(k)}) = r(V_n^{(k)})
-\end{equation}
+Let $V_{n, -i}^{(k)}$ be $V_n^{(k)}$ with the $i$^th^ entry removed. Suppose 
+that for each community $k$, there are enough vertices such that for each $i$, 
+$V_{n, -i}^{(k)}$ spans its corresponding subspace (Theorem 2). 
+Then $r_n^{(k)} = \min\limits_i r(V_{n, -i}^{(k)}) > 0$. 
+Thus by (\ref{eq:mu-conv}), for each $k$, $r_n^{(k)} > \mu_n^{(k)}$ where 
+$\mu_n^{(k)} = \mu(\hat{V}_n^{(k)})$ and $n$ is large enough such that 
+$\min\limits_{k, i} rank(V_{n, -i}^{(k)}) = K$.
 
-for each $k = 1, ..., K$. If enough points are drawn from each community that 
-the corresponding uncorrupted embedding points span a $K$-dimensional subspace
-(Theorem 2), then $r(V_n^{(k)}) > 0$.
+Let $r_n = \min_k r_n^{(k)}$. By (\ref{eq:delta-conv}), 
+$\delta_n \stackrel{a.s.}{\to} 0$. Then as $n\to \infty$, 
+$\delta_n < \min_k \frac{r_n (r_n^{(k)} - \mu_n^{(k)})}{2 + 7 r_n^{(k)}}$ 
+with probability 1. 
 
-Then by Theorem 6 of \citet{pmlr-v28-wang13}, (\ref{eq:delta-conv}) and
-(\ref{eq:thm5-proof}) imply that the SSC detection property holds as 
-$n \to \infty$ with probability 1. 
+Thus the conditions for the SSC detection property from Theorem 6 from
+\citet{pmlr-v28-wang13} are satisfied almost surely as $n \to \infty$.
 
 **Proof of Theorem 6**. 
 Let $P$ and $A$ be organized by community such that the elements of blocks 
