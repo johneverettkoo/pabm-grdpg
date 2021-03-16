@@ -7,7 +7,7 @@ output:
     number_sections: yes
 # output: html_document
 fontsize: 12pt
-# geometry: "left=1cm,right=1cm,top=1cm,bottom=1.5cm"
+geometry: "left=1in,right=1in,top=1in,bottom=1in"
 urlcolor: blue
 header-includes:
 - \usepackage{float}
@@ -27,7 +27,8 @@ abstract: |
   community are orthogonal to one another. Using this property as well as the 
   asymptotic properties of Adjacency Spectral Embedding (ASE) of the GRDPG, we 
   are able to establish theoretical asymptotic results of our community 
-  detection and parameter estimation methods for the PABM. 
+  detection and parameter estimation methods for the PABM, including for 
+  Sparse Subspace Clustering (SSC). 
 ---
 
 ```{r setup, include = FALSE}
@@ -128,7 +129,7 @@ $P \in [0, 1]^{n \times n}$.
 
 # Connecting the Popularity Adjusted Block Model to the Generalized Random Dot Product Graph
 
-## The popularity adjusted block model (PABM) and the generalized random dot product graph
+## The popularity adjusted block model and the generalized random dot product graph
 
 **Definition 1** (Popularity Adjusted Block Model) 
 \cite{307cbeb9b1be48299388437423d94bf1}. 
@@ -211,7 +212,7 @@ $$U = \begin{bmatrix} 1 & 0 & 0 & 0 \\
 0 & 0 & 1 / \sqrt{2} & - 1 / \sqrt{2} \\
 0 & 1 & 0 & 0 \end{bmatrix}$$
 
-as in Definition 1. 
+where each $\lambda^{(kl)}$ is a vector as in Definition 1. 
 Then $A \sim GRDPG_{3, 1}(X U)$ and $A \sim PABM(\{(\lambda^{(kl)}\}_2)$ are 
 equivalent.
 
@@ -221,6 +222,57 @@ $\{\lambda^{(kl)}\}_K$ and orthonormal matrix
 $U \in \mathbb{R}^{K^2 \times K^2}$ that is fixed 
 for each $K$ such that $A \sim GRDPG_{K (K+1) / 2, K (K-1) / 2}(XU)$ and 
 $A \sim PABM(\{(\lambda^{(kl)}\})_K)$ are equivalent.
+
+*Proof of Theorem 2*. 
+Define the following matrices from $\{\lambda^{(kl)}\}_K$: 
+$$\Lambda^{(k)} = 
+\begin{bmatrix} \lambda^{(k,1)} & \cdots & \lambda^{(k, K)} \end{bmatrix}
+\in \mathbb{R}^{n_k \times K}$$
+
+\begin{equation} \label{eq:xy}
+X = \blockdiag(\Lambda^{(1)}, ..., \Lambda^{(K)}) \in \mathbb{R}^{n \times K^2}
+\end{equation}
+
+$$L^{(k)} = \blockdiag(\lambda^{(1k)}, ..., \lambda^{(Kk)}) \in 
+\mathbb{R}^{n \times K}$$
+
+$$Y = \begin{bmatrix} L^{(1)} & \cdots & L^{(K)} \end{bmatrix} \in 
+\mathbb{R}^{n \times K^2}$$
+
+Then $P = X Y^\top$.
+
+Similar to the $K = 2$ case, we have $Y = X \Pi$ for a permutation matrix
+$\Pi$, resulting in $P = X \Pi X^\top$.  
+The permutation described by $\Pi$ has $K$ fixed points, which correspond to 
+$K$ eigenvalues equal to $1$ with corresponding eigenvectors $e_k$ where 
+$k = r (K + 1) + 1$ for $r = 0, ..., K - 1$. It also has 
+$\binom{K}{2} = K (K - 1) / 2$ cycles of order $2$. Each cycle corresponds to 
+a pair of eigenvalues $+1$ and $-1$ and a pair of eigenvectors 
+$(e_s + e_t) / \sqrt{2}$ and $(e_s - e_t) / \sqrt{2}$.
+
+Then $\Pi$ has $K (K + 1) / 2$ eigenvalues equal to $1$ and $K (K - 1) / 2$ 
+eigenvalues equal to $-1$. $\Pi$ has the decomposed form 
+
+\begin{equation} \label{eq:permutation}
+\Pi = U I_{K (K + 1) / 2, K (K - 1) / 2} U^\top
+\end{equation}
+
+The edge probability matrix then can be written as:
+
+\begin{equation} \label{eq:pabm-grdpg}
+P = X U I_{p, q} (X U)^\top
+\end{equation}
+
+\begin{equation} \label{eq:p}
+p = K (K + 1) / 2
+\end{equation}
+
+\begin{equation} \label{eq:q}
+q = K (K - 1) / 2
+\end{equation}
+
+and we can describe the PABM with $K$ communities as a GRDPG with latent 
+positions $X U$ with signature $\big( K (K + 1) / 2, K (K - 1) / 2 \big)$.
 
 **Example** ($K = 3$). Using the same notation as before:
 
@@ -310,26 +362,42 @@ clustering).
 In practice, SSC is often performed by solving the LASSO problems 
 
 \begin{equation} \label{eq:ssc}
-\min_{c_i} \frac{1}{2} ||x_i - X_{-i} c_i||^2_2 + \lambda ||c_i||_1
+c_i = \arg\min_{c} \frac{1}{2} ||x_i - X_{-i} c||^2_2 + \lambda ||c||_1
 \end{equation}
 
 for some sparsity parameter $\lambda > 0$. The $c_i$ vectors are then collected 
-into $C$ and $B$ as before. The ability for this algorithm to identify the 
-communities exactly is called the SSC detection property.
+into $C$ and $B$ as before. 
+
+**Definition 4** (Subspace Detection Property) \cite{pmlr-v28-wang13}. 
+Let $X = \begin{bmatrix} x_1 & \cdots & x_n \end{bmatrix}^\top$ be noisy 
+points sampled from $K$ subspaces. Let $C$ and $B$ be constructed from the 
+solutions of LASSO problems as described in (\ref{eq:ssc}). If each column of 
+$C$ has nonzero norm and $B_{ij} = 0$ $\forall$ $x_i$ and $x_j$ sampled from 
+different subspaces, then $X$ obeys the subspace detection property. 
+
+**Remark**. In practice, sample $X$ often does not obey the subspace detection
+property. In such cases, $B$ is treated as an affinity matrix for a graph which 
+is then partitioned into $K$ subgraphs to obtain the clustering. On the other 
+hand, if $X$ does obey the subspace detection property, $B$ describes a graph 
+with at least $K$ disconnected subgraphs. Ideally, when the subspace detection
+property holds, there are exactly $K$ subgraphs which map to each subspace, 
+but it could be the case that some of the subspaces are represented by 
+multiple disconnected subgraphs. 
 
 Theorem 2 suggests that SSC is appropriate for community detection for the 
 PABM. More precisely, Theorem 2 says that each community consists of a
 $K$-dimensional subspace, and together the subspaces lie in $\mathbb{R}^{K^2}$. 
 The natural approach then is to perform SSC on the ASE of $P$ or $A$.
-\citet{noroozi2019estimation} instead applied SSC to $P$ and $A$. 
+\citet{noroozi2019estimation} instead applied SSC to $P$ and $A$, foregoing 
+embedding altogether. 
 
 Using results from \citet{soltanolkotabi2012}, it can be easily shown that 
-the SSC detection property holds for $XU$, which is an ASE of $P$. More 
+the subspace detection property holds for $XU$, which is an ASE of $P$. More 
 specifically, if points lie exactly on mutually orthogonal subspaces, then the 
-SSC detection property will hold with probability 1, and this is exactly the 
-case for the PABM (Theorem 2). Much of our work is then built on \citet{rubindelanchy2017statistical}, who describe the convergence behavior of 
+subspace detection property will hold with probability 1, and this is exactly 
+the case for the PABM (Theorem 2). Much of our work is then built on \citet{rubindelanchy2017statistical}, who describe the convergence behavior of 
 the ASE of $A$ to the ASE of $P$, and \citet{pmlr-v28-wang13}, who show the 
-necessary conditions for the SSC detection property to hold in noisy cases 
+necessary conditions for the subspace detection property to hold in noisy cases 
 where the points lie near subspaces. 
 
 ## Community detection
@@ -360,8 +428,8 @@ $XU$ is not possible \cite{rubindelanchy2017statistical}.
 If we decompose $P = Z I_{pq} Z^\top$, then
 $\exists Q \in \mathbb{O}(p, q)$ such that $XU = Z Q$. Even if we start with 
 the exact edge probability matrix, we cannot recover the "original" latent 
-positions $XU$. Note that unlike in the case of the RDPG, 
-$Q$ is not an orthogonal matrix. If $z_i$'s are the rows of $XU$, then 
+positions $XU$. Note that unlike in the case of the RDPG, $Q$ is not 
+necessarily an orthogonal matrix. If $z_i$'s are the rows of $XU$, then 
 $||z_i - z_j||^2 \neq ||Q z_i - Q z_j||^2$, and 
 $\langle z_i, z_j \rangle \neq \langle Q z_i, Q z_j \rangle$. This prevents 
 us from using the properties of $XU$ directly. In particular, if 
@@ -410,20 +478,12 @@ of $A_n$ with rows $(\hat{z}_i^{(n)})^\top$. Then by
 
 for some $c > 0$ and sequence of $Q_n \in \mathbb{O}(p, q)$. 
 
-**Theorem 4**. Let $\hat{V}^{(n)} \in \mathbb{R}^{n \times K^2}$ be the matrix 
-of $K^2$ eigenvectors of $A_n$ corresponding to the $K (K+1) / 2$ most positive 
-eigenvalues and $K (K-1) / 2$ most negative eigenvalues with rows
-$(\hat{v}_i^{(n)})^\top$. Let $(i, j)$ correspond to pairs belonging to 
-different communities. Let $n \rho_n = \omega((\log n)^{4c}))$ as described in
-\citet{rubindelanchy2017statistical}. Then for some $c > 0$, 
+**Theorem 4**. 
+Let $\hat{B}_n$ with entries $\hat{B}_n^{(ij})$ be the affinity matrix from OSC (Alg. 1). Then $\forall$ pairs $(i, j)$ belonging to different communities, 
 
 \begin{equation} \label{eq:thm4}
-  \max\limits_{i, j} ||(\hat{v}^{(n)}_i)^\top \hat{v}_j^{(n)}|| = 
-    O_P\bigg( \frac{(\log n)^c}{n \sqrt{\rho_n}}\bigg)
+\hat{B}_n^{(ij)} \stackrel{a.s.}{\to} 0
 \end{equation}
-
-Thus, as $n \to \infty$, the partitioning of $\hat{B}_n$, the affinity matrix 
-from OSE (Alg.1), results in perfect community detection with probability 1. 
 
 Theorems 2, 3, and 4 also provide a very natural path toward using SSC for 
 community detection for the PABM. We established in Theorem 2 that an ASE of 
@@ -1139,57 +1199,6 @@ cycle of order two results in two eigenvalues $\pm 1$ with corresponding
 eigenvectors $(e_i \pm e_j) / \sqrt{2}$ where $i = 2, j = 3$, pair that is 
 swapped.
 
-**Proof of Theorem 2**. 
-Let 
-$$\Lambda^{(k)} = 
-\begin{bmatrix} \lambda^{(k,1)} & \cdots & \lambda^{(k, K)} \end{bmatrix}
-\in \mathbb{R}^{n_k \times K}$$
-
-\begin{equation} \label{eq:xy}
-X = \blockdiag(\Lambda^{(1)}, ..., \Lambda^{(K)}) \in \mathbb{R}^{n \times K^2}
-\end{equation}
-
-$$L^{(k)} = \blockdiag(\lambda^{(1k)}, ..., \lambda^{(Kk)}) \in 
-\mathbb{R}^{n \times K}$$
-
-$$Y = \begin{bmatrix} L^{(1)} & \cdots & L^{(K)} \end{bmatrix} \in 
-\mathbb{R}^{n \times K^2}$$
-
-Then $P = X Y^\top$.
-
-Similar to the $K = 2$ case, we have $Y = X \Pi$ for a permutation matrix
-$\Pi$, resulting in $P = X \Pi X^\top$.  
-The permutation described by $\Pi$ has $K$ fixed points, which correspond to 
-$K$ eigenvalues equal to $1$ with corresponding eigenvectors $e_k$ where 
-$k = r (K + 1) + 1$ for $r = 0, ..., K - 1$. It also has 
-$\binom{K}{2} = K (K - 1) / 2$ cycles of order $2$. Each cycle corresponds to 
-a pair of eigenvalues $+1$ and $-1$ and a pair of eigenvectors 
-$(e_s + e_t) / \sqrt{2}$ and $(e_s - e_t) / \sqrt{2}$.
-
-Then $\Pi$ has $K (K + 1) / 2$ eigenvalues equal to $1$ and $K (K - 1) / 2$ 
-eigenvalues equal to $-1$. $\Pi$ has the decomposed form 
-
-\begin{equation} \label{eq:permutation}
-\Pi = U I_{K (K + 1) / 2, K (K - 1) / 2} U^\top
-\end{equation}
-
-The edge probability matrix then can be written as:
-
-\begin{equation} \label{eq:pabm-grdpg}
-P = X U I_{p, q} (X U)^\top
-\end{equation}
-
-\begin{equation} \label{eq:p}
-p = K (K + 1) / 2
-\end{equation}
-
-\begin{equation} \label{eq:q}
-q = K (K - 1) / 2
-\end{equation}
-
-and we can describe the PABM with $K$ communities as a GRDPG with latent 
-positions $X U$ with signature $\big( K (K + 1) / 2, K (K - 1) / 2 \big)$.
-
 **Lemma 3.1.** 
 Let $P = V D V^\top$ be the spectral decomposition of the edge probability 
 matrix for a PABM. Then $V V^\top = X (X^\top X)^{-1} X^\top$ where $X$ is 
@@ -1210,7 +1219,7 @@ Therefore, using the fact that $U U^\top = I$ and $V^\top V = I$,
 $$(V |D|^{1/2}) ((V |D|^{1/2})^\top (V |D|^{1/2}))^{-1} (V |D|^{1/2})^\top = 
 (X U Q) ((X U Q)^\top (X U Q))^{-1} (X U Q)^\top$$
 
-The righthand side becomes
+The right-hand side becomes
 
 $$\begin{split}
   (X U Q) ((X U Q)^\top (X U Q))^{-1} (X U Q)^\top & 
@@ -1219,7 +1228,7 @@ $$\begin{split}
   & = X (X^\top X)^{-1} X^\top
 \end{split}$$
 
-The lefthand side becomes:
+The left-hand side becomes:
 
 $$\begin{split}
   (V |D|^{1/2}) ((V |D|^{1/2})^\top (V |D|^{1/2}))^{-1} (V |D|^{1/2})^\top & =
@@ -1236,8 +1245,18 @@ if vertices $i$ and $j$ belong to different communities, then the $ij$^th^
 element of $X (X^\top X)^{-1} X^\top = V V^\top = B$ is 0.
 
 **Proof of Theorem 4**. 
+By Theorem 3, if $i$ and $j$ belong to different communities and $v_n^{(i)}$ 
+and $v_n^{(j)}$ are the corresponding eigenvectors of $P_n$, then 
+$(v_n^{(i)})^\top v_n^{(j)} = 0$. Then by \citet{rubindelanchy2017statistical}, 
+for eigenvectors of $A_n$, $\hat{v}_n^{(i)}$ and $\hat{v}_n^{(j)}$, 
 
-**Definition 4** (Inradius) \cite{soltanolkotabi2012} 
+$$(\hat{v}_n^{(i)})^\top \hat{v}_n^{(j)} \stackrel{a.s.}{\to} 
+(v_n^{(i)})^\top v_n^{(j)} = 0$$
+
+since $W_n \hat{v}_n^{(i)} \stackrel{a.s.}{\to} v_n^{(i)}$ for each 
+$i = 1, ..., n$ for some orthonormal $W_n$. 
+
+**Definition 5** (Inradius) \cite{soltanolkotabi2012} 
 \cite{pmlr-v28-wang13}. 
 The inradius of a convex body $\mathcal{P}$, denoted by $r(\mathcal{P})$, is 
 defined as the radius of the largest Euclidean ball inscribed in $\mathcal{P}$.
@@ -1255,12 +1274,7 @@ $\hat{V}_n$ by community, and let $V_n^{(k)}$ and $\hat{V}_n^{(k)}$ be the
 $n_k \times K^2$ matrix of the rows of the $k$^th^ community in $V_n$ and 
 $\hat{V}_n$ respectively. 
 Let $\mu_n^{(k)} = \mu(V_n^{(k)})$ be the subspace incoherence of $V_n^{(k)}$ 
-as defined by \citet{soltanolkotabi2012}. Then 
-
-\begin{equation} \label{eq:mu-zero}
-\mu_n^{(k)} = 0
-\end{equation}
-
+as defined by \citet{soltanolkotabi2012}. Then $\mu_n^{(k)} = 0$ 
 with probability 1 $\forall n, k$. 
 
 Furthermore, Let $\hat{\mu}_n^{(k)} = \mu(\hat{V}_n^{(k)})$ using the 
@@ -1276,7 +1290,12 @@ since $V_n^{(k)}$ is orthogonal to $V_n^{(l)}$ $\forall k \neq l$ (Lemma 3.1),
 this falls directly out of Theorem 2.8 of \citet{soltanolkotabi2012}. 
 
 For the second part, 
-$\mu(\hat{V}_n^{(k)}) = \max_{v_n^{(i)} \in V_n^{(-k)}} ||U_n^{(k)} v_n^{(i)}||_\infty$ where the rows of $U_n^{(k)}$ consist of vectors lying on the subspace spanned by $V_n^{(k)}$. Since if $u_n^{(i)} \in \text{span}(V_n^{(k)}) \implies u_n^{(i)} \perp v_n^{(j)}$ $\forall v_n^{(j)} \in V_n^{(-k)}$ by Theorem 2, this quantity must be 0.
+$\mu(\hat{V}_n^{(k)}) = 
+\max_{v_n^{(i)} \in V_n^{(-k)}} ||U_n^{(k)} v_n^{(i)}||_\infty$ 
+where the rows of $U_n^{(k)}$ consist of vectors lying on the subspace spanned 
+by $V_n^{(k)}$. Since if 
+$u_n^{(i)} \in \text{span}(V_n^{(k)}) \implies u_n^{(i)} \perp v_n^{(j)}$ 
+$\forall v_n^{(j)} \in V_n^{(-k)}$ by Theorem 2, this quantity must be 0.
 
 **Lemma 5.2**. 
 Let $(v_n^{(i)})^\top$ and $(\hat{v}_n^{(i)})^\top$ be the rows of $V_n$ and
@@ -1291,8 +1310,8 @@ For ease of proving, we will consider $V_n$ and $\hat{V}_n$ instead of $Z_n$
 and $\hat{Z}_n$. 
 
 The basis of this theorem is Theorem 6 from \citet{pmlr-v28-wang13}, which 
-states that the SSC detection property holds if the noise is small enough and 
-the subspace inradius is greater than the subspace incoherence for each 
+states that the subspace detection property holds if the noise is small enough 
+and the subspace inradius is greater than the subspace incoherence for each 
 community $k$.
 
 Let $V_{n, -i}^{(k)}$ be $V_n^{(k)}$ with the $i$^th^ entry removed. Suppose 
@@ -1308,7 +1327,7 @@ $\delta_n \stackrel{a.s.}{\to} 0$. Then as $n\to \infty$,
 $\delta_n < \min_k \frac{r_n (r_n^{(k)} - \mu_n^{(k)})}{2 + 7 r_n^{(k)}}$ 
 with probability 1. 
 
-Thus the conditions for the SSC detection property from Theorem 6 from
+Thus the conditions for the subspace detection property from Theorem 6 from
 \citet{pmlr-v28-wang13} are satisfied almost surely as $n \to \infty$.
 
 **Proof of Theorem 6**. 
