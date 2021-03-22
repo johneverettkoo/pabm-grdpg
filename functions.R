@@ -1,4 +1,5 @@
 embedding <- function(A, p = NULL, q = NULL,
+                      scale = TRUE,
                       eps = 1e-6) {
   n <- nrow(A)
   eigen.A <- eigen(A, symmetric = TRUE)
@@ -9,8 +10,12 @@ embedding <- function(A, p = NULL, q = NULL,
   }
   
   U <- eigen.A$vectors[, keep]
-  S <- diag(sqrt(abs(eigen.A$values[keep])))
-  return(U %*% S)
+  if (scale) {
+    S <- diag(sqrt(abs(eigen.A$values[keep])))
+    return(U %*% S)
+  } else {
+    return(U)
+  }
 }
 
 draw.graph <- function(P) {
@@ -244,11 +249,12 @@ ssc <- function(A,
                 K = 2,
                 lambda = .01,
                 parallel = FALSE,
-                normalize = TRUE) {
+                normalize = TRUE,
+                scale = TRUE) {
   p <- K * (K + 1) / 2
   q <- K * (K - 1) / 2
   
-  Y <- t(embedding(A, p, q))
+  Y <- t(embedding(A, p, q, scale))
   
   N <- ncol(Y)
   B <- plyr::aaply(seq(N), 1, function(i) {

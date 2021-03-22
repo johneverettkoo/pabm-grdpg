@@ -1,13 +1,21 @@
 ---
 title: "Connecting the Popularity Adjusted Block Model to the Generalized Random Dot Product Graph for Community Detection and Parameter Estimation"
-author: John Koo, Minh Tang, Michael Trosset
+authors: John Koo, Minh Tang, Michael Trosset
+# author: John Koo
+# author2: Minh Tang
+# author3: Michael Trosset
 output:
   pdf_document:
     citation_package: natbib
     number_sections: yes
+# output:
+#   bookdown::pdf_document2:
+#     citation_package: natbib
+#     number_citations: yes
 # output: html_document
+# output: rticles::rss_article
 fontsize: 12pt
-geometry: "left=1in,right=1in,top=1in,bottom=1in"
+# geometry: "left=1in,right=1in,top=1in,bottom=1in"
 urlcolor: blue
 header-includes:
 - \usepackage{float}
@@ -16,19 +24,18 @@ header-includes:
 - \usepackage[linesnumbered,ruled,vlined]{algorithm2e} 
 - \setcitestyle{numbers,square}
 - \usepackage{verbatim}
+- \usepackage{amsthm}
 bibliography: misc.bib
 abstract: |
-  In this paper, we connect two random graph models, the Popularity 
-  Adjusted Block Model (PABM) and the Generalized Random Dot Product Graph 
-  (GRDPG) and use properties established in this connection to aid in 
-  community detection and parameter estimation. In particular, we note that the
-  PABM can be represented as latent positions such that points within the same 
-  community lie on a subspace, and the subspaces that represent each 
-  community are orthogonal to one another. Using this property as well as the 
-  asymptotic properties of Adjacency Spectral Embedding (ASE) of the GRDPG, we 
-  are able to establish theoretical asymptotic results of our community 
-  detection and parameter estimation methods for the PABM, including for 
-  Sparse Subspace Clustering (SSC). 
+  We connect two random graph models, the Popularity Adjusted Block Model 
+  (PABM) and the Generalized Random Dot Product Graph (GRDPG), demonstrating
+  that a PABM is a GRDPG in which communities correspond to certain mutually
+  orthogonal subspaces of latent positions. This insight leads to the
+  construction of improved algorithms for community detection and parameter
+  estimation with PABM. Using established asymptotic properties of Adjacency
+  Spectral Embedding (ASE) for GRDPG, we derive asymptotic properties of these
+  algorithms, including algorithms that rely on Sparse Subspace Clustering
+  (SSC). We illustrate these properties via simulation.
 ---
 
 ```{r setup, include = FALSE}
@@ -56,6 +63,9 @@ library(mclust)
 theme_set(theme_bw())
 ```
 
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
 \newcommand{\diag}{\text{diag}}
 \newcommand{\tr}{\text{Tr}}
 \newcommand{\blockdiag}{\text{blockdiag}}
@@ -63,6 +73,13 @@ theme_set(theme_bw())
 \newcommand{\iid}{\stackrel{\text{iid}}{\sim}}
 \newcommand{\Bernoulli}{\text{Bernoulli}}
 \newcommand{\Betadist}{\text{Beta}}
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+\theoremstyle{example}
+\newtheorem*{example}{Example}
 
 # Introduction
 
@@ -131,7 +148,8 @@ $P \in [0, 1]^{n \times n}$.
 
 ## The popularity adjusted block model and the generalized random dot product graph
 
-**Definition 1** (Popularity Adjusted Block Model) 
+\begin{definition}[Popularity Adjusted Block Model]
+\label{pabm}
 \cite{307cbeb9b1be48299388437423d94bf1}. 
 Let $P \in [0, 1]^{n \times n}$ be a symmetric edge probability matrix for a 
 set of $n$ 
@@ -156,12 +174,14 @@ $\lambda^{(st)}$ is a column vector
 of dimension $n_s$, then graph $G$ and its corresponding adjacency matrix $A$ 
 is a realization of a popularity adjusted block model with parameters 
 $\{\lambda^{(st)}\}_{s, t = 1}^K$. 
+\end{definition}
 
 We will use the notation $A \sim PABM(\{\lambda^{(kl)}\}_K)$ to denote a random 
 adjacency matrix $A$ drawn from a PABM with parameters $\lambda^{(kl)}$ 
 consisting of $K$ underlying communities.
 
-**Definition 2** (Generalized Random Dot Product Graph) 
+\begin{definition}[Generalized Random Dot Product Graph] 
+\label{grdpg} 
 \cite{rubindelanchy2017statistical}.
 Let $P \in [0, 1]^{n \times n}$ be a symmetric edge probability matrix for a 
 set of $n$ vertices, $V$. If $\exists X \in \mathbb{R}^{n \times d}$ such that 
@@ -178,15 +198,18 @@ with latent positions $X$ and signature $(p, q)$. More precisely, if vertices
 $i$ and $j$ have latent positions $x_i$ and $x_j$ respectively, then the edge 
 probability between the two is $P_{ij} = x_i^\top I_{pq} x_j$, and $X$ contains 
 the latent positions as rows $x_i^\top$. 
+\end{definition}
 
 We will use the notation $A \sim GRDPG_{p,q}(X)$ to denote a random adjacency 
 matrix $A$ drawn from latent positions $X$ and signature $(p, q)$.
 
-**Definition 3**. The indefinite orthogonal group with signature $(p, q)$ is 
+\begin{definition}[Indefinite Orthogonal Group] 
+The indefinite orthogonal group with signature $(p, q)$ is 
 the set $\{Q \in \mathbb{R}^{d \times d} : Q I_{pq} Q^{\top} = I_{pq}\}$, 
 denoted as $\mathbb{O}(p, q)$ \cite{rubindelanchy2017statistical}.
+\end{definition}
 
-**Remark**. 
+\begin{remark}
 Like the RDPG, the latent positions of a GRDPG are not unique 
 \cite{rubindelanchy2017statistical}. 
 More specifically, if $P_{ij} = x_i^\top I_{pq} x_j$, then we also have for any 
@@ -196,10 +219,12 @@ x_i^\top I_{pq} x_j = P_{ij}$.
 Unlike in the RDPG case, transforming the latent positions via multiplication 
 by $Q \in \mathbb{O}(p, q)$ does not necessarily maintain interpoint angles or 
 distances. 
+\end{remark}
 
 ## Connecting the PABM to the GRDPG
 
-**Theorem 1** (Connecting the PABM to the GRDPG for $K = 2$). 
+\begin{theorem}[Connecting the PABM to the GRDPG for $K = 2$]
+\label{theorem1}  
 Let 
 
 $$X = \begin{bmatrix} 
@@ -215,15 +240,19 @@ $$U = \begin{bmatrix} 1 & 0 & 0 & 0 \\
 where each $\lambda^{(kl)}$ is a vector as in Definition 1. 
 Then $A \sim GRDPG_{3, 1}(X U)$ and $A \sim PABM(\{(\lambda^{(kl)}\}_2)$ are 
 equivalent.
+\end{theorem}
 
-**Theorem 2** (Generalization to $K > 2$). There exists a block diagonal matrix 
+\begin{theorem}[Generalization to $K > 2$] 
+\label{theorem2}
+There exists a block diagonal matrix 
 $X \in \mathbb{R}^{n \times K^2}$ defined by PABM parameters 
 $\{\lambda^{(kl)}\}_K$ and orthonormal matrix 
 $U \in \mathbb{R}^{K^2 \times K^2}$ that is fixed 
 for each $K$ such that $A \sim GRDPG_{K (K+1) / 2, K (K-1) / 2}(XU)$ and 
 $A \sim PABM(\{(\lambda^{(kl)}\})_K)$ are equivalent.
+\end{theorem}
 
-*Proof of Theorem 2*. 
+\begin{proof}
 Define the following matrices from $\{\lambda^{(kl)}\}_K$: 
 $$\Lambda^{(k)} = 
 \begin{bmatrix} \lambda^{(k,1)} & \cdots & \lambda^{(k, K)} \end{bmatrix}
@@ -273,8 +302,9 @@ q = K (K - 1) / 2
 
 and we can describe the PABM with $K$ communities as a GRDPG with latent 
 positions $X U$ with signature $\big( K (K + 1) / 2, K (K - 1) / 2 \big)$.
+\end{proof}
 
-**Example** ($K = 3$). Using the same notation as before:
+\begin{example}[$K = 3$] Using the same notation as in Theorem \ref{theorem2}:
 
 $$X = \begin{bmatrix} 
 \lambda^{(11)} & \lambda^{(12)} & \lambda^{(13)} & 0 & 0 & 0 & 0 & 0 & 0 \\
@@ -304,6 +334,7 @@ $$\Pi = \begin{bmatrix}
 \end{bmatrix}$$
 
 * Positions 1, 5, 9 are fixed.
+
 * The cycles of order 2 are $(2, 4)$, $(3, 7)$, and $(6, 8)$.
     
 Therefore, we can decompose $\Pi = U I_{6, 3} U^\top$ where the first three 
@@ -325,6 +356,7 @@ $$XU = \begin{bmatrix}
   0 & \lambda^{(31)} / \sqrt{2} & \lambda^{(32)} / \sqrt{2} & 
   0 & -\lambda^{(31)} / \sqrt{2} & -\lambda^{(32)} / \sqrt{2}
 \end{bmatrix}$$
+\end{example}
 
 # Methods
 
@@ -368,14 +400,16 @@ c_i = \arg\min_{c} \frac{1}{2} ||x_i - X_{-i} c||^2_2 + \lambda ||c||_1
 for some sparsity parameter $\lambda > 0$. The $c_i$ vectors are then collected 
 into $C$ and $B$ as before. 
 
-**Definition 4** (Subspace Detection Property) \cite{pmlr-v28-wang13}. 
+\begin{definition}[Subspace Detection Property \cite{pmlr-v28-wang13}]. 
 Let $X = \begin{bmatrix} x_1 & \cdots & x_n \end{bmatrix}^\top$ be noisy 
 points sampled from $K$ subspaces. Let $C$ and $B$ be constructed from the 
 solutions of LASSO problems as described in (\ref{eq:ssc}). If each column of 
 $C$ has nonzero norm and $B_{ij} = 0$ $\forall$ $x_i$ and $x_j$ sampled from 
 different subspaces, then $X$ obeys the subspace detection property. 
+\end{definition}
 
-**Remark**. In practice, sample $X$ often does not obey the subspace detection
+\begin{remark} 
+In practice, sample $X$ often does not obey the subspace detection
 property. In such cases, $B$ is treated as an affinity matrix for a graph which 
 is then partitioned into $K$ subgraphs to obtain the clustering. On the other 
 hand, if $X$ does obey the subspace detection property, $B$ describes a graph 
@@ -383,22 +417,26 @@ with at least $K$ disconnected subgraphs. Ideally, when the subspace detection
 property holds, there are exactly $K$ subgraphs which map to each subspace, 
 but it could be the case that some of the subspaces are represented by 
 multiple disconnected subgraphs. 
+\end{remark}
 
-Theorem 2 suggests that SSC is appropriate for community detection for the 
-PABM. More precisely, Theorem 2 says that each community consists of a
+Theorem \ref{theorem2} suggests that SSC is appropriate for community 
+detection for the PABM. 
+More precisely, Theorem \ref{theorem2} says that each community consists of a
 $K$-dimensional subspace, and together the subspaces lie in $\mathbb{R}^{K^2}$. 
 The natural approach then is to perform SSC on the ASE of $P$ or $A$.
-\citet{noroozi2019estimation} instead applied SSC to $P$ and $A$, foregoing 
-embedding altogether. 
+\citeauthor{noroozi2019estimation} instead applied SSC to $P$ and $A$, 
+foregoing embedding altogether. 
 
-Using results from \citet{soltanolkotabi2012}, it can be easily shown that 
+Using results from \citeauthor{soltanolkotabi2012}, it can be easily shown that 
 the subspace detection property holds for $XU$, which is an ASE of $P$. More 
 specifically, if points lie exactly on mutually orthogonal subspaces, then the 
 subspace detection property will hold with probability 1, and this is exactly 
-the case for the PABM (Theorem 2). Much of our work is then built on \citet{rubindelanchy2017statistical}, who describe the convergence behavior of 
-the ASE of $A$ to the ASE of $P$, and \citet{pmlr-v28-wang13}, who show the 
-necessary conditions for the subspace detection property to hold in noisy cases 
-where the points lie near subspaces. 
+the case for the PABM (Theorem \ref{theorem2}). 
+Much of our work is then built on
+\citeauthor{rubindelanchy2017statistical}, who describe the convergence 
+behavior of the ASE of $A$ to the ASE of $P$, and \citeauthor{pmlr-v28-wang13},
+who show the necessary conditions for the subspace detection property to hold 
+in noisy cases where the points lie near subspaces. 
 
 ## Community detection
 
@@ -410,7 +448,7 @@ where the points lie near subspaces.
     Compute the eigenvectors of $A$ that correspond to the $K (K+1) / 2$ most 
     positive eigenvalues and $K (K-1) / 2$ most negative eigenvalues. Construct 
     $V$ using these eigenvectors as its columns.\;
-    Compute $B = |V V^\top|$, applying $|\cdot|$ entry-wise.\;
+    Compute $B = |n V V^\top|$, applying $|\cdot|$ entry-wise.\;
     Construct graph $G$ using $B$ as its similarity matrix.\;
     Partition $G$ into $K$ disconnected subgraphs  
     (e.g., using edge thresholding or spectral clustering).\;
@@ -447,50 +485,47 @@ correspond to each community, suggesting the use of SSC. In this paper, we will
 use a different and leave the properties of SSC on the ASE of $A$ as future
 work.
 
-**Theorem 3.** 
+\begin{theorem}
+\label{theorem3}
 Let $P = V D V^\top$ be the spectral decomposition of the edge probability
-matrix. Let $B = V V^\top$. Then $B_{ij} = 0$ if vertices $i$ and $j$ are 
+matrix. Let $B = n V V^\top$. Then $B_{ij} = 0$ if vertices $i$ and $j$ are 
 from different communities.
+\end{theorem}
 
-Theorem 3 provides perfect community detection given $P$. Letting $|B|$ be the 
-affinity matrix for graph $G$, $G$ is partitioned into $K$ disjoint subgraphs 
-that correspond to each community. Using $A$ introduces some error in the ASE, 
-resulting in points that lie near subspaces but not exactly on them. Using 
-results from \cite{rubindelanchy2017statistical}, we can show that as $n$ 
-grows, the ASE of $A$ approaches the ASE of $P$ and $B_{ij} \to 0$ for $i$ and 
-$j$ in different clusters. 
+Theorem \ref{theorem3} provides perfect community detection given $P$. 
+Letting $|B|$ be the affinity matrix for graph $G$, $G$ is partitioned into 
+at least $K$ disjoint subgraphs since each of the $K$ communities have no 
+edges between them. Similar to the subspace detection property, it could be 
+the case that some of the communities are represented by multiple disjoint
+subgraphs in $G$, in which case additional reconstruction is required to
+identify the communities exactly. 
 
-The ASE of $A$ approaches latent positions that form $P$ as 
-the number of vertices $n$ increases. More precisely, let each 
-$\lambda^{(kl)}_i \sim \mathcal{F}^{(kl)}$ for $i = 1, .., n$ and 
-$k, l = 1, ..., K$. Then the corresponding latent positions 
-$XU \sim \mathcal{G}_K$ for some related joint distribution with $K$ underlying
-communities $\mathcal{G}_K$. Denote $Z_n$ as a sample of size $n$ from
-$\mathcal{G}_K$ and adjacency matrix $A_n$ as one draw from edge probability 
-matrix $P_n = Z_n I_{pq} Z_n^\top$. Let $\hat{Z}_n$ be the adjacency embedding 
-of $A_n$ with rows $(\hat{z}_i^{(n)})^\top$. Then by
-\citet{rubindelanchy2017statistical}, 
+Using $A$ instead of $P$ introduces error, which converges to $0$ 
+almost surely:
 
-\begin{equation} \label{eq:thm3}
-  \max\limits_{i \in \{1, ..., n\}} ||Q_n \hat{z}_i^{(n)} - z_i^{(n)}|| = 
-  O_P\bigg(\frac{(\log n)^c}{n^{1/2}} \bigg)
-\end{equation}
-
-for some $c > 0$ and sequence of $Q_n \in \mathbb{O}(p, q)$. 
-
-**Theorem 4**. 
-Let $\hat{B}_n$ with entries $\hat{B}_n^{(ij})$ be the affinity matrix from OSC (Alg. 1). Then $\forall$ pairs $(i, j)$ belonging to different communities, 
+\begin{theorem}
+\label{theorem4} 
+Let $\hat{B}_n$ with entries $\hat{B}_n^{(ij)}$ be the affinity matrix from OSC 
+(Alg. 1). Then $\forall$ pairs $(i, j)$ belonging to different communities 
+and sparsity factor satisfying $n \rho_n = \omega\{(\log n)^{4c}\}$, 
 
 \begin{equation} \label{eq:thm4}
-\hat{B}_n^{(ij)} \stackrel{a.s.}{\to} 0
+\max_{i, j} |n (\hat{v}_n^{(i)})^\top \hat{v}_n^{(j)}| = 
+O_P \Big( \frac{(\log n)^c}{\sqrt{n \rho_n}} \Big)
 \end{equation}
 
-Theorems 2, 3, and 4 also provide a very natural path toward using SSC for 
-community detection for the PABM. We established in Theorem 2 that an ASE of 
-the edge probability matrix $P$ can be constructed such that the communities 
-lie on mutually orthogonal subspaces, and this property can be recovered from
-the eigenvectors of $P$. Then Theorems 3 and 4 show that this property holds 
-for the adjacency matrix $A$ drawn from $P$ as $n \to \infty$. 
+This provides the result that for $i, j$ in different communities, 
+$\hat{B}_n^{(ij)} \stackrel{a.s.}{\to} 0$.
+\end{theorem}
+
+Theorems \ref{theorem2}, \ref{theorem3}, and \ref{theorem4} 
+also provide a very natural path toward using SSC for 
+community detection for the PABM. We established in Theorem \ref{theorem2}
+that an ASE of the edge probability matrix $P$ can be constructed 
+such that the communities lie on mutually orthogonal subspaces,
+and this property can be recovered from the eigenvectors of $P$. 
+Then Theorems \ref{theorem3} and \ref{theorem4} show that this property holds 
+for the unscaled ASE of $A$ drawn from $P$ as $n \to \infty$. 
 
 \begin{algorithm}[t]
   \DontPrintSemicolon
@@ -499,16 +534,16 @@ for the adjacency matrix $A$ drawn from $P$ as $n \to \infty$.
   \KwData{Adjacency matrix $A$, number of communities $K$, 
   hyperparameter $\lambda$}
   \KwResult{Community assignments $1, ..., K$}
-    Find $Z$, the ASE of $A$ using the $K (K + 1) / 2$ most positive 
-    and the $K (K - 1) / 2$ most negative eigenvalues and eigenvectors of 
-    $A$.\;
+    Find $V$, the matrix of eigenvectors of $A$ 
+    corresponding to the $K (K + 1) / 2$ most positive 
+    and the $K (K - 1) / 2$ most negative eigenvalues.\;
     \For {$i = 1, ..., n$} {
-      Assign $z_i^\top$ as the $i^{th}$ row of $Z$. 
-      Assign $Z_{-i} = \begin{bmatrix} 
-      z_1 & \cdots & z_{i-1} & z_{i+1} & \cdots & z_n \end{bmatrix}^\top$.\;
+      Assign $v_i^\top$ as the $i^{th}$ row of $V$. 
+      Assign $V_{-i} = \begin{bmatrix} 
+      v_1 & \cdots & v_{i-1} & v_{i+1} & \cdots & v_n \end{bmatrix}^\top$.\;
       Solve the LASSO problem 
-      $c_i = \arg\min_{\beta_i} 
-      \frac{1}{2} ||z_i - Z_{-i} \beta_i||_2^2 + \lambda ||\beta_i||_1$.\;
+      $c_i = \arg\min_{\beta} 
+      \frac{1}{2} ||v_i - V_{-i} \beta||_2^2 + \lambda ||\beta||_1$.\;
       Assign $\tilde{c}_i = \begin{bmatrix} 
       c_i^{(1)} & \cdots & c_i^{(i-1)} & 0 & c_i^{(i)} & \cdots & c_i^{(n-1)}
       \end{bmatrix}^\top$ such that the superscript is the index of 
@@ -523,12 +558,17 @@ for the adjacency matrix $A$ drawn from $P$ as $n \to \infty$.
     Map each partition to the community labels $1, ..., K$. 
 \end{algorithm}
 
-**Theorem 5**. Let $P_n$ describe the edge probability matrix of the PABM with 
-$n$ vertices, and let $A_n \sim \Bernoulli(P_n)$.  Let $\hat{Z}_n$ be the ASE 
-of $A_n$. Then $\exists \lambda > 0$ such that $\hat{B}_n$, the affinity matrix
-outputted by SSC using $\hat{Z}_n$ and $\lambda$, has $ij$^th^ entry
+\begin{theorem}
+\label{theorem5}
+Let $P_n$ describe the edge probability matrix of the PABM with 
+$n$ vertices, and let $A_n \sim \Bernoulli(P_n)$.  Let $\hat{V}_n$ be the 
+matrix of eigenvectors of $A_n$ corresponding to the $K (K + 1) / 2$ most
+positive and $K (K - 1) / 2$ most negative eigenvalues. Then 
+$\exists \lambda > 0$ such that $\hat{B}_n$, the affinity matrix
+outputted by SSC using $\hat{V}_n$ and $\lambda$, has $ij^{th}$ entry
 $\hat{B}_n^{(ij)} \stackrel{a.s.}{\to} 0$ $\forall i, j$ in different 
 communities. 
+\end{theorem}
 
 ## Parameter estimation
 
@@ -544,7 +584,7 @@ $\sigma^2 > 0$ is a scalar. Then $\lambda^{(kl)} = \pm \sigma u$ and
 $\lambda^{(lk)} = \pm \sigma v$. 
 Given the adjacency matrix $A$ instead of edge probability matrix $P$, we can 
 simply use plug-in estimators (algorithm 3), which converge to the true 
-parameters (Theorem 6).
+parameters.
 
 \begin{algorithm}[t]
   \DontPrintSemicolon
@@ -565,7 +605,9 @@ parameters (Theorem 6).
   }
 \end{algorithm}
 
-**Theorem 6**. Under regularity and sparsity assumptions, and under the further 
+\begin{theorem}
+\label{theorem6}
+Under regularity and sparsity assumptions, and under the further 
 assumption that $K$ is fixed and community labels are known, 
 
 \begin{equation} \label{eq:thm6}
@@ -573,6 +615,7 @@ assumption that $K$ is fixed and community labels are known,
 ||\hat{\lambda}^{(kl)} - \lambda^{(kl)}|| = 
 O_P \bigg(\frac{(\log n_k)^c}{\sqrt{n_k}} \bigg)
 \end{equation}
+\end{theorem}
 
 # Simulated Examples
 
@@ -587,8 +630,8 @@ and this method is compared against SSC \cite{noroozi2019estimation}
 \cite{307cbeb9b1be48299388437423d94bf1}. True 
 community labels are used with Algorithm 3 to estimate the popularity 
 vectors $\{\lambda^{(kl)}\}_K$, and this method is then compared against an
-MLE-based estimator described in \citet{noroozi2019estimation} and
-\citet{307cbeb9b1be48299388437423d94bf1}. 
+MLE-based estimator described in \citeauthor{noroozi2019estimation} and
+\citeauthor{307cbeb9b1be48299388437423d94bf1}. 
 
 Modularity Maximization is NP-hard, so \citet{307cbeb9b1be48299388437423d94bf1} 
 used the Extreme Points (EP) algorithm \cite{le2016}, which is $O(n^{K - 1})$. 
@@ -597,7 +640,7 @@ the Louvain algorithm \cite{Blondel_2008} was used instead.
 
 Two implementations of SSC are shown here. The first method, denoted as 
 SSC-A, treats the columns of the adjacency matrix $A$ as points in
-$\mathbb{R}^n$, as described in \citet{noroozi2019estimation}. The second 
+$\mathbb{R}^n$, as described in \citeauthor{noroozi2019estimation}. The second 
 method, denoted as SSC-ASE, first embeds $A$ and then performs SSC on the 
 embedding, as described in algorithm 2. The sparsity parameter $\lambda$ was 
 chosen via a preliminary cross-validation experiment. For the final clustering 
@@ -681,8 +724,8 @@ clustering.df %>%
   scale_y_log10()
 ```
 
-Theorem 4 implies that OSC will result in not just in the error rate 
-converging to 0 but the error *count* as well.
+Theorem \ref{theorem4} implies that OSC will result in not just in the error
+rate converging to 0 but the error *count* as well.
 We explore this in Fig. \ref{fig:clust_err_ct_sim}.
 
 ```{r clust_err_ct_sim, fig.cap = 'IQR of counts of misclustered vertices using OSC (blue) compared against SSC on the ASE of A (purple), MM (red), and SSC on the adjacency matrix (green). Communities are approximately balanced. Simulations were repeated 50 times for each sample size.', cache = FALSE, fig.width = 10}
@@ -971,15 +1014,15 @@ z.hat <- cluster.pabm(A, K)
 In the first real data example, we applied OSC to the Leeds Butterfly 
 dataset \cite{Wang_2018} consisting of visual similarity measurements among 832 
 butterflies across 10 species. The graph was modified to match the example 
-from \citet{noroozi2019estimation}: Only the 4 most frequent species were 
+from \citeauthor{noroozi2019estimation}: Only the 4 most frequent species were 
 considered, and the similarities were discretized to $\{0, 1\}$ via 
 thresholding. Fig. \ref{fig:butterfly} shows a sorted adjacency matrix sorted 
 by the resultant clustering. 
 
 Comparing against the ground truth species labels, OSC achieves an 
 accuracy of 63\% and an adjusted Rand index of 73\%. In comparison, 
-\citet{noroozi2019estimation} achieved an adjusted Rand index of 73\% using 
-sparse subspace clustering on the same dataset.
+\citeauthor{noroozi2019estimation} achieved an adjusted Rand index of 73\% 
+using sparse subspace clustering on the same dataset.
 
 ```{r butterfly, fig.height = 2, fig.width = 2, fig.cap = 'Adjacency matrix of the Leeds Butterfly dataset after sorting by the clustering outputted by OSC.', cache = FALSE}
 plot.A(A, z.hat)
@@ -1056,7 +1099,8 @@ dplyr::tibble(Network = c('British MPs', 'Political blogs', 'DBLP'),
   knitr::kable(caption = paste('Community detection error rates', 
                                'for modularity maximization,',
                                'sparse subspace clustering, ',
-                               'and OSC.'))
+                               'and OSC.'),
+               format = 'latex')
 ```
 
 ```{r mp, cache = FALSE, fig.width = 8, fig.height = 2, fig.cap = 'Adjacency matrices of (from left to right) the British MPs, Political Blogs, and DBLP networks after sorting by the clustering outputted by OSC.', fig.dpi = 10}
@@ -1161,14 +1205,15 @@ knitr::kable(dplyr::tibble(
   `OSC` = round(1 - c(hh.acc.12, hh.acc.31, hh.acc.46), 3)
 ),
 caption = paste('Community detection error rates for identifying',
-                  'household religion.'))
+                  'household religion.'),
+format = 'latex')
 ```
 
 # Discussion
 
 # Proofs
 
-**Proof of Theorem 1**. 
+**Proof of Theorem \ref{theorem1}**. 
 This is given by straightforward matrix multiplication. It suffices to show 
 that 
 
@@ -1178,10 +1223,11 @@ $$X U I_{3, 1} U^\top X^\top =
   \lambda^{(21)} (\lambda^{(12)})^\top & \lambda^{(22)} (\lambda^{(22)})^\top
 \end{bmatrix}$$
 
-*Remark*. While we can just perform the matrix multiplication to show the 
+\begin{remark} 
+While we can just perform the matrix multiplication to show the 
 equivalence, it is more illustrative to look at a few intermediate steps. Note 
 that the product of the three inner matrices results in a permutation matrix 
-with fixed points at positions $1$ and $4$ and a cycle of order 2 swappoing 
+with fixed points at positions $1$ and $4$ and a cycle of order 2 swapping 
 positions $2$ and $3$: 
 
 $$U I_{3, 1} U^\top = \begin{bmatrix} 
@@ -1198,13 +1244,16 @@ where $i = 1, 4$ corresponding to the locations of the fixed points, and the
 cycle of order two results in two eigenvalues $\pm 1$ with corresponding 
 eigenvectors $(e_i \pm e_j) / \sqrt{2}$ where $i = 2, j = 3$, pair that is 
 swapped.
+\end{remark}
 
-**Lemma 3.1.** 
+\begin{lemma}
+\label{lemma1}
 Let $P = V D V^\top$ be the spectral decomposition of the edge probability 
 matrix for a PABM. Then $V V^\top = X (X^\top X)^{-1} X^\top$ where $X$ is 
 defined as in (\ref{eq:xy}).
+\end{lemma}
 
-*Proof of Lemma 3.1*. 
+*Proof*. 
 By Theorem 2, $P = X U I_{p, q} U^\top X^\top$, where $X$ is defined as in 
 (\ref{eq:xy}) and $p$ and $q$ are defined as in equations (\ref{eq:p}) and
 (\ref{eq:q}). Alternatively, the spectral decomposition can be written as 
@@ -1223,7 +1272,8 @@ The right-hand side becomes
 
 $$\begin{split}
   (X U Q) ((X U Q)^\top (X U Q))^{-1} (X U Q)^\top & 
-    = X U Q Q^{-1} U^\top (X^\top X)^{-1} U (Q^\top)^{-1} Q^\top U^\top X^\top \\
+    = X U Q Q^{-1} U^\top (X^\top X)^{-1} 
+    U (Q^\top)^{-1} Q^\top U^\top X^\top \\
   & = X U U^\top (X^\top X)^{-1} U U^\top X^\top \\
   & = X (X^\top X)^{-1} X^\top
 \end{split}$$
@@ -1236,7 +1286,7 @@ $$\begin{split}
   & = V V^\top
 \end{split}$$
 
-**Proof of Theorem 3**.
+**Proof of Theorem \ref{theorem3}**.
 By Lemma 3.1, $V V^\top = X (X^\top X)^{-1} X^\top$ where $X$ is defined as 
 in Theorem 2. Since $X$ is block diagonal with each block corresponding 
 to one community, $X (X^\top X)^{-1} X^\top$ is also a block diagonal matrix 
@@ -1244,26 +1294,47 @@ with each block corresponding to a community and zeros elsewhere. Therefore,
 if vertices $i$ and $j$ belong to different communities, then the $ij$^th^ 
 element of $X (X^\top X)^{-1} X^\top = V V^\top = B$ is 0.
 
-**Proof of Theorem 4**. 
-By Theorem 3, if $i$ and $j$ belong to different communities and $v_n^{(i)}$ 
-and $v_n^{(j)}$ are the corresponding eigenvectors of $P_n$, then 
-$(v_n^{(i)})^\top v_n^{(j)} = 0$. Then by \citet{rubindelanchy2017statistical}, 
-for eigenvectors of $A_n$, $\hat{v}_n^{(i)}$ and $\hat{v}_n^{(j)}$, 
+**Proof of Theorem \ref{theorem4}**. 
+Let $V_n$ and $\hat{V}_n$ be the eigenvectors of $P$ and $A$ corresponding 
+to the $K (K + 1) / 2$ most positive and $K (K - 1) / 2$ most negative
+eigenvalues. By \citeauthor{rubindelanchy2017statistical}, for some 
+$W \in \mathbb{O}(K^2)$, and $c > 0$,  
+$||\hat{V} W - V||_{2 \to \infty} = 
+O_P \big(\frac{(\log n)^c}{n \sqrt{\rho_n}} \big)$. 
+We furthermore have $||V||_{2 \to \infty} = O_P(n^{-1/2})$. Then if
+$(v_n^{(i)})^\top$ and $(\hat{v}_n^{(i)})^\top$ correspond to the rows of 
+$V_n$ and $\hat{V}_n$, for $i$ and $j$ in different communities, using the 
+fact that $(v_n^{(i)})^\top v_n^{(j)} = 0$, 
 
-$$(\hat{v}_n^{(i)})^\top \hat{v}_n^{(j)} \stackrel{a.s.}{\to} 
-(v_n^{(i)})^\top v_n^{(j)} = 0$$
+$$\begin{split}
+\max_{i, j} |(\hat{v}_n^{(i)})^\top \hat{v}_n^{(j)}| &
+= \max_{i, j} |(\hat{v}_n^{(i)})^\top \hat{v}_n^{(j)} - 
+(v_n^{(i)})^\top v_n^{(j)}| \\
+& = \max_{i, j} |(\hat{v}_n^{(i)})^\top W W^\top \hat{v}_n^{(j)} -
+(v_n^{(i)})^\top v_n^{(j)}| \\
+& = ||\hat{V}_n W^\top W \hat{V}_n - V_n V_n^\top||_{2 \to \infty} \\
+& = ||2 \hat{V}_n W V^\top - 2 V_n V_n^\top + \hat{V}_n W W^\top V_n^\top - 
+2 \hat{V}_n W V^\top + V V^\top||_{2 \to \infty} \\
+& = ||2 (\hat{V}_n W - V_n) V_n^\top + 
+(\hat{V}_n W - V_n) (\hat{V}_n W - V_n)^\top ||_{2 \to \infty} \\
+& \leq 2 ||\hat{V}_n W - V_n||_{2 \to \infty} ||V_n||_{2 \to \infty} +
+||\hat{V}_n W - V_n||_{2 \to \infty}^2 \\
+& = O_P \Big( \frac{(\log n)^c}{n^{3/2} \rho_n^{1/2}} \Big)
+\end{split}$$
 
-since $W_n \hat{v}_n^{(i)} \stackrel{a.s.}{\to} v_n^{(i)}$ for each 
-$i = 1, ..., n$ for some orthonormal $W_n$. 
+Then scaling by $n$, we get 
+$|n (\hat{v}_n^{(i)})^\top \hat{v}_n^{(j)}| = 
+O_P \big( \frac{(\log n)^c}{\sqrt{n \rho_n}} \big)$.
 
-**Definition 5** (Inradius) \cite{soltanolkotabi2012} 
-\cite{pmlr-v28-wang13}. 
+\begin{definition}[Inradius \cite{soltanolkotabi2012} \cite{pmlr-v28-wang13}]
 The inradius of a convex body $\mathcal{P}$, denoted by $r(\mathcal{P})$, is 
 defined as the radius of the largest Euclidean ball inscribed in $\mathcal{P}$.
 In addition, $r(X)$ for data matrix $X$ with rows $x_i^\top$ represents 
 the inradius of the symmetric convex hull of $X$. 
+\end{definition}
 
-**Lemma 5.1**. 
+\begin{lemma}
+\label{lemma2}
 Let $P_n = V_n \Lambda_n V_n^\top$ be the edge probability matrix of a PABM 
 with $n$ vertices. Let $A_n \sim \Bernoulli(P_n)$ be the adjacency matrix 
 drawn from $P_n$, and let $A_n = \hat{V}_n \hat{\Lambda}_n \hat{V}_n^\top$ be 
@@ -1271,45 +1342,47 @@ its approximate spectral decomposition using the $K (K+1) / 2$ most positive
 and $K (K-1) / 2$ most negative eigenvalues and their corresponding 
 eigenvectors.Without loss of generality, order the rows of $V_n$ and 
 $\hat{V}_n$ by community, and let $V_n^{(k)}$ and $\hat{V}_n^{(k)}$ be the 
-$n_k \times K^2$ matrix of the rows of the $k$^th^ community in $V_n$ and 
+$n_k \times K^2$ matrix of the rows of the $k^{th}$ community in $V_n$ and 
 $\hat{V}_n$ respectively. 
 Let $\mu_n^{(k)} = \mu(V_n^{(k)})$ be the subspace incoherence of $V_n^{(k)}$ 
-as defined by \citet{soltanolkotabi2012}. Then $\mu_n^{(k)} = 0$ 
+as defined by \citeauthor{soltanolkotabi2012}. Then $\mu_n^{(k)} = 0$ 
 with probability 1 $\forall n, k$. 
 
 Furthermore, Let $\hat{\mu}_n^{(k)} = \mu(\hat{V}_n^{(k)})$ using the 
-extended definition of $\mu(\cdot)$ from \citet{pmlr-v28-wang13}. Then 
+extended definition of $\mu(\cdot)$ from \citeauthor{pmlr-v28-wang13}. Then 
 
 \begin{equation} \label{eq:mu-conv}
 \hat{\mu}_n^{(k)} = 0
 \end{equation}
+\end{lemma}
 
-*Proof of Lemma 5.1*. 
+*Proof*. 
 For the first part, 
-since $V_n^{(k)}$ is orthogonal to $V_n^{(l)}$ $\forall k \neq l$ (Lemma 3.1), 
-this falls directly out of Theorem 2.8 of \citet{soltanolkotabi2012}. 
+since $v_n^{(k)}$ is orthogonal to $v_n^{(l)}$ $\forall k \neq l$ 
+(Lemma \ref{lemma1}), 
+this falls directly out of Theorem 2.8 of \citeauthor{soltanolkotabi2012}. 
 
 For the second part, 
 $\mu(\hat{V}_n^{(k)}) = 
 \max_{v_n^{(i)} \in V_n^{(-k)}} ||U_n^{(k)} v_n^{(i)}||_\infty$ 
 where the rows of $U_n^{(k)}$ consist of vectors lying on the subspace spanned 
-by $V_n^{(k)}$. Since if 
+by $V_n^{(k)}$. Since 
 $u_n^{(i)} \in \text{span}(V_n^{(k)}) \implies u_n^{(i)} \perp v_n^{(j)}$ 
-$\forall v_n^{(j)} \in V_n^{(-k)}$ by Theorem 2, this quantity must be 0.
+$\forall v_n^{(j)} \in V_n^{(-k)}$ by Theorem \ref{theorem2}, this quantity 
+must be 0.
 
-**Lemma 5.2**. 
+\begin{lemma}
+\label{lemma3}
 Let $(v_n^{(i)})^\top$ and $(\hat{v}_n^{(i)})^\top$ be the rows of $V_n$ and
-$\hat{V}_n$ respectively. By \citet{rubindelanchy2017statistical}, 
+$\hat{V}_n$ respectively. By \citeauthor{rubindelanchy2017statistical}, 
 
 \begin{equation} \label{eq:delta-conv}
 \delta_n = \max_i ||\hat{v}_n^{(i)} - v_n^{(i)}|| \stackrel{a.s.}{\to} 0
 \end{equation}
+\end{lemma}
 
-**Proof of Theorem 5**. 
-For ease of proving, we will consider $V_n$ and $\hat{V}_n$ instead of $Z_n$ 
-and $\hat{Z}_n$. 
-
-The basis of this theorem is Theorem 6 from \citet{pmlr-v28-wang13}, which 
+**Proof of Theorem \ref{theorem5}**. 
+The basis of this proof is Theorem 6 from \citeauthor{pmlr-v28-wang13}, which 
 states that the subspace detection property holds if the noise is small enough 
 and the subspace inradius is greater than the subspace incoherence for each 
 community $k$.
@@ -1328,9 +1401,9 @@ $\delta_n < \min_k \frac{r_n (r_n^{(k)} - \mu_n^{(k)})}{2 + 7 r_n^{(k)}}$
 with probability 1. 
 
 Thus the conditions for the subspace detection property from Theorem 6 from
-\citet{pmlr-v28-wang13} are satisfied almost surely as $n \to \infty$.
+\citeauthor{pmlr-v28-wang13} are satisfied with probability 1 as $n \to \infty$.
 
-**Proof of Theorem 6**. 
+**Proof of Theorem \ref{theorem6}**. 
 Let $P$ and $A$ be organized by community such that the elements of blocks 
 $P^{(kl)}$ and $A^{(kl)}$ correspond to the edges between communities $k$ and 
 $l$. 
@@ -1350,7 +1423,7 @@ one-dimensional approximation. Define
 $\hat{\lambda}^{(kk)} = \hat{\sigma}_{kk} \hat{u}^{(kk)}$. Then 
 $\hat{\lambda}^{(kk)}$ is the adjacency spectral embedding approximation of 
 $\lambda^{(kk)}$.  
-Then by Theorem 5 from \citet{rubindelanchy2017statistical}, the adjacency 
+Then by Theorem 5 of \citeauthor{rubindelanchy2017statistical}, the adjacency 
 spectral embedding $\hat{\lambda}^{(kk)}$ approximates $\lambda^{(kk)}$ at rate 
 $\frac{(\log n_k)^c}{\sqrt{n_k}}$.
 
@@ -1407,7 +1480,7 @@ $$\begin{bmatrix}
 
 where each $\hat{\lambda}^{(kl)}$ is defined as in Algorithm 3, approximates 
 the latent positions of $M^{(kl)}$ up to indefinite orthogonal transformation 
-by the rate given in Theorem 5 of \citet{rubindelanchy2017statistical}.  
+by the rate given in Theorem 5 of \citeauthor{rubindelanchy2017statistical}.  
 In this case, the indefinite orthogonal transformation $W_*$ in the GRDPG 
 result \cite{rubindelanchy2017statistical} is of the form 
 $U^\top \hat{U}$. The eigenvalues of $M$ are distinct since the signature 
