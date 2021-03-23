@@ -95,7 +95,7 @@ cluster.pabm <- function(A, K,
     v.norm <- sqrt(rowSums(V ** 2))
     V <- sweep(V, 1, v.norm, `/`)
   }
-  B <- abs(V %*% t(V))
+  B <- n * abs(V %*% t(V))
   if (laplacian == 'graph') {
     L <- graph.laplacian(B)
   } else if (laplacian == 'normalized') {
@@ -277,6 +277,7 @@ ssc <- function(A,
     B[is.nan(B)] <- 0
   }
   W <- B + t(B)
+  W <- sqrt(N) * W
   L <- normalized.laplacian(W)
   L.eigen <- eigen(L, symmetric = TRUE)
   X <- L.eigen$vectors[, seq(N, N - K)]

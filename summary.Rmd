@@ -549,7 +549,7 @@ for the unscaled ASE of $A$ drawn from $P$ as $n \to \infty$.
     }
     Assign 
     $C = \begin{bmatrix} \tilde{c}_1 & \cdots & \tilde{c}_n \end{bmatrix}$.\;
-    Compute the affinity matrix $B = |C| + |C^\top|$.\;
+    Compute the affinity matrix $B = \sqrt{n} (|C| + |C^\top|)$.\;
     Construct graph $G$ using $B$ as its similarity matrix.\;
     Partition $G$ into $K$ disconnected subgraphs (e.g., using edge 
     thresholding or spectral clustering).\;
@@ -562,10 +562,8 @@ Let $P_n$ describe the edge probability matrix of the PABM with
 $n$ vertices, and let $A_n \sim \Bernoulli(P_n)$.  Let $\hat{V}_n$ be the 
 matrix of eigenvectors of $A_n$ corresponding to the $K (K + 1) / 2$ most
 positive and $K (K - 1) / 2$ most negative eigenvalues. Then 
-$\exists \lambda > 0$ such that $\hat{B}_n$, the affinity matrix
-outputted by SSC using $\hat{V}_n$ and $\lambda$, has $ij^{th}$ entry
-$\hat{B}_n^{(ij)} \stackrel{a.s.}{\to} 0$ $\forall i, j$ in different 
-communities. 
+$\exists \lambda > 0$ such that as $n \to \infty$, $\hat{V}_n$ obeys the 
+subspace detection property with probability 1.
 \end{theorem}
 
 ## Parameter estimation
