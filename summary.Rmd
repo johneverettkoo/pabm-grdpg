@@ -1211,6 +1211,18 @@ format = 'latex')
 
 # Discussion
 
+This paper shows the connection between the PABM and the GRDPG, namely that 
+a PABM graph can be represented as a union of orthogonal subspaces in an 
+embedding under the GRDPG framework. We then exploited this relationship to 
+develop community detection and parameter estimation methods. In fact, we can 
+represent any graph with Bernoulli edges as a GRDPG, and in the PABM case, 
+it turns out that this relationship leads to a very straightforward 
+applications of previous work from \citeauthor{rubindelanchy2017statistical}, 
+\citeauthor{soltanolkotabi2012}, and \citeauthor{pmlr-v28-wang13}, which lead 
+to asymptotically correct solutions with high probability. Similar methods can 
+be applied for other models, such as the Nested Block Model
+\cite{noroozi2021hierarchy}. 
+
 # Proofs
 
 **Proof of Theorem \ref{theorem1}**. 
