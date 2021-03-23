@@ -252,6 +252,7 @@ $A \sim PABM(\{(\lambda^{(kl)}\})_K)$ are equivalent.
 
 \begin{proof}
 Define the following matrices from $\{\lambda^{(kl)}\}_K$: 
+
 $$\Lambda^{(k)} = 
 \begin{bmatrix} \lambda^{(k,1)} & \cdots & \lambda^{(k, K)} \end{bmatrix}
 \in \mathbb{R}^{n_k \times K}$$
@@ -1295,12 +1296,13 @@ $$\begin{split}
 \end{split}$$
 
 **Proof of Theorem \ref{theorem3}**.
-By Lemma 3.1, $V V^\top = X (X^\top X)^{-1} X^\top$ where $X$ is defined as 
-in Theorem 2. Since $X$ is block diagonal with each block corresponding 
-to one community, $X (X^\top X)^{-1} X^\top$ is also a block diagonal matrix 
-with each block corresponding to a community and zeros elsewhere. Therefore, 
-if vertices $i$ and $j$ belong to different communities, then the $ij$^th^ 
-element of $X (X^\top X)^{-1} X^\top = V V^\top = B$ is 0.
+By Lemma \ref{lemma1}, $V V^\top = X (X^\top X)^{-1} X^\top$ where $X$ is 
+defined as in (\ref{eq:xy}). Since $X$ is block diagonal with each 
+block corresponding to one community, $X (X^\top X)^{-1} X^\top$ is also a 
+block diagonal matrix with each block corresponding to a community and zeros
+elsewhere. Therefore, if vertices $i$ and $j$ belong to different communities,
+then the $ij$^th^ element of $n X (X^\top X)^{-1} X^\top = n V V^\top = B$ 
+is 0.
 
 **Proof of Theorem \ref{theorem4}**. 
 Let $V_n$ and $\hat{V}_n$ be the eigenvectors of $P$ and $A$ corresponding 
