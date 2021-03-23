@@ -150,7 +150,6 @@ $P \in [0, 1]^{n \times n}$.
 
 \begin{definition}[Popularity Adjusted Block Model]
 \label{pabm}
-\cite{307cbeb9b1be48299388437423d94bf1}. 
 Let $P \in [0, 1]^{n \times n}$ be a symmetric edge probability matrix for a 
 set of $n$ 
 vertices, $V$. Each vertex has a community label $1, ..., K$, and the rows and 
@@ -182,7 +181,6 @@ consisting of $K$ underlying communities.
 
 \begin{definition}[Generalized Random Dot Product Graph] 
 \label{grdpg} 
-\cite{rubindelanchy2017statistical}.
 Let $P \in [0, 1]^{n \times n}$ be a symmetric edge probability matrix for a 
 set of $n$ vertices, $V$. If $\exists X \in \mathbb{R}^{n \times d}$ such that 
 
@@ -206,7 +204,7 @@ matrix $A$ drawn from latent positions $X$ and signature $(p, q)$.
 \begin{definition}[Indefinite Orthogonal Group] 
 The indefinite orthogonal group with signature $(p, q)$ is 
 the set $\{Q \in \mathbb{R}^{d \times d} : Q I_{pq} Q^{\top} = I_{pq}\}$, 
-denoted as $\mathbb{O}(p, q)$ \cite{rubindelanchy2017statistical}.
+denoted as $\mathbb{O}(p, q)$.
 \end{definition}
 
 \begin{remark}
@@ -370,8 +368,8 @@ beforehand and does not require estimation.
 
 ## Related work
 
-\citet*{307cbeb9b1be48299388437423d94bf1}, who first proposed the PABM, used 
-a relaxed version of Modularity Maximization (MM) based on the Extreme Points
+\citeauthor{307cbeb9b1be48299388437423d94bf1}, who first proposed the PABM, 
+used Modularity Maximization (MM) and the Extreme Points
 (EP) algorithm \cite{le2016} for community detection and parameter estimation. 
 They were able to show that as the sample size increases, the proportion of
 misclassified community labels (up to permutation) goes to 0. 
@@ -394,13 +392,13 @@ clustering).
 In practice, SSC is often performed by solving the LASSO problems 
 
 \begin{equation} \label{eq:ssc}
-c_i = \arg\min_{c} \frac{1}{2} ||x_i - X_{-i} c||^2_2 + \lambda ||c||_1
+c_i = \arg\min_c \frac{1}{2} ||x_i - X_{-i} c||^2_2 + \lambda ||c||_1
 \end{equation}
 
 for some sparsity parameter $\lambda > 0$. The $c_i$ vectors are then collected 
 into $C$ and $B$ as before. 
 
-\begin{definition}[Subspace Detection Property \cite{pmlr-v28-wang13}]. 
+\begin{definition}[Subspace Detection Property]. 
 Let $X = \begin{bmatrix} x_1 & \cdots & x_n \end{bmatrix}^\top$ be noisy 
 points sampled from $K$ subspaces. Let $C$ and $B$ be constructed from the 
 solutions of LASSO problems as described in (\ref{eq:ssc}). If each column of 
@@ -427,14 +425,14 @@ The natural approach then is to perform SSC on the ASE of $P$ or $A$.
 \citeauthor{noroozi2019estimation} instead applied SSC to $P$ and $A$, 
 foregoing embedding altogether. 
 
-Using results from \citeauthor{soltanolkotabi2012}, it can be easily shown that 
+Using results from \citet{soltanolkotabi2012}, it can be easily shown that 
 the subspace detection property holds for $XU$, which is an ASE of $P$. More 
 specifically, if points lie exactly on mutually orthogonal subspaces, then the 
 subspace detection property will hold with probability 1, and this is exactly 
 the case for the PABM (Theorem \ref{theorem2}). 
 Much of our work is then built on
 \citeauthor{rubindelanchy2017statistical}, who describe the convergence 
-behavior of the ASE of $A$ to the ASE of $P$, and \citeauthor{pmlr-v28-wang13},
+behavior of the ASE of $A$ to the ASE of $P$, and \citet{pmlr-v28-wang13},
 who show the necessary conditions for the subspace detection property to hold 
 in noisy cases where the points lie near subspaces. 
 
@@ -1078,7 +1076,7 @@ network \cite{greene2013producing}, the Political Blogs network
 \cite{10.1145/1134271.1134277}, and the DBLP network \cite{NIPS2009_3855} 
 \cite{10.1007/978-3-642-15880-3_42}. For this data analysis, we subsetted the 
 data as described by 
-\citet{307cbeb9b1be48299388437423d94bf1} for their analysis of the same 
+\citeauthor{307cbeb9b1be48299388437423d94bf1} for their analysis of the same 
 networks. Our methods underperformed compared to modularity maximization, 
 although performance is comparable. In 
 addition, OSC's runtime is much lower than that of modularity 
@@ -1325,8 +1323,8 @@ $$\begin{split}
 & = \max_{i, j} |(\hat{v}_n^{(i)})^\top W W^\top \hat{v}_n^{(j)} -
 (v_n^{(i)})^\top v_n^{(j)}| \\
 & = ||\hat{V}_n W^\top W \hat{V}_n - V_n V_n^\top||_{2 \to \infty} \\
-& = ||2 \hat{V}_n W V^\top - 2 V_n V_n^\top + \hat{V}_n W W^\top V_n^\top - 
-2 \hat{V}_n W V^\top + V V^\top||_{2 \to \infty} \\
+& = ||2 \hat{V}_n W V_n^\top - 2 V_n V_n^\top + \hat{V}_n W W^\top V_n^\top - 
+2 \hat{V}_n W V_n^\top + V_n V_n^\top||_{2 \to \infty} \\
 & = ||2 (\hat{V}_n W - V_n) V_n^\top + 
 (\hat{V}_n W - V_n) (\hat{V}_n W - V_n)^\top ||_{2 \to \infty} \\
 & \leq 2 ||\hat{V}_n W - V_n||_{2 \to \infty} ||V_n||_{2 \to \infty} +
