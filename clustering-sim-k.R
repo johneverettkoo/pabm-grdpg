@@ -81,7 +81,7 @@ clustering.df <- foreach(K = K.vec, .combine = dplyr::bind_rows) %do% {
       A <- draw.graph(P)
       clustering <- cluster.pabm(A, K, use.all = TRUE, normalize = FALSE)
       error <- 1 - cluster.acc(clustering, z)
-      clustering.ssc <- ssc(A, K, n ** -1 * K, normalize = TRUE, scale = FALSE)
+      clustering.ssc <- ssc(A, K, K / n, normalize = TRUE, scale = FALSE)
       error.ssc <- 1 - cluster.acc(clustering.ssc, z)
       if (K == 2) {
         clustering.mm <- cluster.sg(A)
