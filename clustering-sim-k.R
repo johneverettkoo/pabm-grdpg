@@ -81,7 +81,7 @@ clustering.df <- foreach(K = K.vec, .combine = dplyr::bind_rows) %do% {
       A <- draw.graph(P)
       clustering <- cluster.pabm(A, K, use.all = TRUE, normalize = FALSE)
       error <- 1 - cluster.acc(clustering, z)
-      clustering.ssc <- ssc(A, K, sparsity, normalize = TRUE)
+      clustering.ssc <- ssc(A, K, n ** -1 * K, normalize = TRUE, scale = FALSE)
       error.ssc <- 1 - cluster.acc(clustering.ssc, z)
       if (K == 2) {
         clustering.mm <- cluster.sg(A)
@@ -89,10 +89,11 @@ clustering.df <- foreach(K = K.vec, .combine = dplyr::bind_rows) %do% {
         clustering.mm <- mod.max(A)
       }
       error.mm <- 1 - cluster.acc(clustering.mm, z)
-      dplyr::tibble(K = K, n = n, 
-                    error = error, 
+      dplyr::tibble(K = K, n = n,
+                    error = error,
                     error.ssc = error.ssc,
-                    error.mm = error.mm) %>% 
+                    error.mm = error.mm) %>%
+        return()
         return()
     } %>% 
       return()
@@ -105,15 +106,17 @@ gc()
 
 clustering.df %>%
   dplyr::group_by(K, n) %>%
-  dplyr::summarise(med.err = median(error),
-                   first.q = quantile(error, .25),
-                   third.q = quantile(error, .75),
-                   med.err.ssc = median(error.ssc),
-                   first.q.ssc = quantile(error.ssc, .25),
-                   third.q.ssc = quantile(error.ssc, .75),
-                   med.err.mm = median(error.mm),
-                   first.q.mm = quantile(error.mm, .25),
-                   third.q.mm = quantile(error.mm, .75)) %>%
+  dplyr::summarise(
+    med.err = median(error),
+    first.q = quantile(error, .25),
+    third.q = quantile(error, .75),
+    med.err.ssc = median(error.ssc),
+    first.q.ssc = quantile(error.ssc, .25),
+    third.q.ssc = quantile(error.ssc, .75),
+    med.err.mm = median(error.mm),
+    first.q.mm = quantile(error.mm, .25),
+    third.q.mm = quantile(error.mm, .75)
+  ) %>%
   ggplot() +
   scale_y_log10() +
   scale_x_log10() +
