@@ -14,7 +14,7 @@ embedding <- function(A, p = NULL, q = NULL,
     S <- diag(sqrt(abs(eigen.A$values[keep])))
     return(U %*% S)
   } else {
-    return(U)
+    return(U * sqrt(n))
   }
 }
 
@@ -277,7 +277,6 @@ ssc <- function(A,
     B[is.nan(B)] <- 0
   }
   W <- B + t(B)
-  W <- sqrt(N) * W
   L <- normalized.laplacian(W)
   L.eigen <- eigen(L, symmetric = TRUE)
   X <- L.eigen$vectors[, seq(N, N - K)]

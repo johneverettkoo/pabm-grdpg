@@ -1,0 +1,475 @@
+---
+title: 'Summary of Dissertation Work Thus Far and Future Steps'
+author: John Koo
+output:
+  pdf_document:
+    citation_package: natbib
+# output: html_document
+urlcolor: blue
+header-includes:
+- \usepackage{float}
+- \usepackage{mathtools}
+- \usepackage{natbib}
+- \usepackage[linesnumbered,ruled,vlined]{algorithm2e} 
+- \setcitestyle{numbers,square}
+- \usepackage{verbatim}
+- \usepackage{amsthm}
+bibliography: short-summary.bib
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      comment = NA, 
+                      warning = FALSE, 
+                      message = FALSE, 
+                      fig.pos = 'H', 
+                      fig.align = 'center', 
+                      fig.height = 5, 
+                      fig.width = 12, 
+                      fig.dpi = 300)
+options(xtable.comment = FALSE, 
+        xtable.table.placement = 'H')
+```
+
+\newcommand{\diag}{\text{diag}}
+\newcommand{\tr}{\text{Tr}}
+\newcommand{\blockdiag}{\text{blockdiag}}
+\newcommand{\indep}{\stackrel{\text{indep}}{\sim}}
+\newcommand{\iid}{\stackrel{\text{iid}}{\sim}}
+\newcommand{\Bernoulli}{\text{Bernoulli}}
+\newcommand{\Betadist}{\text{Beta}}
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+\theoremstyle{example}
+\newtheorem*{example}{Example}
+
+# Introduction and Research Goal/Scope
+
+Statistical analysis on graphs or networks often involves the partitioning of a graph into disconnected subgraphs or clusters, i.e., finding some function $f : [n] \mapsto [K]$. This is often motivated by the assumption that there exist underlying and unobserved communities to which each vertex of the graph belongs, and edges between pairs of vertices are determined by drawing from a probability distribution based on the community relationships between each pair. The goal of the partitioning or clustering then is community detection, or the recovery of the true underlying community labels for each vertex, up to permutation (with some additional parameter estimation being of possible interest), assuming some underlying probability model. 
+
+One example of such a model is the Stochastic Block Model (SBM) with two communities. In this case, we may draw edges between communities independently such that the distribution of each edge within community 1 is $Bernoulli(p)$, the distribution of each edge within community 2 is $Bernoulli(q)$, and the distribution of each edge between communities 1 and 2 is $Bernoulli(r)$. Other models have been proposed, such as the Degree-Corrected Block Model (DCBM), Mixed Membership Stochastic Block Model (MMSBM), and Popularity Adjusted Block Model (PABM), which are often considered generalizations of the SBM. All such models involve undirected, unweighted, hollow graphs (although there are some straightforward generalizations to other types of graphs, in particular to weighted graphs). The information in this graph is stored in adjacency $A \in \{0, 1\}^{n \times n}$ where $A_{ij} = 1$ if there is an edge between vertices $i$ and $j$, and 0 otherwise. 
+
+The underlying similarity among all of these Bernoulli edge graphs is the edge probability matrix, $P \in [0, 1]^{n \times n}$. Each element $P_{ij}$ is the probability of the existence of an edge between vertices $i$ and $j$ ($P$ is then symmetric and $P_{ii} = 0$ $\forall i$). The adjacency matrix $A$ is then drawn such that $A_{ij} \stackrel{indep}{\sim} P_{ij}$ for each $i < j$ and $A_{ji} = A_{ij}$. For instance, in the SBM example from before, $P_{ij} = p$ if vertices $i$ and $j$ both belong to community 1, $P_{ij} = q$ if they both belong to community 2, and $P_{ij} = r$ if one is in community 1 and the other is in community 2. 
+
+## The Popularity Adjusted Block Model
+
+\begin{definition}[Popularity Adjusted Block Model]
+\label{pabm}
+Let $P \in [0, 1]^{n \times n}$ be a symmetric edge probability matrix for a 
+set of $n$ 
+vertices, $V$. Each vertex has a community label $1, ..., K$, and the rows and 
+columns of $P$ are arranged by community label such that $n_k \times n_l$ block 
+$P^{(kl)}$ describes the edge probabilities between vertices in communities 
+$k$ and $l$ ($P^{(lk)} = (P^{(kl)})^\top$). 
+Let graph $G = (V, E)$ be an undirected, unweighted graph such 
+that its corresponding adjacency matrix $A \in \{0, 1\}^{n \times n}$ is a 
+realization of $\Bernoulli(P)$, i.e., 
+$A_{ij} \indep \Bernoulli(P_{ij})$ for $i > j$ 
+($A_{ij} = A_{ji}$ and $A_{ii} = 0$). 
+
+If each block $P^{(kl)}$ can be written as the outer product of two vectors:
+
+\begin{equation} \label{eq:pabm}
+  P^{(kl)} = \lambda^{(kl)} (\lambda^{(lk)})^\top
+\end{equation}
+
+for a set of $K^2$ fixed vectors $\{\lambda^{(st)}\}_{s, t = 1}^K$ where each 
+$\lambda^{(st)}$ is a column vector 
+of dimension $n_s$, then graph $G$ and its corresponding adjacency matrix $A$ 
+is a realization of a popularity adjusted block model with parameters 
+$\{\lambda^{(st)}\}_{s, t = 1}^K$. 
+\end{definition}
+
+We will use the notation $A \sim PABM(\{\lambda^{(kl)}\}_K)$ to denote a random 
+adjacency matrix $A$ drawn from a PABM with parameters $\lambda^{(kl)}$ 
+consisting of $K$ underlying communities.
+
+## The Generalized Random Dot Product Graph
+
+The Random Dot Product Graph (RDPG) is another graph model with Bernoulli edge probabilities. Under this model, each vertex of the graph can be represented by a point in some latent space such that the edge probability between any pair of vertices is given by their corresponding dot product in the latent space. It can be shown that any Bernoulli edge graph with positive semidefinite edge probability matrix $P$ can be represented as a RDPG. More specifically, if $P = V \Sigma V^\top$ is the spectral decomposition of $P$ such that $\Sigma$ is a diagonal matrix of $d$ positive eigenvalues, then $V \Sigma^{1/2}$ is one representation of the latent positions under the RDPG framework. 
+
+\begin{example}[Connecting the SBM to the RDPG]
+Consider the same SBM as before. Let community 1 have $n_1$ vertices and community 2 have $n_2$ vertices such that $n_1 + n_2 = n$. Let the edge probability matrix $P$ be organized by community such that the $P^{(kl)}$ block represents edge probabilities between communities $k$ and $l$. In this case, $P = \begin{bmatrix} P^{(11)} & P^{(12)} \\ P^{(21)} & P^{(22)} \end{bmatrix}$ where each block is a constant value, e.g., $P^{(11)}_{ij} = p$. Then one RDPG representation of this SBM is:
+
+$$X = \begin{bmatrix} 
+\sqrt{p} & 0 \\
+\vdots & \vdots \\
+\sqrt{p} & 0 \\
+\sqrt{r^2 / p} & \sqrt{q - r^2 / p} \\ 
+\vdots & \vdots \\
+\sqrt{r^2 / p} & \sqrt{q - r^2 / p}
+\end{bmatrix}
+\in \mathbb{R}^{n \times 2}$$
+
+where the first $n_1$ rows are $\begin{bmatrix} \sqrt{p} & 0 \end{bmatrix}$ and the next $n_2$ rows are $\begin{bmatrix} \sqrt{r^2 / p} & \sqrt{q - r^2 / p} \end{bmatrix}$. Then it can be shown that 
+
+$$P = X X^\top$$
+\end{example}
+
+If $P$ is not positive semidefinite, then it cannot be the edge probability 
+matrix of a RDPG, but it can be the edge probability matrix of a *Generalized*
+Random Dot Product Graph (GRDPG).[^grdpg]
+
+[^grdpg]: It is trivial to show that *all* Bernoulli graphs are GRDPGs. 
+
+\begin{definition}[Generalized Random Dot Product Graph] 
+\label{grdpg} 
+Let $P \in [0, 1]^{n \times n}$ be a symmetric edge probability matrix for a 
+set of $n$ vertices, $V$. If $\exists X \in \mathbb{R}^{n \times d}$ such that 
+
+\begin{equation} \label{eq:grdpg}
+  P = X I_{pq} X^\top
+\end{equation}
+
+for some $d, p, q \in \mathbb{N}$ and $p + q = d$, then 
+graph $G = (V, E)$ with adjacency matrix $A$ such that 
+$A_{ij} \indep \Bernoulli(P_{ij})$ for $i > j$ ($A_{ij} = A_{ji}$ and 
+$A_{ii} = 0$) is a draw from the generalized random dot product graph model 
+with latent positions $X$ and signature $(p, q)$. More precisely, if vertices 
+$i$ and $j$ have latent positions $x_i$ and $x_j$ respectively, then the edge 
+probability between the two is $P_{ij} = x_i^\top I_{pq} x_j$, and $X$ contains 
+the latent positions as rows $x_i^\top$. 
+\end{definition}
+
+We will use the notation $A \sim GRDPG_{p,q}(X)$ to denote a random adjacency 
+matrix $A$ drawn from latent positions $X$ and signature $(p, q)$.
+
+\begin{definition}[Indefinite Orthogonal Group] 
+The indefinite orthogonal group with signature $(p, q)$ is 
+the set $\{Q \in \mathbb{R}^{d \times d} : Q I_{pq} Q^{\top} = I_{pq}\}$, 
+denoted as $\mathbb{O}(p, q)$.
+\end{definition}
+
+\begin{remark}
+Like the RDPG, the latent positions of a GRDPG are not unique. 
+More specifically, if $P_{ij} = x_i^\top I_{pq} x_j$, then we also have for any 
+$Q \in \mathbb{O}(p, q)$, 
+$(Q x_i)^\top I_{pq} (Q x_j) = x_i^\top (Q^\top I_{pq} Q) x_j = 
+x_i^\top I_{pq} x_j = P_{ij}$. 
+Unlike in the RDPG case, transforming the latent positions via multiplication 
+by $Q \in \mathbb{O}(p, q)$ does not necessarily maintain interpoint angles or 
+distances. 
+\end{remark}
+
+# Literature Review and Previous Work
+
+The PABM was introduced by \citet{307cbeb9b1be48299388437423d94bf1}, who 
+intuited that a spectral clustering type of approach would be appropriate for 
+this problem. Their work was furthered by \citet{noroozi2019estimation}, who 
+used SSC for community detection. SSC is typically performed on points in 
+Euclidean space, which suggests a spectral embedding, but the authors of this 
+paper instead performed SSC on $P$ and $A$ directly. They were able to show 
+that SSC on $P$ results in perfect community detection. 
+
+SSC is described as follows. Given $x_1, ..., x_n \in \mathbb{R}^d$ such 
+that each point lies on one of $K$ subspaces, the goal is to determine 
+which subspace each point belongs to. We might also want to add some noise to 
+the points so that they don't lie exactly on their respective subspaces. 
+
+SSC is performed by solving an optimization problem for each observed point.
+Given $X \in \mathbb{R}^{n \times d}$ with vectors 
+$x_i^\top \in \mathbb{R}^d$ as rows of $X$, the optimization problem 
+$\min_{c_i} ||c_i||_1$ subject to $x_i = X c_i$ and $\beta_i = 0$ is solved 
+for each $i = 1, ..., n$. The solutions are collected collected into matrix 
+$C = \begin{bmatrix} c_1 & \cdots & c_n \end{bmatrix}^\top$ to construct an 
+affinity matrix $B = |C| + |C^\top|$. If each $x_i$ lie perfectly on one of $K$ 
+subspaces, $B$ describes an undirected graph consisting of $K$ disjoint 
+subgraphs, i.e., $B_{ij} = 0$ if $x_i, x_j$ are in different subspaces. 
+If $X$ instead represents points near $K$ subspaces with some noise, a final 
+graph partitioning step is performed (e.g., edge thresholding or spectral 
+clustering). 
+
+In practice, SSC is often performed by solving the LASSO problems 
+
+\begin{equation} \label{eq:ssc}
+c_i = \arg\min_c \frac{1}{2} ||x_i - X_{-i} c||^2_2 + \lambda ||c||_1
+\end{equation}
+
+for some sparsity parameter $\lambda > 0$. The $c_i$ vectors are then collected 
+into $C$ and $B$ as before. 
+
+\begin{definition}[Subspace Detection Property] 
+Let $X = \begin{bmatrix} x_1 & \cdots & x_n \end{bmatrix}^\top$ be noisy 
+points sampled from $K$ subspaces. Let $C$ and $B$ be constructed from the 
+solutions of LASSO problems as described in (\ref{eq:ssc}). If each column of 
+$C$ has nonzero norm and $B_{ij} = 0$ $\forall$ $x_i$ and $x_j$ sampled from 
+different subspaces, then $X$ obeys the subspace detection property. 
+\end{definition}
+
+\citet{pmlr-v28-wang13} showed that in the case where the subspaces are 
+orthogonal (or at least the cosine of their angles is very small) and the 
+points are close enough to their respective subspaces, the subspace detection
+property will hold given an appropriate choice of $\lambda$. It turns out that 
+this is precisely the case for a particular embedding choice for the PABM, of 
+which the properties have been described by 
+\citet{rubindelanchy2017statistical}.
+
+# Completed Work Thus Far
+
+The PABM can be expressed as a GRDPG. In particular, there is one expression 
+of this that results in a very simple structure such that each community 
+corresponds to a subspace and the subspaces are mutually orthogonal.
+
+\begin{theorem}[Connecting the PABM to the GRDPG for $K = 2$]
+\label{theorem1}  
+Let 
+
+$$X = \begin{bmatrix} 
+\lambda^{(11)} & \lambda^{(12)} & 0 & 0 \\ 
+0 & 0 & \lambda^{(21)} & \lambda^{(22)} 
+\end{bmatrix}$$
+
+$$U = \begin{bmatrix} 1 & 0 & 0 & 0 \\
+0 & 0 & 1 / \sqrt{2} & 1 / \sqrt{2} \\
+0 & 0 & 1 / \sqrt{2} & - 1 / \sqrt{2} \\
+0 & 1 & 0 & 0 \end{bmatrix}$$
+
+where each $\lambda^{(kl)}$ is a vector as in Definition 1. 
+Then $A \sim GRDPG_{3, 1}(X U)$ and $A \sim PABM(\{(\lambda^{(kl)}\}_2)$ are 
+equivalent.
+\end{theorem}
+
+\begin{theorem}[Generalization to $K > 2$] 
+\label{theorem2}
+There exists a block diagonal matrix 
+$X \in \mathbb{R}^{n \times K^2}$ defined by PABM parameters 
+$\{\lambda^{(kl)}\}_K$ and orthonormal matrix 
+$U \in \mathbb{R}^{K^2 \times K^2}$ that is fixed 
+for each $K$ such that $A \sim GRDPG_{K (K+1) / 2, K (K-1) / 2}(XU)$ and 
+$A \sim PABM(\{(\lambda^{(kl)}\})_K)$ are equivalent.
+\end{theorem}
+
+\begin{proof}
+Define the following matrices from $\{\lambda^{(kl)}\}_K$: 
+
+$$\Lambda^{(k)} = 
+\begin{bmatrix} \lambda^{(k,1)} & \cdots & \lambda^{(k, K)} \end{bmatrix}
+\in \mathbb{R}^{n_k \times K}$$
+
+\begin{equation} \label{eq:xy}
+X = \blockdiag(\Lambda^{(1)}, ..., \Lambda^{(K)}) \in \mathbb{R}^{n \times K^2}
+\end{equation}
+
+$$L^{(k)} = \blockdiag(\lambda^{(1k)}, ..., \lambda^{(Kk)}) \in 
+\mathbb{R}^{n \times K}$$
+
+$$Y = \begin{bmatrix} L^{(1)} & \cdots & L^{(K)} \end{bmatrix} \in 
+\mathbb{R}^{n \times K^2}$$
+
+Then $P = X Y^\top$.
+
+Similar to the $K = 2$ case, we have $Y = X \Pi$ for a permutation matrix
+$\Pi$, resulting in $P = X \Pi X^\top$.  
+The permutation described by $\Pi$ has $K$ fixed points, which correspond to 
+$K$ eigenvalues equal to $1$ with corresponding eigenvectors $e_k$ where 
+$k = r (K + 1) + 1$ for $r = 0, ..., K - 1$. It also has 
+$\binom{K}{2} = K (K - 1) / 2$ cycles of order $2$. Each cycle corresponds to 
+a pair of eigenvalues $+1$ and $-1$ and a pair of eigenvectors 
+$(e_s + e_t) / \sqrt{2}$ and $(e_s - e_t) / \sqrt{2}$.
+
+Then $\Pi$ has $K (K + 1) / 2$ eigenvalues equal to $1$ and $K (K - 1) / 2$ 
+eigenvalues equal to $-1$. $\Pi$ has the decomposed form 
+
+\begin{equation} \label{eq:permutation}
+\Pi = U I_{K (K + 1) / 2, K (K - 1) / 2} U^\top
+\end{equation}
+
+The edge probability matrix then can be written as:
+
+\begin{equation} \label{eq:pabm-grdpg}
+P = X U I_{p, q} (X U)^\top
+\end{equation}
+
+\begin{equation} \label{eq:p}
+p = K (K + 1) / 2
+\end{equation}
+
+\begin{equation} \label{eq:q}
+q = K (K - 1) / 2
+\end{equation}
+
+and we can describe the PABM with $K$ communities as a GRDPG with latent 
+positions $X U$ with signature $\big( K (K + 1) / 2, K (K - 1) / 2 \big)$.
+\end{proof}
+
+\begin{example}[$K = 3$] Using the same notation as in Theorem \ref{theorem2}:
+
+$$X = \begin{bmatrix} 
+\lambda^{(11)} & \lambda^{(12)} & \lambda^{(13)} & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & \lambda^{(21)} & \lambda^{(22)} & \lambda^{(23)} & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & \lambda^{(31)} & \lambda^{(32)} & \lambda^{(33)}
+\end{bmatrix}$$
+
+$$Y = \begin{bmatrix} 
+\lambda^{(11)} & 0 & 0 & \lambda^{(12)} & 0 & 0 & \lambda^{(13)} & 0 & 0 \\
+0 & \lambda^{(21)} & 0 & 0 & \lambda^{(22)} & 0 & 0 & \lambda^{(23)} & 0 \\
+0 & 0 & \lambda^{(31)} & 0 & 0 & \lambda^{(32)} & 0 & 0 & \lambda^{(33)}
+\end{bmatrix}$$
+
+Then $P = X Y^\top$ and $Y = X \Pi$ where $\Pi$ is a permutation matrix 
+consisting of $3$ fixed points and $3$ cycles of order 2:
+
+$$\Pi = \begin{bmatrix} 
+1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1
+\end{bmatrix}$$
+
+* Positions 1, 5, 9 are fixed.
+
+* The cycles of order 2 are $(2, 4)$, $(3, 7)$, and $(6, 8)$.
+    
+Therefore, we can decompose $\Pi = U I_{6, 3} U^\top$ where the first three 
+columns of $U$ consist of $e_1$, $e_5$, and $e_9$ corresponding to the fixed 
+positions $1$, $5$, and $9$, the next three columns consist of eigenvectors 
+$(e_k + e_l) / \sqrt{2}$, and the last three columns consist of eigenvectors 
+$(e_k - e_l) / \sqrt{2}$, where pairs $(k, l)$ correspond to the cycles of 
+order 2 described above.
+
+The latent positions are the rows of  
+$$XU = \begin{bmatrix}
+  \lambda^{(11)} & 0 & 0 & 
+  \lambda^{(12)} / \sqrt{2} & \lambda^{(13)} / \sqrt{2} & 0 & 
+  \lambda^{(12)} / \sqrt{2} & \lambda^{(13)} / \sqrt{2} & 0 \\
+  0 & \lambda^{(22)} & 0 & 
+  \lambda^{(21)} / \sqrt{2} & 0 & \lambda^{(23)} / \sqrt{2} & 
+  -\lambda^{(21)} / \sqrt{2} & 0 & \lambda^{(23)} / \sqrt{2} \\
+  0 & 0 & \lambda^{(33)} & 
+  0 & \lambda^{(31)} / \sqrt{2} & \lambda^{(32)} / \sqrt{2} & 
+  0 & -\lambda^{(31)} / \sqrt{2} & -\lambda^{(32)} / \sqrt{2}
+\end{bmatrix}$$
+\end{example}
+
+This connection leads to the following property: 
+
+\begin{theorem}
+\label{theorem3}
+Let $P = V D V^\top$ be the spectral decomposition of the edge probability
+matrix. Let $B = n V V^\top$. Then $B_{ij} = 0$ if vertices $i$ and $j$ are 
+from different communities.
+\end{theorem}
+
+In practice, however, we observe $A$ rather than $P$. Using the asymptotic
+properties of the Adjacency Spectral Embedding (ASE) of the GRDPG
+\cite{rubindelanchy2017statistical}, it can be shown that constructing 
+$\hat{B}_n$ from the eigenvectors of $A$ will result in entries of $\hat{B}$
+corresponding to between-community pairings going to 0 with probability 1. 
+
+\begin{algorithm}[t]
+  \DontPrintSemicolon
+  \SetAlgoLined
+  \KwData{Adjacency matrix $A$, number of communities $K$}
+  \KwResult{Community assignments $1, ..., K$}
+    Compute the eigenvectors of $A$ that correspond to the $K (K+1) / 2$ most 
+    positive eigenvalues and $K (K-1) / 2$ most negative eigenvalues. Construct 
+    $V$ using these eigenvectors as its columns.\;
+    Compute $B = |n V V^\top|$, applying $|\cdot|$ entry-wise.\;
+    Construct graph $G$ using $B$ as its similarity matrix.\;
+    Partition $G$ into $K$ disconnected subgraphs  
+    (e.g., using edge thresholding or spectral clustering).\;
+    Map each partition to the community labels $1, ..., K$.\;
+  \caption{Orthogonal Spectral Clustering.}
+\end{algorithm}
+
+\begin{theorem}
+\label{theorem4} 
+Let $\hat{B}_n$ with entries $\hat{B}_n^{(ij)}$ be the affinity matrix from OSC 
+(Alg. 1). Then $\forall$ pairs $(i, j)$ belonging to different communities 
+and sparsity factor satisfying $n \rho_n = \omega\{(\log n)^{4c}\}$, 
+
+\begin{equation} \label{eq:thm4}
+\max_{i, j} |n (\hat{v}_n^{(i)})^\top \hat{v}_n^{(j)}| = 
+O_P \Big( \frac{(\log n)^c}{\sqrt{n \rho_n}} \Big)
+\end{equation}
+
+This provides the result that for $i, j$ in different communities, 
+$\hat{B}_n^{(ij)} \stackrel{a.s.}{\to} 0$.
+\end{theorem}
+
+Theorems \ref{theorem2}, \ref{theorem3}, and \ref{theorem4} 
+also provide a very natural path toward using SSC for 
+community detection for the PABM. We established in Theorem \ref{theorem2}
+that an ASE of the edge probability matrix $P$ can be constructed 
+such that the communities lie on mutually orthogonal subspaces,
+and this property can be recovered from the eigenvectors of $P$. 
+Then Theorems \ref{theorem3} and \ref{theorem4} show that this property holds 
+for the unscaled ASE of $A$ drawn from $P$ as $n \to \infty$. 
+
+\begin{algorithm}[t]
+  \DontPrintSemicolon
+  \SetAlgoLined
+  \caption{Sparse Subspace Clustering using LASSO \cite{pmlr-v28-wang13}.}
+  \KwData{Adjacency matrix $A$, number of communities $K$, 
+  hyperparameter $\lambda$}
+  \KwResult{Community assignments $1, ..., K$}
+    Find $V$, the matrix of eigenvectors of $A$ 
+    corresponding to the $K (K + 1) / 2$ most positive 
+    and the $K (K - 1) / 2$ most negative eigenvalues.\;
+    \For {$i = 1, ..., n$} {
+      Assign $v_i^\top$ as the $i^{th}$ row of $V$. 
+      Assign $V_{-i} = \begin{bmatrix} 
+      v_1 & \cdots & v_{i-1} & v_{i+1} & \cdots & v_n \end{bmatrix}^\top$.\;
+      Solve the LASSO problem 
+      $c_i = \arg\min_{\beta} 
+      \frac{1}{2} ||\sqrt{n} v_i - \sqrt{n} V_{-i} \beta||_2^2 + 
+      \lambda ||\beta||_1$.\;
+      Assign $\tilde{c}_i = \begin{bmatrix} 
+      c_i^{(1)} & \cdots & c_i^{(i-1)} & 0 & c_i^{(i)} & \cdots & c_i^{(n-1)}
+      \end{bmatrix}^\top$ such that the superscript is the index of 
+      $\tilde{c}_i$.\;
+    }
+    Assign 
+    $C = \begin{bmatrix} \tilde{c}_1 & \cdots & \tilde{c}_n \end{bmatrix}$.\;
+    Compute the affinity matrix $B = |C| + |C^\top|$.\;
+    Construct graph $G$ using $B$ as its similarity matrix.\;
+    Partition $G$ into $K$ disconnected subgraphs (e.g., using edge 
+    thresholding or spectral clustering).\;
+    Map each partition to the community labels $1, ..., K$. 
+\end{algorithm}
+
+\begin{theorem}
+\label{theorem5}
+Let $P_n$ describe the edge probability matrix of the PABM with 
+$n$ vertices, and let $A_n \sim \Bernoulli(P_n)$.  Let $\hat{V}_n$ be the 
+matrix of eigenvectors of $A_n$ corresponding to the $K (K + 1) / 2$ most
+positive and $K (K - 1) / 2$ most negative eigenvalues. Then 
+$\exists \lambda > 0$ such that as $n \to \infty$, $\hat{V}_n$ obeys the 
+subspace detection property with probability 1.
+\end{theorem}
+
+We are also able to show convergence properties for parameter estimation using 
+the ASE, the details of which have been omitted for brevity but can be found 
+in the main paper.
+
+# Future Work
+
+So far, we've shown that there is a very convenient GRDPG representation of 
+the PABM that makes community detection almost trivially simple. 
+More specifically, we showed that an embedding of the PABM results in 
+orthogonal subspaces and noise that goes to 0 with probability 1, which makes 
+for a very straightforward application of SSC. It can also be shown that this 
+type of embedding has the same properties of the SBM and DCBM, which are really
+just special cases of the PABM. 
+
+Furthermore, all Bernoulli graphs can be
+represented as a GRDPG, and it may be the case that other, more complicated 
+graphs have nice ASE representations that lead to community detection methods. 
+In particular, we are currently exploring the nature of RDPGs and GRDPGs that
+result from latent positions for which each community lies on a manifold rather
+than on a subspace. 
+Much of this work is based on work by \citet{trosset2020learning} who showed 
+convergence properties for graphs that result from latent positions that lie 
+on a one-dimensional manifold. 
+
+\newpage
+
+# References

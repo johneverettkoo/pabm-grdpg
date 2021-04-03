@@ -399,7 +399,7 @@ c_i = \arg\min_c \frac{1}{2} ||x_i - X_{-i} c||^2_2 + \lambda ||c||_1
 for some sparsity parameter $\lambda > 0$. The $c_i$ vectors are then collected 
 into $C$ and $B$ as before. 
 
-\begin{definition}[Subspace Detection Property]. 
+\begin{definition}[Subspace Detection Property] 
 Let $X = \begin{bmatrix} x_1 & \cdots & x_n \end{bmatrix}^\top$ be noisy 
 points sampled from $K$ subspaces. Let $C$ and $B$ be constructed from the 
 solutions of LASSO problems as described in (\ref{eq:ssc}). If each column of 
@@ -630,8 +630,10 @@ vectors $\{\lambda^{(kl)}\}_K$, and this method is then compared against an
 MLE-based estimator described in \citeauthor{noroozi2019estimation} and
 \citeauthor{307cbeb9b1be48299388437423d94bf1}. 
 
-Modularity Maximization is NP-hard, so \citet{307cbeb9b1be48299388437423d94bf1} 
-used the Extreme Points (EP) algorithm \cite{le2016}, which is $O(n^{K - 1})$. 
+Modularity Maximization is NP-hard, so
+\citeauthor{307cbeb9b1be48299388437423d94bf1} 
+used the Extreme Points (EP) algorithm \cite{le2016}, which is $O(n^{K - 1})$, 
+as a greedy relaxation of the optimization problem. 
 For these simulations, the EP algorithm was used for $K = 2$, and for $K > 2$, 
 the Louvain algorithm \cite{Blondel_2008} was used instead.
 
