@@ -237,7 +237,7 @@ equivalent.
 There exists a block diagonal matrix 
 $X \in \mathbb{R}^{n \times K^2}$ defined by PABM parameters 
 $\{\lambda^{(kl)}\}_K$ and orthonormal matrix 
-$U \in \mathbb{R}^{K^2 \times K^2}$ that is fixed 
+$U \in \mathbb{R}^{K^2 \times K^2}$ that is known 
 for each $K$ such that $A \sim GRDPG_{K (K+1) / 2, K (K-1) / 2}(XU)$ and 
 $A \sim PABM(\{(\lambda^{(kl)}\})_K)$ are equivalent.
 \end{theorem}
@@ -246,7 +246,7 @@ $A \sim PABM(\{(\lambda^{(kl)}\})_K)$ are equivalent.
 Define the following matrices from $\{\lambda^{(kl)}\}_K$: 
 
 $$\Lambda^{(k)} = 
-\begin{bmatrix} \lambda^{(k,1)} & \cdots & \lambda^{(k, K)} \end{bmatrix}
+\begin{bmatrix} \lambda^{(k1)} & \cdots & \lambda^{(kK)} \end{bmatrix}
 \in \mathbb{R}^{n_k \times K}$$
 
 \begin{equation} \label{eq:xy}
@@ -361,7 +361,7 @@ from different communities.
 In practice, however, we observe $A$ rather than $P$. Using the asymptotic
 properties of the Adjacency Spectral Embedding (ASE) of the GRDPG
 \cite{rubindelanchy2017statistical}, it can be shown that constructing 
-$\hat{B}_n$ from the eigenvectors of $A$ will result in entries of $\hat{B}$
+$\hat{B}_n$ from the eigenvectors of $A$ will result in entries of $\hat{B}_n$
 corresponding to between-community pairings going to 0 with probability 1. 
 
 \begin{algorithm}[t]
@@ -407,7 +407,7 @@ for the unscaled ASE of $A$ drawn from $P$ as $n \to \infty$.
 \begin{algorithm}[t]
   \DontPrintSemicolon
   \SetAlgoLined
-  \caption{Sparse Subspace Clustering using LASSO \cite{pmlr-v28-wang13}.}
+  \caption{Sparse Subspace Clustering for the PABM using LASSO.}
   \KwData{Adjacency matrix $A$, number of communities $K$, 
   hyperparameter $\lambda$}
   \KwResult{Community assignments $1, ..., K$}
@@ -455,10 +455,11 @@ in the main paper.
 So far, we've shown that there is a very convenient GRDPG representation of 
 the PABM that makes community detection almost trivially simple. 
 More specifically, we showed that an embedding of the PABM results in 
-orthogonal subspaces and noise that goes to 0 with probability 1, which makes 
-for a very straightforward application of SSC. It can also be shown that this 
-type of embedding has the same properties of the SBM and DCBM, which are really
-just special cases of the PABM. 
+orthogonal subspaces and noise that converges to 0 with probability 1, which 
+makes for a very straightforward application of SSC. It can also be shown that 
+this type of embedding has the same properties for the SBM, DCBM, and Nested 
+Block Model (NBM), which are really just special cases of the PABM
+(see \citet{noroozi2021hierarchy}, in particular Fig 2.). 
 
 Furthermore, all Bernoulli graphs can be
 represented as a GRDPG, and it may be the case that other, more complicated 
@@ -466,9 +467,9 @@ graphs have nice ASE representations that lead to community detection methods.
 In particular, we are currently exploring the nature of RDPGs and GRDPGs that
 result from latent positions for which each community lies on a manifold rather
 than on a subspace. 
-Much of this work is based on work by \citet{trosset2020learning} who showed 
-convergence properties for graphs that result from latent positions that lie 
-on a one-dimensional manifold. 
+Much of this work is based on work by \citet{trosset2020learning} who 
+considered the RDPG with latent positions that lie on a manifold and developed 
+methods for recovering the manifold from an adjacency matrix sampled from it. 
 
 \newpage
 
