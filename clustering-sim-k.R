@@ -84,16 +84,19 @@ clustering.df <- foreach(K = K.vec, .combine = dplyr::bind_rows) %do% {
       clustering.ssc <- ssc(A, K, K / n, normalize = TRUE, scale = FALSE)
       error.ssc <- 1 - cluster.acc(clustering.ssc, z)
       if (K == 2) {
-        clustering.mm <- cluster.sg(A)
+        clustering.ep <- cluster.sg(A)
+        error.ep <- 1 - cluster.acc(clustering.ep, z)
       } else {
-        clustering.mm <- mod.max(A)
+        error.ep <- NA
       }
+      clustering.louvain <- mod.max(A)
+      error.louvain <- 1 - cluster.acc(clustering.louvain, z)
       error.mm <- 1 - cluster.acc(clustering.mm, z)
       dplyr::tibble(K = K, n = n,
                     error = error,
                     error.ssc = error.ssc,
-                    error.mm = error.mm) %>%
-        return()
+                    error.ep = error.ep,
+                    error.louvain = error.louvain) %>%
         return()
     } %>% 
       return()
@@ -113,9 +116,12 @@ clustering.df %>%
     med.err.ssc = median(error.ssc),
     first.q.ssc = quantile(error.ssc, .25),
     third.q.ssc = quantile(error.ssc, .75),
-    med.err.mm = median(error.mm),
-    first.q.mm = quantile(error.mm, .25),
-    third.q.mm = quantile(error.mm, .75)
+    med.err.ep = median(error.ep, na.rm = TRUE),
+    first.q.ep = quantile(error.ep, .25, na.rm = TRUE),
+    third.q.ep = quantile(error.ep, .75, na.rm = TRUE),
+    med.err.louvain = median(error.louvain),
+    first.q.louvain = quantile(error.louvain, .25),
+    third.q.louvain = quantile(error.louvain, .75)
   ) %>%
   ggplot() +
   scale_y_log10() +
@@ -126,9 +132,12 @@ clustering.df %>%
   geom_line(aes(x = n, y = med.err.ssc, colour = 'ssc')) +
   geom_errorbar(aes(x = n, ymin = first.q.ssc, ymax = third.q.ssc,
                     colour = 'ssc')) + 
-  geom_line(aes(x = n, y = med.err.mm, colour = 'mm')) + 
-  geom_errorbar(aes(x = n, ymin = first.q.mm, ymax = third.q.mm,
-                    colour = 'mm')) + 
+  geom_line(aes(x = n, y = med.err.ep, colour = 'ep')) + 
+  geom_errorbar(aes(x = n, ymin = first.q.ep, ymax = third.q.ep,
+                    colour = 'ep')) + 
+  geom_line(aes(x = n, y = med.err.louvain, colour = 'louvain')) + 
+  geom_errorbar(aes(x = n, ymin = first.q.louvain, ymax = third.q.louvain,
+                    colour = 'louvain')) + 
   facet_wrap(~ K)
 
 # export as csv
