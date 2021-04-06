@@ -604,8 +604,7 @@ parameters.
 
 \begin{theorem}
 \label{theorem6}
-Under regularity and sparsity assumptions, and under the further 
-assumption that $K$ is fixed and community labels are known, 
+Under regularity and sparsity assumptions, given fixed $K$, 
 
 \begin{equation} \label{eq:thm6}
 \max_{k, l \in \{1, ..., K\}} 
