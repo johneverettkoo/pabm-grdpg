@@ -673,7 +673,7 @@ Fig. \ref{fig:clust_err_k} show that for large $n$, OSC results in
 a misclustering rate of 0. Sparse subspace clustering produces similar results 
 for $K > 2$. 
 
-```{r clust_err_k, fig.cap = 'IQR of clustering error using OSC (blue) compared against SSC on the ASE of A (purple), MM (red), and SSC on the adjacency matrix (green). Communities are approximately balanced. Simulations were repeated 50 times for each sample size.', fig.width = 10}
+```{r clust_err_k, fig.cap = 'IQR of community detection error error using OSC (blue) compared against SSC on the ASE of A (purple), MM (red), and SSC on the adjacency matrix (green). Communities are approximately balanced. Simulations were repeated 50 times for each sample size.', fig.width = 10}
 clustering.df <- readr::read_csv('clustering-k.csv')
 ssc.df <- readr::read_csv('clustering-ssc-k.csv')
 clustering.df %>%
@@ -852,7 +852,7 @@ sufficiently large sample size. However, Fig. \ref{fig:lambda_est_k_imba}
 suggests that while Algorithm 3 retains $\sqrt{n}$ efficiency, the MLE-based 
 plug-in estimator is less efficient for this setup. 
 
-```{r clust_err_k_imba, fig.cap = 'IQR of clustering error using OSC (blue) compared against SSC on the ASE of A (purple), MM (red), and SSC on the adjacency matrix (green). Communities are imbalanced. Simulations were repeated 50 times for each sample size.', fig.width = 10}
+```{r clust_err_k_imba, fig.cap = 'IQR of community detection error using OSC (blue) compared against SSC on the ASE of A (purple), MM (red), and SSC on the adjacency matrix (green). Communities are imbalanced. Simulations were repeated 50 times for each sample size.', fig.width = 10}
 clustering.df <- readr::read_csv('clustering-k-imbalanced.csv')
 ssc.df <- readr::read_csv('clustering-ssc-k-imbalanced.csv')
 clustering.df %>%
