@@ -433,7 +433,7 @@ subspace detection property will hold with probability 1, and this is exactly
 the case for the PABM (Theorem \ref{theorem2}). 
 Much of our work is then built on
 \citeauthor{rubindelanchy2017statistical}, who describe the convergence 
-behavior of the ASE of $A$ to the ASE of $P$, and \citet{pmlr-v28-wang13},
+behavior of the ASE of $A$ to the ASE of $P$, and \citet{jmlr-v28-wang13},
 who show the necessary conditions for the subspace detection property to hold 
 in noisy cases where the points lie near subspaces. 
 
@@ -529,7 +529,7 @@ for the unscaled ASE of $A$ drawn from $P$ as $n \to \infty$.
 \begin{algorithm}[t]
   \DontPrintSemicolon
   \SetAlgoLined
-  \caption{Sparse Subspace Clustering using LASSO \cite{pmlr-v28-wang13}.}
+  \caption{Sparse Subspace Clustering using LASSO \cite{jmlr-v28-wang13}.}
   \KwData{Adjacency matrix $A$, number of communities $K$, 
   hyperparameter $\lambda$}
   \KwResult{Community assignments $1, ..., K$}
@@ -1254,7 +1254,7 @@ develop community detection and parameter estimation methods. In fact, we can
 represent any graph with Bernoulli edges as a GRDPG, and in the PABM case, 
 it turns out that this relationship leads to a very straightforward 
 applications of previous work from \citeauthor{rubindelanchy2017statistical}, 
-\citeauthor{soltanolkotabi2012}, and \citeauthor{pmlr-v28-wang13}, which lead 
+\citeauthor{soltanolkotabi2012}, and \citeauthor{jmlr-v28-wang13}, which lead 
 to asymptotically correct solutions with high probability. Similar methods can 
 be applied for other models, such as the Nested Block Model
 \cite{noroozi2021hierarchy}. 
@@ -1375,7 +1375,7 @@ Then scaling by $n$, we get
 $|n (\hat{v}_n^{(i)})^\top \hat{v}_n^{(j)}| = 
 O_P \big( \frac{(\log n)^c}{\sqrt{n \rho_n}} \big)$.
 
-\begin{definition}[Inradius \cite{soltanolkotabi2012} \cite{pmlr-v28-wang13}]
+\begin{definition}[Inradius \cite{soltanolkotabi2012} \cite{jmlr-v28-wang13}]
 The inradius of a convex body $\mathcal{P}$, denoted by $r(\mathcal{P})$, is 
 defined as the radius of the largest Euclidean ball inscribed in $\mathcal{P}$.
 In addition, $r(X)$ for data matrix $X$ with rows $x_i^\top$ represents 
@@ -1398,7 +1398,7 @@ as defined by \citeauthor{soltanolkotabi2012}. Then $\mu_n^{(k)} = 0$
 with probability 1 $\forall n, k$. 
 
 Furthermore, Let $\hat{\mu}_n^{(k)} = \mu(\hat{V}_n^{(k)})$ using the 
-extended definition of $\mu(\cdot)$ from \citeauthor{pmlr-v28-wang13}. Then 
+extended definition of $\mu(\cdot)$ from \citeauthor{jmlr-v28-wang13}. Then 
 
 \begin{equation} \label{eq:mu-conv}
 \hat{\mu}_n^{(k)} = 0
@@ -1431,7 +1431,7 @@ $\hat{V}_n$ respectively. By \citeauthor{rubindelanchy2017statistical},
 \end{lemma}
 
 **Proof of Theorem \ref{theorem5}**. 
-The basis of this proof is Theorem 6 from \citeauthor{pmlr-v28-wang13}, which 
+The basis of this proof is Theorem 6 from \citeauthor{jmlr-v28-wang13}, which 
 states that the subspace detection property holds if the noise is small enough 
 and the subspace inradius is greater than the subspace incoherence for each 
 community $k$.
@@ -1450,7 +1450,7 @@ $\delta_n < \min_k \frac{r_n (r_n^{(k)} - \mu_n^{(k)})}{2 + 7 r_n^{(k)}}$
 with probability 1. 
 
 Thus the conditions for the subspace detection property from Theorem 6 from
-\citeauthor{pmlr-v28-wang13} are satisfied with probability 1 as $n \to \infty$.
+\citeauthor{jmlr-v28-wang13} are satisfied with probability 1 as $n \to \infty$.
 
 **Proof of Theorem \ref{theorem6}**. 
 Let $P$ and $A$ be organized by community such that the elements of blocks 
