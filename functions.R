@@ -256,6 +256,11 @@ ssc <- function(A,
   
   Y <- t(embedding(A, p, q, scale))
   
+  if (normalize) {
+    Y <- sweep(Y, 2, apply(Y, 2, function(y) sqrt(sum(y ** 2))), `/`)
+    Y[is.nan(Y)] <- 0
+  }
+  
   N <- ncol(Y)
   B <- plyr::aaply(seq(N), 1, function(i) {
     y <- Y[, i]
@@ -272,14 +277,14 @@ ssc <- function(A,
     return(betahat)
   }, .parallel = parallel) %>% 
     abs()
-  if (normalize) {
-    B <- sweep(B, 2, apply(B, 2, max), `/`)
-    B[is.nan(B)] <- 0
-  }
+  B <- sweep(B, 2, apply(B, 2, max), `/`)
+  B[is.nan(B)] <- 0
   W <- B + t(B)
   L <- normalized.laplacian(W)
   L.eigen <- eigen(L, symmetric = TRUE)
   X <- L.eigen$vectors[, seq(N, N - K)]
+  # X <- sweep(X, 2, apply(X, 2, mean), `-`)
+  # X <- sweep(X, 2, apply(X, 2, sd), `/`)
   clustering <- mclust::Mclust(X, K, verbose = FALSE)$classification
   return(clustering)
 }

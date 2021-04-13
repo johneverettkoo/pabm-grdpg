@@ -25,6 +25,7 @@ header-includes:
 - \setcitestyle{numbers,square}
 - \usepackage{verbatim}
 - \usepackage{amsthm}
+- \usepackage{comment}
 bibliography: misc.bib
 abstract: |
   We connect two random graph models, the Popularity Adjusted Block Model 
@@ -408,14 +409,15 @@ different subspaces, then $X$ obeys the subspace detection property.
 \end{definition}
 
 \begin{remark} 
-In practice, sample $X$ often does not obey the subspace detection
+In practice, a noisy sample $X$ often does not obey the subspace detection
 property. In such cases, $B$ is treated as an affinity matrix for a graph which 
 is then partitioned into $K$ subgraphs to obtain the clustering. On the other 
 hand, if $X$ does obey the subspace detection property, $B$ describes a graph 
 with at least $K$ disconnected subgraphs. Ideally, when the subspace detection
 property holds, there are exactly $K$ subgraphs which map to each subspace, 
 but it could be the case that some of the subspaces are represented by 
-multiple disconnected subgraphs. 
+multiple disconnected subgraphs. The subspace detection property is contingent 
+on choosing a sufficiently large sparsity parameter $\lambda$. 
 \end{remark}
 
 Theorem \ref{theorem2} suggests that SSC is appropriate for community 
@@ -633,8 +635,9 @@ Modularity Maximization is NP-hard, so
 \citeauthor{307cbeb9b1be48299388437423d94bf1} 
 used the Extreme Points (EP) algorithm \cite{le2016}, which is $O(n^{K - 1})$, 
 as a greedy relaxation of the optimization problem. 
-For these simulations, the EP algorithm was used for $K = 2$, and for $K > 2$, 
-the Louvain algorithm \cite{Blondel_2008} was used instead.
+For these simulations, the Louvain algorithm was used, as the EP algorithm 
+proved to be prohibitively computationally expensive for $K > 2$. For $K = 2$, 
+it was verified that EP and Louvain produce comparable results. 
 
 Two implementations of SSC are shown here. The first method, denoted as 
 SSC-A, treats the columns of the adjacency matrix $A$ as points in
@@ -642,8 +645,25 @@ $\mathbb{R}^n$, as described in \citeauthor{noroozi2019estimation}. The second
 method, denoted as SSC-ASE, first embeds $A$ and then performs SSC on the 
 embedding, as described in algorithm 2. The sparsity parameter $\lambda$ was 
 chosen via a preliminary cross-validation experiment. For the final clustering 
-step, a Gaussian Mixture Model was fit on the normalized Lapacian eigenmap of 
+step, a Gaussian Mixture Model was fit on the normalized Laplacian eigenmap of 
 the affinity matrix $B$. 
+
+For comparing methods, we define the community detection error as:
+
+$$L_c(\hat{\sigma}, \sigma; \{v_i\}) = 
+\min_\pi \sum_i I(\pi \circ \hat{\sigma}(v_i) = \sigma{v_i})$$
+
+where $\sigma(v_i)$ is the true community label of vertex $v_i$, 
+$\hat{\sigma}(v_i)$ is a community assignment function, and $\pi$ is a 
+permutation operator. This is effectively the "misclustering count" of
+$\hat{\sigma}$. 
+
+We then define parameter estimation error as the MSE up to sign flip: 
+
+$$MSE(\{\hat{\lambda}^{(kl)}\}, \{\lambda^{(kl)}\}) = 
+\min_{s \in \{-1, 1\}} 
+\sqrt{\frac{1}{n} \sum_{k < l} \sum_{i = 1}^{n_k} 
+(s \hat{\lambda}^{(kl)}_i - \lambda^{(kl)}_i)^2}$$
 
 ## Balanced communities
 
@@ -669,9 +689,10 @@ $\lambda^{(kl)} \iid Beta(1, 2)$ for $k \neq l$
 
 $50$ simulations were performed for each $(n, K)$ pair. 
 
+\begin{comment}
+
 Fig. \ref{fig:clust_err_k} show that for large $n$, OSC results in 
-a misclustering rate of 0. Sparse subspace clustering produces similar results 
-for $K > 2$. 
+a misclustering rate of 0. 
 
 ```{r clust_err_k, fig.cap = 'IQR of community detection error error using OSC (blue) compared against SSC on the ASE of A (purple), MM (red), and SSC on the adjacency matrix (green). Communities are approximately balanced. Simulations were repeated 50 times for each sample size.', fig.width = 10}
 clustering.df <- readr::read_csv('clustering-k.csv')
@@ -704,6 +725,7 @@ clustering.df %>%
   ggplot() +
   scale_x_log10(breaks = c(128, 256, 512, 1024, 2048, 4096)) +
   # scale_x_continuous(breaks = c(128, 256, 512, 1024, 2048, 4096)) + 
+  # scale_y_log10() + 
   labs(y = 'community detection error rate', 
        colour = NULL) +
   geom_line(aes(x = n, y = med.err,
@@ -714,10 +736,10 @@ clustering.df %>%
                 colour = 'SSC-ASE')) + 
   geom_errorbar(aes(x = n, ymin = first.q.ssc, ymax = third.q.ssc,
                     colour = 'SSC-ASE'), width = .1) + 
-  geom_line(aes(x = n, y = med.err.ep,
-                colour = 'MM-EP')) + 
-  geom_errorbar(aes(x = n, ymin = first.q.ep, ymax = third.q.ep,
-                    colour = 'MM-EP'), width = .1) + 
+  # geom_line(aes(x = n, y = med.err.ep,
+  #               colour = 'MM-EP')) + 
+  # geom_errorbar(aes(x = n, ymin = first.q.ep, ymax = third.q.ep,
+  #                   colour = 'MM-EP'), width = .1) + 
   geom_line(aes(x = n, y = med.err.ssc2,
                 colour = 'SSC-A')) + 
   geom_errorbar(aes(x = n, ymin = first.q.ssc2, ymax = third.q.ssc2,
@@ -727,15 +749,26 @@ clustering.df %>%
   geom_errorbar(aes(x = n, ymin = first.q.louvain, ymax = third.q.louvain,
                     colour = 'MM-Louvain'), width = .1) + 
   scale_colour_brewer(palette = 'Set1') + 
-  facet_wrap(~ K, labeller = 'label_both') + 
-  scale_y_log10()
+  facet_wrap(~ K, labeller = 'label_both')
 ```
 
 Theorem \ref{theorem4} implies that OSC will result in not just in the error
 rate converging to 0 but the error *count* as well.
 We explore this in Fig. \ref{fig:clust_err_ct_sim}.
 
-```{r clust_err_ct_sim, fig.cap = 'IQR of counts of misclustered vertices using OSC (blue) compared against SSC on the ASE of A (purple), MM (red), and SSC on the adjacency matrix (green). Communities are approximately balanced. Simulations were repeated 50 times for each sample size.', cache = FALSE, fig.width = 10}
+\end{comment}
+
+Fig \ref{fig:clust_err_ct_sim} shows OSC's community detection error going to 0 
+for large $n$. SSC on both the embedding and on the adjacency 
+matrix produces similar results for $K > 2$. Weaker performance of SSC for 
+$K = 2$ can be attributed to the final spectral clustering step of the 
+affinity matrix. A GMM was fit to the Laplacian eigenmap, but visual 
+inspection suggests that the communities are not distributed as a mixture 
+of Gaussians in the eigenmap. While the subspace detection property is 
+guaranteed for large $n$, in our simulations, setting a large enough 
+sparsity parameter for SSC resulted in more than $K$ disconnected subgraphs. 
+
+```{r clust_err_ct_sim, fig.cap = 'Median and IQR of community detection error. Communities are approximately balanced. Simulations were repeated 50 times for each sample size.', cache = FALSE, fig.width = 10}
 clustering.df <- readr::read_csv('clustering-k.csv')
 ssc.df <- readr::read_csv('clustering-ssc-k.csv')
 clustering.df %>%
@@ -766,6 +799,7 @@ clustering.df %>%
   ggplot() +
   scale_x_log10(breaks = c(128, 256, 512, 1024, 2048, 4096)) +
   # scale_x_continuous(breaks = c(128, 256, 512, 1024, 2048, 4096)) + 
+  scale_y_log10() +
   labs(y = 'community detection error count', 
        colour = NULL) +
   geom_line(aes(x = n, y = med.err * n,
@@ -776,10 +810,10 @@ clustering.df %>%
                 colour = 'SSC-ASE')) + 
   geom_errorbar(aes(x = n, ymin = first.q.ssc * n, ymax = third.q.ssc * n,
                     colour = 'SSC-ASE'), width = .1) + 
-  geom_line(aes(x = n, y = med.err.ep * n,
-                colour = 'MM-EP')) + 
-  geom_errorbar(aes(x = n, ymin = first.q.ep * n, ymax = third.q.ep * n,
-                    colour = 'MM-EP'), width = .1) + 
+  # geom_line(aes(x = n, y = med.err.ep * n,
+  #               colour = 'MM-EP')) + 
+  # geom_errorbar(aes(x = n, ymin = first.q.ep * n, ymax = third.q.ep * n,
+  #                   colour = 'MM-EP'), width = .1) + 
   geom_line(aes(x = n, y = med.err.ssc2 * n,
                 colour = 'SSC-A')) + 
   geom_errorbar(aes(x = n, ymin = first.q.ssc2 * n, ymax = third.q.ssc2 * n,
@@ -790,8 +824,7 @@ clustering.df %>%
                     ymin = first.q.louvain * n, ymax = third.q.louvain * n,
                     colour = 'MM-Louvain'), width = .1) + 
   scale_colour_brewer(palette = 'Set1') + 
-  facet_wrap(~ K, labeller = 'label_both') + 
-  scale_y_log10()
+  facet_wrap(~ K, labeller = 'label_both')
 ```
 
 Given ground truth community labels, Algorithm 3 and the MLE-based plug-in 
@@ -799,7 +832,7 @@ estimators \cite{307cbeb9b1be48299388437423d94bf1} \cite{noroozi2019estimation}
 perform similarly, with root mean square error decaying at rate approximately 
 $n^{-1/2}$. 
 
-```{r lambda_est_k, cache = FALSE, fig.cap = 'Median and IQR RMSE from Algorithm 3 (red) compared against an MLE-based method (blue). Simulations were repeated 50 times for each sample size.', fig.width = 10}
+```{r lambda_est_k, cache = FALSE, fig.cap = 'Median and IQR RMSE from Algorithm 3 (red) compared against an MLE-based method (blue). Simulations were repeated 50 times for each sample size. Communities were drawn to be approximately balanced.', fig.width = 10}
 rmse.df <- readr::read_csv('rmse-k.csv')
 
 rmse.df %>% 
@@ -845,6 +878,8 @@ $\lambda^{(kl)} \iid Beta(1, 2)$ for $k \neq l$
 
 $50$ simulations were performed for each $(n, K)$ pair. 
 
+\begin{comment}
+
 Fig. \ref{fig:clust_err_k_imba} and \ref{fig:clust_err_ct_sim_imba} show 
 similar results as in the balanced communities case, with both OSC and 
 SSC resulting in no misclustered vertices for a 
@@ -852,7 +887,7 @@ sufficiently large sample size. However, Fig. \ref{fig:lambda_est_k_imba}
 suggests that while Algorithm 3 retains $\sqrt{n}$ efficiency, the MLE-based 
 plug-in estimator is less efficient for this setup. 
 
-```{r clust_err_k_imba, fig.cap = 'IQR of community detection error using OSC (blue) compared against SSC on the ASE of A (purple), MM (red), and SSC on the adjacency matrix (green). Communities are imbalanced. Simulations were repeated 50 times for each sample size.', fig.width = 10}
+```{r clust_err_k_imba, fig.cap = 'Median and IQR of community detection error using OSC (blue) compared against SSC on the ASE of A (purple), MM (red), and SSC on the adjacency matrix (green). Communities are imbalanced. Simulations were repeated 50 times for each sample size.', fig.width = 10}
 clustering.df <- readr::read_csv('clustering-k-imbalanced.csv')
 ssc.df <- readr::read_csv('clustering-ssc-k-imbalanced.csv')
 clustering.df %>%
@@ -910,7 +945,14 @@ clustering.df %>%
   scale_y_log10()
 ```
 
-```{r clust_err_ct_sim_imba, fig.cap = 'IQR of counts of misclustered vertices using OSC (blue) compared against SSC on the ASE of A (purple), MM (red), and SSC on the adjacency matrix (green). Communities are imbalanced. Simulations were repeated 50 times for each sample size.', cache = FALSE, fig.width = 10}
+\end{comment}
+
+We again see community detection error trending to 0 for OSC, as well as for 
+SSC when $K > 2$ (Fig. \ref{fig:clust_err_ct_sim_imba}). Alg. 3 continues to 
+see $n^{-1/2}$ decay in parameter estimation error 
+(\ref{fig:lambda_est_k_imba}).
+
+```{r clust_err_ct_sim_imba, fig.cap = 'Median and IQR of community detection error. Communities are imbalanced. Simulations were repeated 50 times for each sample size.', cache = FALSE, fig.width = 10}
 clustering.df <- readr::read_csv('clustering-k-imbalanced.csv')
 ssc.df <- readr::read_csv('clustering-ssc-k-imbalanced.csv')
 clustering.df %>%
@@ -941,6 +983,7 @@ clustering.df %>%
   ggplot() +
   scale_x_log10(breaks = c(128, 256, 512, 1024, 2048, 4096)) +
   # scale_x_continuous(breaks = c(128, 256, 512, 1024, 2048, 4096)) + 
+  scale_y_log10() +
   labs(y = 'community detection error count', 
        colour = NULL) +
   geom_line(aes(x = n, y = med.err * n,
@@ -951,10 +994,10 @@ clustering.df %>%
                 colour = 'SSC-ASE')) + 
   geom_errorbar(aes(x = n, ymin = first.q.ssc * n, ymax = third.q.ssc * n,
                     colour = 'SSC-ASE'), width = .1) + 
-  geom_line(aes(x = n, y = med.err.ep * n,
-                colour = 'MM-EP')) + 
-  geom_errorbar(aes(x = n, ymin = first.q.ep * n, ymax = third.q.ep * n,
-                    colour = 'MM-EP'), width = .1) + 
+  # geom_line(aes(x = n, y = med.err.ep * n,
+  #               colour = 'MM-EP')) + 
+  # geom_errorbar(aes(x = n, ymin = first.q.ep * n, ymax = third.q.ep * n,
+  #                   colour = 'MM-EP'), width = .1) + 
   geom_line(aes(x = n, y = med.err.ssc2 * n,
                 colour = 'SSC-A')) + 
   geom_errorbar(aes(x = n, ymin = first.q.ssc2 * n, ymax = third.q.ssc2 * n,
@@ -965,11 +1008,10 @@ clustering.df %>%
                     ymin = first.q.louvain * n, ymax = third.q.louvain * n,
                     colour = 'MM-Louvain'), width = .1) + 
   scale_colour_brewer(palette = 'Set1') + 
-  facet_wrap(~ K, labeller = 'label_both') + 
-  scale_y_log10()
+  facet_wrap(~ K, labeller = 'label_both')
 ```
 
-```{r lambda_est_k_imba, cache = FALSE, fig.cap = 'Median and IQR RMSE from Algorithm 3 (red) compared against an MLE-based method (blue). Simulations were repeated 50 times for each sample size.', fig.width = 10}
+```{r lambda_est_k_imba, cache = FALSE, fig.cap = 'Median and IQR RMSE from Algorithm 3 (red) compared against an MLE-based method (blue). Simulations were repeated 50 times for each sample size. Communities were drawn to be imbalanced.', fig.width = 10}
 rmse.df <- readr::read_csv('rmse-k-imbalanced.csv')
 
 rmse.df %>% 
@@ -996,12 +1038,14 @@ rmse.df %>%
   scale_x_log10(breaks = c(128, 256, 512, 1024, 2048, 4096))
 ```
 
+\begin{comment}
+
 ## Additional experiments
 
 Using the same set of parameters for generating $P$ and $A$ as in the 
 balanced communities examples for $K = 2$, we generated one instance of $A$ for
 each $n$ and constructed $B$ according to Algorithm 3 to verify that 
-as $n \to \infty$, $(\hat{v}_i)^\top \hat{v_j} \stackrel{P}{\to} 0$ for $i, j$ 
+as $n \to \infty$, $(\hat{v}_i)^\top \hat{v_j} \stackrel{a.s.}{\to} 0$ for $i, j$ 
 in different clusters. Furthermore, the distribution of these inner products 
 should be approximately normal. 
 
@@ -1015,6 +1059,8 @@ ggplot(densities.df) +
   scale_x_continuous(breaks = seq(-5, 5)) + 
   scale_colour_brewer(palette = 'Set1')
 ```
+
+\end{comment}
 
 # Real data examples
 
