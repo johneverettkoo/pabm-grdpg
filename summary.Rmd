@@ -569,6 +569,15 @@ $\exists \lambda > 0$ such that as $n \to \infty$, $\hat{V}_n$ obeys the
 subspace detection property with probability 1.
 \end{theorem}
 
+\begin{remark}
+The proof of Theorem \ref{theorem5} is a direct consequence of Theorem 6 
+from  \citeauthor{jmlr-v28-wang13} and the fact that the unscaled ASE of 
+$P_n$ consists of orthogonal subspaces. \citeauthor{jmlr-v28-wang13} assume 
+that the points in the embedding are all of unit length, and while we apply 
+this normalization in the simulated examples, it is not strictly necessary 
+for Theorem \ref{theorem5} due to orthogonality. 
+\end{remark}
+
 ## Parameter estimation
 
 For any edge probability matrix $P$ for the PABM such that the rows and 
@@ -651,18 +660,18 @@ the affinity matrix $B$.
 For comparing methods, we define the community detection error as:
 
 $$L_c(\hat{\sigma}, \sigma; \{v_i\}) = 
-\min_\pi \sum_i I(\pi \circ \hat{\sigma}(v_i) = \sigma{v_i})$$
+\min_\pi \sum_i I(\pi \circ \hat{\sigma}(v_i) = \sigma(v_i))$$
 
 where $\sigma(v_i)$ is the true community label of vertex $v_i$, 
-$\hat{\sigma}(v_i)$ is a community assignment function, and $\pi$ is a 
+$\hat{\sigma}(v_i)$ is the predicted label of $v_i$, and $\pi$ is a 
 permutation operator. This is effectively the "misclustering count" of
-$\hat{\sigma}$. 
+clustering function $\hat{\sigma}$. 
 
-We then define parameter estimation error as the MSE up to sign flip: 
+We also define parameter estimation error as the RMSE up to sign flip: 
 
-$$MSE(\{\hat{\lambda}^{(kl)}\}, \{\lambda^{(kl)}\}) = 
-\min_{s \in \{-1, 1\}} 
-\sqrt{\frac{1}{n} \sum_{k < l} \sum_{i = 1}^{n_k} 
+$$RMSE(\{\hat{\lambda}^{(kl)}\}, \{\lambda^{(kl)}\}) = 
+\sqrt{\frac{1}{n} \sum_{k < l} \min_{s \in \{-1, 1\}} 
+\sum_{i = 1}^{n_k} 
 (s \hat{\lambda}^{(kl)}_i - \lambda^{(kl)}_i)^2}$$
 
 ## Balanced communities
@@ -1484,19 +1493,28 @@ community $k$.
 
 Let $V_{n, -i}^{(k)}$ be $V_n^{(k)}$ with the $i$^th^ entry removed. Suppose 
 that for each community $k$, there are enough vertices such that for each $i$, 
-$V_{n, -i}^{(k)}$ spans its corresponding subspace (Theorem 2). 
+$V_{n, -i}^{(k)}$ spans its corresponding subspace (Theorem \ref{theorem2}). 
 Then $r_n^{(k)} = \min\limits_i r(V_{n, -i}^{(k)}) > 0$. 
-Thus by (\ref{eq:mu-conv}), for each $k$, $r_n^{(k)} > \mu_n^{(k)}$ where 
+Thus by (\ref{eq:mu-conv}), for each $k$, $r_n^{(k)} > \mu_n^{(k)} = 0$ where 
 $\mu_n^{(k)} = \mu(\hat{V}_n^{(k)})$ and $n$ is large enough such that 
-$\min\limits_{k, i} rank(V_{n, -i}^{(k)}) = K$.
+$\min\limits_{k, i} \text{rank}(V_{n, -i}^{(k)}) = K$.
 
-Let $r_n = \min_k r_n^{(k)}$. By (\ref{eq:delta-conv}), 
+Let $r_n = \min\limits_k r_n^{(k)}$. By (\ref{eq:delta-conv}), 
 $\delta_n \stackrel{a.s.}{\to} 0$. Then as $n\to \infty$, 
-$\delta_n < \min_k \frac{r_n (r_n^{(k)} - \mu_n^{(k)})}{2 + 7 r_n^{(k)}}$ 
+$\delta_n < \min\limits_k 
+\frac{r_n (r_n^{(k)} - \mu_n^{(k)})}{2 + 7 r_n^{(k)}}$ 
+$= \min\limits_k \frac{r_n r_n^{(k)}}{2 + 7 r_n^{(k)}}$
 with probability 1. 
 
 Thus the conditions for the subspace detection property from Theorem 6 from
 \citeauthor{jmlr-v28-wang13} are satisfied with probability 1 as $n \to \infty$.
+
+\begin{remark}
+Theorem 6 of \citeauthor{jmlr-v28-wang13} assume that each $||v_n^{(i)}|| = 1$, 
+which scales each $r_n^{(k)} \leq 1$. This is not strictly necessary for 
+the proof of Theorem \ref{theorem5} since each $\mu_n^{(k)} = 0$, so as long 
+as the $k^{th}$ community spans its subspace, $r_n^{(k)} > 0 = \mu_n^{(k)}$.
+\end{remark}
 
 **Proof of Theorem \ref{theorem6}**. 
 Let $P$ and $A$ be organized by community such that the elements of blocks 
