@@ -6,6 +6,7 @@ authors: John Koo, Minh Tang, Michael Trosset
 # author3: Michael Trosset
 output:
   pdf_document:
+    keep_tex: true
     citation_package: natbib
     number_sections: yes
 # output:
@@ -22,7 +23,7 @@ header-includes:
 - \usepackage{mathtools}
 - \usepackage{natbib}
 - \usepackage[linesnumbered,ruled,vlined]{algorithm2e} 
-- \setcitestyle{numbers,square}
+- \setcitestyle{numbers,square,comma}
 - \usepackage{verbatim}
 - \usepackage{amsthm}
 - \usepackage{comment}
@@ -538,6 +539,7 @@ for the unscaled ASE of $A$ drawn from $P$ as $n \to \infty$.
     Find $V$, the matrix of eigenvectors of $A$ 
     corresponding to the $K (K + 1) / 2$ most positive 
     and the $K (K - 1) / 2$ most negative eigenvalues.\;
+    Normalize $V \leftarrow \sqrt{n} V$.\;
     \For {$i = 1, ..., n$} {
       Assign $v_i^\top$ as the $i^{th}$ row of $V$. 
       Assign $V_{-i} = \begin{bmatrix} 
@@ -552,7 +554,7 @@ for the unscaled ASE of $A$ drawn from $P$ as $n \to \infty$.
     }
     Assign 
     $C = \begin{bmatrix} \tilde{c}_1 & \cdots & \tilde{c}_n \end{bmatrix}$.\;
-    Compute the affinity matrix $B = \sqrt{n} (|C| + |C^\top|)$.\;
+    Compute the affinity matrix $B = |C| + |C^\top|$.\;
     Construct graph $G$ using $B$ as its similarity matrix.\;
     Partition $G$ into $K$ disconnected subgraphs (e.g., using edge 
     thresholding or spectral clustering).\;
@@ -1430,50 +1432,36 @@ Then scaling by $n$, we get
 $|n (\hat{v}_n^{(i)})^\top \hat{v}_n^{(j)}| = 
 O_P \big( \frac{(\log n)^c}{\sqrt{n \rho_n}} \big)$.
 
-\begin{definition}[Inradius \cite{soltanolkotabi2012} \cite{jmlr-v28-wang13}]
+\begin{definition}[Inradius \cite{soltanolkotabi2012, jmlr-v28-wang13}]
 The inradius of a convex body $\mathcal{P}$, denoted by $r(\mathcal{P})$, is 
 defined as the radius of the largest Euclidean ball inscribed in $\mathcal{P}$.
 In addition, $r(X)$ for data matrix $X$ with rows $x_i^\top$ represents 
 the inradius of the symmetric convex hull of $X$. 
 \end{definition}
 
+\begin{definition}[Subspace incoherence property \cite{jmlr-v28-wang13}]
+\end{definition}
+
 \begin{lemma}
 \label{lemma2}
-Let $P_n = V_n \Lambda_n V_n^\top$ be the edge probability matrix of a PABM 
-with $n$ vertices. Let $A_n \sim \Bernoulli(P_n)$ be the adjacency matrix 
-drawn from $P_n$, and let $A_n = \hat{V}_n \hat{\Lambda}_n \hat{V}_n^\top$ be 
-its approximate spectral decomposition using the $K (K+1) / 2$ most positive 
-and $K (K-1) / 2$ most negative eigenvalues and their corresponding 
-eigenvectors.Without loss of generality, order the rows of $V_n$ and 
-$\hat{V}_n$ by community, and let $V_n^{(k)}$ and $\hat{V}_n^{(k)}$ be the 
-$n_k \times K^2$ matrix of the rows of the $k^{th}$ community in $V_n$ and 
-$\hat{V}_n$ respectively. 
-Let $\mu_n^{(k)} = \mu(V_n^{(k)})$ be the subspace incoherence of $V_n^{(k)}$ 
-as defined by \citeauthor{soltanolkotabi2012}. Then $\mu_n^{(k)} = 0$ 
-with probability 1 $\forall n, k$. 
+Let $\hat{V}$ be the eigenvectors of $A_n$ corresponding to the $K (K + 1) / 2$ most positive and $K (K - 1) / 2$ most negative eigenvalues such that the rows of $\hat{V}$ are ordered by community, and let $\hat{V}^{(k)}$ be the rows of the $k^{th}$ community in $\hat{V}$ and $\hat{V}^{(-k)}$ be the rows of $\hat{V}$ with the $k^{th}$ community omitted. Denote $(\hat{v}_i^{(k)})^\top$ as the rows of $\hat{V}$, $\hat{V}_{-i}^{(k)}$ as $\hat{V}^{(k)}$ with the $i^{th}$ row omitted, and $\mathcal{S}^{(k)}$ as the subspace spanned by $V^{(k)}$. Let $V$, $V^{(k)}$, $V^{(-k)}$, and $v_i^{(k)}$ be the corresponding values for $P_n$. 
 
-Furthermore, Let $\hat{\mu}_n^{(k)} = \mu(\hat{V}_n^{(k)})$ using the 
-extended definition of $\mu(\cdot)$ from \citeauthor{jmlr-v28-wang13}. Then 
+Let $\nu_{i}^{(k)} = \max\limits_\eta (\hat{v}_i^{(k)})^\top \eta - \frac{1}{2 \lambda} \eta^\top \eta$ subject to $||V_{-i}^{(k)} \eta||_\infty \leq 1$, and define the projected dual direction $w_{i}^{(k)}$ as $\mathbb{P}_{\mathcal{S}^{(k)}}(\nu_i^{(k)})$ normalized to length 1. Collect the projected dual directions into $W = \begin{bmatrix} w_1^{(k)} & \cdots & w_{n_k}^{(k)} \end{bmatrix}^\top$.
+
+Define the subspace incoherence:
+
+$$\mu_n^{(k)} = \mu(\hat{V}^{(k)}) = \max\limits_{v \in V^{(-k)}} ||W^{(k)} v||_\infty$$
+
+Then $\forall k, n$, 
 
 \begin{equation} \label{eq:mu-conv}
-\hat{\mu}_n^{(k)} = 0
+\mu_n^{(k)} = 0
 \end{equation}
 \end{lemma}
 
 *Proof*. 
-For the first part, 
-since $v_n^{(k)}$ is orthogonal to $v_n^{(l)}$ $\forall k \neq l$ 
-(Lemma \ref{lemma1}), 
-this falls directly out of Theorem 2.8 of \citeauthor{soltanolkotabi2012}. 
-
-For the second part, 
-$\mu(\hat{V}_n^{(k)}) = 
-\max_{v_n^{(i)} \in V_n^{(-k)}} ||U_n^{(k)} v_n^{(i)}||_\infty$ 
-where the rows of $U_n^{(k)}$ consist of vectors lying on the subspace spanned 
-by $V_n^{(k)}$. Since 
-$u_n^{(i)} \in \text{span}(V_n^{(k)}) \implies u_n^{(i)} \perp v_n^{(j)}$ 
-$\forall v_n^{(j)} \in V_n^{(-k)}$ by Theorem \ref{theorem2}, this quantity 
-must be 0.
+Since by Theorem \ref{theorem2} each $\mathcal{S}^{(k)}$ are mutually orthogonal, any vector projected to 
+$\mathcal{S}^{(k)}$ must be orthogonal to each row of $V^{(-k)}$. Therefore, $W^{(k)} v = 0$ $\forall v \in \mathcal{S}^{(-k)}$.
 
 \begin{lemma}
 \label{lemma3}
@@ -1513,7 +1501,8 @@ Thus the conditions for the subspace detection property from Theorem 6 from
 Theorem 6 of \citeauthor{jmlr-v28-wang13} assume that each $||v_n^{(i)}|| = 1$, 
 which scales each $r_n^{(k)} \leq 1$. This is not strictly necessary for 
 the proof of Theorem \ref{theorem5} since each $\mu_n^{(k)} = 0$, so as long 
-as the $k^{th}$ community spans its subspace, $r_n^{(k)} > 0 = \mu_n^{(k)}$.
+as the $k^{th}$ community spans its subspace, $a r_n^{(k)} > 0 = \mu_n^{(k)}$ 
+$\forall a > 0$.
 \end{remark}
 
 **Proof of Theorem \ref{theorem6}**. 
@@ -1525,7 +1514,7 @@ $l$.
 probabilities and edges for community $k$.  
 By definition, 
 $P^{(kk)} = \lambda^{(kk)} (\lambda^{(kk)})^\top$. This implies that the 
-signular value decomposition 
+singular value decomposition 
 $P^{(kk)} = \sigma_{kk}^2 u^{(kk)} (u^{(kk)})^\top$ has one singular value and 
 one pair of singular vectors ($P^{(kk)}$ is symmetric, so the left and right 
 singular vectors are identical). Then $\lambda^{(kk)} = \sigma_{kk} u^{(kk)}$.  
