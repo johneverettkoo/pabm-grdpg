@@ -1,0 +1,52 @@
+sdss presentation outline (15 min)
+
+1. block models
+    * network models with bernoulli edges based on edge probability matrix
+    * block model: P depends on hidden labels
+    * example: SBM
+    * example: PABM
+3. (G)RDPG
+    * also network models with bernoulli edges
+    * not necessarily a block model
+    * all block models are GRDPG
+    * ASE
+4. Connecting the PABM to the GRDPG
+    * example: SBM
+5. Community detection for the PABM
+    * SSC
+    * OSC
+
+script
+
+Hello. Thank you for attending my talk titled, "Connecting the popularity adjusted block model to the generalized random dot product graph." This is joint work with Minh Tang, assistant professor at NC State, and Michael Trosset, professor at IU, where I am currently a PhD student.
+
+Here is the outline of my talk. Before we dive into our contributions, we first need to define the popularity adjusted block model and the generalized random dot product graph. Next, we will show how the PABM is a very special case of the GRDPG. Then finally, we will discuss two community detection techniques for the PABM based on this connection. 
+
+Let's begin.
+
+Suppose we observe a network with binary and undirected edges, for example, a Facebook network in which the nodes are individuals and the edges represent whether individuals are friends. One analysis task might be to partition this network into groups in an unsupervised manner. There are infinitely approaches to this task, but we will take a statistical inference based approach by defining a probability model and trying to estimate parameters of that model.
+
+Let's describe this network by adjacency matrix A such that each A_ij is 1 if there is an edge between nodes i and j, and 0 otherwise. We say this graph is a Bernoulli Graph if there is some other matrix P such that each A_ij is drawn independely as Bernoulli(P_ij). 
+
+In addition, if each node has a hidden community label 1, 2, up to K, and each P_ij depends in some way on the labels z_i and z_j, then this network is called a block model. 
+
+For instance, this two community stochastic block model defines P such that P_ij is 1/2 if i and j are both in community 1, 1/4 if they are both in community 2, and 1/8 if they are in different communities. 
+
+Another more flexible block model is the popularity adjusted block model. First, let's organize P by community such that the kl^th block represents the edge probabilities between communities k and l. Then for each pair of communities, there are popularity vectors lambda^kl in n_k-dimensional space and lambda^lk in n_l-dimensional space such that P^kl is the outer product of lambda^kl and lambda^lk.
+
+We want to recover the hidden labels for these block models. Unfortunately, likelihood maximization is NP-complete, so we need to take another approach. In order to motivate this, we will introduce another type of bernoulli graph model.
+
+We will switch gears to another bernoulli graph model called the generalized random dot product graph. In this model, we start with latent vectors x_1, up to x_n in euclidean space, and we set the edge probability between each pair i and j by taking the indefinite inner product between latent vectors x_i and x_j. 
+
+Under this model, an inference task might be to estimate the latent positions after observing one draw of the model. The adjacency spectral embedding does this by taking the spectral decomposition of A, and it has already been shown that the ASE asymoptotically approaches the true latent positions up to an indefinite orthogonal transformation. 
+
+It is easy to show that all bernoulli graphs, including block models, can be represented as generalized random dot product graphs by taking the spectral decomposition of P. It's well known that the latent configuration that induces the stochastic block model is a collection of point masses where each point mass corresponds to a community. Our contribution shows similarly that the latent configuration that induces the PABM consists of orthogonal subspaces where each subspace corresponds to a community. 
+
+To illustrate this connection between the PABM and the GRDPG, we will take a look at the case where we have two communities. We can decompose P in this manner, and we see that the latent configuration is 4-dimensional and consists of a block diagonal matrix times an orthogonal matrix where each block is rank 2. Thus the latent configuration is for the PABM consists of 2-dimensional subspaces that are orthogonal to each other in 4-dimensional space. This generalizes to K > 2 in the same manner. 
+
+So how does this lead to community detection?
+
+Since the latent configuration consists of subspaces, the ASE consists of subspaces with some noise that goes to 0 with probability 1. While they did not make the connection to the GRDPG, Noroozi, Rimal, and Pensky noticed something very similar and proposed using sparse subspace clustering for community detection on the PABM. Our work shows that a modified version of their SSC algorithm obeys the subspace detection property with probability 1. 
+
+Next, we examined the eigenvectors of P for the PABM and saw that if we select two rows that correspond to different communities, their inner product will always be 0. This led to our own community detection method called orthogonal spectral clustering.
+
