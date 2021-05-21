@@ -1,7 +1,7 @@
 ---
 title: Connecting the Popularity Adjusted Block Model to the Generalized Random Dot Product Graph
 subtitle: SDSS 2021 Lightning Presentation
-author: John Koo
+author: John Koo, Indiana University
 date: 'June 2021'
 output: 
   beamer_presentation:
@@ -40,6 +40,48 @@ source('~/dev/pabm-grdpg/functions.R')
 set.seed(314159)
 ```
 
+## Contributors
+
+::: columns
+
+:::: {.column width='33%'}
+
+```{r, out.width = '100px'}
+knitr::include_graphics('john_koo.jpeg')
+```
+
+John Koo,  
+PhD Student in Statistical Science,  
+Indiana University
+
+::::
+
+:::: {.column width='33%'}
+
+```{r, out.width = '100px'}
+knitr::include_graphics('minh_tang.jpg')
+```
+
+Minh Tang,  
+Assistant Professor of Statistics,  
+NC State University
+
+::::
+
+:::: {.column width='33%'}
+
+```{r, out.width = '100px'}
+knitr::include_graphics('mtrosset.jpg')
+```
+
+Michael Trosset,  
+Professor of Statistics,  
+Indiana University
+
+::::
+
+:::
+
 ## Overview
 
 <style type="text/css">
@@ -66,7 +108,7 @@ knitr::include_graphics('Sna_large.png')
 
 \tiny
 
-By Screenshot taken by User:DarwinPeacock - Screenshot of free software GUESS, CC BY 3.0, https://commons.wikimedia.org/w/index.php?curid=6057981
+Screenshot taken by User:DarwinPeacock - Screenshot of free software GUESS, CC BY 3.0, https://commons.wikimedia.org/w/index.php?curid=6057981
 
 ## Bernoulli Graphs
 
@@ -76,6 +118,8 @@ By Screenshot taken by User:DarwinPeacock - Screenshot of free software GUESS, C
 
 Let $G = (V, E)$ be an undirected and unweighted graph with $|V| = n$.
 
+\vspace*{1\baselineskip}
+
 $G$ is described by adjacency matrix $A$ such that
 $A_{ij} = \begin{cases} 
 1 & \exists \text{ edge between } i \text{ and } j \\
@@ -83,6 +127,8 @@ $A_{ij} = \begin{cases}
 \end{cases}$
 
 $A_{ji} = A_{ij}$ and $A_{ii} = 0$ $\forall i, j \in [n]$.
+
+\vspace*{1\baselineskip}
 
 $A \sim BernoulliGraph(P)$ iff:
 
@@ -180,7 +226,22 @@ P^{(21)} & P^{(22)}
 \lambda^{(21)} (\lambda^{(12)})^\top & \lambda^{(22)} (\lambda^{(22)})^\top
 \end{bmatrix}$$
 
-# Generalized Ranodm Dot Product Graphs
+## Community Detection in Block Models
+
+Likelihood
+
+$$L = \prod_{i<j} \prod_{k, l}^K 
+\big(p_{k, l, i, j}^{A_{ij}} 
+(1 - p_{k, l, i, j})^{1 - A_{ij}} \big)^{z_{ik} z_{jl}}$$
+
+* ML method for community detection: $\hat{\vec{z}} = \arg\max_{\vec{z}} L$
+
+* NP-complete
+  * Expectation-Maximization
+  * Bayesian methods
+  * **Spectral methods**
+
+# Generalized Random Dot Product Graphs
 
 ## Generalized Random Dot Product Graph
 
@@ -199,8 +260,7 @@ $(A, X) \sim GRDPG_{p, q}(F, n)$.
 
 ### Recovery/Estimation
 
-Want to estimate $X$ given $A$, or alternatively, 
-interpoint distances, inner products, or angles.
+Want to estimate $X$ given $A$.
 
 ### Adjacency Spectral Embedding
 
@@ -215,8 +275,8 @@ $p$ most positive and $q$ most negative eigenvalues.
 
 \vspace*{.5\baselineskip}
 
-$$\max_i \|\hat{X}_i - Q_n X_i \| \stackrel{a.s.}{\to} 0
-\text{ (Rubin-Delanchy et al., 2020)}$$
+Rubin-Delanchy et al., 2020:  
+$$\max_i \|\hat{X}_i - Q_n X_i \| \stackrel{a.s.}{\to} 0$$
 
 $$Q_n \in \mathbb{O}(p, q)$$
 
@@ -294,10 +354,6 @@ to different communities, then $x_i^\top x_j = 0$.
 $A \sim GRDPG_{p, q}(X U) \implies A \sim GRDPG_{p, q}(X U Q)$ 
 $\forall Q \in \mathbb{O}(p, q)$
 
-# Community Detection for the PABM
-
-## Sparse Subspace Clustering
-
 **Corollary**: $X$ is block diagonal by community and 
 $U$ is orthogonal $\implies$ 
 each community corresponds to a subspace in $\mathbb{R}^{K^2}$.
@@ -305,24 +361,35 @@ each community corresponds to a subspace in $\mathbb{R}^{K^2}$.
 Subspace property holds even with linear transformation 
 $Q \in \mathbb{O}(p, q)$.
 
+# Community Detection for the PABM
+
+## Sparse Subspace Clustering
+
+*Sparse Subspace Clustering* (Elhamifar and Vidal, 2009):  
+Let the rows of $X \in \mathbb{R}^{n \times d}$ are vectors that lie on or near a small number of low-dimensional subspaces. SSC constructs a graph from $X$ as follows:
+
+1. For each $i \in [n]$, solve the optimization problem  
+$c_i = \arg\min_{c} \|c\|_1$ subject to $x_i = X c$ and $c^{(i)} = 0$.
+2. Construct a similarity graph using $B = |C| + |C^\top|$ as its affinity matrix, where $C = \begin{bmatrix} c_1 & \cdots & c_n \end{bmatrix}$.
+
+If $X$ obeys the *Subspace Detection Property*, then it produces a similarity graph $B$ such that $B_{ij} = 0$ $\forall z_i \neq z_j$.
+
+## Sparse Subspace Clustering for Community Detection
+
 Noroozi et al. observed that the rank of $P$ is $K^2$ 
 and the columns of $P$ belonging to each community has rank $K$ 
 to justify SSC for the PABM.
 
-$$\arg\min_{c_i} \|c_i\|_1 \text{ subject to } A_{\cdot, i} = A c_i
-\text{ and } c_i^{(i)} = 0$$
+$$c_i = \arg\min_{c} \|c\|_1 \text{ subject to } A_{\cdot, i} = A c
+\text{ and } c^{(i)} = 0$$
 
 GRDPG-based approach: Apply SSC to the ASE of $A$.
 
-$$\arg\min_{c_i} \|c_i\|_1 \text{ subject to } 
-\hat{x}_i = \hat{X} c_i \text{ and } c_i^{(i)} = 0$$
+$$c_i = \arg\min_{c} \|c\|_1 \text{ subject to } 
+\hat{x}_i = \hat{X} c \text{ and } c^{(i)} = 0$$
 $$A \approx \hat{X} I_{p, q} \hat{X}^\top$$
 
 ## Sparse Subspace Clustering
-
-**Theorem** (KTT): 
-If $P = V \Lambda V^\top$ and $B = n V V^\top$, 
-then $B_{ij} = 0$ $\forall i, j$ in different communities.
 
 **Theorem** (KTT): 
 
@@ -341,28 +408,36 @@ $\sqrt{n} \hat{V}_n$ obeys the Subspace Detection Property with probability 1.
 ## Orthogonal Spectral Clustering
 
 **Theorem** (KTT): 
-If $P = V \Lambda V^\top$ and $B = n V V^\top$, 
-then $B_{ij} = 0$ $\forall i, j$ in different communities.
+If $P = V \Lambda V^\top$ is the spectral decomposition of $P$ for the PABM and 
+$V$ has rows $v_i^\top$, then $v_i^\top v_j = 0$ $\forall z_i \neq z_j$.
 
-Orthogonal Spectral Clustering algorithm: 
+**Theorem** (KTT): 
+If $A \approx \hat{V} \hat{\Lambda} \hat{V}^\top$ is the spectral decomposition 
+of $A$ for the PABM using the $K (K+1) / 2$ most positive and $K (K-1) / 2$ 
+most negative eigenvalues, and we denote $\hat{v}_i^\top$ as the rows of 
+$\hat{V}$, then 
+
+$$\max_{i, j : z_i \neq z_j} \hat{v}_i^\top \hat{v}_j = 
+O_P \Big( \frac{(\log n)^c}{\sqrt{n \rho_n}} \Big)$$
+
+Orthogonal Spectral Clustering (KTT): 
 
 1. Let $V$ be the eigenvectors of $A$ corresponding to the $K (K+1)/2$ most 
 positive and $K (K-1) / 2$ most negative eigenvalues.
 2. Compute $B = |n V V^\top|$ applying $|\cdot|$ entry-wise.
-3. Construct graph $G$ using $B$ as its similarity matrix.
-4. Partition $G$ into $K$ disconnected subgraphs.
+3. Construct graph $\hat{G}$ using $B$ as its similarity matrix.
+4. Partition $\hat{G}$ into $K$ disconnected subgraphs.
 
-**Theorem** (KTT): 
-Let $\hat{B}_n$ with entries $\hat{B}_n^{(ij)}$ be the affinity matrix from OSC. 
-Then $\forall$ pairs $(i, j)$ belonging to different communities 
-and sparsity factor satisfying $n \rho_n = \omega\{(\log n)^{4c}\}$, 
+## Simulation Study
 
-$$
-\max_{i, j} \hat{B}^{(ij)} = 
-O_P \Big( \frac{(\log n)^c}{\sqrt{n \rho_n}} \Big)
-$$
+Simulation setup:
 
-## Simulation Results
+1. $Z_1, ..., Z_n \stackrel{iid}{\sim} Categorical(1 / K, ..., 1 / K)$
+2. $\lambda_{ik} \stackrel{iid}{\sim} Beta(a_{ik}, b_{ik})$  
+$a_{ik} = \begin{cases} 2 & z_i = k \\ 1 & z_i \neq k \end{cases}$, 
+$b_{ik} = \begin{cases} 1 & z_i = k \\ 2 & z_i \neq k \end{cases}$
+3. $P_{ij} = \lambda_{i z_j} \lambda_{j z_i}$
+4. $A \sim BernoulliGraph(P)$
 
 ```{r clust_err_k, fig.width = 10, fig.height = 3, out.width = '100%'}
 setwd('..')
@@ -423,6 +498,21 @@ clustering.df %>%
   facet_wrap(~ K, labeller = 'label_both')
 ```
 
-\tiny
+## Conclusion
 
-IQR of community detection error rates using OSC (blue) compared against SSC on the ASE of A (purple), MM (red), and SSC on the adjacency matrix (green). Communities are approximately balanced. Simulations were repeated 50 times for each sample size.
+1. The PABM is a recently developed flexible block model that can be used to describe many graphs with community structure. 
+
+2. Likelihood maximization is NP-complete for block models, so we need to take a different approach to community detection.
+
+3. The GRDPG, which describes all block models, motivates a spectral approach to statistical inference on graphs.
+
+4. Under the GRDPG framework, the PABM is induced by a latent configuration in $\mathbb{R}^{K^2}$ consisting of $K$ $K$-dimensional subspaces that are all orthogonal to each other.
+
+5. The latent configuration of the PABM under the GRDPG framework leads to two methods for community detection, both of which have nice theoretical asymptotic properties. 
+
+## Thank you
+
+Code and draft of the paper available at  
+https://github.com/johneverettkoo/pabm-grdpg
+
+R package coming soon at https://github.com/johneverettkoo/pabm
