@@ -2,7 +2,7 @@ Thank you for attending my talk titled connecting the popularity adjusted block 
 
 So let's begin by defining the popularity adjusted block model. The popularity adjusted block model is a generative model for networks with community structure. It is a generalization of the degree-corrected block model, which in turn is a generalization of the stochastic block model, and all of these models start by saying each node of a network has a hidden community label. We will denote n as the number of nodes and K as the number of communities. In the pabm, each node has K popularity parameters lambda_i1, lambda_i2, up to lambda_iK. So lambda_ik is the i^th node's affinity toward community k. The edge probability between nodes i and j, P_ij, then is defined as lambda_{i, z_j} lambda_{j z_i}, where z_i is the community label of node i, and z_j is the community label of node j. 
 
-A research group from UCF came up with an another characterization of the pabm using popularity vectors. This hints at the idea that the pabm can be represented by a set of latent vectors in euclidean space.
+A research group from UCF came up with an equivalent characterization of the pabm using popularity vectors. This hints at the idea that the pabm can be represented by a set of latent vectors in euclidean space.
 
 Let's designate P^kl as the n_k x n_l block of edge probabilities between k and l. We also organize the popularity parameters into popularity vectors, so lambda^kl contains the popularity parameters of community k toward community l. We have K^2 of these popularity vectors. Then we can decompose each block P^kl as the outer product of lambda^kl and lambda^lk. 
 
@@ -21,4 +21,7 @@ Next, we show that the PABM is a special case of the GRDPG with a specific laten
 Furthermore, we showed that if we take the spectral decomposition of the edge probability matrix P of a PABM, then the rows of V that correspond to different communities are orthogonal. It stands to reason that if we replace P with A sampled from P, we get a similar result. And in fact we were able to show that the inner product of two rows of v-hat that correspond to different communities goes to 0 at this rate. This leads to a clustering algorithm which we call orthogonal spectral clustering.
 
 
-We then performed a simulation study to show empirically that orthogonal spectral clustering does indeed result in zero error rate if n is large enough. We also compared it against two sparse subspace clustering algorithms. 
+We then performed a simulation study to show empirically that orthogonal spectral clustering does indeed result in zero error rate if n is large enough. We also compared it against two sparse subspace clustering implementations. 
+
+
+And that is my time. Please take a look at the longer presentation for a more detailed look at our analysis of the PABM and GRDPG. Thank you.
