@@ -1,0 +1,232 @@
+---
+title: Connecting the Popularity Adjusted Block Model to the Generalized Random Dot Product Graph
+subtitle: SDSS 2021 Lightning Presentation
+author: John Koo, Indiana University
+date: 'June 2021'
+output: 
+  beamer_presentation:
+    fig_crop: no
+    theme: 'default'
+    colortheme: 'beaver'
+    includes:
+      in_header: page_headers.tex
+header-includes:
+- \usepackage{setspace}
+- \usepackage{float}
+- \usepackage{mathtools}
+- \usepackage{natbib}
+- \usepackage[linesnumbered,ruled,vlined]{algorithm2e} 
+- \setcitestyle{numbers,square,comma}
+- \usepackage{verbatim}
+- \usepackage{amsthm}
+- \usepackage{comment}
+- \setbeamertemplate{itemize items}[circle]
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, 
+                      comment = NA, 
+                      warning = FALSE, 
+                      message = FALSE,
+                      fig.align = 'center',
+                      fig.lp = '')
+options(xtable.comment = FALSE, 
+        xtable.table.placement = 'H')
+library(ggplot2)
+import::from(magrittr, `%>%`)
+theme_set(theme_bw())
+
+source('~/dev/pabm-grdpg/functions.R')
+set.seed(314159)
+```
+
+## The Popularity Adjusted Block Model
+
+\newcommand{\diag}{\text{diag}}
+\newcommand{\tr}{\text{Tr}}
+\newcommand{\blockdiag}{\text{blockdiag}}
+\newcommand{\indep}{\stackrel{\text{ind}}{\sim}}
+\newcommand{\iid}{\stackrel{\text{iid}}{\sim}}
+\newcommand{\Bernoulli}{\text{Bernoulli}}
+\newcommand{\Betadist}{\text{Beta}}
+\newcommand{\BG}{\text{BernoulliGraph}}
+\newcommand{\Cat}{\text{Categorical}}
+\newcommand{\Uniform}{\text{Uniform}}
+\newcommand{\RDPG}{\text{RDPG}}
+\newcommand{\GRDPG}{\text{GRDPG}}
+\newcommand{\PABM}{\text{PABM}}
+
+**Def** Popularity Adjusted Block Model (Sengupta and Chen, 2017):
+
+Let each vertex $i \in [n]$ have $K$ popularity parameters
+$\lambda_{i1}, ..., \lambda_{iK} \in [0, 1]$. 
+Then $A \sim \PABM(P)$ if each $P_{ij} = \lambda_{i z_j} \lambda_{j z_i}$,  
+e.g., if $z_i = k$ and $z_j = l$, $P_{ij} = \lambda_{il} \lambda_{jk}$.
+
+**Lemma** (Noroozi, Rimal, and Pensky, 2020): 
+
+$A$ is sampled from a PABM if $P$ can be described as:
+
+1. Let each $P^{(kl)}$ denote the $n_k \times n_l$ matrix of edge probabilities 
+between communities $k$ and $l$. 
+2. Organize popularity parameters as vectors 
+$\lambda^{(kl)} \in \mathbb{R}^{n_k}$ 
+such that $\lambda^{(kl)}_i = \lambda_{k_i l}$ is the popularity parameter 
+of the $i$^th^ vertex of community $k$ towards community $l$. 
+3. Each block can be decomposed as 
+$P^{(kl)} = \lambda^{(kl)} (\lambda^{(lk)})^\top$.
+
+**Notation**: $A \sim \PABM(\{\lambda^{(kl)}\}_K)$.
+
+## The Generalized Random Dot Product Graph
+
+Generalized Random Dot Product Graph $A \sim GRDPG_{p, q}(X)$  
+(Rubin-Delanchy, Cape, Tang, Priebe, 2020)
+
+* Latent vectors $x_1, ..., x_n \in \mathbb{R}^{p+q}$ such that 
+$x_i^\top I_{p, q} x_j \in [0, 1]$ and $I_{p, q} = blockdiag(I_p, -I_q)$
+* $A \sim BernoulliGraph(X I_{p, q} X^\top)$ where 
+$X = \begin{bmatrix} x_1 & \cdots & x_n \end{bmatrix}^\top$
+
+If latent vectors $X_1, ..., X_n \stackrel{iid}{\sim} F$, then we write 
+$(A, X) \sim GRDPG_{p, q}(F, n)$.
+
+## (Generalized) Random Dot Product Graph Model
+
+### Recovery/Estimation
+
+Want to estimate $X$ given $A$.
+
+### Adjacency Spectral Embedding
+
+To embed in $\mathbb{R}^{p+q}$, 
+
+1. Compute $A \approx \hat{V} \hat{\Lambda} \hat{V}^\top$ 
+where $\hat{\Lambda} \in \mathbb{R}^{(p+q) \times (p+q)}$ and 
+$\hat{V} \in \mathbb{R}^{n \times (p+q)}$ by using 
+$p$ most positive and $q$ most negative eigenvalues.
+
+2. Let $\hat{X} = \hat{V} |\hat{\Lambda}|^{1/2}$.
+
+\vspace*{.5\baselineskip}
+
+Rubin-Delanchy et al., 2020:  
+$$\max_i \|\hat{X}_i - Q_n X_i \| \stackrel{a.s.}{\to} 0$$
+
+$$Q_n \in \mathbb{O}(p, q)$$
+
+## Connecting the PABM to the GRDPG
+
+**Theorem** (KTT): $A \sim PABM(\{\lambda^{(kl)}\}_K)$ is equivalent to 
+$A \sim GRDPG_{p, q}(X U)$ such that
+
+* $p = K (K + 1) / 2$
+* $q = K (K - 1) / 2$
+* $U$ is orthogonal and predetermined for each $K$
+* $X$ is block diagonal and composed of $\{\lambda^{(kl)}\}_K$  
+$\implies$ if $x_i^\top$ and $x_j^\top$ are two rows of $X U$ corresponding 
+to different communities, then $x_i^\top x_j = 0$.
+
+**Remark** (non-uniqueness of the latent configuration):  
+$A \sim GRDPG_{p, q}(X U) \implies A \sim GRDPG_{p, q}(X U Q)$ 
+$\forall Q \in \mathbb{O}(p, q)$
+
+**Corollary**: $X$ is block diagonal by community and 
+$U$ is orthogonal $\implies$ 
+each community corresponds to a subspace in $\mathbb{R}^{K^2}$.
+
+Subspace property holds even with linear transformation 
+$Q \in \mathbb{O}(p, q)$.
+
+## Connecting the PABM ot the GRDPG
+
+**Theorem** (KTT): 
+If $P = V \Lambda V^\top$ is the spectral decomposition of $P$ for the PABM and 
+$V$ has rows $v_i^\top$, then $v_i^\top v_j = 0$ $\forall z_i \neq z_j$.
+
+**Theorem** (KTT): 
+If $A \approx \hat{V} \hat{\Lambda} \hat{V}^\top$ is the spectral decomposition 
+of $A$ for the PABM using the $K (K+1) / 2$ most positive and $K (K-1) / 2$ 
+most negative eigenvalues, and we denote $\hat{v}_i^\top$ as the rows of 
+$\hat{V}$, then 
+
+$$\max_{i, j : z_i \neq z_j} n \hat{v}_i^\top \hat{v}_j = 
+O_P \Big( \frac{(\log n)^c}{\sqrt{n \rho_n}} \Big)$$
+
+Orthogonal Spectral Clustering (KTT): 
+
+1. Let $V$ be the eigenvectors of $A$ corresponding to the $K (K+1)/2$ most 
+positive and $K (K-1) / 2$ most negative eigenvalues.
+2. Compute $B = |n V V^\top|$ applying $|\cdot|$ entry-wise.
+3. Construct graph $\hat{G}$ using $B$ as its similarity matrix.
+4. Partition $\hat{G}$ into $K$ disconnected subgraphs.
+
+## Simulation Study
+
+Simulation setup:
+
+1. $Z_1, ..., Z_n \stackrel{iid}{\sim} Categorical(1 / K, ..., 1 / K)$
+2. $\lambda_{ik} \stackrel{iid}{\sim} Beta(a_{ik}, b_{ik})$  
+$a_{ik} = \begin{cases} 2 & z_i = k \\ 1 & z_i \neq k \end{cases}$, 
+$b_{ik} = \begin{cases} 1 & z_i = k \\ 2 & z_i \neq k \end{cases}$
+3. $P_{ij} = \lambda_{i z_j} \lambda_{j z_i}$
+4. $A \sim BernoulliGraph(P)$
+
+```{r clust_err_k, fig.width = 10, fig.height = 3, out.width = '100%'}
+setwd('..')
+clustering.df <- readr::read_csv('clustering-k.csv')
+ssc.df <- readr::read_csv('clustering-ssc-k.csv')
+clustering.df %>%
+  dplyr::group_by(n, K) %>%
+  dplyr::summarise(
+    med.err = median(error),
+    first.q = quantile(error, .25),
+    third.q = quantile(error, .75),
+    med.err.ssc = median(error.ssc),
+    first.q.ssc = quantile(error.ssc, .25),
+    third.q.ssc = quantile(error.ssc, .75),
+    med.err.ep = median(error.ep, na.rm = TRUE),
+    first.q.ep = quantile(error.ep, .25, na.rm = TRUE),
+    third.q.ep = quantile(error.ep, .75, na.rm = TRUE),
+    med.err.louvain = median(error.louvain),
+    first.q.louvain = quantile(error.louvain, .25),
+    third.q.louvain = quantile(error.louvain, .75)
+  ) %>% 
+  dplyr::ungroup() %>% 
+  dplyr::inner_join(
+    ssc.df %>% 
+      dplyr::group_by(n, K) %>% 
+      dplyr::summarise(med.err.ssc2 = median(error.ssc2),
+                       first.q.ssc2 = quantile(error.ssc2, .25),
+                       third.q.ssc2 = quantile(error.ssc2, .75)) %>% 
+      dplyr::ungroup()
+  ) %>% 
+  ggplot() +
+  scale_x_log10(breaks = c(128, 256, 512, 1024, 2048, 4096)) +
+  # scale_x_continuous(breaks = c(128, 256, 512, 1024, 2048, 4096)) + 
+  scale_y_log10() +
+  labs(y = 'community detection error rate', 
+       colour = NULL) +
+  geom_line(aes(x = n, y = med.err,
+                colour = 'OSC')) +
+  geom_errorbar(aes(x = n, ymin = first.q, ymax = third.q,
+                    colour = 'OSC'), width = .1) + 
+  geom_line(aes(x = n, y = med.err.ssc,
+                colour = 'SSC-ASE')) + 
+  geom_errorbar(aes(x = n, ymin = first.q.ssc, ymax = third.q.ssc,
+                    colour = 'SSC-ASE'), width = .1) + 
+  # geom_line(aes(x = n, y = med.err.ep,
+  #               colour = 'MM-EP')) + 
+  # geom_errorbar(aes(x = n, ymin = first.q.ep, ymax = third.q.ep,
+  #                   colour = 'MM-EP'), width = .1) + 
+  geom_line(aes(x = n, y = med.err.ssc2,
+                colour = 'SSC-A')) + 
+  geom_errorbar(aes(x = n, ymin = first.q.ssc2, ymax = third.q.ssc2,
+                    colour = 'SSC-A'), width = .1) + 
+  # geom_line(aes(x = n, y = med.err.louvain,
+  #               colour = 'MM-Louvain')) + 
+  # geom_errorbar(aes(x = n, ymin = first.q.louvain, ymax = third.q.louvain,
+  #                   colour = 'MM-Louvain'), width = .1) + 
+  scale_colour_brewer(palette = 'Set1') + 
+  facet_wrap(~ K, labeller = 'label_both')
+```
