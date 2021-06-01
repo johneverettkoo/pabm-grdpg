@@ -56,12 +56,22 @@ set.seed(314159)
 \newcommand{\GRDPG}{\text{GRDPG}}
 \newcommand{\PABM}{\text{PABM}}
 
+```{r out.width = '50%', fig.height = 3, fig.width = 4}
+Pz <- generate.P.beta(64, 4, 4, 1, 1, 4)
+P <- Pz$P
+z <- Pz$clustering
+A <- draw.graph(P)
+qgraph::qgraph(A, groups = factor(z), legend = FALSE)
+```
+
 **Def** Popularity Adjusted Block Model (Sengupta and Chen, 2017):
 
 Let each vertex $i \in [n]$ have $K$ popularity parameters
 $\lambda_{i1}, ..., \lambda_{iK} \in [0, 1]$. 
 Then $A \sim \PABM(P)$ if each $P_{ij} = \lambda_{i z_j} \lambda_{j z_i}$,  
 e.g., if $z_i = k$ and $z_j = l$, $P_{ij} = \lambda_{il} \lambda_{jk}$.
+
+## The Popularity Adjusted Block Model
 
 **Lemma** (Noroozi, Rimal, and Pensky, 2020): 
 
@@ -90,30 +100,6 @@ $X = \begin{bmatrix} x_1 & \cdots & x_n \end{bmatrix}^\top$
 
 If latent vectors $X_1, ..., X_n \stackrel{iid}{\sim} F$, then we write 
 $(A, X) \sim GRDPG_{p, q}(F, n)$.
-
-## (Generalized) Random Dot Product Graph Model
-
-### Recovery/Estimation
-
-Want to estimate $X$ given $A$.
-
-### Adjacency Spectral Embedding
-
-To embed in $\mathbb{R}^{p+q}$, 
-
-1. Compute $A \approx \hat{V} \hat{\Lambda} \hat{V}^\top$ 
-where $\hat{\Lambda} \in \mathbb{R}^{(p+q) \times (p+q)}$ and 
-$\hat{V} \in \mathbb{R}^{n \times (p+q)}$ by using 
-$p$ most positive and $q$ most negative eigenvalues.
-
-2. Let $\hat{X} = \hat{V} |\hat{\Lambda}|^{1/2}$.
-
-\vspace*{.5\baselineskip}
-
-Rubin-Delanchy et al., 2020:  
-$$\max_i \|\hat{X}_i - Q_n X_i \| \stackrel{a.s.}{\to} 0$$
-
-$$Q_n \in \mathbb{O}(p, q)$$
 
 ## Connecting the PABM to the GRDPG
 
