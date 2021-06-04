@@ -1,9 +1,12 @@
 Thank you for attending my talk titled connecting the popularity adjusted block model to the generalized random dot product graph.
 
-So let's begin by defining the popularity adjusted block model. The popularity adjusted block model is a generative model for networks with community structure. It is a generalization of the degree-corrected block model, which in turn is a generalization of the stochastic block model, and all of these models start by saying each node of a network has a hidden community label. We will denote n as the number of nodes and K as the number of communities. In the pabm, each node has K popularity parameters lambda_i1, lambda_i2, up to lambda_iK. So lambda_ik is the i^th node's affinity toward community k. The edge probability between nodes i and j, P_ij, then is defined as lambda_{i, z_j} lambda_{j z_i}, where z_i is the community label of node i, and z_j is the community label of node j. 
+This is joint work with my advisors, Minh Tang at NC State and Michael Trosset at IU.
 
 
-A research group from UCF came up with an equivalent characterization of the pabm using popularity vectors. This hints at the idea that the pabm can be represented by a set of latent vectors in euclidean space.
+So let's begin by defining the popularity adjusted block model. The popularity adjusted block model is a generative model for networks with community structure. It is a generalization of the degree-corrected block model, which in turn is a generalization of the stochastic block model, and all of these models start by saying each node of a network has a hidden and unobservable community label. We will denote n as the number of nodes and K as the number of communities. In the pabm, each node has K popularity parameters lambda_i1, lambda_i2, up to lambda_iK. So lambda_ik is the i^th node's affinity toward community k. The edge probability between nodes i and j, P_ij, then is defined as lambda_{i, z_j} lambda_{j z_i}, where z_i is the community label of node i, and z_j is the community label of node j. One goal in analyzing a network that is sampled from the PABM might be community detection, or recovery of the hidden labels.
+
+
+Another research group (who also happen to be presenting their research on this model at this conference) came up with an equivalent characterization of the pabm using popularity vectors. This hints at the idea that the pabm can be represented by a set of latent vectors in euclidean space.
 
 Let's designate P^kl as the n_k x n_l block of edge probabilities between k and l. We also organize the popularity parameters into popularity vectors, so lambda^kl contains the popularity parameters of community k toward community l. We have K^2 of these popularity vectors. Then we can decompose each block P^kl as the outer product of lambda^kl and lambda^lk. 
 

@@ -369,7 +369,7 @@ $Q \in \mathbb{O}(p, q)$.
 Let the rows of $X \in \mathbb{R}^{n \times d}$ are vectors that lie on or near a small number of low-dimensional subspaces. SSC constructs a graph from $X$ as follows:
 
 1. For each $i \in [n]$, solve the optimization problem  
-$c_i = \arg\min_{c} \|c\|_1$ subject to $x_i = X c$ and $c^{(i)} = 0$.
+$c_i = \arg\min_{c} \|c\|_1$ subject to $x_i = X^\top c$ and $c^{(i)} = 0$.
 2. Construct a similarity graph using $B = |C| + |C^\top|$ as its affinity matrix, where $C = \begin{bmatrix} c_1 & \cdots & c_n \end{bmatrix}$.
 
 If $X$ obeys the *Subspace Detection Property*, then it produces a similarity graph $B$ such that $B_{ij} = 0$ $\forall z_i \neq z_j$.
@@ -386,7 +386,7 @@ $$c_i = \arg\min_{c} \|c\|_1 \text{ subject to } A_{\cdot, i} = A c
 GRDPG-based approach: Apply SSC to the ASE of $A$.
 
 $$c_i = \arg\min_{c} \|c\|_1 \text{ subject to } 
-\hat{x}_i = \hat{X} c \text{ and } c^{(i)} = 0$$
+\hat{x}_i = \hat{X}^\top c \text{ and } c^{(i)} = 0$$
 $$A \approx \hat{X} I_{p, q} \hat{X}^\top$$
 
 ## Sparse Subspace Clustering
