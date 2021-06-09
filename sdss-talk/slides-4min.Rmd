@@ -1,7 +1,10 @@
 ---
 title: Connecting the Popularity Adjusted Block Model to the Generalized Random Dot Product Graph
 subtitle: SDSS 2021 Lightning Presentation
-author: John Koo, Indiana University
+author: |
+  | John Koo, Indiana University
+  | Minh Tang, NC State University
+  | Michael Trosset, Indiana University
 date: 'June 2021'
 output: 
   beamer_presentation:
@@ -67,9 +70,9 @@ qgraph::qgraph(A, groups = factor(z), legend = FALSE)
 **Def** Popularity Adjusted Block Model (Sengupta and Chen, 2017):
 
 Let each vertex $i \in [n]$ have $K$ popularity parameters
-$\lambda_{i1}, ..., \lambda_{iK} \in [0, 1]$. 
-Then $A \sim \PABM(P)$ if each $P_{ij} = \lambda_{i z_j} \lambda_{j z_i}$,  
-e.g., if $z_i = k$ and $z_j = l$, $P_{ij} = \lambda_{il} \lambda_{jk}$.
+$\lambda_{i1}, ..., \lambda_{iK} \in [0, 1]$.  
+Then $A \sim \BG(P)$ is a PABM if each 
+$P_{ij} = \lambda_{i z_j} \lambda_{j z_i}$
 
 ## The Popularity Adjusted Block Model
 
@@ -90,21 +93,21 @@ $P^{(kl)} = \lambda^{(kl)} (\lambda^{(lk)})^\top$.
 
 ## The Generalized Random Dot Product Graph
 
-Generalized Random Dot Product Graph $A \sim GRDPG_{p, q}(X)$  
+Generalized Random Dot Product Graph $A \sim \GRDPG_{p, q}(X)$  
 (Rubin-Delanchy, Cape, Tang, Priebe, 2020)
 
 * Latent vectors $x_1, ..., x_n \in \mathbb{R}^{p+q}$ such that 
-$x_i^\top I_{p, q} x_j \in [0, 1]$ and $I_{p, q} = blockdiag(I_p, -I_q)$
-* $A \sim BernoulliGraph(X I_{p, q} X^\top)$ where 
+$x_i^\top I_{p, q} x_j \in [0, 1]$ and $I_{p, q} = \blockdiag(I_p, -I_q)$
+* $A \sim \BG(X I_{p, q} X^\top)$ where 
 $X = \begin{bmatrix} x_1 & \cdots & x_n \end{bmatrix}^\top$
 
 If latent vectors $X_1, ..., X_n \stackrel{iid}{\sim} F$, then we write 
-$(A, X) \sim GRDPG_{p, q}(F, n)$.
+$(A, X) \sim \GRDPG_{p, q}(F, n)$.
 
 ## Connecting the PABM to the GRDPG
 
-**Theorem** (KTT): $A \sim PABM(\{\lambda^{(kl)}\}_K)$ is equivalent to 
-$A \sim GRDPG_{p, q}(X U)$ such that
+**Theorem** (KTT): $A \sim \PABM(\{\lambda^{(kl)}\}_K)$ is equivalent to 
+$A \sim \GRDPG_{p, q}(X U)$ such that
 
 * $p = K (K + 1) / 2$
 * $q = K (K - 1) / 2$
@@ -114,7 +117,7 @@ $\implies$ if $x_i^\top$ and $x_j^\top$ are two rows of $X U$ corresponding
 to different communities, then $x_i^\top x_j = 0$.
 
 **Remark** (non-uniqueness of the latent configuration):  
-$A \sim GRDPG_{p, q}(X U) \implies A \sim GRDPG_{p, q}(X U Q)$ 
+$A \sim \GRDPG_{p, q}(X U) \implies A \sim \GRDPG_{p, q}(X U Q)$ 
 $\forall Q \in \mathbb{O}(p, q)$
 
 **Corollary**: $X$ is block diagonal by community and 
@@ -151,12 +154,12 @@ positive and $K (K-1) / 2$ most negative eigenvalues.
 
 Simulation setup:
 
-1. $Z_1, ..., Z_n \stackrel{iid}{\sim} Categorical(1 / K, ..., 1 / K)$
-2. $\lambda_{ik} \stackrel{iid}{\sim} Beta(a_{ik}, b_{ik})$  
+1. $Z_1, ..., Z_n \stackrel{iid}{\sim} \Cat(1 / K, ..., 1 / K)$
+2. $\lambda_{ik} \stackrel{iid}{\sim} \Betadist(a_{ik}, b_{ik})$  
 $a_{ik} = \begin{cases} 2 & z_i = k \\ 1 & z_i \neq k \end{cases}$, 
 $b_{ik} = \begin{cases} 1 & z_i = k \\ 2 & z_i \neq k \end{cases}$
 3. $P_{ij} = \lambda_{i z_j} \lambda_{j z_i}$
-4. $A \sim BernoulliGraph(P)$
+4. $A \sim \BG(P)$
 
 ```{r clust_err_k, fig.width = 10, fig.height = 3, out.width = '100%'}
 setwd('..')
