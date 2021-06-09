@@ -429,16 +429,16 @@ community detection in the PABM. SSC is performed by solving an
 optimization problem for each observed point. Given
 \(X \in \mathbb{R}^{n \times d}\) with vectors
 \(x_i^\top \in \mathbb{R}^d\) as rows of \(X\), the optimization problem
-\(\min_{c_i} ||c_i||_1\) subject to \(x_i = X c_i\) and \(\beta_i = 0\)
-is solved for each \(i = 1, ..., n\). The solutions are collected
-collected into matrix
+\(c_i = \arg\min_{c} ||c||_1\) subject to \(x_i = X c\) and
+\(c^{(i)} = 0\) is solved for each \(i = 1, ..., n\). The solutions are
+collected collected into matrix
 \(C = \begin{bmatrix} c_1 & \cdots & c_n \end{bmatrix}^\top\) to
 construct an affinity matrix \(B = |C| + |C^\top|\). If each \(x_i\) lie
 perfectly on one of \(K\) subspaces, \(B\) describes an undirected graph
 consisting of \(K\) disjoint subgraphs, i.e., \(B_{ij} = 0\) if
 \(x_i, x_j\) are in different subspaces. If \(X\) instead represents
 points near \(K\) subspaces with some noise, a final graph partitioning
-step is performed (e.g., edge thresholding or spectral clustering).
+step may be performed (e.g., edge thresholding or spectral clustering).
 
 In practice, SSC is often performed by solving the LASSO problems
 
@@ -535,8 +535,8 @@ orthogonal subspaces. Multiplication by \(Q \in \mathbb{O}(p, q)\)
 removes the orthogonality property but retains the property that each
 community is represented by a \(K\)-dimensional subspace. Therefore, the
 ASE of \(P\) results in subspaces that correspond to each community,
-suggesting the use of SSC. In this paper, we will use a different and
-leave the properties of SSC on the ASE of \(A\) as future work.
+suggesting the use of SSC. Before exploring SSC, we will first consider
+a different approach.
 
 \begin{theorem}
 \label{theorem3}
@@ -619,8 +619,8 @@ Let $P_n$ describe the edge probability matrix of the PABM with
 $n$ vertices, and let $A_n \sim \text{Bernoulli}(P_n)$.  Let $\hat{V}_n$ be the 
 matrix of eigenvectors of $A_n$ corresponding to the $K (K + 1) / 2$ most
 positive and $K (K - 1) / 2$ most negative eigenvalues. Then 
-$\exists \lambda > 0$ such that as $n \to \infty$, $\hat{V}_n$ obeys the 
-subspace detection property with probability 1.
+$\exists \lambda > 0$ and $N \in \mathbb{N}$ such that when $n > N$, 
+$\sqrt{n} \hat{V}_n$ obeys the subspace detection property with probability 1.
 \end{theorem}
 
 \begin{remark}
