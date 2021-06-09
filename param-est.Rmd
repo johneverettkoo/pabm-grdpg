@@ -44,8 +44,8 @@ $X = \frac{1}{2} \begin{bmatrix} \lambda^{(kl)} & \lambda^{(kl)} \\
 \lambda^{(lk)} & -\lambda^{(lk)} \end{bmatrix}$ and signature $(1, 1)$. 
 
 Treating $M^{(kl)}$ as an edge probability matrix, draw 
-$\hat{M}^{(kl)} \sim BernoulliGraph(M^{(kl)})$, and let $\hat{X}$ be its ASE. 
-Then $\hat{M}^{(kl)} = \begin{bmatrix} 0 & A^{(kl)} \\ A^{(lk)} & 0 \end{bmatrix}$ and  $\|\hat{X} Q - X\|_{2 \to \infty} = O_P(\frac{(\log n_{kl})^c}{\sqrt{n_{kl}}})$ where $n_{kl} = n_{lk} = n_k + n_l$.
+$\hat{M}^{(kl)} \sim BernoulliGraph(M^{(kl)})$, and letting $\hat{X}$ be its ASE, 
+we get $\hat{M}^{(kl)} = \begin{bmatrix} 0 & A^{(kl)} \\ A^{(lk)} & 0 \end{bmatrix}$ and  $\|\hat{X} Q - X\|_{2 \to \infty} = O_P(\frac{(\log n_{kl})^c}{\sqrt{n_{kl}}})$ where $n_{kl} = n_{lk} = n_k + n_l$.
 
 Then we get $\|\hat{M}^{(kl)} - M^{(kl)}\|$ 
 $= \|(\hat{X} Q - X) I_{1,1} X^\top + X I_{1,1} (\hat{X} Q - X)^\top + (\hat{X} Q - X) I_{1,1} (\hat{X} Q - X)^\top\|$  
