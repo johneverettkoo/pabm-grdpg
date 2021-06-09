@@ -67,6 +67,7 @@
 \usepackage{float}
 \usepackage{mathtools}
 \usepackage{natbib}
+\usepackage{parskip}
 \usepackage[linesnumbered,ruled,vlined]{algorithm2e}
 \setcitestyle{numbers,square,comma}
 \usepackage{verbatim}
@@ -110,7 +111,7 @@ via simulation.
 \newtheorem{lemma}{Lemma}
 \theoremstyle{remark}
 \newtheorem*{remark}{Remark}
-\theoremstyle{example}
+\theoremstyle{definition}
 \newtheorem*{example}{Example}
 
 \hypertarget{introduction}{%
@@ -300,25 +301,19 @@ $A \sim PABM(\{(\lambda^{(kl)}\})_K)$ are equivalent.
 \end{theorem}
 
 \begin{proof}
-Define the following matrices from $\{\lambda^{(kl)}\}_K$: 
-
-$$\Lambda^{(k)} = 
-\begin{bmatrix} \lambda^{(k,1)} & \cdots & \lambda^{(k, K)} \end{bmatrix}
-\in \mathbb{R}^{n_k \times K}$$
-
-\begin{equation} \label{eq:xy}
-X = \text{blockdiag}(\Lambda^{(1)}, ..., \Lambda^{(K)}) \in \mathbb{R}^{n \times K^2}
-\end{equation}
-
-$$L^{(k)} = \text{blockdiag}(\lambda^{(1k)}, ..., \lambda^{(Kk)}) \in 
-\mathbb{R}^{n \times K}$$
-
-$$Y = \begin{bmatrix} L^{(1)} & \cdots & L^{(K)} \end{bmatrix} \in 
-\mathbb{R}^{n \times K^2}$$
-
-Then $P = X Y^\top$.
-
-Similar to the $K = 2$ case, we have $Y = X \Pi$ for a permutation matrix
+First define the following matrices from $\{\lambda^{(kl)}\}_K$: 
+\begin{gather}
+\label{eq:xy}
+\Lambda^{(k)} = \begin{bmatrix} \lambda^{(k,1)} \mid \cdots \mid \lambda^{(k, K)} \end{bmatrix}
+\in \mathbb{R}^{n_k \times K}, \quad 
+X = \text{blockdiag}(\Lambda^{(1)}, \dots, \Lambda^{(K)}) \in
+\mathbb{R}^{n \times K^2} \\
+L^{(k)} = \text{blockdiag}(\lambda^{(1k)}, \dots, \lambda^{(Kk)}) \in 
+\mathbb{R}^{n \times K}, \quad 
+Y = \begin{bmatrix} L^{(1)} \mid \cdots \mid L^{(K)} \end{bmatrix} \in
+\mathbb{R}^{n \times K^2}.
+\end{gather}
+We then have $P = X Y^\top$. Similar to the $K = 2$ case, we have $Y = X \Pi$ for a permutation matrix
 $\Pi$, resulting in $P = X \Pi X^\top$.  
 The permutation described by $\Pi$ has $K$ fixed points, which correspond to 
 $K$ eigenvalues equal to $1$ with corresponding eigenvectors $e_k$ where 
@@ -327,48 +322,42 @@ $\binom{K}{2} = K (K - 1) / 2$ cycles of order $2$. Each cycle corresponds to
 a pair of eigenvalues $+1$ and $-1$ and a pair of eigenvectors 
 $(e_s + e_t) / \sqrt{2}$ and $(e_s - e_t) / \sqrt{2}$.
 
-Then $\Pi$ has $K (K + 1) / 2$ eigenvalues equal to $1$ and $K (K - 1) / 2$ 
-eigenvalues equal to $-1$. $\Pi$ has the decomposed form 
-
+Then $\Pi$ has $p = K (K + 1) / 2$ eigenvalues equal to $1$ and $q = K (K - 1) / 2$ 
+eigenvalues equal to $-1$. We therefore have
 \begin{equation} \label{eq:permutation}
 \Pi = U I_{K (K + 1) / 2, K (K - 1) / 2} U^\top
 \end{equation}
-
-The edge probability matrix then can be written as:
-
+where $U$ is a $K^2 \times K^2$ orthogonal matrix. The edge probability matrix can then be written as
 \begin{equation} \label{eq:pabm-grdpg}
 P = X U I_{p, q} (X U)^\top
 \end{equation}
-
-\begin{equation} \label{eq:p}
-p = K (K + 1) / 2
-\end{equation}
-
-\begin{equation} \label{eq:q}
-q = K (K - 1) / 2
-\end{equation}
-
-and we can describe the PABM with $K$ communities as a GRDPG with latent 
-positions $X U$ with signature $\big( K (K + 1) / 2, K (K - 1) / 2 \big)$.
+% \begin{equation} \label{eq:p}
+% p = K (K + 1) / 2
+% \end{equation}
+% \begin{equation} \label{eq:q}
+% q = K (K - 1) / 2
+% \end{equation}
+We can therefore describe the PABM with $K$ communities as a GRDPG with latent 
+positions $X U$ and signature $(p,q) = \bigl( \tfrac{1}{2} K (K + 1) ,
+\tfrac{1}{2} K (K - 1)\bigr)$.
 \end{proof}
 
-\begin{example}[$K = 3$] Using the same notation as in Theorem \ref{theorem2}:
-
-$$X = \begin{bmatrix} 
+\begin{example}[$K = 3$] Using the same notation as in Theorem
+  \ref{theorem2}, we can define
+\begin{gather*}
+X = \begin{bmatrix} 
 \lambda^{(11)} & \lambda^{(12)} & \lambda^{(13)} & 0 & 0 & 0 & 0 & 0 & 0 \\
 0 & 0 & 0 & \lambda^{(21)} & \lambda^{(22)} & \lambda^{(23)} & 0 & 0 & 0 \\
 0 & 0 & 0 & 0 & 0 & 0 & \lambda^{(31)} & \lambda^{(32)} & \lambda^{(33)}
-\end{bmatrix}$$
-
-$$Y = \begin{bmatrix} 
+\end{bmatrix}, \\
+Y = \begin{bmatrix} 
 \lambda^{(11)} & 0 & 0 & \lambda^{(12)} & 0 & 0 & \lambda^{(13)} & 0 & 0 \\
 0 & \lambda^{(21)} & 0 & 0 & \lambda^{(22)} & 0 & 0 & \lambda^{(23)} & 0 \\
 0 & 0 & \lambda^{(31)} & 0 & 0 & \lambda^{(32)} & 0 & 0 & \lambda^{(33)}
-\end{bmatrix}$$
-
-Then $P = X Y^\top$ and $Y = X \Pi$ where $\Pi$ is a permutation matrix 
-consisting of $3$ fixed points and $3$ cycles of order 2:
-
+\end{bmatrix}.
+\end{gather*}
+Then $Y = X \Pi$ and $P = X Y^{\top}$ where $\Pi$ is a permutation matrix of
+the form
 $$\Pi = \begin{bmatrix} 
 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
@@ -379,20 +368,22 @@ $$\Pi = \begin{bmatrix}
 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1
-\end{bmatrix}$$
-
-* Positions 1, 5, 9 are fixed.
-
-* The cycles of order 2 are $(2, 4)$, $(3, 7)$, and $(6, 8)$.
-    
-Therefore, we can decompose $\Pi = U I_{6, 3} U^\top$ where the first three 
+\end{bmatrix}.$$
+The matrix $\Pi$ corresponds to a permutation of $\{1,2,\dots,9\}$
+with the following decomposition.
+\begin{enumerate}
+\item Positions 1, 5, 9 are fixed.
+\item There are three cycles of length 2, namely $(2, 4)$, $(3, 7)$, and $(6, 8)$.
+\end{enumerate}
+We can therefore write $\Pi$ as $\Pi = U I_{6, 3} U^\top$ where the first three 
 columns of $U$ consist of $e_1$, $e_5$, and $e_9$ corresponding to the fixed 
 positions $1$, $5$, and $9$, the next three columns consist of eigenvectors 
 $(e_k + e_l) / \sqrt{2}$, and the last three columns consist of eigenvectors 
 $(e_k - e_l) / \sqrt{2}$, where pairs $(k, l)$ correspond to the cycles of 
 order 2 described above.
 
-The latent positions are the rows of  
+The matrix $P$ can then be written as a generalized random dot product
+graph where the latent positions are the rows of the matrix
 $$XU = \begin{bmatrix}
   \lambda^{(11)} & 0 & 0 & 
   \lambda^{(12)} / \sqrt{2} & \lambda^{(13)} / \sqrt{2} & 0 & 
