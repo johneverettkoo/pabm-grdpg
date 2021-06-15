@@ -1,12 +1,21 @@
 embedding <- function(A, p = NULL, q = NULL,
                       scale = TRUE,
                       eps = 1e-6) {
+  if (p + q == 0) {
+    stop('one of p or q must be > 0')
+  }
   n <- nrow(A)
   eigen.A <- eigen(A, symmetric = TRUE)
   if (is.null(p) | is.null(q)) {
     keep <- (abs(eigen.A$values) > eps)
   } else {
-    keep <- c(seq(p), seq(n, n - q + 1))
+    if (p * q > 0) {
+      keep <- c(seq(p), seq(n, n - q + 1))
+    } else if (p == 0) {
+      keep <- seq(n, n - q + 1)
+    } else {
+      keep <- seq(p)
+    }
   }
   
   U <- eigen.A$vectors[, keep]
@@ -217,31 +226,37 @@ estimate.lambda.block <- function(P.block, within = FALSE) {
   }
 }
 
-lambda.rmse <- function(P, Phat, clustering) {
+lambda.rmse <- function(P, A, clustering) {
   K <- max(clustering)
-  n <- nrow(Phat)
+  n <- nrow(A)
   n.vector <- sapply(seq(K), function(k) sum(clustering == k))
   sapply(seq(K), function(k) {
+    n.k <- sum(clustering == k)
     sapply(seq(k), function(l) {
+      n.l <- sum(clustering == l)
       P.block <- P[clustering == k, clustering == l]
-      Phat.block <- Phat[clustering == k, clustering == l]
+      A.block <- A[clustering == k, clustering == l]
       if (k == l) {
-        lambda <- estimate.lambda.block(P.block, TRUE)
-        lambda.hat <- estimate.lambda.block(Phat.block, TRUE)
-        return(sum((lambda - lambda.hat) ** 2))
+        # lambda <- estimate.lambda.block(P.block, TRUE)
+        lambda.hat <- estimate.lambda.block(A.block, TRUE)
+        P.hat <- lambda.hat %*% t(lambda.hat)
+        # return(sum((lambda - lambda.hat) ** 2))
+        return(norm(P.hat - P.block, 'F') / (n.k))
       } else {
-        lambdas <- estimate.lambda.block(P.block)
-        lambda.hats <- estimate.lambda.block(Phat.block)
-        return(sum((lambdas[[1]] - lambda.hats[[1]]) ** 2) + 
-                 sum((lambdas[[2]] - lambda.hats[[2]]) ** 2))
+        # lambdas <- estimate.lambda.block(P.block)
+        lambda.hats <- estimate.lambda.block(A.block)
+        # return(sum((lambdas[[1]] - lambda.hats[[1]]) ** 2) + 
+        #          sum((lambdas[[2]] - lambda.hats[[2]]) ** 2))
+        P.hat <- lambda.hats[[1]] %*% t(lambda.hats[[2]])
+        return(norm(P.hat - P.block, 'F') / sqrt(n.k * n.l))
       }
     }) %>% 
       sum() %>% 
       return()
   }) %>% 
     sum() %>% 
-    magrittr::divide_by(n * K) %>% 
-    sqrt() %>% 
+    # magrittr::divide_by(n * K) %>% 
+    # sqrt() %>% 
     return()
 }
 
@@ -300,17 +315,19 @@ lambda.rmse.mle <- function(P, A, z) {
       if (k == l) {
         A.kk <- A[z == k, z == l]
         P.kk <- P[z == k, z == l]
-        lambda.hat <- 
-          as.numeric((A.kk %*% e.n.k) / 
+        lambda.hat <-
+          as.numeric((A.kk %*% e.n.k) /
                        as.numeric(sqrt(t(e.n.k) %*% A.kk %*% e.n.k)))
-        lambda <- estimate.lambda.block(P.kk, TRUE)
-        return(sum((lambda - lambda.hat) ** 2))
+        # lambda <- estimate.lambda.block(P.kk, TRUE)
+        # return(sum((lambda - lambda.hat) ** 2))
+        P.hat <- lambda.hat %*% t(lambda.hat)
+        return(norm(P.hat - P.kk, 'F') / (n.k))
       } else {
         n.l <- n.vector[l]
         e.n.l <- rep(1, n.l)
         A.kl <- A[z == k, z == l]
         P.kl <- P[z == k, z == l]
-        lambdas <- estimate.lambda.block(P.kl)
+        # lambdas <- estimate.lambda.block(P.kl)
         lambda.hat.kl <- 
           as.numeric((A.kl %*% e.n.l) / 
                        as.numeric(sqrt(t(e.n.k) %*% A.kl %*% e.n.l)))
@@ -321,16 +338,18 @@ lambda.rmse.mle <- function(P, A, z) {
                                         0, lambda.hat.kl)
         lambda.hat.lk <- dplyr::if_else(is.nan(lambda.hat.lk), 
                                         0, lambda.hat.lk)
-        return(sum((lambdas[[1]] - lambda.hat.kl) ** 2) + 
-                 sum((lambdas[[2]] - lambda.hat.lk) ** 2))
+        # return(sum((lambdas[[1]] - lambda.hat.kl) ** 2) + 
+        #          sum((lambdas[[2]] - lambda.hat.lk) ** 2))
+        P.hat <- lambda.hat.kl %*% t(lambda.hat.lk)
+        return(norm(P.kl - P.hat, 'F') / sqrt(n.k * n.l))
       }
     }) %>% 
       sum() %>% 
       return()
   }) %>% 
     sum() %>% 
-    magrittr::divide_by(n * K) %>% 
-    sqrt() %>% 
+    # magrittr::divide_by(n * K) %>% 
+    # sqrt() %>% 
     return()
 }
 
