@@ -1252,22 +1252,20 @@ adjacency spectral embedding \(\hat{\lambda}^{(kk)}_n\) approximates
 
 \emph{Case \(k \neq l\)}. \(P^{(kl)}_n\) and \(A^{(kl)}_n\) represent edge
 probabilities and edges between communities \(k\) and \(l\). Note that
-\(P^{(kl)} = (P^{(lk)})^\top\).\\
-By definition, \(P^{(kl)} = \lambda^{(kl)} (\lambda^{(lk)})^\top\). As
-in the \(k = l\) case, we note that the singular value decomposition
-\(P^{(kl)} = \sigma_{kl}^2 u^{(kl)} (v^{(kl)})^\top\) is one-dimensional
-and \(\lambda^{(kl)} = \sigma_{kl} u^{(kl)}\). (We can also note that
-the SVD of \(P^{(lk)} = \sigma_{kl}^2 v^{(kl)} (u^{(kl)})^\top\), i.e.,
-\(\sigma_{kl} = \sigma_{lk}\), \(u^{(kl)} = v^{(lk)}\), and
-\(v^{(kl)} = u^{(lk)}\).)\\
+\(P^{(kl)}_n = (P^{(lk)}_n)^\top\).
+By definition, \(P^{(kl)}_n = \lambda^{(kl)}_n (\lambda^{(lk)}_n)^\top\).
+Therefore,
+\(P^{(kl)} = (\sigma^{(kl)}_n)^2 u^{(kl)}_n (v^{(kl)}_n)^\top\) is rank 2
+
 Now consider the Hermitian dilation
 
-\[M^{(kl)} = 2 \begin{bmatrix} 0 & P^{(kl)} \\ P^{(lk)} & 0 \end{bmatrix}\]
+\[M^{(kl)}_n = 2 \begin{bmatrix}
+0 & P^{(kl)}_n \\ P^{(lk)}_n & 0 \end{bmatrix}\]
 
 which is a symmetric \(n_{kl} \times n_{kl}\) matrix. It can
-be shown that the spectral decomposition of \(M^{(kl)}\) is
+be shown that the spectral decomposition of \(M^{(kl)}_n\) is
 
-\[M^{(kl)} =
+\[M^{(kl)}_n =
 \begin{bmatrix} u^{(kl)} & -u^{(kl)} \\ v^{(kl)} & v^{(kl)} \end{bmatrix} \times
 \begin{bmatrix} \sigma^2_{kl} & 0 \\ 0 & -\sigma^2_{kl} \end{bmatrix} \times
 \begin{bmatrix} u^{(kl)} & -u^{(kl)} \\ v^{(kl)} & v^{(kl)} \end{bmatrix}^\top\]
@@ -1276,18 +1274,14 @@ Thus treating \(M^{(kl)}\) as the edge probability matrix of a GRDPG, we
 have latent positions in \(\mathbb{R}^2\) given by
 
 \[\begin{bmatrix}
-  \sigma_{kl} u^{(kl)} & \sigma_{kl} u^{(kl)} \\
-  \sigma_{kl} v^{(kl)} & -\sigma_{kl} v^{(kl)}
-\end{bmatrix} =
-\begin{bmatrix}
-  \lambda^{(kl)} & \lambda^{(kl)} \\
-  \lambda^{(lk)} & -\lambda^{(lk)}
+  \lambda^{(kl)}_n & \lambda^{(kl)}_n \\
+  \lambda^{(lk)}_n & -\lambda^{(lk)}_n
 \end{bmatrix}\]
 
 Now consider
 
-\[\hat{M}^{(kl)} = \begin{bmatrix} 0 & A^{(kl)} \\ A^{(lk)} & 0 \end{bmatrix}\]
-Then \(\hat{M}^{(kl)}\) is an adjacency matrix drawn from \(M^{(kl)}\),
+\[\hat{M}^{(kl)}_n = \begin{bmatrix} 0 & A^{(kl)}_n \\ A^{(lk)}_n & 0 \end{bmatrix}\]
+Then \(\hat{M}^{(kl)}_n\) is an adjacency matrix drawn from \(M^{(kl)}_n\),
 so its adjacency spectral embedding, given by
 
 \[\begin{bmatrix}
