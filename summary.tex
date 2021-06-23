@@ -839,7 +839,14 @@ error decaying at rate approximately \(n^{-1/2}\).
 
 }
 
-\caption{Median and IQR RMSE from Algorithm 3 (red) compared against an MLE-based method (blue). Simulations were repeated 50 times for each sample size. Communities were drawn to be approximately balanced.}\label{fig:lambda_est_k}
+\caption{Median and IQR RMSE for popularity vectors from Algorithm 3 (red) compared against an MLE-based method (blue). Simulations were repeated 50 times for each sample size. Communities were drawn to be approximately balanced.}\label{fig:lambda_est_k}
+\end{figure}
+
+We observe similar behavior when comparing errors in the edge probability blocks. 
+
+\begin{figure}[H]
+{\centering \includegraphics{summary_files/figure-latex/lambda_est_p-1}}
+\caption{Median and IQR RMSE for edge probability blocks reconstructed from the outputs of Algorithm 3 (red) compared against outputs of an MLE-based method (blue). Simulations were repeated 50 times for each sample size. Communities were drawn to be approximately balanced.}
 \end{figure}
 
 \hypertarget{imbalanced-communities}{%
@@ -862,13 +869,13 @@ parameters:
   for \(k = 1, ..., K\)
 \item
   Community labels
-  \(z_k \stackrel{\text{iid}}{\sim}Multinomial(\alpha_1, ..., \alpha_K)\)
+  \(z_k \stackrel{\text{iid}}{\sim} \Multinomial(\alpha_1, ..., \alpha_K)\)
 \item
   Within-group popularities
-  \(\lambda^{(kk)} \stackrel{\text{iid}}{\sim}Beta(2, 1)\)
+  \(\lambda^{(kk)} \stackrel{\text{iid}}{\sim} \Betadist(2, 1)\)
 \item
   Between-group popularities
-  \(\lambda^{(kl)} \stackrel{\text{iid}}{\sim}Beta(1, 2)\) for
+  \(\lambda^{(kl)} \stackrel{\text{iid}}{\sim} \Betadist(1, 2)\) for
   \(k \neq l\)
 \end{itemize}
 
@@ -896,8 +903,12 @@ plug-in estimator is less efficient for this setup.
 
 We again see community detection error trending to 0 for OSC, as well as
 for SSC when \(K > 2\) (Fig. \ref{fig:clust_err_ct_sim_imba}). Alg. 3
-continues to see \(n^{-1/2}\) decay in parameter estimation error
-(\ref{fig:lambda_est_k_imba}).
+continues to see \(n^{-1/2}\) decay in parameter estimation error; 
+however, the MLE-based estimators for the popularity vectors decay at a slower 
+rate (Fig. \ref{fig:lambda_est_k_imba}). 
+The reduced rate of decay is removed 
+if we reconstruct the edge probability blocks 
+by taking the outer products of the popularity vectors. 
 
 \begin{figure}[H]
 
@@ -915,6 +926,15 @@ continues to see \(n^{-1/2}\) decay in parameter estimation error
 }
 
 \caption{Median and IQR RMSE from Algorithm 3 (red) compared against an MLE-based method (blue). Simulations were repeated 50 times for each sample size. Communities were drawn to be imbalanced.}\label{fig:lambda_est_k_imba}
+\end{figure}
+
+\begin{figure}[H]
+
+{\centering \includegraphics{summary_files/figure-latex/lambda_est_p_imba-1}
+
+}
+
+\caption{Median and IQR RMSE of edge probability blocks derived from the outputs of Algorithm 3 (red) compared against an MLE-based method (blue). Simulations were repeated 50 times for each sample size. Communities were drawn to be imbalanced.}\label{fig:lambda_est_p_imba}
 \end{figure}
 
 \begin{comment}
