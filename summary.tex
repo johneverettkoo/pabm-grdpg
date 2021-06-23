@@ -644,43 +644,47 @@ block is an outer product of two vectors, i.e.,
 \(P^{(kl)} = \lambda^{(kl)} (\lambda^{(lk)})^\top\). Therefore, given
 \(P^{(kl)}\), \(\lambda^{(kl)}\) and \(\lambda^{(lk)}\) are solvable
 up to multiplicative constant using singular value
-decomposition. More specifically, let \(P^{(kl)} = \sigma^2 u v^\top\)
+decomposition. More specifically, 
+let \(P^{(kl)} = (\sigma^{(kl)})^2 u^{(kl)} (v^{(kl)})^\top\)
 be the singular value decomposition of \(P^{(kl)}\).
-\(u \in \mathbb{R}^{n_k}\) and \(v \in \mathbb{R}^{n_l}\) are vectors
-and \(\sigma^2 > 0\) is a scalar. Then \(\lambda^{(kl)} = s_1 u\)
-and \(\lambda^{(lk)} = s_2 v\) where $s_1 s_2 = \sigma^2$.
+\(u^{(kl)} \in \mathbb{R}^{n_k}\) and 
+\(v^{(kl)} \in \mathbb{R}^{n_l}\) are vectors
+and \(\sigma^{(kl)}\) is a scalar. Then \(\lambda^{(kl)} = s_1 u^{(kl)}\)
+and \(\lambda^{(lk)} = s_2 v^{(kl)}\) 
+for unidentifiable $s_1 s_2 = (\sigma^{(kl)})^2$.
 Given the adjacency matrix \(A\)
 instead of edge probability matrix \(P\), we can simply use plug-in
-estimators, which converge to the true parameters, again, up to a
-multiplicative constant. Since these popularity vectors aren't identifiable,
-due to the ambiguity of this constant,
-we instead estimate each edge probability block
-$P^{(kl)} = \lambda^{(kl)} (\lambda^{(lk)})^\top$
-using the observed edge block $A^{(kl)}$ (Algorithm 3).
-Alternatively, we can estimate the entire edge probability matrix as
-$\hat{P} = \hat{X} I_{p,q} \hat{X}^\top$, where $\hat{X}$ is the ASE of $A$.
+estimators by taking the SVD of each $A^{(kl)}$. 
+Since each $\lambda^{(kl)}$ is not strictly identifiable,
+we instead estimate each $\tilde{\lambda}^{(kl)} = \sigma^{(kl)} u^{(kl)}$. 
 
 \begin{algorithm}[t]
   \DontPrintSemicolon
   \SetAlgoLined
-  \caption{PABM block probability estimation.}
-  \KwData{Adjacency block $A^{(kl)}$}
-  \KwResult{Estimated edge probability block $\hat{P}^{(kl)}$}
-  Compute $A^{(kl)} = U \Sigma V^\top$, the SVD of the $kl^{th}$ block.\;
-  Assign $u^{(kl)}$ and $v^{(kl)}$ as the first columns of $U$ and $V$.
-  Assign $(\sigma^{(kl)})^2 \leftarrow \Sigma_{11}$.\;
-  Assign $\hat{\lambda}^{(kl)} \leftarrow \pm \sigma^{(kl)} u^{(kl)}$ and
-  $\hat{\lambda}^{(lk)} \leftarrow \pm \sigma^{(kl)} v^{(kl)}$.\;
-  Assign $\hat{P}^{(kl)} = \hat{\lambda}^{(kl)} (\hat{\lambda}^{(lk)})^\top$.
+  \caption{PABM parameter estimation.}
+  \KwData{Adjacency matrix $A$, community assignments $1, ..., K$}
+  \KwResult{PABM parameter estimates $\{\hat{\lambda}^{(kl)}\}_K$.}
+  Arrange the rows and columns of $A$ by community such that each 
+  $A^{(kl)}$ block consists of estimated edge probabilities between 
+  communities $k$ and $l$.\;
+  \For {$k, l = 1, ..., K$, $k \leq l$} {
+    Compute $A^{(kl)} = U \Sigma V^\top$, the SVD of the $kl^{th}$ 
+    block.\;
+    Assign $u^{(kl)}$ and $v^{(kl)}$ as the first columns of $U$ and $V$. 
+    Assign $(\sigma^{(kl)})^2 \leftarrow \Sigma_{11}$.\;
+    Assign $\hat{\lambda}^{(kl)} \leftarrow \pm \sigma^{(kl)} u^{(kl)}$ and 
+    $\hat{\lambda}^{(lk)} \leftarrow \pm \sigma^{(kl)} v^{(kl)}$.
+  }
 \end{algorithm}
 
 \begin{theorem}
 \label{theorem6}
-Let $n_{kl} = n_k + n_l$.
-Under regularity and sparsity assumptions, given fixed $K$,
+Under regularity and sparsity assumptions, given fixed $K$, 
 
 \begin{equation} \label{eq:thm6}
-\max_{k, l} \|\hat{P}_n^{(kl)} - P_n^{(kl)}\| = O_P \bigg(\frac{(\log n_{kl})}{\sqrt{n_{kl}}} \bigg)
+\max_{k, l \in \{1, ..., K\}} 
+||\hat{\lambda}^{(kl)} - \lambda^{(kl)}|| = 
+O_P \bigg(\frac{(\log n_k)^c}{\sqrt{n_k}} \bigg)
 \end{equation}
 \end{theorem}
 
@@ -730,10 +734,22 @@ where \(\sigma(v_i)\) is the true community label of vertex \(v_i\),
 a permutation operator. This is effectively the ``misclustering count''
 of clustering function \(\hat{\sigma}\).
 
-We also define parameter estimation error as the RMSE
-of the estimated edge probability blocks:
+We also define two types of parameter estimation error. 
+First, we estimate the popularity vectors directly and compute the RMSE. 
+In this case, the "true" popularity vectors are derived from 
+taking the SVD of each edge probability block $P^{(kl)}$ 
+to avoid the unidentifiable multiplicative constants. 
 
-\[RMSE =
+\[\text{RMSE}(\{\hat{\lambda}^{(kl)}\}_K, \{\lambda^{(kl)}\}_K) = 
+\sqrt{\frac{1}{n} \sum_{k < l} \min_{s = \pm 1} 
+\|s \hat{\lambda}^{(kl)} - \lambda^{(kl)} \|_2^2}\]
+
+We can also avoid the unidentifiable multiplicative constant more directly 
+by reconstructing each 
+$\hat{P}^{(kl)} = \hat{\lambda}^{(kl)} (\hat{\lambda}^{(lk)})^\top$, 
+which we use to define another parameter estimation error. 
+
+\[\text{RMSE}(\hat{P}, P) =
 \sum_{k,l} \sqrt{\frac{1}{n_k n_l} \|P^{(kl)} - \hat{P}^{(kl)}\|_F^2}\]
 
 \hypertarget{balanced-communities}{%
@@ -744,7 +760,7 @@ multinomial distribution with mixture parameters
 \(\{\alpha_1, ..., \alpha_K\}\), then \(\{\lambda^{(kl)}\}_K\) according
 to the drawn community labels, \(P\) was constructed using the drawn
 \(\{\lambda^{(kl)}\}_K\), and \(A\) was drawn from \(P\) by
-\(A_{ij} \stackrel{indep}{\sim} \Bernoulli(P_{ij})\). Each simulation has
+\(A_{ij} \indep \Bernoulli(P_{ij})\). Each simulation has
 a unique edge probability matrix \(P\).
 
 For these examples, we set the following parameters:
@@ -813,8 +829,8 @@ in more than \(K\) disconnected subgraphs.
 \end{figure}
 
 Given ground truth community labels, Algorithm 3 and the MLE-based
-plug-in estimators \cite{307cbeb9b1be48299388437423d94bf1}
-\cite{noroozi2019estimation} perform similarly, with root mean square
+plug-in estimators \cite{noroozi2019estimation, 307cbeb9b1be48299388437423d94bf1} 
+perform similarly, with root mean square
 error decaying at rate approximately \(n^{-1/2}\).
 
 \begin{figure}[H]
@@ -1230,69 +1246,80 @@ organized by community such that the elements of blocks \(P^{(kl)}\) and
 \(A^{(kl)}\) correspond to the edges between communities \(k\) and
 \(l\).
 
-\emph{Case \(k = l\)}. \(P^{(kk)}_n\) and \(A^{(kk)}_n\) represent
+\emph{Case \(k = l\)}. \(P^{(kk)}\) and \(A^{(kk)}\) represent
 within-community edge probabilities and edges for community \(k\).\\
-By definition, \(P^{(kk)}_n = \lambda^{(kk)}_n (\lambda^{(kk)}_n)^\top\). This
+By definition, \(P^{(kk)} = \lambda^{(kk)} (\lambda^{(kk)})^\top\). This
 implies that the singular value decomposition
-\(P^{(kk)}_n = (\sigma^{(kk)}_n)^2 u^{(kk)}_n (u^{(kk)}_n)^\top\)
-has one singular
-value and one pair of singular vectors (\(P^{(kk)}_n\) is symmetric, so
+\(P^{(kk)} = \sigma_{kk}^2 u^{(kk)} (u^{(kk)})^\top\) has one singular
+value and one pair of singular vectors (\(P^{(kk)}\) is symmetric, so
 the left and right singular vectors are identical). Then
-\(\lambda^{(kk)}_n = \sigma^{(kk)}_n u^{(kk)}_n\).\\
-Let \(\hat{U}^{(kk)}_n \hat{\Sigma}^{(kk)}_n (\hat{U}^{(kk)}_n)^\top\) be the
-singular value decomposition of \(A^{(kk)}_n\), and let
-\((\hat{\sigma}^{(kk)})^2 \hat{u}^{(kk)}_n (\hat{u}^{(kk)}_n)^\top\) be its
+\(\lambda^{(kk)} = \sigma_{kk} u^{(kk)}\).\\
+Let \(\hat{U}^{(kk)} \hat{\Sigma}^{(kk)} (\hat{U}^{(kk)})^\top\) be the
+singular value decomposition of \(A^{(kk)}\), and let
+\(\hat{\sigma}_{kk}^2 \hat{u}^{(kk)} (\hat{u}^{(kk)})^\top\) be its
 one-dimensional approximation. Define
-\(\hat{\lambda}^{(kk)}_n = \hat{\sigma}^{(kk)}_n \hat{u}^{(kk)}_n\). Then
-\(\hat{\lambda}^{(kk)}_n\) is the adjacency spectral embedding
-approximation of \(\lambda^{(kk)}_n\).\\
+\(\hat{\lambda}^{(kk)} = \hat{\sigma}_{kk} \hat{u}^{(kk)}\). Then
+\(\hat{\lambda}^{(kk)}\) is the adjacency spectral embedding
+approximation of \(\lambda^{(kk)}\).\\
 Then by Theorem 5 of \citeauthor{rubindelanchy2017statistical}, the
-adjacency spectral embedding \(\hat{\lambda}^{(kk)}_n\) approximates
-\(\lambda^{(kk)}_n\) at rate \(\frac{(\log n_k)^c}{\sqrt{n_k}}\).
+adjacency spectral embedding \(\hat{\lambda}^{(kk)}\) approximates
+\(\lambda^{(kk)}\) at rate \(\frac{(\log n_k)^c}{\sqrt{n_k}}\).
 
-\emph{Case \(k \neq l\)}. \(P^{(kl)}_n\) and \(A^{(kl)}_n\) represent edge
+\emph{Case \(k \neq l\)}. \(P^{(kl)}\) and \(A^{(kl)}\) represent edge
 probabilities and edges between communities \(k\) and \(l\). Note that
-\(P^{(kl)}_n = (P^{(lk)}_n)^\top\).
-By definition, \(P^{(kl)}_n = \lambda^{(kl)}_n (\lambda^{(lk)}_n)^\top\).
-Therefore,
-\(P^{(kl)} = (\sigma^{(kl)}_n)^2 u^{(kl)}_n (v^{(kl)}_n)^\top\) is rank 2
-
+\(P^{(kl)} = (P^{(lk)})^\top\).\\
+By definition, \(P^{(kl)} = \lambda^{(kl)} (\lambda^{(lk)})^\top\). As
+in the \(k = l\) case, we note that the singular value decomposition
+\(P^{(kl)} = \sigma_{kl}^2 u^{(kl)} (v^{(kl)})^\top\) is one-dimensional
+and \(\lambda^{(kl)} = \sigma_{kl} u^{(kl)}\). (We can also note that
+the SVD of \(P^{(lk)} = \sigma_{kl}^2 v^{(kl)} (u^{(kl)})^\top\), i.e.,
+\(\sigma_{kl} = \sigma_{lk}\), \(u^{(kl)} = v^{(lk)}\), and
+\(v^{(kl)} = u^{(lk)}\).)\\
 Now consider the Hermitian dilation
 
-\[M^{(kl)}_n = 2 \begin{bmatrix}
-0 & P^{(kl)}_n \\ P^{(lk)}_n & 0 \end{bmatrix}\]
+\[M^{(kl)} = 2 \begin{bmatrix} 0 & P^{(kl)} \\ P^{(lk)} & 0 \end{bmatrix}\]
 
-which is a symmetric \(n_{kl} \times n_{kl}\) matrix. It can
-be shown that the spectral decomposition of \(M^{(kl)}_n\) is
+which is a symmetric \((n_k + n_l) \times (n_k + n_l)\) matrix. It can
+be shown that the spectral decomposition of \(M^{(kl)}\) is
 
-\[M^{(kl)}_n =
-\begin{bmatrix} u^{(kl)} & -u^{(kl)} \\ v^{(kl)} & v^{(kl)} \end{bmatrix} \times
+\[M^{(kl)} = 
+\begin{bmatrix} u^{(kl)} & -u^{(kl)} \\ v^{(kl)} & v^{(kl)} \end{bmatrix} \times 
 \begin{bmatrix} \sigma^2_{kl} & 0 \\ 0 & -\sigma^2_{kl} \end{bmatrix} \times
 \begin{bmatrix} u^{(kl)} & -u^{(kl)} \\ v^{(kl)} & v^{(kl)} \end{bmatrix}^\top\]
 
 Thus treating \(M^{(kl)}\) as the edge probability matrix of a GRDPG, we
 have latent positions in \(\mathbb{R}^2\) given by
 
-\[\begin{bmatrix}
-  \lambda^{(kl)}_n & \lambda^{(kl)}_n \\
-  \lambda^{(lk)}_n & -\lambda^{(lk)}_n
+\[\begin{bmatrix} 
+  \sigma_{kl} u^{(kl)} & \sigma_{kl} u^{(kl)} \\ 
+  \sigma_{kl} v^{(kl)} & -\sigma_{kl} v^{(kl)} 
+\end{bmatrix} = 
+\begin{bmatrix} 
+  \lambda^{(kl)} & \lambda^{(kl)} \\ 
+  \lambda^{(lk)} & -\lambda^{(lk)} 
 \end{bmatrix}\]
 
 Now consider
 
-\[\hat{M}^{(kl)}_n = \begin{bmatrix} 0 & A^{(kl)}_n \\ A^{(lk)}_n & 0 \end{bmatrix}\]
-Then \(\hat{M}^{(kl)}_n\) is an adjacency matrix drawn from \(M^{(kl)}_n\),
+\[\hat{M}^{(kl)} = \begin{bmatrix} 0 & A^{(kl)} \\ A^{(lk)} & 0 \end{bmatrix}\]
+Then \(\hat{M}^{(kl)} = M^{(kl)} + E'\) where
+
+\[E' = \begin{bmatrix} 0 & E \\ E^\top & 0 \end{bmatrix}\]
+
+and \(E\) is the \(n_k \times n_l\) matrix of independent noise (to
+generate the Bernoulli entries in \(A^{(kl)}\).\\
+Then \(\hat{M}^{(kl)}\) is an adjacency matrix drawn from \(M^{(kl)}\),
 so its adjacency spectral embedding, given by
 
-\[\begin{bmatrix}
-  \hat{\lambda}^{(kl)} & \hat{\lambda}^{(kl)} \\
-  \hat{\lambda}^{(lk)} & -\hat{\lambda}^{(lk)}
+\[\begin{bmatrix} 
+  \hat{\lambda}^{(kl)} & \hat{\lambda}^{(kl)} \\ 
+  \hat{\lambda}^{(lk)} & -\hat{\lambda}^{(lk)} 
 \end{bmatrix}\]
 
 where each \(\hat{\lambda}^{(kl)}\) is defined as in Algorithm 3,
 approximates the latent positions of \(M^{(kl)}\) up to indefinite
-orthogonal transformation with rate $\frac{(\log n_{kl})^c}{\sqrt{n_{kl}}}$
-\cite{rubindelanchy2017statistical}.\\
+orthogonal transformation by the rate given in Theorem 5 of
+\citeauthor{rubindelanchy2017statistical}.\\
 In this case, the indefinite orthogonal transformation \(W_*\) in the
 GRDPG result \cite{rubindelanchy2017statistical} is of the form
 \(U^\top \hat{U}\). The eigenvalues of \(M\) are distinct since the
