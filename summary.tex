@@ -139,52 +139,43 @@ each pair. The goal of this analysis then is population community
 detection, or the recovery of the true underlying community labels for
 each vertex, up to permutation, with some additional parameter
 estimation being of possible interest, assuming some underlying
-probability model. One such model is the Stochastic Block Model (SBM),
-first proposed by \citet{doi:10.1080/0022250X.1971.9989788}, which
-assumes that the edge probability from one vertex to another follows a
-Bernoulli distribution with fixed probabilities for each pair of
-community labels. Other random graph models have been proposed and
-studied, such as the Degree-Corrected Block Model (DCBM), introduced by
-\citet{Karrer_2011}, which is a generalization of the SBM. The
-Popularity Adjusted Block Model (PABM) was then introduced by
+probability model. 
+
+A general family of models that generate unweighted and undirected graphs is the Bernoulli Graph, which is described by an edge probability matrix $P$. Edges between each pair of vertices $i$ and $j$ is drawn as a Bernoulli trial with probability $P_{ij}$, for each $0 \leq i < j \leq n$ and $n$ is the number of vertices in the graph. Community detection methods often restrict this type of model by assigning each vertex a community label $z_1, ..., z_n$ and then setting each $P_{ij}$ as a function of the labels of vertices $i$ and $j$. Such models are called Block Models. 
+
+One popular type of Block Model is the Stochastic Block Model (SBM),
+first proposed by \citet{doi:10.1080/0022250X.1971.9989788}, 
+which restricts each edge probability $P_{ij}$ as only depending on the labels 
+$z_i$ and $z_j$, i.e., $P_{ij} = \omega_{z_i, z_j}$. 
+Various generalizations of the SBM have since been utilized, 
+including the Degree-Corrected Block Model (DCBM), 
+introduced by\citet{Karrer_2011}, 
+which assigns an additional parameter $\theta_i$ to each vertex 
+and sets $P_{ij} = \theta_i \theta_j \omega_{z_i, z_j}$. 
+The Popularity Adjusted Block Model (PABM) was then introduced by
 \citet*{307cbeb9b1be48299388437423d94bf1} as a generalization of the
 DCBM to address the heterogeneity of edge probabilities within and
 between communities while still maintaining distinct community
 structure.
 
-The underlying similarity among the SBM, PABM, and other such models is
-that they involve a symmetric edge probability matrix
-\(P \in [0, 1]^{n \times n}\) where \(n\) is the number of vertices in
-the graph. An undirected and unweighted graph is then drawn from this
-edge probability matrix such that the existence of an edge between each
-pair of vertices \(i\) and \(j\) is given by
-\(\text{Bernoulli}(P_{ij})\). For example, for the SBM with two
-communities for which the within-community edge probability is \(\xi\)
-and the between-community edge probability is \(\eta\), the entries of
-\(P\) consist of \(P_{ij} = \xi\) if \(i\) and \(j\) are in the same
-community and \(i \neq j\), \(P_{ij} = \eta\) if \(i\) and \(j\) belong
-to separate communities, and \(P_{ii} = 0\).
-
-The Random Dot Product Graph (RDPG) model proposed by
-\citet*{10.1007/978-3-540-77004-6_11} is another graph model with
-Bernoulli edge probabilities. Under this model, each vertex of the graph
+Parallel to the families of Block Models is another type of Bernoulli Graph 
+called the Random Dot Product Graph (RDPG), proposed by
+\citet*{10.1007/978-3-540-77004-6_11}. Under this model, each vertex of the graph
 can be represented by a point in some latent space such that the edge
 probability between any pair of vertices is given by their corresponding
 dot product in the latent space, i.e., given a latent positions
 \(x_1, ..., x_n \in \mathbb{R}^d\), the edge probability matrix is
-\(P = X X^\top\) where
-\(X = \begin{bmatrix} x_1 & \cdots & x_n \end{bmatrix}^\top\). The assortative
+\(P = X X^\top\) where 
+\(X = \begin{bmatrix} x_1 & \cdots & x_n \end{bmatrix}^\top\). 
+It can be shown that all Bernoulli Graphs with 
+positive semidefinite edge probability matrix $P$ is a type of RDPG. 
+For instance, the assortative
 SBM is equivalent to a special case of the RDPG for which all vertices
 of a given community share the same position in the latent space
-\cite{lyzinski2014}. It has also been shown that similar random graph
-models, including the DCBM, can be represented in a similar fashion
-\cite{lyzinski2014, rubindelanchy2017consistency}. An analogous
-property exists for the PABM, not for the RDPG model but the
-\emph{Generalized} Random Dot Product Graph (GRDPG) model, which is an
-extension of the RDPG to allow edge probability matrices that are not positive
-semidefinite. This relationship will be explored in this paper and exploited to
-construct algorithms for community detection and parameter estimation for the
-PABM.
+\cite{lyzinski2014}. A similar property exists for the DCBM
+\cite{lyzinski2014, rubindelanchy2017consistency}. 
+Because the edge probability matrix for the PABM is not positive semidefinite, 
+we instead show that it is a special case of the \emph{Generalized} Random Dot Product Graph (GRDPG) in order to analyze the PABM as a latent space model for community detection and parameter estimation. 
 
 \hypertarget{notation}{%
 \subsection{Notation and Scope}\label{notation}}
@@ -698,8 +689,8 @@ the edge probability matrix \(P\) is constructed using the popularity
 vectors, and finally an unweighted and undirected adjacency matrix \(A\)
 is drawn from \(P\). OSC is then used for community detection, and this
 method is compared against SSC \cite{noroozi2019estimation,soltanolkotabi2014}
-and MM \cite{igraph}
-\cite{307cbeb9b1be48299388437423d94bf1}. True community labels are used
+and MM \cite{igraph, 307cbeb9b1be48299388437423d94bf1}. 
+True community labels are used
 with Algorithm 3 to estimate the popularity vectors
 \(\{\lambda^{(kl)}\}_K\), and this method is then compared against an
 MLE-based estimator described by \citeauthor{noroozi2019estimation} and
@@ -987,7 +978,7 @@ accuracy of 63\% and an adjusted Rand index of 73\%. In comparison,
 In the second example, we applied OSC to the British MPs Twitter network
 \cite{greene2013producing}, the Political Blogs network
 \cite{10.1145/1134271.1134277}, and the DBLP network
-\cite{NIPS2009_3855} \cite{10.1007/978-3-642-15880-3_42}. For this data
+\cite{NIPS2009_3855, 10.1007/978-3-642-15880-3_42}. For this data
 analysis, we subsetted the data as described by
 \citeauthor{307cbeb9b1be48299388437423d94bf1} for their analysis of the
 same networks. Our methods underperformed compared to modularity
