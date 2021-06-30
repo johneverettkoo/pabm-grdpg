@@ -15,7 +15,6 @@ doMC::registerDoMC(parallel::detectCores() / 2)
 
 # simulation params
 K.vec <- c(4, 3, 2)
-alpha <- .5
 a1 <- b2 <- 2
 a2 <- b1 <- 1
 n.vec <- c(128, 256, 512, 1024, 2048, 4096)
@@ -36,9 +35,7 @@ rmse.df <- foreach(K = K.vec, .combine = dplyr::bind_rows) %do% {
       P <- P.z$P
       z <- P.z$clustering
       A <- draw.graph(P)
-      Zhat <- embedding(A, p, q)
-      Phat <- Zhat %*% Ipq %*% t(Zhat)
-      rmse <- lambda.rmse(P, Phat, z)
+      rmse <- lambda.rmse(P, A, z)
       rmse.mle <- lambda.rmse.mle(P, A, z)
       dplyr::tibble(K = K, n = n, rmse = rmse, rmse.mle = rmse.mle) %>% 
         return()
@@ -62,9 +59,9 @@ rmse.df %>%
   ggplot() +
   scale_y_log10() +
   scale_x_log10() +
-  geom_line(aes(x = n, y = median.rmse, colour = 'Algorithm 4')) +
+  geom_line(aes(x = n, y = median.rmse, colour = 'Proposed')) +
   geom_errorbar(aes(x = n, ymin = q1.rmse, ymax = q3.rmse,
-                    colour = 'Algorithm 4')) +
+                    colour = 'Proposed')) +
   geom_line(aes(x = n, y = median.rmse.mle, colour = 'MLE-based')) +
   geom_errorbar(aes(x = n, ymin = q1.rmse.mle, ymax = q3.rmse.mle,
                     colour = 'MLE-based')) +

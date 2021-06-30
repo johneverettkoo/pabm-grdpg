@@ -869,6 +869,33 @@ rmse.df %>%
   scale_x_log10(breaks = c(128, 256, 512, 1024, 2048, 4096))
 ```
 
+```{r lambda_est_p, cache = FALSE, fig.cap = 'Median and IQR RMSE from Algorithm 3 (red) compared against an MLE-based method (blue). Simulations were repeated 50 times for each sample size. Communities were drawn to be approximately balanced.', fig.width = 10}
+rmse.df <- readr::read_csv('rmse-p.csv')
+
+rmse.df %>% 
+  na.omit() %>% 
+  dplyr::group_by(K, n) %>% 
+  dplyr::summarise(median.rmse = median(rmse),
+                   q1.rmse = quantile(rmse, .25),
+                   q3.rmse = quantile(rmse, .75),
+                   median.rmse.mle = median(rmse.mle),
+                   q1.rmse.mle = quantile(rmse.mle, .25),
+                   q3.rmse.mle = quantile(rmse.mle, .75)) %>% 
+  dplyr::ungroup() %>% 
+  ggplot() +
+  geom_line(aes(x = n, y = median.rmse, colour = 'Algorithm 3')) + 
+  geom_errorbar(aes(x = n, ymin = q1.rmse, ymax = q3.rmse,
+                    colour = 'Algorithm 3'), width = .1) + 
+  geom_line(aes(x = n, y = median.rmse.mle, colour = 'MLE-based')) + 
+  geom_errorbar(aes(x = n, ymin = q1.rmse.mle, ymax = q3.rmse.mle,
+                   colour = 'MLE-based'), width = .1) + 
+  scale_colour_brewer(palette = 'Set1') + 
+  labs(y = 'RMSE', colour = NULL) + 
+  facet_wrap(~ K, labeller = 'label_both') + 
+  scale_y_log10() + 
+  scale_x_log10(breaks = c(128, 256, 512, 1024, 2048, 4096))
+```
+
 ## Imbalanced communities
 
 Simulations performed in this section are similar to those in the previous 
@@ -1023,6 +1050,33 @@ clustering.df %>%
 
 ```{r lambda_est_k_imba, cache = FALSE, fig.cap = 'Median and IQR RMSE from Algorithm 3 (red) compared against an MLE-based method (blue). Simulations were repeated 50 times for each sample size. Communities were drawn to be imbalanced.', fig.width = 10}
 rmse.df <- readr::read_csv('rmse-k-imbalanced.csv')
+
+rmse.df %>% 
+  na.omit() %>% 
+  dplyr::group_by(K, n) %>% 
+  dplyr::summarise(median.rmse = median(rmse),
+                   q1.rmse = quantile(rmse, .25),
+                   q3.rmse = quantile(rmse, .75),
+                   median.rmse.mle = median(rmse.mle),
+                   q1.rmse.mle = quantile(rmse.mle, .25),
+                   q3.rmse.mle = quantile(rmse.mle, .75)) %>% 
+  dplyr::ungroup() %>% 
+  ggplot() +
+  geom_line(aes(x = n, y = median.rmse, colour = 'Algorithm 3')) + 
+  geom_errorbar(aes(x = n, ymin = q1.rmse, ymax = q3.rmse,
+                    colour = 'Algorithm 3'), width = .1) + 
+  geom_line(aes(x = n, y = median.rmse.mle, colour = 'MLE-based')) + 
+  geom_errorbar(aes(x = n, ymin = q1.rmse.mle, ymax = q3.rmse.mle,
+                   colour = 'MLE-based'), width = .1) + 
+  scale_colour_brewer(palette = 'Set1') + 
+  labs(y = 'RMSE', colour = NULL) + 
+  facet_wrap(~ K, labeller = 'label_both') + 
+  scale_y_log10() + 
+  scale_x_log10(breaks = c(128, 256, 512, 1024, 2048, 4096))
+```
+
+```{r lambda_est_p_imba, cache = FALSE, fig.cap = 'Median and IQR RMSE from Algorithm 3 (red) compared against an MLE-based method (blue). Simulations were repeated 50 times for each sample size. Communities were drawn to be imbalanced.', fig.width = 10}
+rmse.df <- readr::read_csv('rmse-p-imbalanced.csv')
 
 rmse.df %>% 
   na.omit() %>% 

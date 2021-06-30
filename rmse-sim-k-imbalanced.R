@@ -11,11 +11,10 @@ import::here(embedding, draw.graph, I.pq, generate.P.beta,
              .from = 'functions.R')
 
 # parallel backend
-doMC::registerDoMC(parallel::detectCores() / 2)
+doMC::registerDoMC(parallel::detectCores() / 1.5)
 
 # simulation params
 K.vec <- c(4, 3, 2)
-alpha <- .5
 a1 <- b2 <- 2
 a2 <- b1 <- 1
 n.vec <- c(128, 256, 512, 1024, 2048, 4096)
@@ -36,9 +35,7 @@ rmse.df <- foreach(K = K.vec, .combine = dplyr::bind_rows) %do% {
       P <- P.z$P
       z <- P.z$clustering
       A <- draw.graph(P)
-      Zhat <- embedding(A, p, q)
-      Phat <- Zhat %*% Ipq %*% t(Zhat)
-      rmse <- lambda.rmse(P, Phat, z)
+      rmse <- lambda.rmse(P, A, z)
       rmse.mle <- lambda.rmse.mle(P, A, z)
       dplyr::tibble(K = K, n = n, rmse = rmse, rmse.mle = rmse.mle) %>% 
         return()
