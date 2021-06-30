@@ -1069,82 +1069,98 @@ swapped.
 \label{lemma1}
 Let $P = V D V^\top$ be the spectral decomposition of the edge probability 
 matrix for a PABM. Then $V V^\top = X (X^\top X)^{-1} X^\top$ where $X$ is 
-defined as in (\ref{eq:xy}).
+defined as in Eq.\eqref{eq:xy}.
 \end{lemma}
 
 \emph{Proof}. By Theorem 2, \(P = X U I_{p, q} U^\top X^\top\), where
-\(X\) is defined as in (\ref{eq:xy}) and $p = K(K+1)/2$ and $q = K(K-1)/2$. % are given by $p =
+\(X\) is defined as in Eq.~\eqref{eq:xy}), $p = K(K+1)/2$, and $q = K(K-1)/2$. % are given by $p =
 % K(K+1)/2$ and $q = are defined as
 % in equations (\ref{eq:p}) and (\ref{eq:q}). 
-Alternatively, the spectral
-decomposition can be written as
-\(P = V D V^\top = V |D|^{1/2} I_{p, q} |D|^{1/2} V^\top\) for the same
-\((p, q)\) and \(|\cdot|^{1/2}\) is applied entry-wise. Thus for some
+Alternatively we have the eigendecomposition \(P = V D V^\top = V
+|D|^{1/2} I_{p, q} |D|^{1/2} V^\top\) and \(|\cdot|^{1/2}\) is applied entry-wise. Thus for some
 \(Q \in \mathbb{O}(p, q)\),
-
-\[X U Q = V |D|^{1/2}\]
-
-Therefore, using the fact that \(U U^\top = I\) and \(V^\top V = I\),
-
-\[(V |D|^{1/2}) ((V |D|^{1/2})^\top (V |D|^{1/2}))^{-1} (V |D|^{1/2})^\top = 
-(X U Q) ((X U Q)^\top (X U Q))^{-1} (X U Q)^\top\]
-
-The right-hand side becomes
-
-\[\begin{split}
-  (X U Q) ((X U Q)^\top (X U Q))^{-1} (X U Q)^\top & 
-    = X U Q Q^{-1} U^\top (X^\top X)^{-1} 
-    U (Q^\top)^{-1} Q^\top U^\top X^\top \\
-  & = X U U^\top (X^\top X)^{-1} U U^\top X^\top \\
-  & = X (X^\top X)^{-1} X^\top
-\end{split}\]
-
-The left-hand side becomes:
-
-\[\begin{split}
-  (V |D|^{1/2}) ((V |D|^{1/2})^\top (V |D|^{1/2}))^{-1} (V |D|^{1/2})^\top & =
-    V |D|^{1/2} |D|^{-1/2} (V^\top V)^{-1} |D|^{-1/2} |D|^{1/2} V^\top \\
-  & = V V^\top
-\end{split}\]
+\[X U Q = V |D|^{1/2}.\]
+Let $R = U Q |D|^{-1/2}$. Then $R$ is {\em invertible} and hence
+$$X (X^{\top} X)^{-1} X^{\top} = X R (R^{\top} X^{\top} X R)^{-1}
+R^{\top} X^{\top}.$$ 
+Furthermore $V = XR$ and since $V$ has orthonormal columns, $V^{\top}
+V = I$. We thus conclude
+$$X (X^{\top} X)^{-1} X^{\top} = V (V^{\top} V)^{-1} V^{\top} = V V^{\top}$$
+as desired.
+% Therefore, using the fact that \(U U^\top = I\) and \(V^\top V = I\),
+% we have
+% \[(V |D|^{1/2}) ((V |D|^{1/2})^\top (V |D|^{1/2}))^{-1} (V |D|^{1/2})^\top = 
+% (X U Q) ((X U Q)^\top (X U Q))^{-1} (X U Q)^\top.\]
+% The right-hand side becomes
+% \[\begin{split}
+%   (X U Q) ((X U Q)^\top (X U Q))^{-1} (X U Q)^\top & 
+%     = X U Q Q^{-1} U^\top (X^\top X)^{-1} 
+%     U (Q^\top)^{-1} Q^\top U^\top X^\top \\
+%   & = X U U^\top (X^\top X)^{-1} U U^\top X^\top \\
+%   & = X (X^\top X)^{-1} X^\top.
+% \end{split}\]
+% The left-hand side becomes:
+% \[\begin{split}
+%   (V |D|^{1/2}) ((V |D|^{1/2})^\top (V |D|^{1/2}))^{-1} (V |D|^{1/2})^\top & =
+%     V |D|^{1/2} |D|^{-1/2} (V^\top V)^{-1} |D|^{-1/2} |D|^{1/2} V^\top \\
+%   & = V V^\top.
+% \end{split}\]
 
 \textbf{Proof of Theorem \ref{theorem3}}. By Lemma \ref{lemma1},
 \(V V^\top = X (X^\top X)^{-1} X^\top\) where \(X\) is defined as in
 (\ref{eq:xy}). Since \(X\) is block diagonal with each block
 corresponding to one community, \(X (X^\top X)^{-1} X^\top\) is also a
 block diagonal matrix with each block corresponding to a community and
-zeros elsewhere. Therefore, if vertices \(i\) and \(j\) belong to
-different communities, then the \(ij\)\textsuperscript{th} element of
-\(n X (X^\top X)^{-1} X^\top = n V V^\top = B\) is 0.
+zeros elsewhere. Let $B = n VV^{\top}$. Then $B_{ij} = 0$ whenever
+vertices $i$ and $j$ belong to different communities.  
+%
+%then the \(ij\)\textsuperscript{th} element of
+%\(n X (X^\top X)^{-1} X^\top = n V V^\top = B\) is 0.
 
 \textbf{Proof of Theorem \ref{theorem4}}. Let \(V_n\) and \(\hat{V}_n\)
-be the eigenvectors of \(P\) and \(A\) corresponding to the
+be the $n \times K^2$ matrices whose columns are the eigenvectors of \(P\) and \(A\) corresponding to the
 \(K (K + 1) / 2\) most positive and \(K (K - 1) / 2\) most negative
-eigenvalues. By \citeauthor{rubindelanchy2017statistical}, for some
-\(W \in \mathbb{O}(K^2)\), and \(c > 0\),\\
-\(||\hat{V} W - V||_{2 \to \infty} = O_P \big(\frac{(\log n)^c}{n \sqrt{\rho_n}} \big)\).
-We furthermore have \(||V||_{2 \to \infty} = O_P(n^{-1/2})\). Then if
-\((v_n^{(i)})^\top\) and \((\hat{v}_n^{(i)})^\top\) correspond to the
-rows of \(V_n\) and \(\hat{V}_n\), for \(i\) and \(j\) in different
-communities, using the fact that \((v_n^{(i)})^\top v_n^{(j)} = 0\),
-
+eigenvalues, respectively. From Lemma~5 in
+\citeauthor{rubindelanchy2017statistical} we have, for some
+\(W \in \mathbb{O}(K^2)\) and \(c > 0\), that
+$$\|\hat{V} W - V\|_{2 \to \infty} = O_P \big(\frac{(\log n)^c}{n \sqrt{\rho_n}} \big).$$
+We furthermore have \(\|V\|_{2 \to \infty} = O_P(n^{-1/2})\). Let
+\((v_n^{(i)})^\top\) and \((\hat{v}_n^{(i)})^\top\) denote the $i$th row
+row of \(V_n\) and \(\hat{V}_n\), respectively. Recall
+Theorem~\ref{theorem3} and note that $B_{ij} = n(v_n^{(i)})^{\top}
+v_n^{(j)}$. Now suppose that vertices $i$ and $j$ belongs to different
+communities. Then $B_{ij} = 0$ and we have
+% Then for \(i\) and
+% \(j\) belonging to different
+% communities, we ha using the fact that \((v_n^{(i)})^\top v_n^{(j)} = 0\),
 \[\begin{split}
 \max_{i, j} |(\hat{v}_n^{(i)})^\top \hat{v}_n^{(j)}| &
 = \max_{i, j} |(\hat{v}_n^{(i)})^\top \hat{v}_n^{(j)} - 
 (v_n^{(i)})^\top v_n^{(j)}| \\
 & = \max_{i, j} |(\hat{v}_n^{(i)})^\top W W^\top \hat{v}_n^{(j)} -
 (v_n^{(i)})^\top v_n^{(j)}| \\
-& = ||\hat{V}_n W^\top W \hat{V}_n - V_n V_n^\top||_{2 \to \infty} \\
-& = ||2 \hat{V}_n W V_n^\top - 2 V_n V_n^\top + \hat{V}_n W W^\top V_n^\top - 
-2 \hat{V}_n W V_n^\top + V_n V_n^\top||_{2 \to \infty} \\
-& = ||2 (\hat{V}_n W - V_n) V_n^\top + 
-(\hat{V}_n W - V_n) (\hat{V}_n W - V_n)^\top ||_{2 \to \infty} \\
-& \leq 2 ||\hat{V}_n W - V_n||_{2 \to \infty} ||V_n||_{2 \to \infty} +
-||\hat{V}_n W - V_n||_{2 \to \infty}^2 \\
+& \leq \max_{i,j} \Bigl(\|W^{\top} \hat{v}_n^{(i)} - v_n^{(i)}\| \times \|\hat{v}_n^{(j)}\|\bigr)
++ \|W^{\top} \hat{v}_n^{(j)} - v_n^{(j)}\| \times \|v_n^{(i)}\|\Bigr) \\
+% & \leq 
+% \hat{V}_n W^\top W \hat{V}_n - V_n V_n^\top||_{2 \to \infty} \\
+% & = ||2 \hat{V}_n W V_n^\top - 2 V_n V_n^\top + \hat{V}_n W W^\top V_n^\top - 
+% 2 \hat{V}_n W V_n^\top + V_n V_n^\top||_{2 \to \infty} \\
+% & = ||2 (\hat{V}_n W - V_n) V_n^\top + 
+% (\hat{V}_n W - V_n) (\hat{V}_n W - V_n)^\top ||_{2 \to \infty} \\
+% & \leq 2 
+&\leq \|\hat{V}_n W - V_n\|_{2 \to \infty} \times \|\hat{V}_n\|_{2 \to \infty} +
+\|\hat{V}_n W - V_n\|_{2 \to \infty} \times \|V_n\|_{2 \to \infty} \\
+& \leq \|\hat{V}_n W - V_n\|_{2 \to \infty}^2 + 2 \|\hat{V}_n W -
+V_n\|_{2 \to \infty} \times \|V_n\|_{2 \to \infty}
+\\
 & = O_P \Big( \frac{(\log n)^c}{n^{3/2} \rho_n^{1/2}} \Big)
-\end{split}\]
+\end{split}.\]
+Scaling all terms in the above inequality by \(n\), we obtain
+$$|n (\hat{v}_n^{(i)})^\top \hat{v}_n^{(j)}| = O_P \Big( \frac{(\log n)^c}{\sqrt{n \rho_n}} \Big)$$
+as desired.
 
-Then scaling by \(n\), we get
-\(|n (\hat{v}_n^{(i)})^\top \hat{v}_n^{(j)}| = O_P \big( \frac{(\log n)^c}{\sqrt{n \rho_n}} \big)\).
+We now provide a proof of Theorem~\ref{theorem5}. We first recall several
+useful definitions for analyzing sparse subspace clustering.
 
 \begin{definition}[Inradius \cite{soltanolkotabi2012, jmlr-v28-wang13}]
 The inradius of a convex body $\mathcal{P}$, denoted by $r(\mathcal{P})$, is 
@@ -1163,20 +1179,26 @@ Let $\hat{V}$ be the eigenvectors of $A_n$ corresponding to the $K (K + 1) / 2$ 
 Let $\nu_{i}^{(k)} = \max\limits_\eta (\hat{v}_i^{(k)})^\top \eta - \frac{1}{2 \lambda} \eta^\top \eta$ subject to $||V_{-i}^{(k)} \eta||_\infty \leq 1$, and define the projected dual direction $w_{i}^{(k)}$ as $\mathbb{P}_{\mathcal{S}^{(k)}}(\nu_i^{(k)})$ normalized to length 1. Collect the projected dual directions into $W = \begin{bmatrix} w_1^{(k)} & \cdots & w_{n_k}^{(k)} \end{bmatrix}^\top$.
 
 Define the subspace incoherence:
-
 $$\mu_n^{(k)} = \mu(\hat{V}^{(k)}) = \max\limits_{v \in V^{(-k)}} ||W^{(k)} v||_\infty$$
-
-Then $\forall k, n$, 
-
+Then $\forall k$, we have
 \begin{equation} \label{eq:mu-conv}
 \mu_n^{(k)} = 0
 \end{equation}
 \end{lemma}
 
-\emph{Proof}. Since by Theorem \ref{theorem2} each \(\mathcal{S}^{(k)}\)
-are mutually orthogonal, any vector projected to \(\mathcal{S}^{(k)}\)
-must be orthogonal to each row of \(V^{(-k)}\). Therefore,
-\(W^{(k)} v = 0\) \(\forall v \in \mathcal{S}^{(-k)}\).
+\begin{proof} From Theorem \ref{theorem3} we have that the subspaces
+  $\{\mathcal{S}^{(1)}, \dots, \mathcal{S}^{(K)}\}$
+  are mutually orthogonal, i.e., $v^{\top} w = 0$ for all $v \in
+  \mathcal{S}^{(k)}$ and $w \in \mathcal{S}^{(\ell)}$ with $k \not =
+  \ell$. Now let $z \in \mathbb{R}^{K^2}$ be arbitrary and let
+  $\tilde{z} = \mathbb{P}_{\mathcal{S}^{(k)}} z$ be the projection of
+    $z$ onto $\mathcal{S}^{(k)}$. We then have $v^{\top} \tilde{z} =
+    0$ for all $v \in V^{(-k)}$. Since $z$ is arbitrary, this implies $\|W^{(k)} v\|_{\infty} = 0$ for all $v
+    \in V^{(-k)}$ and hence $\mu_n^{(k)} = 0$ as desired.
+%   Therefore any vector projected to \(\mathcal{S}^{(k)}\)
+% must be orthogonal to each row of \(V^{(-k)}\) and hence
+%\(W^{(k)} v = 0\) for all $v \in \mathcal{S}^{(-k)}$, as desired.
+\end{proof}
 
 \begin{lemma}
 \label{lemma3}
@@ -1215,36 +1237,35 @@ from \citeauthor{jmlr-v28-wang13} are satisfied with probability 1 as
 \(n \to \infty\).
 
 \begin{remark}
-Theorem 6 of \citeauthor{jmlr-v28-wang13} assume that each $||v_n^{(i)}|| = 1$, 
+Theorem 6 of \citeauthor{jmlr-v28-wang13} assume that each $\|v_n^{(i)}\| = 1$, 
 which scales each $r_n^{(k)} \leq 1$. This is not strictly necessary for 
 the proof of Theorem \ref{theorem5} since each $\mu_n^{(k)} = 0$, so as long 
 as the $k^{th}$ community spans its subspace, $a r_n^{(k)} > 0 = \mu_n^{(k)}$ 
 $\forall a > 0$.
 \end{remark}
 
-\textbf{Proof of Theorem \ref{theorem6}}. Let \(P\) and \(A\) be
-organized by community such that the elements of blocks \(P^{(kl)}\) and
-\(A^{(kl)}\) correspond to the edges between communities \(k\) and
-\(l\).
+\textbf{Proof of Theorem \ref{theorem6}}. Let \(P\) be
+organized by community such that \(P^{(k \ell)}\) denote the $n_k \times
+n_{\ell}$ matrix obtained by keeping only the rows of $P$
+corresponding to vertices in community $k$ and the columns of $P$
+corresponding to vertices in community $\ell$. We define $A^{(k
+  \ell)}$ analogously. Recall that $P^{(k \ell)} = \lambda^{(k \ell)} (\lambda^{(\ell k)})^{\top}$ for all $k, \ell$. We now consider estimation of $P^{(k \ell)}$
+for the cases when $k = \ell$ versus when $k \not = \ell$.
 
-\emph{Case \(k = l\)}. \(P^{(kk)}\) and \(A^{(kk)}\) represent
-within-community edge probabilities and edges for community \(k\).\\
-By definition, \(P^{(kk)} = \lambda^{(kk)} (\lambda^{(kk)})^\top\). This
-implies that the singular value decomposition
-\(P^{(kk)} = \sigma_{kk}^2 u^{(kk)} (u^{(kk)})^\top\) has one singular
-value and one pair of singular vectors (\(P^{(kk)}\) is symmetric, so
-the left and right singular vectors are identical). Then
-\(\lambda^{(kk)} = \sigma_{kk} u^{(kk)}\).\\
-Let \(\hat{U}^{(kk)} \hat{\Sigma}^{(kk)} (\hat{U}^{(kk)})^\top\) be the
+\emph{Case \(k = l\)}. let $P^{(kk)} =
+\sigma_{kk}^2 u^{(kk)} (u^{(kk)})^\top$ be the singular value
+decomposition of $P^{(kk)}$. We can then define
+$\tilde{\lambda}^{(kk)} = \sigma_{kk} u^{(kk)}$. 
+Now let $\hat{U}^{(kk)} \hat{\Sigma}^{(kk)} (\hat{U}^{(kk)})^\top$ be the
 singular value decomposition of \(A^{(kk)}\), and let
-\(\hat{\sigma}_{kk}^2 \hat{u}^{(kk)} (\hat{u}^{(kk)})^\top\) be its
-one-dimensional approximation. Define
+$\hat{\sigma}_{kk}^2 \hat{u}^{(kk)} (\hat{u}^{(kk)})^\top$ be the
+best rank-one approximation of $A^{(kk)}$. Define
 \(\hat{\lambda}^{(kk)} = \hat{\sigma}_{kk} \hat{u}^{(kk)}\). Then
-\(\hat{\lambda}^{(kk)}\) is the adjacency spectral embedding
-approximation of \(\lambda^{(kk)}\).\\
-Then by Theorem 5 of \citeauthor{rubindelanchy2017statistical}, the
-adjacency spectral embedding \(\hat{\lambda}^{(kk)}\) approximates
-\(\lambda^{(kk)}\) at rate \(\frac{(\log n_k)^c}{\sqrt{n_k}}\).
+\(\hat{\lambda}^{(kk)}\) is the adjacency spectral embedding approximation of \(\lambda^{(kk)}\)
+and by Theorem 5 of \citeauthor{rubindelanchy2017statistical}, we have
+%adjacency spectral embedding \(\hat{\lambda}^{(kk)}\) approximates
+$$\|\hat{\lambda}^{(kk)} - \lambda^{(kk)}\|_{\infty} = \frac{(\log n_k)^c}{\sqrt{n_k}}.$$
+Here $\|\cdot\|_{\infty}$ denote the $\ell_{\infty}$ norm of a vector.
 
 \emph{Case \(k \neq l\)}. \(P^{(kl)}\) and \(A^{(kl)}\) represent edge
 probabilities and edges between communities \(k\) and \(l\). Note that
