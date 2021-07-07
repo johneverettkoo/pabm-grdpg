@@ -68,13 +68,13 @@
 \usepackage{float}
 \usepackage{mathtools}
 \usepackage{natbib}
+\bibliographystyle{abbrvnat}
 \usepackage{parskip}
 \usepackage[linesnumbered,ruled,vlined]{algorithm2e}
 \setcitestyle{numbers,square,comma}
 \usepackage{verbatim}
 \usepackage{amsthm}
 \usepackage{comment}
-\usepackage[]{natbib}
 \bibliographystyle{plainnat}
 \addtolength{\oddsidemargin}{-.5in}%
 \addtolength{\evensidemargin}{-.5in}%
@@ -104,18 +104,18 @@ via simulation.
 
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
-\newcommand{\diag}{\text{diag}}
-\newcommand{\tr}{\text{Tr}}
-\newcommand{\blockdiag}{\text{blockdiag}}
-\newcommand{\indep}{\stackrel{\text{indep}}{\sim}}
-\newcommand{\iid}{\stackrel{\text{iid}}{\sim}}
-\newcommand{\Bernoulli}{\text{Bernoulli}}
-\newcommand{\Betadist}{\text{Beta}}
-\newcommand{\BG}{\text{BernoulliGraph}}
-\newcommand{\PABM}{\text{PABM}}
-\newcommand{\RDPG}{\text{RDPG}}
-\newcommand{\GRDPG}{\text{GRDPG}}
-\newcommand{\Multinomial}{\text{Multinomial}}
+\newcommand{\diag}{\mathrm{diag}}
+\newcommand{\tr}{\mathrm{Tr}}
+\newcommand{\blockdiag}{\mathrm{blockdiag}}
+\newcommand{\indep}{\stackrel{\mathrm{indep}}{\sim}}
+\newcommand{\iid}{\stackrel{\mathrm{iid}}{\sim}}
+\newcommand{\Bernoulli}{\mathrm{Bernoulli}}
+\newcommand{\Betadist}{\mathrm{Beta}}
+\newcommand{\BG}{\mathrm{BernoulliGraph}}
+\newcommand{\PABM}{\mathrm{PABM}}
+\newcommand{\RDPG}{\mathrm{RDPG}}
+\newcommand{\GRDPG}{\mathrm{GRDPG}}
+\newcommand{\Multinomial}{\mathrm{Multinomial}}
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}{Lemma}
 \newtheorem{proposition}{Proposition}
@@ -1624,4 +1624,9 @@ O\Bigl(\frac{(\log (n_k + n_{\ell}))^c}{\sqrt{n_k + n_{\ell}}}\Bigr)$$
 with high probability. Combining this bound with the bound for
 $\|\hat{\lambda}^{(kk)} - \lambda^{(kk)}\|_{\infty}$ given above
 yields Eq.~\eqref{eq:thm6} in Theorem~\ref{theorem6}. 
+
+\renewcommand\refname{References}
+
+\bibliography{misc.bib}
+
 \end{document}
