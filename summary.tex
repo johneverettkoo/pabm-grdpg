@@ -458,7 +458,7 @@ known beforehand and does not require estimation.
 \hypertarget{related-work}{%
 \subsection{Related work}\label{related-work}}
 
-\citeauthor{307cbeb9b1be48299388437423d94bf1}, who first proposed the
+\citet{307cbeb9b1be48299388437423d94bf1}, who first proposed the
 PABM, used Modularity Maximization (MM) and the Extreme Points (EP)
 algorithm \cite{le2016} for community detection and parameter
 estimation. They were able to show that as the sample size increases,
@@ -522,7 +522,7 @@ detection for the PABM. More precisely, Theorem \ref{theorem2} says that
 each community consists of a \(K\)-dimensional subspace, and together
 the subspaces lie in \(\mathbb{R}^{K^2}\). The natural approach then is
 to perform SSC on the ASE of \(P\) or \(A\).
-\citeauthor{noroozi2019estimation} instead applied SSC to \(P\) and
+\citet{noroozi2019estimation} instead applied SSC to \(P\) and
 \(A\), foregoing embedding altogether.
 
 Using results from \citet{soltanolkotabi2012}, it can be easily shown
@@ -531,7 +531,7 @@ of \(P\). More specifically, if points lie exactly on mutually
 orthogonal subspaces, then the subspace detection property will hold
 with probability 1, and this is exactly the case for the PABM (Theorem
 \ref{theorem2}). Much of our work is then built on
-\citeauthor{rubindelanchy2017statistical}, who describe the convergence
+\citet{rubindelanchy2017statistical}, who describe the convergence
 behavior of the ASE of \(A\) to the ASE of \(P\), and
 \citet{jmlr-v28-wang13}, who show the necessary conditions for the
 subspace detection property to hold in noisy cases where the points lie
@@ -735,8 +735,8 @@ probability at least $1 - \epsilon$.
 
 \begin{remark}
 The proof of Theorem \ref{theorem5} is a direct consequence of Theorem 6
-from  \citeauthor{jmlr-v28-wang13} and the fact that the columns of
-$V_n$ correspond to orthogonal subspaces. \citeauthor{jmlr-v28-wang13} assume
+from  \citet{jmlr-v28-wang13} and the fact that the columns of
+$V_n$ correspond to orthogonal subspaces. \citet{jmlr-v28-wang13} assume
 that the points in the embedding are all of unit length, and while we apply
 this normalization in the simulated examples, it is not strictly necessary
 for Theorem \ref{theorem5} due to orthogonality.
@@ -809,22 +809,22 @@ and MM \cite{igraph, 307cbeb9b1be48299388437423d94bf1}.
 True community labels are used
 with Algorithm 3 to estimate the popularity vectors
 \(\{\lambda^{(kl)}\}_K\), and this method is then compared against an
-MLE-based estimator described by \citeauthor{noroozi2019estimation} and
-\citeauthor{307cbeb9b1be48299388437423d94bf1}.
+MLE-based estimator described by \citet{noroozi2019estimation} and
+\citet{307cbeb9b1be48299388437423d94bf1}.
 
 Modularity Maximization is NP-hard, so
-\citeauthor{307cbeb9b1be48299388437423d94bf1} used the Extreme Points
+\citet{307cbeb9b1be48299388437423d94bf1} used the Extreme Points
 (EP) algorithm \cite{le2016}, which is \(O(n^{K - 1})\), as a greedy
 relaxation of the optimization problem. For these simulations, the
 Louvain algorithm was used for modularity maximization,
-as \citeauthor{307cbeb9b1be48299388437423d94bf1}'s implementation proved to be
+as \citet{307cbeb9b1be48299388437423d94bf1}'s implementation proved to be
 prohibitively computationally expensive for \(K > 2\). For \(K = 2\), it
 was verified that the Louvain algorithm produces comparable results
 to EP-MM.
 
 Two implementations of SSC are shown here. The first method, denoted as
 SSC-A, treats the columns of the adjacency matrix \(A\) as points in
-\(\mathbb{R}^n\), as described in \citeauthor{noroozi2019estimation}.
+\(\mathbb{R}^n\), as described in \citet{noroozi2019estimation}.
 The second method, denoted as SSC-ASE, first embeds \(A\) and then
 performs SSC on the embedding, as described in algorithm 2. The sparsity
 parameter \(\lambda\) was chosen via a preliminary cross-validation
@@ -1072,14 +1072,14 @@ should be approximately normal.
 In the first real data example, we applied OSC to the Leeds Butterfly
 dataset \cite{Wang_2018} consisting of visual similarity measurements
 among 832 butterflies across 10 species. The graph was modified to match
-the example from \citeauthor{noroozi2019estimation}: Only the 4 most
+the example from \citet{noroozi2019estimation}: Only the 4 most
 frequent species were considered, and the similarities were discretized
 to \(\{0, 1\}\) via thresholding. Fig. \ref{fig:butterfly} shows a
 sorted adjacency matrix sorted by the resultant clustering.
 
 Comparing against the ground truth species labels, OSC achieves an
 accuracy of 63\% and an adjusted Rand index of 73\%. In comparison,
-\citeauthor{noroozi2019estimation} achieved an adjusted Rand index of
+\citet{noroozi2019estimation} achieved an adjusted Rand index of
 73\% using sparse subspace clustering on the same dataset.
 
 \begin{figure}[H]
@@ -1096,7 +1096,7 @@ In the second example, we applied OSC to the British MPs Twitter network
 \cite{10.1145/1134271.1134277}, and the DBLP network
 \cite{NIPS2009_3855, 10.1007/978-3-642-15880-3_42}. For this data
 analysis, we subsetted the data as described by
-\citeauthor{307cbeb9b1be48299388437423d94bf1} for their analysis of the
+\citet{307cbeb9b1be48299388437423d94bf1} for their analysis of the
 same networks. Our methods underperformed compared to modularity
 maximization, although performance is comparable. In addition, OSC's
 runtime is much lower than that of modularity maximization.
@@ -1169,8 +1169,8 @@ relationship to develop community detection and parameter estimation
 methods. In fact, we can represent any graph with Bernoulli edges as a
 GRDPG, and in the PABM case, it turns out that this relationship leads
 to a very straightforward applications of previous work from
-\citeauthor{rubindelanchy2017statistical},
-\citeauthor{soltanolkotabi2012}, and \citeauthor{jmlr-v28-wang13}, which
+\citet{rubindelanchy2017statistical},
+\citet{soltanolkotabi2012}, and \citet{jmlr-v28-wang13}, which
 lead to asymptotically correct solutions with high probability. Similar
 methods can be applied for other models, such as the Nested Block Model
 \cite{noroozi2021hierarchy}.
@@ -1216,7 +1216,7 @@ In particular we can take $c = 1 + \epsilon$ for any $\epsilon > 0$.
 % be the $n \times K^2$ matrices whose columns are the eigenvectors of \(P\) and \(A\) corresponding to the
 % \(K (K + 1) / 2\) most positive and \(K (K - 1) / 2\) most negative
 % eigenvalues, respectively. From Lemma~5 in
-% \citeauthor{rubindelanchy2017statistical} we have, for some
+% \citet{rubindelanchy2017statistical} we have, for some
 % \(W \in \mathbb{O}(K^2)\) and \(c > 0\), that
 % $$\|\hat{V} W - V\|_{2 \to \infty} = O_P \big(\frac{\log^{c}n}{n \sqrt{\rho_n}} \big).$$
 % We furthermore have \(\|V\|_{2 \to \infty} = O_P(n^{-1/2})\). 
@@ -1420,7 +1420,7 @@ $$\mu^{(k)} = \mu(\hat{V}^{(k)}) = \max\limits_{v \in V^{(-k)}} \|W^{(k)} v\|_\i
 % \begin{lemma}
 % \label{lemma3}
 % Let $(v_n^{(i)})^\top$ and $(\hat{v}_n^{(i)})^\top$ be the rows of $V_n$ and
-% $\hat{V}_n$ respectively. By \citeauthor{rubindelanchy2017statistical},
+% $\hat{V}_n$ respectively. By \citet{rubindelanchy2017statistical},
 
 % \begin{equation} \label{eq:delta-conv}
 % \delta_n = \max_i \|\hat{v}_n^{(i)} - v_n^{(i)}\| \stackrel{a.s.}{\to} 0
@@ -1433,7 +1433,7 @@ proof of Theorem~\ref{theorem5}.
 \begin{proof}[Proof of Theorem~\ref{theorem5}]
 For a given $k = 1,2\dots,K$, let $r^{(k)} = \min_{i}r(V_{-i}^{(k)})$ be inradius of the convex hull formed by
 the rows of $V_{-i}^{(k)}$ and let $r_* = \min_{k} r^{(k)}$. Then Theorem~6 in
-\citeauthor{jmlr-v28-wang13} states that there exists a $\lambda > 0$
+\citet{jmlr-v28-wang13} states that there exists a $\lambda > 0$
 such that $\sqrt{n} \hat{V}$ satisfies
 the subspace detection property in
 Definition~\ref{def:subspace_detection} whenever
@@ -1457,7 +1457,7 @@ We now verify that for sufficiently large n, Eq.~\eqref{eq:cond1} and Eq.~\eqref
 holds with high probability.
 % satisfied with high probability. 
 % Indeed, let
-% The basis of this proof is Theorem 6 from \citeauthor{jmlr-v28-wang13}, which states that the
+% The basis of this proof is Theorem 6 from \citet{jmlr-v28-wang13}, which states that the
 % subspace detection property holds if the noise in $\sqrt{n}\hat{V}$
 % as an estimate for $\sqrt{n} V$ is small enough and that the inradius
 % of the $\hat{V}^{(k)}$ are greater 
@@ -1507,7 +1507,7 @@ with probability converging to $1$ as \(n \to \infty\).
 \end{proof}
 
 \begin{remark}
-Theorem 6 of \citeauthor{jmlr-v28-wang13} assumes that each row $v_i$
+Theorem 6 of \citet{jmlr-v28-wang13} assumes that each row $v_i$
 of $V$ has unit norm, i.e., $\|v_{i}\| = 1$  for all $i$. This
 assumption has the effect of scaling the $r^{(k)}$ so that $r^{(k)}
 \leq 1$ for all $k = 1,2,\dots,K$. We emphasize that this assumption
@@ -1535,7 +1535,7 @@ $\hat{\sigma}_{kk}^2 \hat{u}^{(kk)} (\hat{u}^{(kk)})^\top$ be the
 best rank-one approximation of $A^{(kk)}$. Define
 \(\hat{\lambda}^{(kk)} = \hat{\sigma}_{kk} \hat{u}^{(kk)}\). Then
 \(\hat{\lambda}^{(kk)}\) is the adjacency spectral embedding approximation of \(\lambda^{(kk)}\)
-and by Theorem 5 of \citeauthor{rubindelanchy2017statistical}, we have
+and by Theorem 5 of \citet{rubindelanchy2017statistical}, we have
 %adjacency spectral embedding \(\hat{\lambda}^{(kk)}\) approximates
 $$\|\hat{\lambda}^{(kk)} - \lambda^{(kk)}\|_{\infty} = O\Bigl(\frac{(\log n_k)^c}{\sqrt{n_k}}\Bigr)$$
 with high probability. 
@@ -1596,7 +1596,7 @@ n_{\ell}) \times 2$ matrix
   \hat{\lambda}^{(\ell k)} & -\hat{\lambda}^{(\ell k)} 
 \end{bmatrix}\]
 where each \(\hat{\lambda}^{(kl)}\) is defined as in Algorithm 3. Then
-by Theorem 5 of \citeauthor{rubindelanchy2017statistical}, there
+by Theorem 5 of \citet{rubindelanchy2017statistical}, there
 exists an indefinite orthogonal transformation $W^{*}$ such that,  with
 high probability,
 $$\max_{i} |W^{*} \hat{\Lambda}_{i}^{(k \ell)} - \Lambda_{i}^{(k \ell)} \| =
@@ -1606,7 +1606,7 @@ $\hat{\Lambda}_i^{(k \ell)}$ denote the $i$th rows of $\Lambda^{(k
   \ell)}$ and $\hat{\Lambda}^{(k \ell)}$, respectively. 
 % approximates the latent positions of \(M^{(kl)}\) up to indefinite
 % orthogonal transformation by the rate given in Theorem 5 of
-% \citeauthor{rubindelanchy2017statistical}.\\
+% \citet{rubindelanchy2017statistical}.\\
 Furthermore, by looking at the proof of Theorem~5 in
 \cite{rubindelanchy2017statistical}, we see that $W^{*}$ is also
 blocks diagonal with $2$ blocks where the positive eigenvalues of $M^{(k \ell)}$
