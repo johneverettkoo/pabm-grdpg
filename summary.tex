@@ -491,11 +491,18 @@ for some sparsity parameter \(\lambda > 0\). The \(c_i\) vectors are
 then collected into \(C\) and \(B\) as before.
 
 \begin{definition}[Subspace Detection Property]
+  \label{def:subspace_detection}
 Let $X = \begin{bmatrix} x_1 & \cdots & x_n \end{bmatrix}^\top$ be noisy
-points sampled from $K$ subspaces. Let $C$ and $B$ be constructed from the
-solutions of LASSO problems as described in (\ref{eq:ssc}). If each column of
-$C$ has nonzero norm and $B_{ij} = 0$ $\forall$ $x_i$ and $x_j$ sampled from
-different subspaces, then $X$ obeys the subspace detection property.
+points sampled from $K$ subspaces, i.e., $x_i = y_i + z_i$ where the
+$y_i$ belongs to the union of $K$ subspaces and the $z_i$ are noise
+vectors. Let $\lambda \geq 0$ be given and
+let $C$ and $B$
+be constructed from the
+solutions of LASSO problems as described in Eq.~\eqref{eq:ssc} with
+this given choice of $\lambda$. Then $X$
+is said to satisfy the subspace detection property with weighting parameter $\lambda$ if each column of
+$C$ has nonzero norm and $B_{ij} = 0$ whenever $y_i$ and $y_j$ are
+from different subspaces.
 \end{definition}
 
 \begin{remark}
@@ -719,16 +726,17 @@ from the eigenvectors of \(P\). Then Theorems \ref{theorem3} and
 \label{theorem5}
 Let $P_n$ describe the edge probability matrix of the PABM with
 $n$ vertices, and let $A_n \sim \text{Bernoulli}(P_n)$.  Let $\hat{V}_n$ be the
-matrix of eigenvectors of $A_n$ corresponding to the $K (K + 1) / 2$ most
-positive and $K (K - 1) / 2$ most negative eigenvalues. Then
-$\exists \lambda > 0$ and $N \in \mathbb{N}$ such that when $n > N$,
-$\sqrt{n} \hat{V}_n$ obeys the subspace detection property with probability 1.
+matrix of eigenvectors of $A_n$ corresponding to the $K^2$ largest
+eigenvalues in modulus. Then for all $\epsilon > 0$ 
+there exists a choice of $\lambda > 0$ and $N \in \mathbb{N}$ such
+that for all $n \geq N$, $\sqrt{n} \hat{V}_n$ obeys the subspace detection property with
+probability at least $1 - \epsilon$.  
 \end{theorem}
 
 \begin{remark}
 The proof of Theorem \ref{theorem5} is a direct consequence of Theorem 6
-from  \citeauthor{jmlr-v28-wang13} and the fact that the unscaled ASE of
-$P_n$ consists of orthogonal subspaces. \citeauthor{jmlr-v28-wang13} assume
+from  \citeauthor{jmlr-v28-wang13} and the fact that the columns of
+$V_n$ correspond to orthogonal subspaces. \citeauthor{jmlr-v28-wang13} assume
 that the points in the embedding are all of unit length, and while we apply
 this normalization in the simulated examples, it is not strictly necessary
 for Theorem \ref{theorem5} due to orthogonality.
@@ -779,12 +787,12 @@ we instead estimate each $\tilde{\lambda}^{(kl)} = \sigma^{(kl)} u^{(kl)}$.
 \begin{theorem}
 \label{theorem6}
 Under regularity and sparsity assumptions, given fixed $K$, 
-
 \begin{equation} \label{eq:thm6}
 \max_{k, l \in \{1, ..., K\}} 
-||\hat{\lambda}^{(kl)} - \lambda^{(kl)}|| = 
-O_P \bigg(\frac{(\log n_k)^c}{\sqrt{n_k}} \bigg)
+\|\hat{\lambda}^{(kl)} - \lambda^{(kl)}\|_{\infty} = 
+O\bigg(\frac{(\log n_k)^c}{\sqrt{n_k}} \bigg)
 \end{equation}
+with high probability.
 \end{theorem}
 
 \hypertarget{simulated-examples}{%
@@ -1256,35 +1264,219 @@ belongs to different communities.
 % $$|n (\hat{v}_n^{(i)})^\top \hat{v}_n^{(j)}| = O_P \Big( \frac{(\log n)^c}{\sqrt{n \rho_n}} \Big)$$
 % as desired.
 
-We now provide a proof of Theorem~\ref{theorem5}. We first recall several
-useful definitions for analyzing sparse subspace clustering.
+We now provide a proof of Theorem~\ref{theorem5}. Our proof is based
+on verifying the sufficient conditions given in Theorem~6 of
+\cite{jmlr-v28-wang13}
+under which sparse subspace clustering based on solving the
+optimization problem in Eq.~\eqref{eq:ssc} yields an affinity matrix
+$B = |C| + |C^{\top}|$ satisfying the subspace detection property of
+Definition~\ref{def:subspace_detection}. We first recall a few
+definitions used in \cite{jmlr-v28-wang13}; for ease of exposition,
+these definitions are stated using the notations of the current paper. 
 
+ % We first recall the
+% notion of the inradius of a set of points. 
 \begin{definition}[Inradius \cite{soltanolkotabi2012, jmlr-v28-wang13}]
+  \label{inradius}
 The inradius of a convex body $\mathcal{P}$, denoted by $r(\mathcal{P})$, is
 defined as the radius of the largest Euclidean ball inscribed in $\mathcal{P}$.
-In addition, $r(X)$ for data matrix $X$ with rows $x_i^\top$ represents
-the inradius of the symmetric convex hull of $X$.
+Let $X$ be a $n \times d$ matrix with rows $x_1, x_2, \dots,
+x_n$. We then define, with a slight abuse of notation, $r(X)$ as the
+inradius of the convex hull formed by $\{\pm x_1, \pm x_2, \dots, \pm x_n\}$. 
 \end{definition}
 
-\begin{definition}[Subspace incoherence property \cite{jmlr-v28-wang13}]
+\begin{definition}[Subspace incoherence]
+  \label{def:subspace_incoherence}
+Let $\hat{V}$ be the eigenvectors of $A_n$
+corresponding to the $K^2$ largest eigenvalues in modulus. Let
+$\hat{V}^{(k)}$ denote the matrix formed by keeping only the rows of
+$\hat{V}$ corresponding to the $k^{th}$
+community and let $\hat{V}^{(-k)}$ denote the matrix formed by
+omitting the rows of $\hat{V}$
+corresponding to the $k^{th}$ community. Let $(\hat{v}_i^{(k)})^\top$ denote
+the $i$th row of $\hat{V}^{(k)}$ and $\hat{V}_{-i}^{(k)}$ be $\hat{V}^{(k)}$ with
+the $i^{th}$ row omitted. Let $V$, $V^{(k)}$, $V^{(-k)}$, and
+$v_i^{(k)}$ be defined similarly using the eigenvectors $V$ of
+$P_n$. Finally let $\mathcal{S}^{(k)}$ be the vector space spanned by the
+rows of $V^{(k)}$. 
+
+Now define $\nu_{i}^{(k)}$ for $k = 1,2,\dots,K$ and $i =
+1,2,\dots,n_{k}$ as the solution of the following optimization problem
+$$\nu_{i}^{(k)} = \max_\eta (\hat{v}_i^{(k)})^\top \eta - \frac{1}{2
+  \lambda} \eta^\top \eta, \quad \text{subject to $\|V_{-i}^{(k)}
+  \eta\|_\infty \leq 1$.}$$
+Given $\nu_i^{(k)}$, let $\mathbb{P}_{\mathcal{S}^{(k)}}(\nu_i^{(k)})$
+be the vector in $\mathbb{R}^{K^2}$ corresponding to the orthogonal projection of $\nu_i^{(k)}$ onto the vector space
+$\mathcal{S}^{(k)}$ and define the projected dual direction $w_{i}^{(k)}$
+as
+$$w_i^{(k)} =
+\frac{\mathbb{P}_{\mathcal{S}^{(k)}}(\nu_i^{(k)})}{\|\mathbb{P}_{\mathcal{S}^{(k)}}(\nu_i^{(k)})\|}.$$
+Now let $W^{(k)} = \begin{bmatrix} w_1^{(k)} & \cdots & w_{n_k}^{(k)} \end{bmatrix}^\top$
+and define the subspace incoherence for $\hat{V}^{(k)}$ by
+$$\mu^{(k)} = \mu(\hat{V}^{(k)}) = \max\limits_{v \in V^{(-k)}} \|W^{(k)} v\|_\infty.$$
 \end{definition}
 
-\begin{lemma}
-\label{lemma2}
-Let $\hat{V}$ be the eigenvectors of $A_n$ corresponding to the $K (K + 1) / 2$ most positive and $K (K - 1) / 2$ most negative eigenvalues such that the rows of $\hat{V}$ are ordered by community, and let $\hat{V}^{(k)}$ be the rows of the $k^{th}$ community in $\hat{V}$ and $\hat{V}^{(-k)}$ be the rows of $\hat{V}$ with the $k^{th}$ community omitted. Denote $(\hat{v}_i^{(k)})^\top$ as the rows of $\hat{V}$, $\hat{V}_{-i}^{(k)}$ as $\hat{V}^{(k)}$ with the $i^{th}$ row omitted, and $\mathcal{S}^{(k)}$ as the subspace spanned by $V^{(k)}$. Let $V$, $V^{(k)}$, $V^{(-k)}$, and $v_i^{(k)}$ be the corresponding values for $P_n$.
+  
 
-Let $\nu_{i}^{(k)} = \max\limits_\eta (\hat{v}_i^{(k)})^\top \eta - \frac{1}{2 \lambda} \eta^\top \eta$ subject to $||V_{-i}^{(k)} \eta||_\infty \leq 1$, and define the projected dual direction $w_{i}^{(k)}$ as $\mathbb{P}_{\mathcal{S}^{(k)}}(\nu_i^{(k)})$ normalized to length 1. Collect the projected dual directions into $W = \begin{bmatrix} w_1^{(k)} & \cdots & w_{n_k}^{(k)} \end{bmatrix}^\top$.
+% Our proof is based on Theorem~6 in \cite{jmlr-v28-wang13} that provide
+% sufficient conditions under which sparse subspace clustering based on
+% solving the optimization problem in Eq.~\eqref{eq:ssc} yields an
+% affinity matrix $B = |C| + |C^{\top}|$ satisfying the subspace
+% detection property of Definition~\ref{def:subspace_detection}.  
+% \begin{theorem}
+%   Let $d \geq 1$ and let $\mathcal{S}_1, \mathcal{S}_2, \dots, \mathcal{S}_{L}$ be
+%   subspaces of $\mathbb{R}^{d}$. 
+% Let $Y = [y_1 \mid y_2 \mid \dots \mid y_n]^{\top}$ be a $n \times d$ matrix
+% with rows $y_i \in \mathcal{S}_1 \cup \mathcal{S}_2 \cup
+% \dots \mathcal{S}_{L}$. Let $x_i = y_i + z_i$ and suppose that there
+% exists a finite $\delta \geq 0$ such that $\|z_i\| \leq \delta$ for
+% all $i$.
+% \end{theorem}
 
-Define the subspace incoherence:
-$$\mu_n^{(k)} = \mu(\hat{V}^{(k)}) = \max\limits_{v \in V^{(-k)}} ||W^{(k)} v||_\infty$$
-Then $\forall k$, we have
+% Our proof leverages
+% the conditions given in Theorem~6 of \cite{jmlr-v28-wang13} for
+% guaranteeing the subspace detection property of a noisy
 
-\begin{equation} \label{eq:mu-conv}
-\mu_n^{(k)} = 0
-\end{equation}
-\end{lemma}
+% Note that the rows
+% of $\sqrt{n}V$ satisfy the subspace detection property in
+% Definition~\ref{def:subspace_detection}. Now, by 
+% Lemma~\ref{lem:technical}, there exists an orthogonal transformation
+% $W$ such that the rows of $\sqrt{n}\hat{V}_n W$ are
+% uniformly close to the rows of $\sqrt{n} V_n$. 
 
-\begin{proof} From Theorem \ref{theorem3} we have that the subspaces
+% Our proof leverages
+% the conditions given in Theorem~6 of \cite{jmlr-v28-wang13} for
+% guaranteeing the subspace detection property of a noisy
+
+% together with the uniform row-wise
+% error bound between $\hat{V}$ and $V$ as given in
+% Lemma~\ref{lem:technical}. 
+
+% We first recall the
+% notion of the inradius of a set of points. 
+% \begin{definition}[Inradius \cite{soltanolkotabi2012, jmlr-v28-wang13}]
+% The inradius of a convex body $\mathcal{P}$, denoted by $r(\mathcal{P})$, is
+% defined as the radius of the largest Euclidean ball inscribed in $\mathcal{P}$.
+% In addition, $r(X)$ for data matrix $X$ with rows $x_i^\top$ represents
+% the inradius of the symmetric convex hull of $X$.
+% \end{definition}
+
+% The next 
+
+% \begin{definition}[Subspace incoherence property \cite{jmlr-v28-wang13}]
+% \end{definition}
+
+
+
+% \begin{lemma}
+% \label{lemma2} % Let $\hat{V}$ be the eigenvectors of $A_n$
+% % corresponding to the $K^2$ largest eigenvalues in modulus. Let
+% % $\hat{V}^{(k)}$ denote the matrix formed by keeping only the rows of
+% % $\hat{V}$ corresponding to the $k^{th}$
+% % community and let $\hat{V}^{(-k)}$ denote the matrix formed by
+% % omitting the rows of $\hat{V}$
+% % corresponding to the $k^{th}$ community. Let $(\hat{v}_i^{(k)})^\top$ denote
+% % the $i$th row of $\hat{V}^{(k)}$ and $\hat{V}_{-i}^{(k)}$ be $\hat{V}^{(k)}$ with
+% % the $i^{th}$ row omitted. Let $V$, $V^{(k)}$, $V^{(-k)}$, and
+% % $v_i^{(k)}$ be defined similarly using the eigenvectors $V$ of
+% % $P_n$. Finally let $\mathcal{S}^{(k)}$ be the vector space spanned by the
+% % rows of $V^{(k)}$. 
+
+% % Now define $\nu_{i}^{(k)}$ for $k = 1,2,\dots,K$ and $i =
+% % 1,2,\dots,n_{k}$ as the solution of the following optimization problem
+% % $$\nu_{i}^{(k)} = \max_\eta (\hat{v}_i^{(k)})^\top \eta - \frac{1}{2
+% %   \lambda} \eta^\top \eta, \quad \text{subject to $\|V_{-i}^{(k)}
+% %   \eta\|_\infty \leq 1$.}$$
+% % Given $\nu_i^{(k)}$, let $\mathbb{P}_{\mathcal{S}^{(k)}}(\nu_i^{(k)})$
+% % be the vector in $\mathbb{R}^{K^2}$ corresponding to the orthogonal projection of $\nu_i^{(k)}$ onto the vector space
+% % $\mathcal{S}^{(k)}$ and define the projected dual direction $w_{i}^{(k)}$
+% % as
+% % $$w_i^{(k)} =
+% % \frac{\mathbb{P}_{\mathcal{S}^{(k)}}(\nu_i^{(k)})}{\|\mathbb{P}_{\mathcal{S}^{(k)}}(\nu_i^{(k)})\|}.$$
+% % Now let $W^{(k)} = \begin{bmatrix} w_1^{(k)} & \cdots & w_{n_k}^{(k)} \end{bmatrix}^\top$
+% % and define the subspace incoherence for $W^{(k)}$ by
+% % $$\mu^{(k)} = \mu(\hat{V}^{(k)}) = \max\limits_{v \in V^{(-k)}} \|W^{(k)} v\|_\infty.$$
+% Recall the notations in Definition~\ref{def:subspace_incoherence}. 
+% We then have
+% \begin{equation} \label{eq:mu-conv}
+% \mu^{(k)} = 0, \quad \text{for all $k = 1,2,\dots,K$.}
+% \end{equation}
+% \end{lemma}
+
+% \begin{proof} From Theorem \ref{theorem3} we have that the subspaces
+%   $\{\mathcal{S}^{(1)}, \dots, \mathcal{S}^{(K)}\}$
+%   are mutually orthogonal, i.e., $v^{\top} w = 0$ for all $v \in
+%   \mathcal{S}^{(k)}$ and $w \in \mathcal{S}^{(\ell)}$ with $k \not =
+%   \ell$. Now let $z \in \mathbb{R}^{K^2}$ be arbitrary and let
+%   $\tilde{z} = \mathbb{P}_{\mathcal{S}^{(k)}} z$ be the projection of
+%     $z$ onto $\mathcal{S}^{(k)}$. We then have $v^{\top} \tilde{z} =
+%     0$ for all $v \in V^{(-k)}$. Since $z$ is arbitrary, this implies $\|W^{(k)} v\|_{\infty} = 0$ for all $v
+%     \in V^{(-k)}$ and hence $\mu^{(k)} = 0$ as desired.
+% %   Therefore any vector projected to \(\mathcal{S}^{(k)}\)
+% % must be orthogonal to each row of \(V^{(-k)}\) and hence
+% %\(W^{(k)} v = 0\) for all $v \in \mathcal{S}^{(-k)}$, as desired.
+% \end{proof}
+
+% \begin{lemma}
+% \label{lemma3}
+% Let $(v_n^{(i)})^\top$ and $(\hat{v}_n^{(i)})^\top$ be the rows of $V_n$ and
+% $\hat{V}_n$ respectively. By \citeauthor{rubindelanchy2017statistical},
+
+% \begin{equation} \label{eq:delta-conv}
+% \delta_n = \max_i \|\hat{v}_n^{(i)} - v_n^{(i)}\| \stackrel{a.s.}{\to} 0
+% \end{equation}
+% \end{lemma}
+
+With the above definitions in place, we are now ready to state our
+proof of Theorem~\ref{theorem5}.
+
+\begin{proof}[Proof of Theorem~\ref{theorem5}]
+For a given $k = 1,2\dots,K$, let $r^{(k)} = \min_{i}r(V_{-i}^{(k)})$ be inradius of the convex hull formed by
+the rows of $V_{-i}^{(k)}$ and let $r_* = \min_{k} r^{(k)}$. Then Theorem~6 in
+\citeauthor{jmlr-v28-wang13} states that there exists a $\lambda > 0$
+such that $\sqrt{n} \hat{V}$ satisfies
+the subspace detection property in
+Definition~\ref{def:subspace_detection} whenever
+the following two conditions are satisfied
+\begin{gather}
+  \label{eq:cond1}
+  \mu^{(k)} < r^{(k)} \quad \text{for all $k = 1,2,\dots,K$}, \\
+  \label{eq:cond2}
+  \max_{i} \|W \hat{v}_{i} - v_{i}\| \leq \min_{k} \frac{r_*(r^{(k)} -
+    \mu^{(k)})}{2 + 7 r^{(k)}}.
+\end{gather}
+% Furthermore, we can also choose the weighting parameter $\lambda$ in
+% the range
+% $$\frac{1}{r_* - 2 \delta - \delta^2} \leq \lambda \leq \min_{k}
+% \frac{r_k - \mu_k - 2 \delta_1}{\delta(1 + 
+% In other words, $\sqrt{n}\hat{V}_n$ 
+% small enough and the
+% subspace inradius is greater than the subspace incoherence for each
+% community \(k\).
+We now verify that for sufficiently large n, Eq.~\eqref{eq:cond1} and Eq.~\eqref{eq:cond2}
+holds with high probability.
+% satisfied with high probability. 
+% Indeed, let
+% The basis of this proof is Theorem 6 from \citeauthor{jmlr-v28-wang13}, which states that the
+% subspace detection property holds if the noise in $\sqrt{n}\hat{V}$
+% as an estimate for $\sqrt{n} V$ is small enough and that the inradius
+% of the $\hat{V}^{(k)}$ are greater 
+% small enough and the
+% subspace inradius is greater than the subspace incoherence for each
+% community \(k\).
+ % , let \(v_{-i}^{(k)}\) be the matrix \(V^{(k)}\) with the
+% \(i\)\textsuperscript{th} row removed. Then 
+
+{\bf Verifying Eq.~\eqref{eq:cond1}}. If $n$ is sufficiently large then
+there are enough vertices in each community $k$ so that
+$\mathrm{span}(V_{-i}^{(k)}) = \mathcal{S}^{(k)}$ for all $i$ and hence
+% spans its corresponding subspace (Theorem
+% \ref{theorem2}). 
+% We therefore have, for sufficiently large $n$, that 
+\(r^{(k)} = \min_{i} r(V_{-i}^{(k)}) > 0\) for
+all $k = 1,2,\dots,K$. % Eq.~\eqref{eq:cond1} then follows from the fact that $\mu^{(k)} = 0$ for all $k = 1,2,\dots,K.$
+% Indeed, from 
+Next, by Theorem \ref{theorem3} we have that the subspaces
   $\{\mathcal{S}^{(1)}, \dots, \mathcal{S}^{(K)}\}$
   are mutually orthogonal, i.e., $v^{\top} w = 0$ for all $v \in
   \mathcal{S}^{(k)}$ and $w \in \mathcal{S}^{(\ell)}$ with $k \not =
@@ -1292,54 +1484,37 @@ Then $\forall k$, we have
   $\tilde{z} = \mathbb{P}_{\mathcal{S}^{(k)}} z$ be the projection of
     $z$ onto $\mathcal{S}^{(k)}$. We then have $v^{\top} \tilde{z} =
     0$ for all $v \in V^{(-k)}$. Since $z$ is arbitrary, this implies $\|W^{(k)} v\|_{\infty} = 0$ for all $v
-    \in V^{(-k)}$ and hence $\mu_n^{(k)} = 0$ as desired.
-%   Therefore any vector projected to \(\mathcal{S}^{(k)}\)
-% must be orthogonal to each row of \(V^{(-k)}\) and hence
-%\(W^{(k)} v = 0\) for all $v \in \mathcal{S}^{(-k)}$, as desired.
+    \in V^{(-k)}$ and hence $\mu^{(k)} = 0$ for all $k
+    =1,2,\dots,K$. Therefore $\mu^{(k)} < r^{(k)}$ for all $k =
+    1=2,\dots,K$ as desired.
+
+% Lemma~\ref{lemma2} then implies, with high
+% Combining the above two facts, we have, for sufficiently large, that $n$ \(r^{(k)} > \mu_n^{(k)} = 0\) for all $k = 1,2\dots,K$.
+% where \(\mu_n^{(k)} = \mu(\hat{V}_n^{(k)})\) and \(n\) is large enough
+% such that \(\min\limits_{k, i} \text{rank}(V_{n, -i}^{(k)}) = K\).
+
+{\bf Verifying Eq.~\eqref{eq:cond2}}.
+Let $\delta = \max_{i} \sqrt{n} \|W
+\hat{v}_{i} - v_{i}\|$. Then from Lemma~\ref{lem:technical}, we have
+\(\delta \stackrel{a.s.}{\to} 0\) and hence
+$$\delta < \min_{k} \frac{r_* (r^{(k)} - \mu^{(k)})}{2 + 7 r^{(k)}}$$
+asymptotically almost surely. 
+% \(= \min\limits_k \frac{r_n r_n^{(k)}}{2 + 7 r_n^{(k)}}\) with
+% probability 1.
+
+In summary $\sqrt{n} \hat{V}$ satisfies the subspace detection property
+with probability converging to $1$ as \(n \to \infty\).
 \end{proof}
 
-\begin{lemma}
-\label{lemma3}
-Let $(v_n^{(i)})^\top$ and $(\hat{v}_n^{(i)})^\top$ be the rows of $V_n$ and
-$\hat{V}_n$ respectively. By \citeauthor{rubindelanchy2017statistical},
-
-\begin{equation} \label{eq:delta-conv}
-\delta_n = \max_i \|\hat{v}_n^{(i)} - v_n^{(i)}\| \stackrel{a.s.}{\to} 0
-\end{equation}
-\end{lemma}
-
-\textbf{Proof of Theorem \ref{theorem5}}. The basis of this proof is
-Theorem 6 from \citeauthor{jmlr-v28-wang13}, which states that the
-subspace detection property holds if the noise is small enough and the
-subspace inradius is greater than the subspace incoherence for each
-community \(k\).
-
-Let \(V_{n, -i}^{(k)}\) be \(V_n^{(k)}\) with the
-\(i\)\textsuperscript{th} entry removed. Suppose that for each community
-\(k\), there are enough vertices such that for each \(i\),
-\(V_{n, -i}^{(k)}\) spans its corresponding subspace (Theorem
-\ref{theorem2}). Then
-\(r_n^{(k)} = \min\limits_i r(V_{n, -i}^{(k)}) > 0\). Thus by
-(\ref{eq:mu-conv}), for each \(k\), \(r_n^{(k)} > \mu_n^{(k)} = 0\)
-where \(\mu_n^{(k)} = \mu(\hat{V}_n^{(k)})\) and \(n\) is large enough
-such that \(\min\limits_{k, i} \text{rank}(V_{n, -i}^{(k)}) = K\).
-
-Let \(r_n = \min\limits_k r_n^{(k)}\). By (\ref{eq:delta-conv}),
-\(\delta_n \stackrel{a.s.}{\to} 0\). Then as \(n\to \infty\),
-\(\delta_n < \min\limits_k \frac{r_n (r_n^{(k)} - \mu_n^{(k)})}{2 + 7 r_n^{(k)}}\)
-\(= \min\limits_k \frac{r_n r_n^{(k)}}{2 + 7 r_n^{(k)}}\) with
-probability 1.
-
-Thus the conditions for the subspace detection property from Theorem 6
-from \citeauthor{jmlr-v28-wang13} are satisfied with probability 1 as
-\(n \to \infty\).
-
 \begin{remark}
-Theorem 6 of \citeauthor{jmlr-v28-wang13} assume that each $\|v_n^{(i)}\| = 1$, 
-which scales each $r_n^{(k)} \leq 1$. This is not strictly necessary for 
-the proof of Theorem \ref{theorem5} since each $\mu_n^{(k)} = 0$, so as long 
-as the $k^{th}$ community spans its subspace, $a r_n^{(k)} > 0 = \mu_n^{(k)}$ 
-$\forall a > 0$.
+Theorem 6 of \citeauthor{jmlr-v28-wang13} assumes that each row $v_i$
+of $V$ has unit norm, i.e., $\|v_{i}\| = 1$  for all $i$. This
+assumption has the effect of scaling the $r^{(k)}$ so that $r^{(k)}
+\leq 1$ for all $k = 1,2,\dots,K$. We emphasize that this assumption
+has no effect on the proof of Theorem \ref{theorem5}. Indeed,
+since $\mu^{(k)} = 0$ for all $k$, as long as the rows of $V^{(k)}$
+spans the subspace $S^{(k)}$, then $a r^{(k)} > \mu^{(k)}$ 
+for any scalar $a > 0$. 
 \end{remark}
 
 \textbf{Proof of Theorem \ref{theorem6}}. Let \(P\) be
@@ -1350,7 +1525,7 @@ corresponding to vertices in community $\ell$. We define $A^{(k
   \ell)}$ analogously. Recall that $P^{(k \ell)} = \lambda^{(k \ell)} (\lambda^{(\ell k)})^{\top}$ for all $k, \ell$. We now consider estimation of $P^{(k \ell)}$
 for the cases when $k = \ell$ versus when $k \not = \ell$.
 
-\emph{Case \(k = l\)}. let $P^{(kk)} =
+\emph{Case \(k = l\)}. Let $P^{(kk)} =
 \sigma_{kk}^2 u^{(kk)} (u^{(kk)})^\top$ be the singular value
 decomposition of $P^{(kk)}$. We can then define
 $\tilde{\lambda}^{(kk)} = \sigma_{kk} u^{(kk)}$. 
@@ -1362,72 +1537,91 @@ best rank-one approximation of $A^{(kk)}$. Define
 \(\hat{\lambda}^{(kk)}\) is the adjacency spectral embedding approximation of \(\lambda^{(kk)}\)
 and by Theorem 5 of \citeauthor{rubindelanchy2017statistical}, we have
 %adjacency spectral embedding \(\hat{\lambda}^{(kk)}\) approximates
-$$\|\hat{\lambda}^{(kk)} - \lambda^{(kk)}\|_{\infty} = \frac{(\log n_k)^c}{\sqrt{n_k}}.$$
+$$\|\hat{\lambda}^{(kk)} - \lambda^{(kk)}\|_{\infty} = O\Bigl(\frac{(\log n_k)^c}{\sqrt{n_k}}\Bigr)$$
+with high probability. 
 Here $\|\cdot\|_{\infty}$ denote the $\ell_{\infty}$ norm of a vector.
 
-\emph{Case \(k \neq l\)}. \(P^{(kl)}\) and \(A^{(kl)}\) represent edge
-probabilities and edges between communities \(k\) and \(l\). Note that
-\(P^{(kl)} = (P^{(lk)})^\top\).\\
-By definition, \(P^{(kl)} = \lambda^{(kl)} (\lambda^{(lk)})^\top\). As
-in the \(k = l\) case, we note that the singular value decomposition
-\(P^{(kl)} = \sigma_{kl}^2 u^{(kl)} (v^{(kl)})^\top\) is one-dimensional
-and \(\lambda^{(kl)} = \sigma_{kl} u^{(kl)}\). (We can also note that
-the SVD of \(P^{(lk)} = \sigma_{kl}^2 v^{(kl)} (u^{(kl)})^\top\), i.e.,
-\(\sigma_{kl} = \sigma_{lk}\), \(u^{(kl)} = v^{(lk)}\), and
-\(v^{(kl)} = u^{(lk)}\).)\\
-Now consider the Hermitian dilation
+\emph{Case \(k \neq l\)}. % \(P^{(kl)}\) and \(A^{(kl)}\) represent edge
+% probabilities and edges between communities \(k\) and \(l\). Note that
+% \(P^{(kl)} = (P^{(lk)})^\top\).\\
+% By definition, \(P^{(kl)} = \lambda^{(kl)} (\lambda^{(lk)})^\top\). 
+Let \(P^{(k \ell)} = \sigma_{k \ell}^2 u^{(k \ell)} (v^{(k \ell)})^\top\) and 
+\(P^{(\ell k)} = \sigma_{kl}^2 u^{(\ell k)} (v^{(\ell k)})^\top\)  be the singular
+value decompositions and note that \(\sigma_{k \ell} = \sigma_{\ell
+  k}\), \(u^{(k \ell)} = v^{(\ell k)}\), and
+\(v^{(k \ell)} = u^{(\ell k)}\). 
+Now define \(\lambda^{(k \ell)} = \sigma_{k \ell} u^{(k \ell)}\) and
+\(\lambda^{(\ell k)} = \sigma_{k \ell}
+v^{(k \ell)}\).
 
-\[M^{(kl)} = 2 \begin{bmatrix} 0 & P^{(kl)} \\ P^{(lk)} & 0 \end{bmatrix}\]
+% (We can also note that
+% the SVD of \(P^{(lk)} = \sigma_{kl}^2 v^{(kl)} (u^{(kl)})^\top\), i.e.,
+% \(\sigma_{kl} = \sigma_{lk}\), \(u^{(kl)} = v^{(lk)}\), and
+% \(v^{(kl)} = u^{(lk)}\).)\\
+Next consider the Hermitian dilation
 
-which is a symmetric \((n_k + n_l) \times (n_k + n_l)\) matrix. It can
-be shown that the spectral decomposition of \(M^{(kl)}\) is
+\[M^{(k \ell)} = 2 \begin{bmatrix} 0 & P^{(k \ell)} \\ P^{(\ell k)} & 0 \end{bmatrix}\]
+
+which is a symmetric \((n_k + n_l) \times (n_k + n_l)\) matrix. The
+eigendecomposition of \(M^{(kl)}\) is then
 
 \[M^{(kl)} = 
-\begin{bmatrix} u^{(kl)} & -u^{(kl)} \\ v^{(kl)} & v^{(kl)} \end{bmatrix} \times 
+\begin{bmatrix} u^{(k \ell)} & -u^{(k \ell)} \\ v^{(k \ell)} & v^{(k \ell)} \end{bmatrix} \times 
 \begin{bmatrix} \sigma^2_{kl} & 0 \\ 0 & -\sigma^2_{kl} \end{bmatrix} \times
-\begin{bmatrix} u^{(kl)} & -u^{(kl)} \\ v^{(kl)} & v^{(kl)} \end{bmatrix}^\top\]
-
-Thus treating \(M^{(kl)}\) as the edge probability matrix of a GRDPG, we
-have latent positions in \(\mathbb{R}^2\) given by
-
-\[\begin{bmatrix} 
-  \sigma_{kl} u^{(kl)} & \sigma_{kl} u^{(kl)} \\ 
-  \sigma_{kl} v^{(kl)} & -\sigma_{kl} v^{(kl)} 
+\begin{bmatrix} u^{(k \ell)} & -u^{(k \ell)} \\ v^{(k \ell)} & v^{(k \ell)} \end{bmatrix}^\top\]
+Thus treating \(M^{(k \ell)}\) as the edge probability matrix of a GRDPG, we
+have latent positions in \(\mathbb{R}^2\) given by the $(n_k + n_{\ell}) \times 2$ matrix
+\[\Lambda^{K \ell} = \begin{bmatrix} 
+  \sigma_{k \ell} u^{(k \ell)} & \sigma_{k \ell} u^{(k \ell)} \\ 
+  \sigma_{k \ell} v^{(k \ell)} & -\sigma_{k \ell} v^{(k \ell)} 
 \end{bmatrix} = 
 \begin{bmatrix} 
-  \lambda^{(kl)} & \lambda^{(kl)} \\ 
-  \lambda^{(lk)} & -\lambda^{(lk)} 
-\end{bmatrix}\]
-
+  \lambda^{(k \ell)} & \lambda^{(k \ell)} \\ 
+  \lambda^{( \ell k)} & -\lambda^{( \ell k)} 
+\end{bmatrix}.\]
 Now consider
+\[\hat{M}^{(k \ell)} = \begin{bmatrix} 0 & A^{(k \ell)} \\ A^{(\ell k)} & 0 \end{bmatrix}\]
+% Then \(\hat{M}^{(kl)} = M^{(kl)} + E'\) where
 
-\[\hat{M}^{(kl)} = \begin{bmatrix} 0 & A^{(kl)} \\ A^{(lk)} & 0 \end{bmatrix}\]
-Then \(\hat{M}^{(kl)} = M^{(kl)} + E'\) where
+% \[E' = \begin{bmatrix} 0 & E \\ E^\top & 0 \end{bmatrix}\]
 
-\[E' = \begin{bmatrix} 0 & E \\ E^\top & 0 \end{bmatrix}\]
-
-and \(E\) is the \(n_k \times n_l\) matrix of independent noise (to
-generate the Bernoulli entries in \(A^{(kl)}\).\\
-Then \(\hat{M}^{(kl)}\) is an adjacency matrix drawn from \(M^{(kl)}\),
-so its adjacency spectral embedding, given by
-
-\[\begin{bmatrix} 
-  \hat{\lambda}^{(kl)} & \hat{\lambda}^{(kl)} \\ 
-  \hat{\lambda}^{(lk)} & -\hat{\lambda}^{(lk)} 
+% and \(E\) is the \(n_k \times n_l\) matrix of independent noise (to
+% generate the Bernoulli entries in \(A^{(kl)}\).\\
+We can then view \(\hat{M}^{(kl)}\) as an adjacency matrix drawn from
+the edge probabilities matrix \(M^{(kl)}\). Now suppose that the adjacency spectral
+embedding of $\hat{M}^{(k \ell)}$ is represented as the $(n_k +
+n_{\ell}) \times 2$ matrix
+\[\hat{\Lambda}^{(k \ell)} = \begin{bmatrix} 
+  \hat{\lambda}^{(k \ell)} & \hat{\lambda}^{(k \ell)} \\ 
+  \hat{\lambda}^{(\ell k)} & -\hat{\lambda}^{(\ell k)} 
 \end{bmatrix}\]
-
-where each \(\hat{\lambda}^{(kl)}\) is defined as in Algorithm 3,
-approximates the latent positions of \(M^{(kl)}\) up to indefinite
-orthogonal transformation by the rate given in Theorem 5 of
-\citeauthor{rubindelanchy2017statistical}.\\
-In this case, the indefinite orthogonal transformation \(W_*\) in the
-GRDPG result \cite{rubindelanchy2017statistical} is of the form
-\(U^\top \hat{U}\). The eigenvalues of \(M\) are distinct since the
-signature for this GRDPG is \((1, 1)\), and \(U^\top \hat{U}\) is block
-diagonal, resulting in \(W_* \stackrel{a.s.}{\to} I\). Therefore, the
-adjacency spectral embedding of \(\hat{M}^{(kl)}\) is a direct
-estimation of the specific latent positions outlined for \(M^{(kl)}\),
-up to sign flip.
-
-
+where each \(\hat{\lambda}^{(kl)}\) is defined as in Algorithm 3. Then
+by Theorem 5 of \citeauthor{rubindelanchy2017statistical}, there
+exists an indefinite orthogonal transformation $W^{*}$ such that,  with
+high probability,
+$$\max_{i} |W^{*} \hat{\Lambda}_{i}^{(k \ell)} - \Lambda_{i}^{(k \ell)} \| =
+O\Bigl(\frac{(\log (n_k + n_{\ell}))^c}{\sqrt{n_k + n_{\ell}}}\Bigr)$$
+with high probability. Here $\Lambda_{i}^{(k \ell)}$ and
+$\hat{\Lambda}_i^{(k \ell)}$ denote the $i$th rows of $\Lambda^{(k
+  \ell)}$ and $\hat{\Lambda}^{(k \ell)}$, respectively. 
+% approximates the latent positions of \(M^{(kl)}\) up to indefinite
+% orthogonal transformation by the rate given in Theorem 5 of
+% \citeauthor{rubindelanchy2017statistical}.\\
+Furthermore, by looking at the proof of Theorem~5 in
+\cite{rubindelanchy2017statistical}, we see that $W^{*}$ is also
+blocks diagonal with $2$ blocks where the positive eigenvalues of $M^{(k \ell)}$
+forming a block and the negative eigenvalues of $M^{(k \ell)}$ forming
+the remaining block. % \(U^\top \hat{U}\). 
+Since $M^{(k \ell)}$ has one positive eigenvalue and one negative
+eigenvalue, we see that $W^{*}$ is necessarily of the form $W^{*}
+= \Bigl[\begin{smallmatrix} 1 & 0 \\ 0 & - 1\end{smallmatrix}\Bigr]$
+% \((1, 1)\), and \(U^\top \hat{U}\) is block
+% diagonal, resulting in \(W_* \stackrel{a.s.}{\to} I\). 
+Using this form for $W^{*}$, we obtain
+$$\max\{\|\hat{\lambda}^{(k \ell)} - \lambda^{(k \ell)}\|_{\infty},
+\|\hat{\lambda}^{(\ell k)} - \lambda^{(\ell k)}\|_{\infty}\}  =
+O\Bigl(\frac{(\log (n_k + n_{\ell}))^c}{\sqrt{n_k + n_{\ell}}}\Bigr)$$
+with high probability. Combining this bound with the bound for
+$\|\hat{\lambda}^{(kk)} - \lambda^{(kk)}\|_{\infty}$ given above
+yields Eq.~\eqref{eq:thm6} in Theorem~\ref{theorem6}. 
 \end{document}
