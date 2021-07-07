@@ -68,13 +68,13 @@
 \usepackage{float}
 \usepackage{mathtools}
 \usepackage{natbib}
+\bibliographystyle{abbrvnat}
 \usepackage{parskip}
 \usepackage[linesnumbered,ruled,vlined]{algorithm2e}
 \setcitestyle{numbers,square,comma}
 \usepackage{verbatim}
 \usepackage{amsthm}
 \usepackage{comment}
-\usepackage[]{natbib}
 \bibliographystyle{plainnat}
 \addtolength{\oddsidemargin}{-.5in}%
 \addtolength{\evensidemargin}{-.5in}%
@@ -104,18 +104,18 @@ via simulation.
 
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
-\newcommand{\diag}{\text{diag}}
-\newcommand{\tr}{\text{Tr}}
-\newcommand{\blockdiag}{\text{blockdiag}}
-\newcommand{\indep}{\stackrel{\text{indep}}{\sim}}
-\newcommand{\iid}{\stackrel{\text{iid}}{\sim}}
-\newcommand{\Bernoulli}{\text{Bernoulli}}
-\newcommand{\Betadist}{\text{Beta}}
-\newcommand{\BG}{\text{BernoulliGraph}}
-\newcommand{\PABM}{\text{PABM}}
-\newcommand{\RDPG}{\text{RDPG}}
-\newcommand{\GRDPG}{\text{GRDPG}}
-\newcommand{\Multinomial}{\text{Multinomial}}
+\newcommand{\diag}{\mathrm{diag}}
+\newcommand{\tr}{\mathrm{Tr}}
+\newcommand{\blockdiag}{\mathrm{blockdiag}}
+\newcommand{\indep}{\stackrel{\mathrm{indep}}{\sim}}
+\newcommand{\iid}{\stackrel{\mathrm{iid}}{\sim}}
+\newcommand{\Bernoulli}{\mathrm{Bernoulli}}
+\newcommand{\Betadist}{\mathrm{Beta}}
+\newcommand{\BG}{\mathrm{BernoulliGraph}}
+\newcommand{\PABM}{\mathrm{PABM}}
+\newcommand{\RDPG}{\mathrm{RDPG}}
+\newcommand{\GRDPG}{\mathrm{GRDPG}}
+\newcommand{\Multinomial}{\mathrm{Multinomial}}
 \newtheorem{definition}{Definition}
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}{Lemma}
@@ -280,9 +280,43 @@ U = \begin{bmatrix} 1 & 0 & 0 & 0 \\
 0 & 0 & 1 / \sqrt{2} & - 1 / \sqrt{2} \\
 0 & 1 & 0 & 0 \end{bmatrix},$$
 where the $\{\lambda^{(kl)}\}$ are as defined in Definition 1.
-Then $A \sim \mathrm{GRDPG}_{3, 1}(X U)$ and $B \sim \mathrm{PABM}(\{(\lambda^{(kl)}\})$ are
+Then $A \sim \mathrm{GRDPG}_{3, 1}(X U)$ and $B \sim \mathrm{PABM}(\{\lambda^{(kl)}\}_K)$ are
 identically distributed.
 \end{theorem}
+
+\begin{proof}
+This is given by
+straightforward matrix multiplication. 
+
+\[X U I_{3, 1} U^\top X^\top =
+\begin{bmatrix}
+  \lambda^{(11)} (\lambda^{(11)})^\top & \lambda^{(12)} (\lambda^{(21)})^\top \\
+  \lambda^{(21)} (\lambda^{(12)})^\top & \lambda^{(22)} (\lambda^{(22)})^\top
+\end{bmatrix}\]
+\end{proof}
+
+\begin{remark}
+While we can just perform the matrix multiplication to show the
+equivalence, it is more illustrative to look at a few intermediate steps. Note
+that the product of the three inner matrices results in a permutation matrix
+with fixed points at positions $1$ and $4$ and a cycle of order 2 swapping
+positions $2$ and $3$:
+
+$$U I_{3, 1} U^\top = \begin{bmatrix}
+  1 & 0 & 0 & 0 \\
+  0 & 0 & 1 & 0 \\
+  0 & 1 & 0 & 0 \\
+  0 & 0 & 0 & 1
+\end{bmatrix} = \Pi$$
+
+Since $U$ is orthonormal and $I_{3, 1}$ is diagonal, $\Pi = U I_{3, 1} U^\top$
+is a spectral decomposition of this permutation matrix. Note that the two fixed
+points result in eigenvalues of $+1$ with corresponding eigenvectors $e_i$
+where $i = 1, 4$ corresponding to the locations of the fixed points, and the
+cycle of order two results in two eigenvalues $\pm 1$ with corresponding
+eigenvectors $(e_i \pm e_j) / \sqrt{2}$ where $i = 2, j = 3$, pair that is
+swapped.
+\end{remark}
 
 \begin{theorem}[Generalization to $K > 2$]
 \label{theorem2}
@@ -418,7 +452,7 @@ estimation. They were able to show that as the sample size increases,
 the proportion of misclassified community labels (up to permutation)
 goes to 0.
 
-\citet*{noroozi2019estimation} used Sparse Subspace Clustering (SSC) for
+\citet*{noroozi2019estimation} used Sparse Subspace Clustering (SSC) \cite{5206547} for
 community detection in the PABM. SSC is performed by solving an
 optimization problem for each observed point. Given
 \(X \in \mathbb{R}^{n \times d}\) with vectors
@@ -538,6 +572,32 @@ Let $P = V D V^\top$ be the spectral decomposition of the edge probability
 matrix. Let $B = n V V^\top$. Then $B_{ij} = 0$ if vertices $i$ and $j$ are
 from different communities.
 \end{theorem}
+
+\begin{proof}
+By Theorem \ref{theorem2}, \(P = X U I_{p, q} U^\top X^\top\), where
+\(X\) is defined as in Eq.~\eqref{eq:xy}, $p = K(K+1)/2$, and $q = K(K-1)/2$.
+Alternatively we have the eigendecomposition \(P = V D V^\top = V
+|D|^{1/2} I_{p, q} |D|^{1/2} V^\top\) and \(|\cdot|^{1/2}\) is 
+applied entry-wise. Thus for some \(Q \in \mathbb{O}(p, q)\),
+
+\[X U Q = V |D|^{1/2}.\]
+
+Let $R = U Q |D|^{-1/2}$. Then $R$ is {\em invertible} and hence
+
+$$X (X^{\top} X)^{-1} X^{\top} = X R (R^{\top} X^{\top} X R)^{-1}
+R^{\top} X^{\top}.$$
+
+Furthermore $V = XR$ and since $V$ has orthonormal columns, $V^{\top}
+V = I$. Thus,
+
+$$X (X^{\top} X)^{-1} X^{\top} = V (V^{\top} V)^{-1} V^{\top} = V V^{\top}$$.
+
+Again by Theorem \ref{theorem2}, $X$ is block diagonal, with each block 
+corresponding to a community. Then $n X (X^\top X)^{-1} X^\top$ is also block 
+diagonal with each block corresponding to a community, and zeros elsewhere. 
+Thus, $[n V V^\top]_{ij} = [n X (X^\top X)^{-1} X^\top]_{ij} = 0$ if vertices 
+$i$ and $j$ are from different communities.
+\end{proof}
 
 Theorem \ref{theorem3} provides perfect community detection given \(P\).
 Letting \(|B|\) be the affinity matrix for graph \(G\), \(G\) is
@@ -1062,92 +1122,9 @@ methods can be applied for other models, such as the Nested Block Model
 \hypertarget{proofs}{%
 \section{Proofs}\label{proofs}}
 
-\textbf{Proof of Theorem \ref{theorem1}}. This is given by
-straightforward matrix multiplication. It suffices to show that
-
-\[X U I_{3, 1} U^\top X^\top =
-\begin{bmatrix}
-  \lambda^{(11)} (\lambda^{(11)})^\top & \lambda^{(12)} (\lambda^{(21)})^\top \\
-  \lambda^{(21)} (\lambda^{(12)})^\top & \lambda^{(22)} (\lambda^{(22)})^\top
-\end{bmatrix}\]
-
-\begin{remark}
-While we can just perform the matrix multiplication to show the
-equivalence, it is more illustrative to look at a few intermediate steps. Note
-that the product of the three inner matrices results in a permutation matrix
-with fixed points at positions $1$ and $4$ and a cycle of order 2 swapping
-positions $2$ and $3$:
-
-$$U I_{3, 1} U^\top = \begin{bmatrix}
-  1 & 0 & 0 & 0 \\
-  0 & 0 & 1 & 0 \\
-  0 & 1 & 0 & 0 \\
-  0 & 0 & 0 & 1
-\end{bmatrix} = \Pi$$
-
-Since $U$ is orthonormal and $I_{3, 1}$ is diagonal, $\Pi = U I_{3, 1} U^\top$
-is a spectral decomposition of this permutation matrix. Note that the two fixed
-points result in eigenvalues of $+1$ with corresponding eigenvectors $e_i$
-where $i = 1, 4$ corresponding to the locations of the fixed points, and the
-cycle of order two results in two eigenvalues $\pm 1$ with corresponding
-eigenvectors $(e_i \pm e_j) / \sqrt{2}$ where $i = 2, j = 3$, pair that is
-swapped.
-\end{remark}
-
-\begin{lemma}
-\label{lemma1}
-Let $P = V D V^\top$ be the spectral decomposition of the edge probability 
-matrix for a PABM. Then $V V^\top = X (X^\top X)^{-1} X^\top$ where $X$ is 
-defined as in Eq.\eqref{eq:xy}.
-\end{lemma}
-
-\emph{Proof}. By Theorem 2, \(P = X U I_{p, q} U^\top X^\top\), where
-\(X\) is defined as in Eq.~\eqref{eq:xy}), $p = K(K+1)/2$, and $q = K(K-1)/2$. % are given by $p =
-% K(K+1)/2$ and $q = are defined as
-% in equations (\ref{eq:p}) and (\ref{eq:q}). 
-Alternatively we have the eigendecomposition \(P = V D V^\top = V
-|D|^{1/2} I_{p, q} |D|^{1/2} V^\top\) and \(|\cdot|^{1/2}\) is applied entry-wise. Thus for some
-\(Q \in \mathbb{O}(p, q)\),
-\[X U Q = V |D|^{1/2}.\]
-Let $R = U Q |D|^{-1/2}$. Then $R$ is {\em invertible} and hence
-$$X (X^{\top} X)^{-1} X^{\top} = X R (R^{\top} X^{\top} X R)^{-1}
-R^{\top} X^{\top}.$$ 
-Furthermore $V = XR$ and since $V$ has orthonormal columns, $V^{\top}
-V = I$. We thus conclude
-$$X (X^{\top} X)^{-1} X^{\top} = V (V^{\top} V)^{-1} V^{\top} = V V^{\top}$$
-as desired.
-% Therefore, using the fact that \(U U^\top = I\) and \(V^\top V = I\),
-% we have
-% \[(V |D|^{1/2}) ((V |D|^{1/2})^\top (V |D|^{1/2}))^{-1} (V |D|^{1/2})^\top = 
-% (X U Q) ((X U Q)^\top (X U Q))^{-1} (X U Q)^\top.\]
-% The right-hand side becomes
-% \[\begin{split}
-%   (X U Q) ((X U Q)^\top (X U Q))^{-1} (X U Q)^\top & 
-%     = X U Q Q^{-1} U^\top (X^\top X)^{-1} 
-%     U (Q^\top)^{-1} Q^\top U^\top X^\top \\
-%   & = X U U^\top (X^\top X)^{-1} U U^\top X^\top \\
-%   & = X (X^\top X)^{-1} X^\top.
-% \end{split}\]
-% The left-hand side becomes:
-% \[\begin{split}
-%   (V |D|^{1/2}) ((V |D|^{1/2})^\top (V |D|^{1/2}))^{-1} (V |D|^{1/2})^\top & =
-%     V |D|^{1/2} |D|^{-1/2} (V^\top V)^{-1} |D|^{-1/2} |D|^{1/2} V^\top \\
-%   & = V V^\top.
-% \end{split}\]
-
-\textbf{Proof of Theorem \ref{theorem3}}. By Lemma \ref{lemma1},
-\(V V^\top = X (X^\top X)^{-1} X^\top\) where \(X\) is defined as in
-(\ref{eq:xy}). Since \(X\) is block diagonal with each block
-corresponding to one community, \(X (X^\top X)^{-1} X^\top\) is also a
-block diagonal matrix with each block corresponding to a community and
-zeros elsewhere. Let $B = n VV^{\top}$. Then $B_{ij} = 0$ whenever
-vertices $i$ and $j$ belong to different communities.  
-%
-%then the \(ij\)\textsuperscript{th} element of
-%\(n X (X^\top X)^{-1} X^\top = n V V^\top = B\) is 0.
-
-\textbf{Proof of Theorem \ref{theorem4}}. Let \(V_n\) and \(\hat{V}_n\)
-be the $n \times K^2$ matrices whose columns are the eigenvectors of \(P\) and \(A\) corresponding to the
+\begin{proof}[Proof of Theorem \ref{theorem4}]
+Let \(V_n\) and \(\hat{V}_n\)be the $n \times K^2$ matrices 
+whose columns are the eigenvectors of \(P\) and \(A\) corresponding to the
 \(K (K + 1) / 2\) most positive and \(K (K - 1) / 2\) most negative
 eigenvalues, respectively. From Lemma~5 in
 \citeauthor{rubindelanchy2017statistical} we have, for some
@@ -1187,6 +1164,7 @@ V_n\|_{2 \to \infty} \times \|V_n\|_{2 \to \infty}
 Scaling all terms in the above inequality by \(n\), we obtain
 $$|n (\hat{v}_n^{(i)})^\top \hat{v}_n^{(j)}| = O_P \Big( \frac{(\log n)^c}{\sqrt{n \rho_n}} \Big)$$
 as desired.
+\end{proof}
 
 We now provide a proof of Theorem~\ref{theorem5}. We first recall several
 useful definitions for analyzing sparse subspace clustering.
@@ -1199,6 +1177,22 @@ the inradius of the symmetric convex hull of $X$.
 \end{definition}
 
 \begin{definition}[Subspace incoherence property \cite{jmlr-v28-wang13}]
+Let $\nu_i(X, \lambda) = 
+\arg\max_\eta x_i^\top \eta - \frac{1}{2 \lambda} \eta^\top \eta$ 
+subject to $\|X_{-i} \eta\|_\infty \leq 1$. 
+Define the projected dual direction of $X$ to subspace $\mathcal{S}$ as 
+$v_i(X, \lambda, \mathcal{S}) = 
+\frac{\mathbb{P}_{\mathcal{S}}(\nu_i)}{\|\mathbb{P}_{\mathcal{S}}(\nu_i)\|}$.
+
+If $X = \begin{bmatrix} X^{(1)} & \cdots & X^{(K)} \end{bmatrix}^\top$ 
+is a set of points lying near $K$ subspaces $\{S^{(1)}, ..., S^{(K)}\}$ 
+and each $x^{(k)}_i$ has corresponding point $y^{(k)}_i$ which lies exactly on 
+$\mathcal{S}^{(k)}$, let $v_i^{(k)} = v_i(X^{(k)}, \lambda, \mathcal{S}^{(k)})$ 
+and 
+$V^{(k)} = \begin{bmatrix} v_1^{(k)} & \cdots & v_{n_k}^{(k)} \end{bmatrix}^\top$. 
+Then we define $X^{(k)}$ as $\mu_k$-incoherent to $X^{(-k)}$ where 
+
+$$\mu_k = \max_{y \in Y^{(-k)}} \|V^{(k)} y\|_\infty$$
 \end{definition}
 
 \begin{lemma}
@@ -1240,7 +1234,8 @@ $\hat{V}_n$ respectively. By \citeauthor{rubindelanchy2017statistical},
 \end{equation}
 \end{lemma}
 
-\textbf{Proof of Theorem \ref{theorem5}}. The basis of this proof is
+\begin{proof}[Proof of Theorem \ref{theorem5}]
+The basis of this proof is
 Theorem 6 from \citeauthor{jmlr-v28-wang13}, which states that the
 subspace detection property holds if the noise is small enough and the
 subspace inradius is greater than the subspace incoherence for each
@@ -1265,6 +1260,7 @@ probability 1.
 Thus the conditions for the subspace detection property from Theorem 6
 from \citeauthor{jmlr-v28-wang13} are satisfied with probability 1 as
 \(n \to \infty\).
+\end{proof}
 
 \begin{remark}
 Theorem 6 of \citeauthor{jmlr-v28-wang13} assume that each $\|v_n^{(i)}\| = 1$, 
@@ -1274,12 +1270,14 @@ as the $k^{th}$ community spans its subspace, $a r_n^{(k)} > 0 = \mu_n^{(k)}$
 $\forall a > 0$.
 \end{remark}
 
-\textbf{Proof of Theorem \ref{theorem6}}. Let \(P\) be
-organized by community such that \(P^{(k \ell)}\) denote the $n_k \times
-n_{\ell}$ matrix obtained by keeping only the rows of $P$
+\begin{proof}[Proof of Theorem \ref{theorem6}]
+Let \(P\) be organized by community such that \(P^{(k \ell)}\) 
+denote the $n_k \times n_{\ell}$ matrix obtained by keeping only the rows of $P$
 corresponding to vertices in community $k$ and the columns of $P$
-corresponding to vertices in community $\ell$. We define $A^{(k
-  \ell)}$ analogously. Recall that $P^{(k \ell)} = \lambda^{(k \ell)} (\lambda^{(\ell k)})^{\top}$ for all $k, \ell$. We now consider estimation of $P^{(k \ell)}$
+corresponding to vertices in community $\ell$. We define 
+$A^{(k  \ell)}$ analogously. 
+Recall that $P^{(k \ell)} = \lambda^{(k \ell)} (\lambda^{(\ell k)})^{\top}$ 
+for all $k, \ell$. We now consider estimation of $P^{(k \ell)}$
 for the cases when $k = \ell$ versus when $k \not = \ell$.
 
 \emph{Case \(k = l\)}. let $P^{(kk)} =
@@ -1293,8 +1291,9 @@ best rank-one approximation of $A^{(kk)}$. Define
 \(\hat{\lambda}^{(kk)} = \hat{\sigma}_{kk} \hat{u}^{(kk)}\). Then
 \(\hat{\lambda}^{(kk)}\) is the adjacency spectral embedding approximation of \(\lambda^{(kk)}\)
 and by Theorem 5 of \citeauthor{rubindelanchy2017statistical}, we have
-%adjacency spectral embedding \(\hat{\lambda}^{(kk)}\) approximates
-$$\|\hat{\lambda}^{(kk)} - \lambda^{(kk)}\|_{\infty} = \frac{(\log n_k)^c}{\sqrt{n_k}}.$$
+
+$$\|\hat{\lambda}^{(kk)} - \lambda^{(kk)}\|_{\infty} = O_P \bigg( \frac{(\log n_k)^c}{\sqrt{n_k}}\bigg).$$
+
 Here $\|\cdot\|_{\infty}$ denote the $\ell_{\infty}$ norm of a vector.
 
 \emph{Case \(k \neq l\)}. \(P^{(kl)}\) and \(A^{(kl)}\) represent edge
@@ -1360,8 +1359,10 @@ diagonal, resulting in \(W_* \stackrel{a.s.}{\to} I\). Therefore, the
 adjacency spectral embedding of \(\hat{M}^{(kl)}\) is a direct
 estimation of the specific latent positions outlined for \(M^{(kl)}\),
 up to sign flip.
+\end{proof}
 
 \renewcommand\refname{References}
-  \bibliography{misc.bib}
+
+\bibliography{misc.bib}
 
 \end{document}
