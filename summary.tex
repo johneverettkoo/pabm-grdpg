@@ -203,7 +203,8 @@ Graph}\label{the-popularity-adjusted-block-model-and-the-generalized-random-dot-
 \begin{definition}[Popularity Adjusted Block Model]
 \label{pabm}
 Let $P \in [0, 1]^{n \times n}$ be a symmetric edge probability matrix for a
-graph $G = (V, E)$ with adjacency matrix $A$ such that $A \sim \mathrm{Bernoulli}(P)$.
+graph $G = (V, E)$ with adjacency matrix $A$ 
+such that $A \sim \mathrm{Bernoulli}(P)$.
 Let each vertex have a community label between $1$ and $K$.
 Then $G$ is drawn from a Popularity Adjusted Block Model if
 each vertex has $K$ popularity parameters that describe its affinity
@@ -228,9 +229,9 @@ $\{\lambda^{(st)}\}_K$ if its adjacency matrix $A$
 satisfies $A \sim \mathrm{Bernoulli}(P)$.
 \end{definition}
 
-We will use the notation \(A \sim \PABM(\{\lambda^{(kl)}\}_K)\) to denote
+We will use the notation \(A \sim \PABM(\{\lambda^{(k \ell)}\}_K)\) to denote
 a random adjacency matrix \(A\) drawn from a PABM with parameters
-\(\lambda^{(kl)}\) consisting of \(K\) underlying communities.
+\(\lambda^{(k \ell)}\) consisting of \(K\) underlying communities.
 
 \begin{definition}[Generalized Random Dot Product Graph]
 \label{grdpg}
@@ -242,12 +243,24 @@ If $\exists X \in \mathbb{R}^{n \times d}$ such that
 \end{equation}
 
 for some $d, p, q \in \mathbb{N}$ and $p + q = d$, then
-$G$ is drawn from the Generalized Random Dot Product Graph with latent positions $x_1, ..., x_n \in \mathbb{R}^d$ and signature $(p, q)$.
+$G$ is drawn from the Generalized Random Dot Product Graph 
+with latent positions $x_1, ..., x_n \in \mathbb{R}^d$ and signature $(p, q)$.
 \end{definition}
 
 We will use the notation \(A \sim \GRDPG_{p,q}(X)\) to denote a random
 adjacency matrix \(A\) drawn from latent positions \(X\) and signature
-\((p, q)\). If instead of fixed latent positions, they are drawn $X_1, ..., X_n \iid F$, we denote the GRDPG as $(A, X) \sim \GRDPG_{p,q}(F, n)$.
+\((p, q)\). If instead of fixed latent positions, 
+they are drawn $X_1, ..., X_n \iid F$, 
+we denote the GRDPG as $(A, X) \sim \GRDPG_{p,q}(F, n)$.
+
+\begin{remark}
+We can use Adjacency Spectral Embedding (ASE) 
+\cite{rubindelanchy2017statistical} to recover the latent vectors of a GRDPG. 
+This procedure consists of taking the spectral decomposition of $A$ 
+(or $P$ if available) and choosing the $p$ most positive and $q$ most negative
+eigenvalues and their corresponding eigenvectors 
+to construct the embedding $\hat{Z} = V |D|^{1/2}$. 
+\end{remark}
 
 \begin{definition}[Indefinite Orthogonal Group]
 The indefinite orthogonal group with signature $(p, q)$ is
@@ -256,10 +269,10 @@ denoted as $\mathbb{O}(p, q)$.
 \end{definition}
 
 \begin{remark}
-Like the RDPG, the latent positions of a GRDPG are not unique
+The latent vectors that produce $X I_{p,q} X^\top = P$ are not unique
 \cite{rubindelanchy2017statistical}.
-More specifically, if $P_{ij} = x_i^\top I_{p, q} x_j$, then we also have for any
-$Q \in \mathbb{O}(p, q)$,
+More specifically, if $P_{ij} = x_i^\top I_{p, q} x_j$, 
+then we also have for any$Q \in \mathbb{O}(p, q)$,
 $(Q x_i)^\top I_{p, q} (Q x_j) = x_i^\top (Q^\top I_{p, q} Q) x_j =
 x_i^\top I_{p, q} x_j = P_{ij}$.
 Unlike in the RDPG case, transforming the latent positions via multiplication
@@ -281,8 +294,9 @@ U = \begin{bmatrix} 1 & 0 & 0 & 0 \\
 0 & 0 & 1 / \sqrt{2} & 1 / \sqrt{2} \\
 0 & 0 & 1 / \sqrt{2} & - 1 / \sqrt{2} \\
 0 & 1 & 0 & 0 \end{bmatrix},$$
-where the $\{\lambda^{(kl)}\}$ are as defined in Definition 1.
-Then $A \sim \mathrm{GRDPG}_{3, 1}(X U)$ and $B \sim \mathrm{PABM}(\{(\lambda^{(kl)}\})$ are
+where the $\{\lambda^{(k \ell)}\}$ are as defined in Definition 1.
+Then $A \sim \mathrm{GRDPG}_{3, 1}(X U)$ and 
+$B \sim \mathrm{PABM}(\{(\lambda^{(k \ell)}\}_K)$ are
 identically distributed.
 \end{proposition}
 
@@ -308,18 +322,15 @@ is also an eigendecomposition of $\Pi$ where the fixed
 points of $\Pi$ are mapped to the eigenvectors $e_1$ and $e_4$
 while the cycles of order two are mapped to the eigenvectors  
 $\tfrac{1}{\sqrt{2}}(e_{2} + e_3)$ and $\tfrac{1}{\sqrt{2}}(e_{2} -
-e_3)$; here $e_i$ denote the $i$th basis vector in $\mathbb{R}^{4}$. %  and $ eigenvalues $\pm 1$ with corresponding
-% eigenvectors $(e_i \pm e_j) / \sqrt{2}$ where $i = 2, j = 3$, pair that is
-% swapped.
+e_3)$; here $e_i$ denote the $i^\mathrm{th}$ basis vector in $\mathbb{R}^{4}$.
 \end{proof}
-% The form for the matrix $\Pi$ used in the proof of
-% Proposition~\ref{theorem1} can 
+
 \begin{theorem}[Generalization to $K > 2$]
 \label{theorem2}
 Let $A \sim \mathrm{PABM}(\{\lambda^{(k \ell)}\})$ be an instance of a
 PABM with $K \geq 1$ blocks and latent vectors $\{\lambda^{(k \ell)}
 \colon 1 \leq k \leq K, 1 \leq \ell \leq K\}$. Then there exists a block diagonal matrix
-$X \in \mathbb{R}^{n \times K^2}$ defined by the $\{\lambda^{(kl)}\}$ and a $K^2 \times
+$X \in \mathbb{R}^{n \times K^2}$ defined by the $\{\lambda^{(k \ell)}\}$ and a $K^2 \times
 K^2$ {\em fixed} orthonormal matrix $U$ such 
 that $A \sim \mathrm{GRDPG}_{K (K+1) / 2, K (K-1) / 2}(XU)$.
 \end{theorem}
@@ -449,7 +460,7 @@ Two inference objectives arise from the PABM:
 \item
   Community membership identification (up to permutation).
 \item
-  Parameter estimation (estimating \(\lambda^{(kl)}\)'s).
+  Parameter estimation (estimating \(\lambda^{(k \ell)}\)'s).
 \end{enumerate}
 
 In our methods, we assume that \(K\), the number of communities, is
@@ -465,10 +476,10 @@ estimation. They were able to show that as the sample size increases,
 the proportion of misclassified community labels (up to permutation)
 goes to 0.
 
-\citet*{noroozi2019estimation} used Sparse Subspace Clustering (SSC) for
-community detection in the PABM. SSC is performed by solving an
-optimization problem for each observed point. Given
-\(X \in \mathbb{R}^{n \times d}\) with vectors
+\citet*{noroozi2019estimation} used Sparse Subspace Clustering (SSC) 
+\cite{5206547} for community detection in the PABM. 
+The SSC algorithm can be described as follows: 
+Given \(X \in \mathbb{R}^{n \times d}\) with vectors
 \(x_i^\top \in \mathbb{R}^d\) as rows of \(X\), the optimization problem
 \(c_i = \arg\min_{c} ||c||_1\) subject to \(x_i = X c\) and
 \(c^{(i)} = 0\) is solved for each \(i = 1, ..., n\). The solutions are
@@ -477,9 +488,9 @@ collected collected into matrix
 construct an affinity matrix \(B = |C| + |C^\top|\). If each \(x_i\) lie
 perfectly on one of \(K\) subspaces, \(B\) describes an undirected graph
 consisting of \(K\) disjoint subgraphs, i.e., \(B_{ij} = 0\) if
-\(x_i, x_j\) are in different subspaces. If \(X\) instead represents
+\(x_i, x_j\) lie on different subspaces. If \(X\) instead represents
 points near \(K\) subspaces with some noise, a final graph partitioning
-step may be performed (e.g., edge thresholding or spectral clustering).
+step may be required (e.g., edge thresholding or spectral clustering).
 
 In practice, SSC is often performed by solving the LASSO problems
 
@@ -745,49 +756,50 @@ probability at least $1 - \epsilon$.
 For any edge probability matrix \(P\) for the PABM such that the rows
 and columns are organized by community, the \(kl\)\textsuperscript{th}
 block is an outer product of two vectors, i.e.,
-\(P^{(kl)} = \lambda^{(kl)} (\lambda^{(lk)})^\top\). Therefore, given
-\(P^{(kl)}\), \(\lambda^{(kl)}\) and \(\lambda^{(lk)}\) are solvable
+\(P^{(k \ell)} = \lambda^{(k \ell)} (\lambda^{(\ell k)})^\top\). Therefore, given
+\(P^{(k \ell)}\), \(\lambda^{(k \ell)}\) and \(\lambda^{(\ell k)}\) are solvable
 up to multiplicative constant using singular value
 decomposition. More specifically, 
-let \(P^{(kl)} = (\sigma^{(kl)})^2 u^{(kl)} (v^{(kl)})^\top\)
-be the singular value decomposition of \(P^{(kl)}\).
-\(u^{(kl)} \in \mathbb{R}^{n_k}\) and 
-\(v^{(kl)} \in \mathbb{R}^{n_l}\) are vectors
-and \(\sigma^{(kl)}\) is a scalar. Then \(\lambda^{(kl)} = s_1 u^{(kl)}\)
-and \(\lambda^{(lk)} = s_2 v^{(kl)}\) 
-for unidentifiable $s_1 s_2 = (\sigma^{(kl)})^2$.
+let \(P^{(k \ell)} = (\sigma^{(k \ell)})^2 u^{(k \ell)} (v^{(k \ell)})^\top\)
+be the singular value decomposition of \(P^{(k \ell)}\).
+\(u^{(k \ell)} \in \mathbb{R}^{n_k}\) and 
+\(v^{(k \ell)} \in \mathbb{R}^{n_\ell}\) are vectors
+and \(\sigma^{(k \ell)}\) is a scalar. 
+Then \(\lambda^{(k \ell)} = s_1 u^{(k \ell)}\)
+and \(\lambda^{(\ell k)} = s_2 v^{(k \ell)}\) 
+for unidentifiable $s_1 s_2 = (\sigma^{(k \ell)})^2$.
 Given the adjacency matrix \(A\)
 instead of edge probability matrix \(P\), we can simply use plug-in
-estimators by taking the SVD of each $A^{(kl)}$. 
-Since each $\lambda^{(kl)}$ is not strictly identifiable,
-we instead estimate each $\tilde{\lambda}^{(kl)} = \sigma^{(kl)} u^{(kl)}$. 
+estimators by taking the SVD of each $A^{(k \ell)}$. 
+Since each $\lambda^{(k \ell)}$ is not strictly identifiable,
+we instead estimate each $\tilde{\lambda}^{(k \ell)} = \sigma^{(k \ell)} u^{(k \ell)}$. 
 
 \begin{algorithm}[t]
   \DontPrintSemicolon
   \SetAlgoLined
   \caption{PABM parameter estimation.}
   \KwData{Adjacency matrix $A$, community assignments $1, ..., K$}
-  \KwResult{PABM parameter estimates $\{\hat{\lambda}^{(kl)}\}_K$.}
+  \KwResult{PABM parameter estimates $\{\hat{\lambda}^{(k \ell)}\}_K$.}
   Arrange the rows and columns of $A$ by community such that each 
-  $A^{(kl)}$ block consists of estimated edge probabilities between 
+  $A^{(k \ell)}$ block consists of estimated edge probabilities between 
   communities $k$ and $l$.\;
   \For {$k, l = 1, ..., K$, $k \leq l$} {
-    Compute $A^{(kl)} = U \Sigma V^\top$, the SVD of the $kl^{th}$ 
+    Compute $A^{(k \ell)} = U \Sigma V^\top$, the SVD of the $kl^{th}$ 
     block.\;
-    Assign $u^{(kl)}$ and $v^{(kl)}$ as the first columns of $U$ and $V$. 
-    Assign $(\sigma^{(kl)})^2 \leftarrow \Sigma_{11}$.\;
-    Assign $\hat{\lambda}^{(kl)} \leftarrow \pm \sigma^{(kl)} u^{(kl)}$ and 
-    $\hat{\lambda}^{(lk)} \leftarrow \pm \sigma^{(kl)} v^{(kl)}$.
+    Assign $u^{(k \ell)}$ and $v^{(k \ell)}$ as the first columns of $U$ and $V$. 
+    Assign $(\sigma^{(k \ell)})^2 \leftarrow \Sigma_{11}$.\;
+    Assign $\hat{\lambda}^{(k \ell)} \leftarrow \pm \sigma^{(k \ell)} u^{(k \ell)}$ and 
+    $\hat{\lambda}^{(\ell k)} \leftarrow \pm \sigma^{(k \ell)} v^{(k \ell)}$.
   }
 \end{algorithm}
 
 \begin{theorem}
 \label{theorem6}
-Let each $\tilde{\lambda}^{(kl)}$ be the popularity vector derived from its corresponding $P^{(kl)}$, and let $\hat{\lambda}^{(kl)}$ be its estimate from $A^{(kl)}$ (Alg. 3). Then if $n \rho_n = \omega \big( (\log n)^{4 c} \big)$,
+Let each $\tilde{\lambda}^{(k \ell)}$ be the popularity vector derived from its corresponding $P^{(k \ell)}$, and let $\hat{\lambda}^{(k \ell)}$ be its estimate from $A^{(k \ell)}$ (Alg. 3). Then if $n \rho_n = \omega \big( (\log n)^{4 c} \big)$,
 
 \begin{equation} \label{eq:thm6}
 \max_{k, l \in \{1, ..., K\}} 
-\|\hat{\lambda}^{(kl)} - \tilde{\lambda}^{(kl)}\|_{\infty} = 
+\|\hat{\lambda}^{(k \ell)} - \tilde{\lambda}^{(k \ell)}\|_{\infty} = 
 O\bigg(\frac{(\log n_k)^c}{\sqrt{n_k}} \bigg)
 \end{equation}
 
@@ -798,7 +810,7 @@ with high probability.
 \section{Simulated Examples}\label{simulated-examples}}
 
 For each simulation, community labels are drawn from a multinomial
-distribution, the popularity vectors \(\{\lambda^{(kl)}\}_K\) are drawn
+distribution, the popularity vectors \(\{\lambda^{(k \ell)}\}_K\) are drawn
 from two types of joint distributions depending on whether \(k = l\),
 the edge probability matrix \(P\) is constructed using the popularity
 vectors, and finally an unweighted and undirected adjacency matrix \(A\)
@@ -807,7 +819,7 @@ method is compared against SSC \cite{noroozi2019estimation,soltanolkotabi2014}
 and MM \cite{igraph, 307cbeb9b1be48299388437423d94bf1}. 
 True community labels are used
 with Algorithm 3 to estimate the popularity vectors
-\(\{\lambda^{(kl)}\}_K\), and this method is then compared against an
+\(\{\lambda^{(k \ell)}\}_K\), and this method is then compared against an
 MLE-based estimator described by \citet{noroozi2019estimation} and
 \citet{307cbeb9b1be48299388437423d94bf1}.
 
@@ -843,29 +855,29 @@ of clustering function \(\hat{\sigma}\).
 We also define two types of parameter estimation error. 
 First, we estimate the popularity vectors directly and compute the RMSE. 
 In this case, the "true" popularity vectors are derived from 
-taking the SVD of each edge probability block $P^{(kl)}$ 
+taking the SVD of each edge probability block $P^{(k \ell)}$ 
 to avoid the unidentifiable multiplicative constants. 
 
-\[\text{RMSE}(\{\hat{\lambda}^{(kl)}\}_K, \{\lambda^{(kl)}\}_K) = 
+\[\text{RMSE}(\{\hat{\lambda}^{(k \ell)}\}_K, \{\lambda^{(k \ell)}\}_K) = 
 \sqrt{\frac{1}{n} \sum_{k < l} \min_{s = \pm 1} 
-\|s \hat{\lambda}^{(kl)} - \lambda^{(kl)} \|_2^2}\]
+\|s \hat{\lambda}^{(k \ell)} - \lambda^{(k \ell)} \|_2^2}\]
 
 We can also avoid the unidentifiable multiplicative constant more directly 
 by reconstructing each 
-$\hat{P}^{(kl)} = \hat{\lambda}^{(kl)} (\hat{\lambda}^{(lk)})^\top$, 
+$\hat{P}^{(k \ell)} = \hat{\lambda}^{(k \ell)} (\hat{\lambda}^{(\ell k)})^\top$, 
 which we use to define another parameter estimation error. 
 
 \[\text{RMSE}(\hat{P}, P) =
-\sum_{k,l} \sqrt{\frac{1}{n_k n_l} \|P^{(kl)} - \hat{P}^{(kl)}\|_F^2}\]
+\sum_{k,l} \sqrt{\frac{1}{n_k n_\ell} \|P^{(k \ell)} - \hat{P}^{(k \ell)}\|_F^2}\]
 
 \hypertarget{balanced-communities}{%
 \subsection{Balanced communities}\label{balanced-communities}}
 
 In each simulation, community labels \(z_1, ..., z_n\) were drawn from a
 multinomial distribution with mixture parameters
-\(\{\alpha_1, ..., \alpha_K\}\), then \(\{\lambda^{(kl)}\}_K\) according
+\(\{\alpha_1, ..., \alpha_K\}\), then \(\{\lambda^{(k \ell)}\}_K\) according
 to the drawn community labels, \(P\) was constructed using the drawn
-\(\{\lambda^{(kl)}\}_K\), and \(A\) was drawn from \(P\) by
+\(\{\lambda^{(k \ell)}\}_K\), and \(A\) was drawn from \(P\) by
 \(A_{ij} \indep \Bernoulli(P_{ij})\). Each simulation has
 a unique edge probability matrix \(P\).
 
@@ -888,7 +900,7 @@ For these examples, we set the following parameters:
   \(\lambda^{(kk)} \stackrel{\text{iid}}{\sim} \Betadist(2, 1)\)
 \item
   Between-group popularities
-  \(\lambda^{(kl)} \stackrel{\text{iid}}{\sim} \Betadist(1, 2)\) for
+  \(\lambda^{(k \ell)} \stackrel{\text{iid}}{\sim} \Betadist(1, 2)\) for
   \(k \neq l\)
 \end{itemize}
 
@@ -981,7 +993,7 @@ parameters:
   \(\lambda^{(kk)} \stackrel{\text{iid}}{\sim} \Betadist(2, 1)\)
 \item
   Between-group popularities
-  \(\lambda^{(kl)} \stackrel{\text{iid}}{\sim} \Betadist(1, 2)\) for
+  \(\lambda^{(k \ell)} \stackrel{\text{iid}}{\sim} \Betadist(1, 2)\) for
   \(k \neq l\)
 \end{itemize}
 
@@ -1189,7 +1201,7 @@ $V_n$. See \cite{cape_biometrika} and
 \cite[Lemma~5]{rubindelanchy2017statistical} for a proof. 
 \begin{lemma}
   \label{lem:technical}
-Let $A \sim \mathrm{PABM}(\{\lambda^{(k \ell)}\}_{K})$ be a $K$-blocks
+Let $A \sim \mathrm{PABM}(\{\lambda^{(k \ell \ell)}\}_{K})$ be a $K$-blocks
 PABM graph on $n$ vertices and let \(V_n\) and \(\hat{V}_n\)
 be the $n \times K^2$ matrices whose columns are the eigenvectors of \(P\) and \(A\) corresponding to the
 $K^2$ largest eigenvalues in modulus, respectively.
@@ -1561,10 +1573,10 @@ Next consider the Hermitian dilation
 
 \[M^{(k \ell)} = 2 \begin{bmatrix} 0 & P^{(k \ell)} \\ P^{(\ell k)} & 0 \end{bmatrix}\]
 
-which is a symmetric \((n_k + n_l) \times (n_k + n_l)\) matrix. The
-eigendecomposition of \(M^{(kl)}\) is then
+which is a symmetric \((n_k + n_\ell) \times (n_k + n_\ell)\) matrix. The
+eigendecomposition of \(M^{(k \ell)}\) is then
 
-\[M^{(kl)} = 
+\[M^{(k \ell)} = 
 \begin{bmatrix} u^{(k \ell)} & -u^{(k \ell)} \\ v^{(k \ell)} & v^{(k \ell)} \end{bmatrix} \times 
 \begin{bmatrix} \sigma^2_{kl} & 0 \\ 0 & -\sigma^2_{kl} \end{bmatrix} \times
 \begin{bmatrix} u^{(k \ell)} & -u^{(k \ell)} \\ v^{(k \ell)} & v^{(k \ell)} \end{bmatrix}^\top\]
@@ -1584,17 +1596,17 @@ Now consider
 
 % \[E' = \begin{bmatrix} 0 & E \\ E^\top & 0 \end{bmatrix}\]
 
-% and \(E\) is the \(n_k \times n_l\) matrix of independent noise (to
+% and \(E\) is the \(n_k \times n_\ell\) matrix of independent noise (to
 % generate the Bernoulli entries in \(A^{(kl)}\).\\
-We can then view \(\hat{M}^{(kl)}\) as an adjacency matrix drawn from
-the edge probabilities matrix \(M^{(kl)}\). Now suppose that the adjacency spectral
+We can then view \(\hat{M}^{(k \ell)}\) as an adjacency matrix drawn from
+the edge probabilities matrix \(M^{(k \ell)}\). Now suppose that the adjacency spectral
 embedding of $\hat{M}^{(k \ell)}$ is represented as the $(n_k +
 n_{\ell}) \times 2$ matrix
 \[\hat{\Lambda}^{(k \ell)} = \begin{bmatrix} 
   \hat{\lambda}^{(k \ell)} & \hat{\lambda}^{(k \ell)} \\ 
   \hat{\lambda}^{(\ell k)} & -\hat{\lambda}^{(\ell k)} 
 \end{bmatrix}\]
-where each \(\hat{\lambda}^{(kl)}\) is defined as in Algorithm 3. Then
+where each \(\hat{\lambda}^{(k \ell)}\) is defined as in Algorithm 3. Then
 by Theorem 5 of \citet{rubindelanchy2017statistical}, there
 exists an indefinite orthogonal transformation $W^{*}$ such that,  with
 high probability,
