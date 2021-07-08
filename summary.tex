@@ -811,17 +811,17 @@ with high probability.
 
 For each simulation, community labels are drawn from a multinomial
 distribution, the popularity vectors \(\{\lambda^{(k \ell)}\}_K\) are drawn
-from two types of joint distributions depending on whether \(k = l\),
+from two types of joint distributions depending on whether \(k = \ell\),
 the edge probability matrix \(P\) is constructed using the popularity
-vectors, and finally an unweighted and undirected adjacency matrix \(A\)
+vectors, and finally the adjacency matrix \(A\)
 is drawn from \(P\). OSC is then used for community detection, and this
 method is compared against SSC \cite{noroozi2019estimation,soltanolkotabi2014}
 and MM \cite{igraph, 307cbeb9b1be48299388437423d94bf1}. 
 True community labels are used
 with Algorithm 3 to estimate the popularity vectors
 \(\{\lambda^{(k \ell)}\}_K\), and this method is then compared against an
-MLE-based estimator described by \citet{noroozi2019estimation} and
-\citet{307cbeb9b1be48299388437423d94bf1}.
+MLE-based estimator described in \cite{noroozi2019estimation} and
+\cite{307cbeb9b1be48299388437423d94bf1}.
 
 Modularity Maximization is NP-hard, so
 \citet{307cbeb9b1be48299388437423d94bf1} used the Extreme Points
@@ -837,7 +837,7 @@ Two implementations of SSC are shown here. The first method, denoted as
 SSC-A, treats the columns of the adjacency matrix \(A\) as points in
 \(\mathbb{R}^n\), as described in \citet{noroozi2019estimation}.
 The second method, denoted as SSC-ASE, first embeds \(A\) and then
-performs SSC on the embedding, as described in algorithm 2. The sparsity
+performs SSC on the embedding, as described in Algorithm 2. The sparsity
 parameter \(\lambda\) was chosen via a preliminary cross-validation
 experiment. For the final clustering step, a Gaussian Mixture Model was
 fit on the normalized Laplacian eigenmap of the affinity matrix \(B\).
@@ -877,9 +877,7 @@ In each simulation, community labels \(z_1, ..., z_n\) were drawn from a
 multinomial distribution with mixture parameters
 \(\{\alpha_1, ..., \alpha_K\}\), then \(\{\lambda^{(k \ell)}\}_K\) according
 to the drawn community labels, \(P\) was constructed using the drawn
-\(\{\lambda^{(k \ell)}\}_K\), and \(A\) was drawn from \(P\) by
-\(A_{ij} \indep \Bernoulli(P_{ij})\). Each simulation has
-a unique edge probability matrix \(P\).
+\(\{\lambda^{(k \ell)}\}_K\), and \(A\) was drawn from \(P\).
 
 For these examples, we set the following parameters:
 
@@ -930,12 +928,17 @@ Fig \ref{fig:clust_err_ct_sim} shows OSC's community detection error
 going to 0 for large \(n\). SSC on both the embedding and on the
 adjacency matrix produces similar results for \(K > 2\). Weaker
 performance of SSC for \(K = 2\) can be attributed to the final spectral
-clustering step of the affinity matrix. A GMM was fit to the Laplacian
-eigenmap, but visual inspection suggests that the communities are not
-distributed as a mixture of Gaussians in the eigenmap. While the
-subspace detection property is guaranteed for large \(n\), in our
-simulations, setting a large enough sparsity parameter for SSC resulted
-in more than \(K\) disconnected subgraphs.
+clustering step of the affinity matrix. 
+While the subspace detection property is guaranteed for large \(n\), in our
+simulations, setting the sparsity parameter to the required value resulted
+in more than \(K\) disconnected subgraphs. 
+We instead chose a smaller sparsity parameter, 
+necessitating this final clustering step. 
+A GMM was fit to the normalized Laplacian eigenmap of $B$,
+but visual inspection suggests that the communities are not
+distributed as a mixture of Gaussians in the eigenmap. 
+A different choice of mixture distribution may result in better performance. 
+
 
 \begin{figure}[H]
 
@@ -961,6 +964,7 @@ error decaying at rate approximately \(n^{-1/2}\).
 \end{figure}
 
 We observe similar behavior when comparing errors in the edge probability blocks. 
+Both algorithms perform similarly with $n^{-1/2}$ convergence.
 
 \begin{figure}[H]
 {\centering \includegraphics{summary_files/figure-latex/lambda_est_p-1}}
@@ -983,7 +987,7 @@ parameters:
 \item
   Number of underlying communities \(K = 2, 3, 4\)
 \item
-  Mixture parameters \(\alpha_k = \frac{k^{-1}}{\sum_{l=1}^K l^{-1}}\)
+  Mixture parameters \(\alpha_k = \frac{k^{-1}}{\sum_{\ell=1}^K \ell^{-1}}\)
   for \(k = 1, ..., K\)
 \item
   Community labels
@@ -1083,7 +1087,7 @@ should be approximately normal.
 In the first real data example, we applied OSC to the Leeds Butterfly
 dataset \cite{Wang_2018} consisting of visual similarity measurements
 among 832 butterflies across 10 species. The graph was modified to match
-the example from \citet{noroozi2019estimation}: Only the 4 most
+the example from \cite{noroozi2019estimation}: Only the 4 most
 frequent species were considered, and the similarities were discretized
 to \(\{0, 1\}\) via thresholding. Fig. \ref{fig:butterfly} shows a
 sorted adjacency matrix sorted by the resultant clustering.
@@ -1106,28 +1110,11 @@ In the second example, we applied OSC to the British MPs Twitter network
 \cite{greene2013producing}, the Political Blogs network
 \cite{10.1145/1134271.1134277}, and the DBLP network
 \cite{NIPS2009_3855, 10.1007/978-3-642-15880-3_42}. For this data
-analysis, we subsetted the data as described by
-\citet{307cbeb9b1be48299388437423d94bf1} for their analysis of the
+analysis, we subsetted the data as described in
+\cite{307cbeb9b1be48299388437423d94bf1} for their analysis of the
 same networks. Our methods underperformed compared to modularity
 maximization, although performance is comparable. In addition, OSC's
 runtime is much lower than that of modularity maximization.
-
-\begin{table}
-
-\caption{\label{tab:unnamed-chunk-6}Community detection error rates for modularity maximization, sparse subspace clustering,  and OSC.}
-\centering
-\begin{tabular}[t]{l|r|r|r}
-\hline
-Network & MM & SSC-ASE & OSC\\
-\hline
-British MPs & 0.003 & 0.018 & 0.009\\
-\hline
-Political blogs & 0.050 & 0.196 & 0.062\\
-\hline
-DBLP & 0.028 & 0.087 & 0.059\\
-\hline
-\end{tabular}
-\end{table}
 
 \begin{figure}[H]
 
@@ -1137,6 +1124,23 @@ DBLP & 0.028 & 0.087 & 0.059\\
 
 \caption{Adjacency matrices of (from left to right) the British MPs, Political Blogs, and DBLP networks after sorting by the clustering outputted by OSC.}\label{fig:mp}
 \end{figure}
+
+\begin{table}
+
+\caption{\label{tab:unnamed-chunk-6}Community detection error rates on the British MPs Twitter, Political Blogs, and DBLP networks using modularity maximization, sparse subspace clustering, and OSC.}
+\centering
+\begin{tabular}[t]{l|r|r|r}
+\hline
+Network & MM & SSC-ASE & OSC\\
+\hline
+British MPs & 0.003 & 0.018 & 0.009\\
+\hline
+Political Blogs & 0.050 & 0.196 & 0.062\\
+\hline
+DBLP & 0.028 & 0.087 & 0.059\\
+\hline
+\end{tabular}
+\end{table}
 
 In the third example, we consider the Karantaka villages data studied by
 \citet{DVN/U3BIHX_2013}. For this example, we chose the \texttt{visitgo}
