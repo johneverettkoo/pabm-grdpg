@@ -107,7 +107,7 @@ via simulation.
 \newcommand{\diag}{\mathrm{diag}}
 \newcommand{\tr}{\mathrm{Tr}}
 \newcommand{\blockdiag}{\mathrm{blockdiag}}
-\newcommand{\indep}{\stackrel{\mathrm{indep}}{\sim}}
+\newcommand{\indep}{\stackrel{\mathrm{ind}}{\sim}}
 \newcommand{\iid}{\stackrel{\mathrm{iid}}{\sim}}
 \newcommand{\Bernoulli}{\mathrm{Bernoulli}}
 \newcommand{\Betadist}{\mathrm{Beta}}
@@ -142,7 +142,7 @@ each vertex, up to permutation, with some additional parameter
 estimation being of possible interest, assuming some underlying
 probability model. 
 
-A general family of models that generate unweighted and undirected graphs is the Bernoulli Graph, which is described by an edge probability matrix $P$. Edges between each pair of vertices $i$ and $j$ is drawn as a Bernoulli trial with probability $P_{ij}$, for each $0 \leq i < j \leq n$ and $n$ is the number of vertices in the graph. Community detection methods often restrict this type of model by assigning each vertex a community label $z_1, ..., z_n$ and then setting each $P_{ij}$ as a function of the labels of vertices $i$ and $j$. Such models are called Block Models. 
+A general family of models that describe unweighted and undirected graphs is the Bernoulli Graph, which is characterized by edge probability matrix $P$. Edges between each pair of vertices $i$ and $j$ are drawn as a Bernoulli trial with probability $P_{ij}$, for each $0 \leq i < j \leq n$ and $n$ is the number of vertices in the graph. Community detection methods often restrict this type of model by assigning each vertex a community label $z_1, ..., z_n$ and then setting each $P_{ij}$ as a function of the labels of vertices $i$ and $j$. Such models are called Block Models. 
 
 One popular type of Block Model is the Stochastic Block Model (SBM),
 first proposed by \citet{doi:10.1080/0022250X.1971.9989788}, 
@@ -150,7 +150,7 @@ which restricts each edge probability $P_{ij}$ as only depending on the labels
 $z_i$ and $z_j$, i.e., $P_{ij} = \omega_{z_i, z_j}$. 
 Various generalizations of the SBM have since been utilized, 
 including the Degree-Corrected Block Model (DCBM), 
-introduced by\citet{Karrer_2011}, 
+introduced by \citet{Karrer_2011}, 
 which assigns an additional parameter $\theta_i$ to each vertex 
 and sets $P_{ij} = \theta_i \theta_j \omega_{z_i, z_j}$. 
 The Popularity Adjusted Block Model (PABM) was then introduced by
@@ -664,26 +664,32 @@ additional reconstruction is required to identify the communities
 exactly.
 
 Using \(A\) instead of \(P\) introduces error, which converges to \(0\)
-almost surely:
+almost surely. 
 
 \begin{theorem}
 \label{theorem4}
-Let $\hat{B}_n$ with entries $\hat{B}_n^{(ij)}$ be the affinity matrix from OSC
+Let $\hat{B}$ with entries $\hat{B}_{ij}$ be the affinity matrix from OSC
 (Alg. 1). Then $\forall$ pairs $(i, j)$ belonging to different communities
-and sparsity factor satisfying $n \rho_n = \omega\{(\log n)^{4c}\}$,
+and sparsity factor satisfying $n \rho_n = \omega \big( (\log n)^{4c} \big)$,
 
 \begin{equation} \label{eq:thm4}
-\max_{i, j} |n (\hat{v}_n^{(i)})^\top \hat{v}_n^{(j)}| =
+\max_{i, j} |n \hat{v}_i^\top \hat{v}_j| =
 O_P \Big( \frac{(\log n)^c}{\sqrt{n \rho_n}} \Big)
 \end{equation}
 
 This provides the result that for $i, j$ in different communities,
-$\hat{B}_n^{(ij)} \stackrel{a.s.}{\to} 0$.
+$\hat{B}_{ij} \stackrel{a.s.}{\to} 0$.
 \end{theorem}
 
+The sparsity factor $\rho_n$ can be characterized as 
+the average expected degree of the vertices of the graph 
+divided by the number of vertices. 
+Thus Theorem \ref{theorem4} requires the average degree 
+to grow faster than $(\log n)^{4c}$.
+
 Theorems \ref{theorem2}, \ref{theorem3}, and \ref{theorem4} also provide
-a very natural path toward using SSC for community detection for the
-PABM. We established in Theorem \ref{theorem2} that an ASE of the edge
+a natural path toward using SSC for community detection. 
+We established in Theorem \ref{theorem2} that an ASE of the edge
 probability matrix \(P\) can be constructed such that the communities
 lie on mutually orthogonal subspaces, and this property can be recovered
 from the eigenvectors of \(P\). Then Theorems \ref{theorem3} and
@@ -724,23 +730,14 @@ from the eigenvectors of \(P\). Then Theorems \ref{theorem3} and
 
 \begin{theorem}
 \label{theorem5}
-Let $P_n$ describe the edge probability matrix of the PABM with
-$n$ vertices, and let $A_n \sim \text{Bernoulli}(P_n)$.  Let $\hat{V}_n$ be the
-matrix of eigenvectors of $A_n$ corresponding to the $K^2$ largest
+Let $P$ describe the edge probability matrix of the PABM with
+$n$ vertices, and let $A \sim \Bernoulli(P)$.  Let $\hat{V}$ be the
+matrix of eigenvectors of $A$ corresponding to the $K^2$ largest
 eigenvalues in modulus. Then for all $\epsilon > 0$ 
 there exists a choice of $\lambda > 0$ and $N \in \mathbb{N}$ such
-that for all $n \geq N$, $\sqrt{n} \hat{V}_n$ obeys the subspace detection property with
+that for all $n \geq N$, $\sqrt{n} \hat{V}$ obeys the subspace detection property with
 probability at least $1 - \epsilon$.  
 \end{theorem}
-
-\begin{remark}
-The proof of Theorem \ref{theorem5} is a direct consequence of Theorem 6
-from  \citet{jmlr-v28-wang13} and the fact that the columns of
-$V_n$ correspond to orthogonal subspaces. \citet{jmlr-v28-wang13} assume
-that the points in the embedding are all of unit length, and while we apply
-this normalization in the simulated examples, it is not strictly necessary
-for Theorem \ref{theorem5} due to orthogonality.
-\end{remark}
 
 \hypertarget{parameter-estimation}{%
 \subsection{Parameter estimation}\label{parameter-estimation}}
@@ -786,12 +783,14 @@ we instead estimate each $\tilde{\lambda}^{(kl)} = \sigma^{(kl)} u^{(kl)}$.
 
 \begin{theorem}
 \label{theorem6}
-Under regularity and sparsity assumptions, given fixed $K$, 
+Let each $\tilde{\lambda}^{(kl)}$ be the popularity vector derived from its corresponding $P^{(kl)}$, and let $\hat{\lambda}^{(kl)}$ be its estimate from $A^{(kl)}$ (Alg. 3). Then if $n \rho_n = \omega \big( (\log n)^{4 c} \big)$,
+
 \begin{equation} \label{eq:thm6}
 \max_{k, l \in \{1, ..., K\}} 
-\|\hat{\lambda}^{(kl)} - \lambda^{(kl)}\|_{\infty} = 
+\|\hat{\lambda}^{(kl)} - \tilde{\lambda}^{(kl)}\|_{\infty} = 
 O\bigg(\frac{(\log n_k)^c}{\sqrt{n_k}} \bigg)
 \end{equation}
+
 with high probability.
 \end{theorem}
 
@@ -1513,7 +1512,7 @@ assumption has the effect of scaling the $r^{(k)}$ so that $r^{(k)}
 \leq 1$ for all $k = 1,2,\dots,K$. We emphasize that this assumption
 has no effect on the proof of Theorem \ref{theorem5}. Indeed,
 since $\mu^{(k)} = 0$ for all $k$, as long as the rows of $V^{(k)}$
-spans the subspace $S^{(k)}$, then $a r^{(k)} > \mu^{(k)}$ 
+spans the subspace $\mathcal{S}^{(k)}$, then $a r^{(k)} > \mu^{(k)}$ 
 for any scalar $a > 0$. 
 \end{remark}
 
@@ -1571,7 +1570,7 @@ eigendecomposition of \(M^{(kl)}\) is then
 \begin{bmatrix} u^{(k \ell)} & -u^{(k \ell)} \\ v^{(k \ell)} & v^{(k \ell)} \end{bmatrix}^\top\]
 Thus treating \(M^{(k \ell)}\) as the edge probability matrix of a GRDPG, we
 have latent positions in \(\mathbb{R}^2\) given by the $(n_k + n_{\ell}) \times 2$ matrix
-\[\Lambda^{K \ell} = \begin{bmatrix} 
+\[\Lambda^{(k \ell)} = \begin{bmatrix} 
   \sigma_{k \ell} u^{(k \ell)} & \sigma_{k \ell} u^{(k \ell)} \\ 
   \sigma_{k \ell} v^{(k \ell)} & -\sigma_{k \ell} v^{(k \ell)} 
 \end{bmatrix} = 
