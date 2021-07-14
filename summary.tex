@@ -84,11 +84,20 @@
 
 \title{Connecting the Popularity Adjusted Block Model to the Generalized Random
 Dot Product Graph for Community Detection and Parameter Estimation}
-\author{}
-\date{\vspace{-2.5em}}
+
+\author{John Koo\\Department of Statistics, Indiana University\\
+and\\
+Minh Tang\\Department of Statistics, North Carolina State University\\
+and\\
+Michael Trosset\\Department of Statistics, Indiana University}
+
+% \date{\vspace{-2.5em}}
+\date{}
 
 \begin{document}
+
 \maketitle
+
 \begin{abstract}
 We connect two random graph models, the Popularity Adjusted Block Model
 (PABM) and the Generalized Random Dot Product Graph (GRDPG),
@@ -142,7 +151,15 @@ each vertex, up to permutation, with some additional parameter
 estimation being of possible interest, assuming some underlying
 probability model. 
 
-A general family of models that describe unweighted and undirected graphs is the Bernoulli Graph, which is characterized by edge probability matrix $P$. Edges between each pair of vertices $i$ and $j$ are drawn as a Bernoulli trial with probability $P_{ij}$, for each $0 \leq i < j \leq n$ and $n$ is the number of vertices in the graph. Community detection methods often restrict this type of model by assigning each vertex a community label $z_1, ..., z_n$ and then setting each $P_{ij}$ as a function of the labels of vertices $i$ and $j$. Such models are called Block Models. 
+A general family of models that describe unweighted and undirected graphs is 
+the Bernoulli Graph, which is characterized by edge probability matrix $P$. 
+Edges between each pair of vertices $i$ and $j$ are drawn 
+as a Bernoulli trial with probability $P_{ij}$, for each 
+$0 \leq i < j \leq n$ and $n$ is the number of vertices in the graph. 
+Community detection methods often restrict this type of model 
+by assigning each vertex a community label $z_1, ..., z_n$ 
+and then setting each $P_{ij}$ as a function of the labels $z_i$ and $z_j$. 
+Such models are called Block Models. 
 
 One popular type of Block Model is the Stochastic Block Model (SBM),
 first proposed by \citet{doi:10.1080/0022250X.1971.9989788}, 
@@ -161,8 +178,9 @@ structure.
 
 Parallel to the families of Block Models is another type of Bernoulli Graph 
 called the Random Dot Product Graph (RDPG), proposed by
-\citet*{10.1007/978-3-540-77004-6_11}. Under this model, each vertex of the graph
-can be represented by a point in some latent space such that the edge
+\citet*{10.1007/978-3-540-77004-6_11}. 
+Under this model, each vertex of the graph
+can be represented by a vector in some latent space such that the edge
 probability between any pair of vertices is given by their corresponding
 dot product in the latent space, i.e., given a latent positions
 \(x_1, ..., x_n \in \mathbb{R}^d\), the edge probability matrix is
@@ -173,16 +191,36 @@ positive semidefinite edge probability matrix $P$ is a type of RDPG.
 For instance, the assortative
 SBM is equivalent to a special case of the RDPG for which all vertices
 of a given community share the same position in the latent space
-\cite{lyzinski2014}. A similar property exists for the DCBM
+\cite{lyzinski2014}. A similar property exists for the DCBM, 
+which is equivalent to a RDPG in which vertices that belong to the same 
+community all lie in a line segment in the latent space 
 \cite{lyzinski2014, rubindelanchy2017consistency}. 
 Because the edge probability matrix for the PABM is not positive semidefinite, 
-we instead show that it is a special case of the \emph{Generalized} Random Dot Product Graph (GRDPG) in order to analyze the PABM as a latent space model for community detection and parameter estimation. 
+we instead show that it is a special case of the 
+\emph{Generalized} Random Dot Product Graph (GRDPG) 
+in order to analyze the PABM as a latent space model 
+for community detection and parameter estimation. 
 
 \hypertarget{notation}{%
 \subsection{Notation and Scope}\label{notation}}
 
-Let $G = (V, E)$ be an unweighted, undirected, and hollow graph with vertex set $V$ ($|V| = n$) and edge set $E$. $A \in \{0, 1\}^{n \times n}$ represents the adjacency matrix of $G$ such that $A_{ij} = 1$ if there exists an edge between vertices $i$ and $j$ and $0$ otherwise. Because $G$ is symmetric and hollow,
-$A_{ij} = A_{ji}$ and $A_{ii} = 0$ for each $i, j \in [n]$. We further restrict our analyses to Bernoulli graphs. Let $P \in [0, 1]^{n \times n}$ be a symmetric matrix of edge probabilities. Graph $G$ is sampled from $P$ by drawing $A_{ij} \indep \Bernoulli(P_{ij})$ for each $1 \leq i < j \leq n$  (setting $A_{ji} = A_{ij}$ and $A_{ii} = 0$). We denote $A \sim \BG(P)$ as graph with adjacency matrix $A$ sampled from edge probability matrix $P$ in this manner. If each vertex has a hidden label in $[K]$, they are denoted as $z_1, ..., z_n$. Finally, we denote $X = \begin{bmatrix} x_1 & \cdots & x_n \end{bmatrix}^\top \in \mathbb{R}^{n \times d}$ as the collection of $n$ latent vectors $x_1, ..., x_n \in \mathbb{R}^d$.
+Let $G = (V, E)$ be an unweighted, undirected, 
+and hollow graph with vertex set $V$ ($|V| = n$) and edge set $E$. 
+$A \in \{0, 1\}^{n \times n}$ represents the adjacency matrix of $G$ 
+such that $A_{ij} = 1$ if there exists an edge between vertices $i$ and $j$ 
+and $0$ otherwise. Because $G$ is symmetric and hollow,
+$A_{ij} = A_{ji}$ and $A_{ii} = 0$ for each $i, j \in [n]$. 
+We further restrict our analyses to Bernoulli graphs. 
+Let $P \in [0, 1]^{n \times n}$ be a symmetric matrix of edge probabilities. 
+Graph $G$ is sampled from $P$ by drawing $A_{ij} \indep \Bernoulli(P_{ij})$ 
+for each $1 \leq i < j \leq n$ (setting $A_{ji} = A_{ij}$ and $A_{ii} = 0$). 
+We denote $A \sim \BG(P)$ as a graph with adjacency matrix $A$ 
+sampled from edge probability matrix $P$ in this manner. 
+If each vertex has a hidden label in $[K]$, 
+they are denoted as $z_1, ..., z_n$. 
+Finally, we denote 
+$X = \begin{bmatrix} x_1 & \cdots & x_n \end{bmatrix}^\top \in \mathbb{R}^{n \times d}$ 
+as the collection of $n$ latent vectors $x_1, ..., x_n \in \mathbb{R}^d$.
 
 \hypertarget{connecting-the-popularity-adjusted-block-model-to-the-generalized-random-dot-product-graph}{%
 \section{Connecting the Popularity Adjusted Block Model to the
@@ -218,20 +256,22 @@ such that $n_k \times n_{\ell}$ block $P^{(k \ell)}$
 describes the edge probabilities between vertices in communities
 $k$ and $\ell$; note that $P^{(k \ell)} = (P^{(k \ell)})^\top$.
 Now suppose that each block $P^{(k \ell)}$ can be written as the outer product of two vectors:
+
 \begin{equation} \label{eq:pabm}
   P^{(k \ell)} = \lambda^{(k \ell)} (\lambda^{(\ell k)})^\top
 \end{equation}
+
 for a set of $K^2$ popularity vectors $\{\lambda^{(st)}\}_{1 \leq
   s \leq K, 1 \leq t \leq K}$ where each
 $\lambda^{(st)}$ is a column vector of dimension $n_s$. Then a graph $G$
 is drawn from a PABM with parameters
-$\{\lambda^{(st)}\}_K$ if its adjacency matrix $A$
+$\{\lambda^{(st)}\}$ if its adjacency matrix $A$
 satisfies $A \sim \mathrm{Bernoulli}(P)$.
 \end{definition}
 
 We will use the notation \(A \sim \PABM(\{\lambda^{(k \ell)}\}_K)\) to denote
 a random adjacency matrix \(A\) drawn from a PABM with parameters
-\(\lambda^{(k \ell)}\) consisting of \(K\) underlying communities.
+\(\{\lambda^{(k \ell)}\}\) consisting of \(K\) underlying communities.
 
 \begin{definition}[Generalized Random Dot Product Graph]
 \label{grdpg}
@@ -283,9 +323,11 @@ distances.
 \hypertarget{connecting-the-pabm-to-the-grdpg}{%
 \subsection{Connecting the PABM to the
 GRDPG}\label{connecting-the-pabm-to-the-grdpg}}
+
 \begin{proposition}[Connecting the PABM to the GRDPG for $K = 2$]
 \label{theorem1}
 Let
+
 $$X = \begin{bmatrix}
 \lambda^{(11)} & \lambda^{(12)} & 0 & 0 \\
 0 & 0 & \lambda^{(21)} & \lambda^{(22)}
@@ -294,6 +336,7 @@ U = \begin{bmatrix} 1 & 0 & 0 & 0 \\
 0 & 0 & 1 / \sqrt{2} & 1 / \sqrt{2} \\
 0 & 0 & 1 / \sqrt{2} & - 1 / \sqrt{2} \\
 0 & 1 & 0 & 0 \end{bmatrix},$$
+
 where the $\{\lambda^{(k \ell)}\}$ are as defined in Definition 1.
 Then $A \sim \mathrm{GRDPG}_{3, 1}(X U)$ and 
 $B \sim \mathrm{PABM}(\{(\lambda^{(k \ell)}\}_K)$ are
@@ -327,11 +370,12 @@ e_3)$; here $e_i$ denote the $i^\mathrm{th}$ basis vector in $\mathbb{R}^{4}$.
 
 \begin{theorem}[Generalization to $K > 2$]
 \label{theorem2}
-Let $A \sim \mathrm{PABM}(\{\lambda^{(k \ell)}\})$ be an instance of a
+Let $A \sim \mathrm{PABM}(\{\lambda^{(k \ell)}\}_K)$ be an instance of a
 PABM with $K \geq 1$ blocks and latent vectors $\{\lambda^{(k \ell)}
-\colon 1 \leq k \leq K, 1 \leq \ell \leq K\}$. Then there exists a block diagonal matrix
-$X \in \mathbb{R}^{n \times K^2}$ defined by the $\{\lambda^{(k \ell)}\}$ and a $K^2 \times
-K^2$ {\em fixed} orthonormal matrix $U$ such 
+\colon 1 \leq k \leq K, 1 \leq \ell \leq K\}$. 
+Then there exists a block diagonal matrix
+$X \in \mathbb{R}^{n \times K^2}$ defined by $\{\lambda^{(k \ell)}\}$ and a 
+$K^2 \times K^2$ {\em fixed} orthonormal matrix $U$ such 
 that $A \sim \mathrm{GRDPG}_{K (K+1) / 2, K (K-1) / 2}(XU)$.
 \end{theorem}
 
@@ -360,7 +404,8 @@ It is then straighforward to verify that
   (\lambda^{(Kk)})^{\top} \end{bmatrix} = \begin{bmatrix} P^{(k1)}
   \mid P^{(k2)} \mid \dots \mid P^{(kK)} \end{bmatrix}.
 \end{gather*}
-We therefore have $P = X Y^\top$. Similar to the $K = 2$ case, we also have $Y = X \Pi$ for some permutation matrix
+We therefore have $P = X Y^\top$. 
+Similar to the $K = 2$ case, we also have $Y = X \Pi$ for some permutation matrix
 $\Pi$ and hence $P = X \Pi X^\top$.
 The permutation described by $\Pi$ has $K$ fixed points, which correspond to
 $K$ eigenvalues equal to $1$ with corresponding eigenvectors $e_k$ where
@@ -371,6 +416,7 @@ $\{(e_s + e_t)/\sqrt{2},(e_s - e_t)/ \sqrt{2}\}$.
 
 Let $p = K (K + 1) / 2$ and $q = K (K - 1) / 2$. 
 We therefore have
+
 \begin{equation} \label{eq:permutation}
 \Pi = U I_{K (K + 1) / 2, K (K - 1) / 2} U^\top
 \end{equation}
@@ -378,12 +424,7 @@ where $U$ is a $K^2 \times K^2$ orthogonal matrix and hence
 \begin{equation} \label{eq:pabm-grdpg}
 P = X U I_{p, q} (X U)^\top.
 \end{equation}
-% \begin{equation} \label{eq:p}
-% p = K (K + 1) / 2
-% \end{equation}
-% \begin{equation} \label{eq:q}
-% q = K (K - 1) / 2
-% \end{equation}
+
 In summary we can describe the PABM with $K$ communities as a GRDPG with latent
 positions $X U$ and signature $(p,q) = \bigl( \tfrac{1}{2} K (K + 1) ,
 \tfrac{1}{2} K (K - 1)\bigr)$.
@@ -404,23 +445,14 @@ Y = \begin{bmatrix}
 0 & 0 & \lambda^{(31)} & 0 & 0 & \lambda^{(32)} & 0 & 0 & \lambda^{(33)}
 \end{bmatrix}.
 \end{gather*}
-Then $Y = X \Pi$ and $P = X Y^{\top}$ where $\Pi$ is a $9 \times 9$ permutation matrix of
-the form
-$$\Pi = %\begin{bmatrix}
-% 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-% 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
-% 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
-% 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-% 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
-% 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
-% 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
-% 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
-% 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1%
+Then $Y = X \Pi$ and $P = X Y^{\top}$ where $\Pi$ is a $9 \times 9$ 
+permutation matrix of the form
+
+$$\Pi = 
 \Bigl[e_1 \mid e_4 \mid e_7 \mid e_2 \mid e_5 \mid e_8 \mid e_3
-\mid e_6 \mid e_9 \Bigr].
-% \end{bmatrix}.
-$$
-where $e_i$ denote the $i$th basis vector in $\mathbb{R}^{9}$. 
+\mid e_6 \mid e_9 \Bigr].$$
+
+where $e_i$ denotes the $i^{th}$ basis vector in $\mathbb{R}^{9}$. 
 The matrix $\Pi$ corresponds to a permutation of $\{1,2,\dots,9\}$
 with the following decomposition.
 \begin{enumerate}
@@ -507,22 +539,22 @@ Let $X = \begin{bmatrix} x_1 & \cdots & x_n \end{bmatrix}^\top$ be noisy
 points sampled from $K$ subspaces, i.e., $x_i = y_i + z_i$ where the
 $y_i$ belongs to the union of $K$ subspaces and the $z_i$ are noise
 vectors. Let $\lambda \geq 0$ be given and
-let $C$ and $B$
-be constructed from the
+let $C$ and $B$ be constructed from the
 solutions of LASSO problems as described in Eq.~\eqref{eq:ssc} with
 this given choice of $\lambda$. Then $X$
-is said to satisfy the subspace detection property with weighting parameter $\lambda$ if each column of
+is said to satisfy the subspace detection property 
+with sparsity parameter $\lambda$ if each column of
 $C$ has nonzero norm and $B_{ij} = 0$ whenever $y_i$ and $y_j$ are
 from different subspaces.
 \end{definition}
 
 \begin{remark}
 In practice, a noisy sample $X$ often does not obey the subspace detection
-property. In such cases, $B$ is treated as an affinity matrix for a graph which
-is then partitioned into $K$ subgraphs to obtain the clustering. On the other
+property. In such cases, $B$ is treated as an affinity matrix for a graph, 
+which requires a partitioning step to obtain the final clustering. On the other
 hand, if $X$ does obey the subspace detection property, $B$ describes a graph
 with at least $K$ disconnected subgraphs. Ideally, when the subspace detection
-property holds, there are exactly $K$ subgraphs which map to each subspace,
+property holds, there are exactly $K$ subgraphs which map onto each subspace,
 but it could be the case that some of the subspaces are represented by
 multiple disconnected subgraphs. The subspace detection property is contingent
 on choosing a sufficiently large sparsity parameter $\lambda$.
@@ -583,17 +615,15 @@ the RDPG, \(Q\) is not necessarily an orthogonal matrix. If \(z_i\)'s
 are the rows of \(XU\), then
 \(||z_i - z_j||^2 \neq ||Q z_i - Q z_j||^2\), and
 \(\langle z_i, z_j \rangle \neq \langle Q z_i, Q z_j \rangle\). This
-prevents us from using the properties of \(XU\) directly. In particular,
-if \(Q \in \mathbb{O}(n)\), then we could use the fact that
-\(\langle z_i, z_j \rangle = \langle Q z_i, Q z_j \rangle = 0\) if
-vertices \(i\) and \(j\) are in different communities.
+prevents us from using the orthogonality property of \(XU\) directly. 
 
 The explicit form of \(XU\) represents points in \(\mathbb{R}^{K^2}\)
 such that points within each community lie on \(K\)-dimensional
 orthogonal subspaces. Multiplication by \(Q \in \mathbb{O}(p, q)\)
 removes the orthogonality property but retains the property that each
 community is represented by a \(K\)-dimensional subspace. Therefore, the
-ASE of \(P\) results in subspaces that correspond to each community,
+ASE of \(P\) still consists of subspaces 
+that correspond to communities of the PABM, even if they are not orthogonal, 
 suggesting the use of SSC. Before exploring SSC, we will first consider
 a different approach.
 
@@ -666,16 +696,17 @@ conclude that $B_{ij} = 0$ whenever vertices $i$ and $j$ belong to different com
 
 
 Theorem \ref{theorem3} provides perfect community detection given \(P\).
-Letting \(|B|\) be the affinity matrix for graph \(G\), \(G\) is
+Letting \(|B|\) be the affinity matrix for graph \(G'\), \(G'\) is
 partitioned into at least \(K\) disjoint subgraphs since each of the
 \(K\) communities have no edges between them. Similar to the subspace
 detection property, it could be the case that some of the communities
-are represented by multiple disjoint subgraphs in \(G\), in which case
+are represented by multiple disjoint subgraphs in \(G'\), in which case
 additional reconstruction is required to identify the communities
 exactly.
 
 Using \(A\) instead of \(P\) introduces error, which converges to \(0\)
-almost surely. 
+almost surely. We use this fact to motivate Orthogonal Spectral Clustering 
+(Alg. 1).
 
 \begin{theorem}
 \label{theorem4}
@@ -701,11 +732,13 @@ to grow faster than $(\log n)^{4c}$.
 Theorems \ref{theorem2}, \ref{theorem3}, and \ref{theorem4} also provide
 a natural path toward using SSC for community detection. 
 We established in Theorem \ref{theorem2} that an ASE of the edge
-probability matrix \(P\) can be constructed such that the communities
-lie on mutually orthogonal subspaces, and this property can be recovered
-from the eigenvectors of \(P\). Then Theorems \ref{theorem3} and
-\ref{theorem4} show that this property holds for the unscaled ASE of
-\(A\) drawn from \(P\) as \(n \to \infty\).
+probability matrix \(P\) can be constructed from a latent vector configuration 
+consisting of orthogonal subspaces. Theorem \ref{theorem3} shows how 
+this property can be recovered from the eigenvectors of \(P\). 
+Then Theorem \ref{theorem4} shows that replacing $P$ with $A$ 
+approximates these properties with error that goes to zero as \(n \to \infty\). 
+This allows us to obtain the subspace detection property 
+in Theorem \ref{theorem5}. 
 
 \begin{algorithm}[t]
   \DontPrintSemicolon
@@ -768,11 +801,14 @@ and \(\sigma^{(k \ell)}\) is a scalar.
 Then \(\lambda^{(k \ell)} = s_1 u^{(k \ell)}\)
 and \(\lambda^{(\ell k)} = s_2 v^{(k \ell)}\) 
 for unidentifiable $s_1 s_2 = (\sigma^{(k \ell)})^2$.
+Since each $\lambda^{(k \ell)}$ is not strictly identifiable,
+we instead estimate each 
+$\tilde{\lambda}^{(k \ell)} = \sigma^{(k \ell)} u^{(k \ell)}$. 
 Given the adjacency matrix \(A\)
 instead of edge probability matrix \(P\), we can simply use plug-in
-estimators by taking the SVD of each $A^{(k \ell)}$. 
-Since each $\lambda^{(k \ell)}$ is not strictly identifiable,
-we instead estimate each $\tilde{\lambda}^{(k \ell)} = \sigma^{(k \ell)} u^{(k \ell)}$. 
+estimators by taking the SVD of each $A^{(k \ell)}$ to obtain 
+$\hat{\lambda}^{(k \ell)} = \hat{\sigma}^{(k \ell)} \hat{u}^{(k \ell)}$ 
+using the largest signular value of $A$ and its corresponding singular vectors. 
 
 \begin{algorithm}[t]
   \DontPrintSemicolon
@@ -858,9 +894,9 @@ In this case, the "true" popularity vectors are derived from
 taking the SVD of each edge probability block $P^{(k \ell)}$ 
 to avoid the unidentifiable multiplicative constants. 
 
-\[\text{RMSE}(\{\hat{\lambda}^{(k \ell)}\}_K, \{\lambda^{(k \ell)}\}_K) = 
+\[\text{RMSE}(\{\hat{\lambda}^{(k \ell)}\}, \{\tilde{\lambda}^{(k \ell)}\}) = 
 \sqrt{\frac{1}{n} \sum_{k < l} \min_{s = \pm 1} 
-\|s \hat{\lambda}^{(k \ell)} - \lambda^{(k \ell)} \|_2^2}\]
+\|s \hat{\lambda}^{(k \ell)} - \tilde{\lambda}^{(k \ell)} \|_2^2}\]
 
 We can also avoid the unidentifiable multiplicative constant more directly 
 by reconstructing each 
@@ -924,21 +960,20 @@ We explore this in Fig. \ref{fig:clust_err_ct_sim}.
 
 \end{comment}
 
-Fig \ref{fig:clust_err_ct_sim} shows OSC's community detection error
+Fig. \ref{fig:clust_err_ct_sim} shows the number of mislabeled vertices
 going to 0 for large \(n\). SSC on both the embedding and on the
-adjacency matrix produces similar results for \(K > 2\). Weaker
+adjacency matrix produces similar trends for \(K > 2\). Weaker
 performance of SSC for \(K = 2\) can be attributed to the final spectral
 clustering step of the affinity matrix. 
 While the subspace detection property is guaranteed for large \(n\), in our
 simulations, setting the sparsity parameter to the required value resulted
 in more than \(K\) disconnected subgraphs. 
 We instead chose a smaller sparsity parameter, 
-necessitating this final clustering step. 
+necessitating a final clustering step. 
 A GMM was fit to the normalized Laplacian eigenmap of $B$,
 but visual inspection suggests that the communities are not
 distributed as a mixture of Gaussians in the eigenmap. 
 A different choice of mixture distribution may result in better performance. 
-
 
 \begin{figure}[H]
 
@@ -950,9 +985,10 @@ A different choice of mixture distribution may result in better performance.
 \end{figure}
 
 Given ground truth community labels, Algorithm 3 and the MLE-based
-plug-in estimators \cite{307cbeb9b1be48299388437423d94bf1} 
-perform similarly, with root mean square
-error decaying at rate approximately \(n^{-1/2}\).
+plug-in estimators perform similarly, with root mean square
+error decaying at rate approximately \(n^{-1/2}\) (Fig. \ref{fig:lambda_est_k}). 
+We observe similar behavior when comparing errors 
+in the edge probability blocks (Fig. \ref{fig:p_block_est}).
 
 \begin{figure}[H]
 
@@ -960,21 +996,20 @@ error decaying at rate approximately \(n^{-1/2}\).
 
 }
 
-\caption{Median and IQR RMSE for popularity vectors from Algorithm 3 (red) compared against an MLE-based method (blue). Simulations were repeated 50 times for each sample size. Communities were drawn to be approximately balanced.}\label{fig:lambda_est_k}
+\caption{Median and IQR RMSE for popularity vectors from Algorithm 3 (red) compared against an MLE-based method (blue). Simulations were repeated 50 times for each sample size. Communities were drawn to be approximately balanced.}
+\label{fig:lambda_est_k}
 \end{figure}
-
-We observe similar behavior when comparing errors in the edge probability blocks. 
-Both algorithms perform similarly with $n^{-1/2}$ convergence.
 
 \begin{figure}[H]
 {\centering \includegraphics{summary_files/figure-latex/lambda_est_p-1}}
 \caption{Median and IQR RMSE for edge probability blocks reconstructed from the outputs of Algorithm 3 (red) compared against outputs of an MLE-based method (blue). Simulations were repeated 50 times for each sample size. Communities were drawn to be approximately balanced.}
+\label{fig:p_block_est}
 \end{figure}
 
 \hypertarget{imbalanced-communities}{%
 \subsection{Imbalanced communities}\label{imbalanced-communities}}
 
-Simulations performed in this section are similar to those in the
+Simulations performed in this section are the same as those in the
 previous section with the exception of the mixture parameters
 \(\{\alpha_1, ..., \alpha_K\}\) used to draw community labels from the
 multinomial distribution. For these examples, we set the following
@@ -1146,7 +1181,7 @@ In the third example, we consider the Karantaka villages data studied by
 \citet{DVN/U3BIHX_2013}. For this example, we chose the \texttt{visitgo}
 networks from villages 12, 31, and 46 at the household level. The label
 of interest is the religious affiliation. The networks were truncated to
-religions ``1'' and ``2'', and vertices of degree 0 were removed. The results are displayed in Fig \ref{fig:households-figure} and Table \ref{tab:households-table}.
+religions ``1'' and ``2'', and vertices of degree 0 were removed. The results are displayed in Fig. \ref{fig:households-figure} and Table \ref{tab:households-table}.
 
 \begin{figure}[H]
 
