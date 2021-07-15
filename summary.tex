@@ -935,7 +935,7 @@ For these examples, we set the following parameters:
 \item
   Between-group popularities
   \(\lambda^{(k \ell)} \stackrel{\text{iid}}{\sim} \Betadist(1, 2)\) for
-  \(k \neq l\)
+  \(k \neq \ell\)
 \end{itemize}
 
 \(50\) simulations were performed for each \((n, K)\) pair.
@@ -1033,7 +1033,7 @@ parameters:
 \item
   Between-group popularities
   \(\lambda^{(k \ell)} \stackrel{\text{iid}}{\sim} \Betadist(1, 2)\) for
-  \(k \neq l\)
+  \(k \neq \ell\)
 \end{itemize}
 
 \(50\) simulations were performed for each \((n, K)\) pair.
@@ -1065,7 +1065,8 @@ however, the MLE-based estimators for the popularity vectors decay at a slower
 rate (Fig. \ref{fig:lambda_est_k_imba}). 
 The reduced rate of decay is removed 
 if we reconstruct the edge probability blocks 
-by taking the outer products of the popularity vectors. 
+by taking the outer products of the popularity vectors 
+(Fig. \ref{fig:lambda_est_p_imba}). 
 
 \begin{figure}[H]
 
@@ -1127,10 +1128,7 @@ frequent species were considered, and the similarities were discretized
 to \(\{0, 1\}\) via thresholding. Fig. \ref{fig:butterfly} shows a
 sorted adjacency matrix sorted by the resultant clustering.
 
-Comparing against the ground truth species labels, OSC achieves an
-accuracy of 63\% and an adjusted Rand index of 73\%. In comparison,
-\citet{noroozi2019estimation} achieved an adjusted Rand index of
-73\% using sparse subspace clustering on the same dataset.
+Comparing against the ground truth species labels, OSC achieves an adjusted Rand index of 92\%, while SSC on the ASE achieves an adjusted Rand index of 96\%. In comparison, SSC on the adjacency matrix yields an adjusted Rand index of 73\% \citep{noroozi2019estimation}.
 
 \begin{figure}[H]
 
@@ -1177,11 +1175,13 @@ DBLP & 0.028 & 0.087 & 0.059\\
 \end{tabular}
 \end{table}
 
-In the third example, we consider the Karantaka villages data studied by
-\citet{DVN/U3BIHX_2013}. For this example, we chose the \texttt{visitgo}
+In the third example, we analyzed the Karantaka villages data studied by
+\citet{DVN/U3BIHX_2013}. We chose the \texttt{visitgo}
 networks from villages 12, 31, and 46 at the household level. The label
 of interest is the religious affiliation. The networks were truncated to
-religions ``1'' and ``2'', and vertices of degree 0 were removed. The results are displayed in Fig. \ref{fig:households-figure} and Table \ref{tab:households-table}.
+religions ``1'' and ``2'', and vertices of degree 0 were removed. 
+The results are displayed in Fig. \ref{fig:households-figure} and 
+Table \ref{tab:households-table}.
 
 \begin{figure}[H]
 
