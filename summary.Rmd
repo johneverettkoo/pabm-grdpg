@@ -1154,7 +1154,7 @@ z.hat <- cluster.pabm(A, K)
 #   igraph::cluster_louvain() %>% 
 #   igraph::membership()
 
-# ari <- round(fossil::adj.rand.index(z, z.hat) * 100)
+ari <- round(fossil::adj.rand.index(z, z.hat) * 100)
 ```
 
 In the first real data example, we applied OSC to the Leeds Butterfly 
