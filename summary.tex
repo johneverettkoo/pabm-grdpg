@@ -67,15 +67,18 @@
 \setcounter{secnumdepth}{5}
 \usepackage{float}
 \usepackage{mathtools}
-\usepackage{natbib}
-\bibliographystyle{abbrvnat}
+% \usepackage{natbib}
+\usepackage[backend=bibtex,style=authoryear,giveninits,natbib]{biblatex}
+\addbibresource{misc.bib}
+\renewbibmacro{in:}{%
+  \ifentrytype{article}{}{%
+  \printtext{\bibstring{in}\intitlepunct}}}
 \usepackage{parskip}
 \usepackage[linesnumbered,ruled,vlined]{algorithm2e}
-\setcitestyle{numbers,square,comma}
+% \setcitestyle{numbers,square,comma}
 \usepackage{verbatim}
 \usepackage{amsthm}
 \usepackage{comment}
-\bibliographystyle{plainnat}
 \addtolength{\oddsidemargin}{-.5in}%
 \addtolength{\evensidemargin}{-.5in}%
 \addtolength{\textwidth}{1in}%
@@ -138,15 +141,15 @@ via simulation study.
 \hypertarget{introduction}{%
 \section{Introduction}\label{introduction}}
 
-Statistical inference on random graphs requires a suitable probability model.  A general probability model for unweighted and undirected graphs is the Bernoulli Graph, which assumes that edges occur as independent Bernoulli trials.  A Bernoulli Graph is characterized by an edge probability matrix $P=[P_{ij}]$, where an edge between vertices $i$ and $j$ occurs with success probability $P_{ij}$.  A trivial example of a Bernoulli Graph is the Erd\"{o}s-R\'{e}nyi model proposed by Gilbert \cite{Gilbert:1959}, in which the vertices of the random graph are fixed and possible edges occur independently with fixed probability $P_{ij}=p$.  The requirement that $p$ is fixed is too strong for most applications, and various researchers have weakened that requirement in various ways.  The present work relates two lines of generalization.
+Statistical inference on random graphs requires a suitable probability model.  A general probability model for unweighted and undirected graphs is the Bernoulli Graph, which assumes that edges occur as independent Bernoulli trials.  A Bernoulli Graph is characterized by an edge probability matrix $P=[P_{ij}]$, where an edge between vertices $i$ and $j$ occurs with success probability $P_{ij}$.  A trivial example of a Bernoulli Graph is the Erd\"{o}s-R\'{e}nyi model proposed by \citet{Gilbert:1959}, in which the vertices of the random graph are fixed and possible edges occur independently with fixed probability $P_{ij}=p$.  The requirement that $p$ is fixed is too strong for most applications, and various researchers have weakened that requirement in various ways.  The present work relates two lines of generalization.
 
 Network analysis is often concerned with community detection.  One form of community detection assumes that each vertex belongs to an unobserved community, with the probability of an edge between vertices $i$ and $j$ depending on the communities to which $i$ and $j$ belong.  Formally, one assigns each vertex $v_i$ a community label $z_i$ and assumes a Bernoulli Graph in which $P_{ij}$ is a function of $z_i$ and $z_j$.  Such models, called Block Models, define the goal of community detection as a problem in statistical inference: identify the true community (up to permutation of labels) to which each vertex belongs.
 
-The classical Stochastic Block Model (SBM) of \citet{doi:10.1080/0022250X.1971.9989788} specifies that each edge probability $P_{ij}$ depends only on the labels $z_i$ and $z_j$, i.e., $P_{ij} = \omega_{z_,z_j}$.  Subsequent researchers have weakened this assumption.   The Degree-Corrected Block Model (DCBM) of \citet{Karrer_2011} assigns an additional parameter $\theta_i$ to each vertex and sets $P_{ij} = \theta_i \theta_j \omega_{z_,z_j}$. The Popularity Adjusted Block Model (PABM) of \citet*{307cbeb9b1be48299388437423d94bf1} generalizes the DCBM, allowing heterogeneity of edge probabilities within and between communities while still maintaining distinct community structure.
+The classical Stochastic Block Model (SBM) of \citet{doi:10.1080/0022250X.1971.9989788} specifies that each edge probability $P_{ij}$ depends only on the labels $z_i$ and $z_j$, i.e., $P_{ij} = \omega_{z_,z_j}$.  Subsequent researchers have weakened this assumption.   The Degree-Corrected Block Model (DCBM) of \citet{Karrer_2011} assigns an additional parameter $\theta_i$ to each vertex and sets $P_{ij} = \theta_i \theta_j \omega_{z_,z_j}$. The Popularity Adjusted Block Model (PABM) of \citet{307cbeb9b1be48299388437423d94bf1} generalizes the DCBM, allowing heterogeneity of edge probabilities within and between communities while still maintaining distinct community structure.
 
-Another type of Bernoulli Graph was proposed by \citet*{10.1007/978-3-540-77004-6_11}.  A Random Dot Product Graph (RDPG) specifies that each vertex corresponds to a latent position vector in Euclidean space and that the probability of an edge between two vertices is the dot product of their latent position vectors.  Thus, if the latent positions $x_1,\ldots,x_n \in \mathbb{R}^d$ and $X = [\begin{array}{ccc} x_1 & \cdots & x_n \end{array} ]^\top$, then the edge probability matrix is $P = XX^\top$.  Clearly, any Bernoulli Graph with positive semidefinite $P$ is an RDPG.  The positive definite Euclidean inner product in the RDPG model was replaced by an indefinite inner product in \cite{rubindelanchy2017consistency}, resulting in the {\em Generalized}\/ RDPG (GRDPG).
+Another type of Bernoulli Graph was proposed by \citet*{10.1007/978-3-540-77004-6_11}.  A Random Dot Product Graph (RDPG) specifies that each vertex corresponds to a latent position vector in Euclidean space and that the probability of an edge between two vertices is the dot product of their latent position vectors.  Thus, if the latent positions $x_1,\ldots,x_n \in \mathbb{R}^d$ and $X = [\begin{array}{ccc} x_1 & \cdots & x_n \end{array} ]^\top$, then the edge probability matrix is $P = XX^\top$.  Clearly, any Bernoulli Graph with positive semidefinite $P$ is an RDPG.  The positive definite Euclidean inner product in the RDPG model was replaced by an indefinite inner product in \citet{rubindelanchy2017consistency}, resulting in the {\em Generalized}\/ RDPG (GRDPG).
 
-In contrast to Block Models, neither RDPGs nor GRDPGs inherently specify distinct communities.  However, one can easily impose community structure by assuming that the latent positions lie in distinct clusters.  Hence, it is not surprising that Block Models can be studied by reformulating them as RDPGs or GRDPGs.  For example, an assortative SBM (an SBM for which $P$ is positive semidefinite) is equivalent to an RDPG for which all vertices in the same community correspond to the same latent position vector \cite{lyzinski2014}.  Likewise, the DCBM is equivalent to an RDPG for which all vertices in the same community correspond to latent position vectors that lie on a straight line \cite{lyzinski2014, rubindelanchy2017consistency}. 
+In contrast to Block Models, neither RDPGs nor GRDPGs inherently specify distinct communities.  However, one can easily impose community structure by assuming that the latent positions lie in distinct clusters.  Hence, it is not surprising that Block Models can be studied by reformulating them as RDPGs or GRDPGs.  For example, an assortative SBM (an SBM for which $P$ is positive semidefinite) is equivalent to an RDPG for which all vertices in the same community correspond to the same latent position vector (\cite{lyzinski2014}).  Likewise, the DCBM is equivalent to an RDPG for which all vertices in the same community correspond to latent position vectors that lie on a straight line (\cite{lyzinski2014, rubindelanchy2017consistency}). 
 
 Because the edge probability matrix of a PABM is not necessarily positive semidefinite, a PABM is not necessarily an RDPG.   In Section \ref{connecting-the-pabm-to-the-grdpg} we demonstrate that every PABM is in fact a specific type of GRDPG for which the latent position vectors lie in distinct orthogonal subspaces, each subspace corresponding to a community.  This identification is our central result.  In Section \ref{methods}, we use the geometry of the GRDPG to derive more efficient algorithms for detecting the communities and estimating the parameters in the PABM.  We report the results of simulation studies in Section \ref{simulated-examples} and apply our methods to three well-known data sets in Section \ref{real-data-examples}. Section \ref{discussion} concludes.
 
@@ -513,13 +516,13 @@ known beforehand and does not require estimation.
 
 \citet{307cbeb9b1be48299388437423d94bf1} 
 used Modularity Maximization (MM) and the Extreme Points (EP)
-algorithm \cite{le2016} for community detection and parameter
+algorithm (\cite{le2016}) for community detection and parameter
 estimation. They were able to show that as the sample size increases,
 the proportion of misclassified community labels (up to permutation)
 goes to 0.
 
-\citet*{noroozi2019estimation} used Sparse Subspace Clustering (SSC) 
-\cite{5206547} for community detection in the PABM. 
+\citet{noroozi2019estimation} used Sparse Subspace Clustering (SSC) 
+(\cite{5206547}) for community detection in the PABM. 
 The SSC algorithm can be described as follows: 
 Given \(X \in \mathbb{R}^{n \times d}\) with vectors
 \(x_i^\top \in \mathbb{R}^d\) as rows of \(X\), the optimization problem
@@ -615,7 +618,7 @@ we have (or can estimate) \(XU\) directly, then both the community
 detection and parameter identification problem are trivial since \(U\)
 is orthonormal and fixed for each value of \(K\). However, direct
 identification or estimation of \(XU\) is not possible
-\cite{rubindelanchy2017statistical}.
+(\cite{rubindelanchy2017statistical}).
 
 If we decompose \(P = Z I_{p, q} Z^\top\), then
 \(\exists\) \(Q \in \mathbb{O}(p, q)\) such that \(XU = Z Q\). Even if we
@@ -753,7 +756,7 @@ in Theorem \ref{theorem5}.
 \begin{algorithm}[t]
   \DontPrintSemicolon
   \SetAlgoLined
-  \caption{Sparse Subspace Clustering using LASSO \cite{jmlr-v28-wang13}.}
+  \caption{Sparse Subspace Clustering using LASSO.}
   \KwData{Adjacency matrix $A$, number of communities $K$,
   hyperparameter $\lambda$}
   \KwResult{Community assignments $1, ..., K$}
@@ -861,17 +864,17 @@ from two types of joint distributions depending on whether \(k = \ell\),
 the edge probability matrix \(P\) is constructed using the popularity
 vectors, and finally the adjacency matrix \(A\)
 is drawn from \(P\). OSC is then used for community detection, and this
-method is compared against SSC \cite{noroozi2019estimation,soltanolkotabi2014}
-and MM \cite{igraph, 307cbeb9b1be48299388437423d94bf1}. 
+method is compared against SSC (\cite{noroozi2019estimation,soltanolkotabi2014})
+and MM (\cite{igraph, 307cbeb9b1be48299388437423d94bf1}). 
 True community labels are used
 with Algorithm 3 to estimate the popularity vectors
 \(\{\lambda^{(k \ell)}\}_K\), and this method is then compared against an
-MLE-based estimator described in \cite{noroozi2019estimation} and
-\cite{307cbeb9b1be48299388437423d94bf1}.
+MLE-based estimator described in \citet{noroozi2019estimation} and
+\citet{307cbeb9b1be48299388437423d94bf1}.
 
 Modularity Maximization is NP-hard, so
 \citet{307cbeb9b1be48299388437423d94bf1} used the Extreme Points
-(EP) algorithm \cite{le2016}, which is \(O(n^{K - 1})\), as a greedy
+(EP) algorithm (\cite{le2016}), which is \(O(n^{K - 1})\), as a greedy
 relaxation of the optimization problem. For these simulations, the
 Louvain algorithm was used for modularity maximization,
 as \citet{307cbeb9b1be48299388437423d94bf1}'s implementation proved to be
@@ -1068,12 +1071,10 @@ by taking the outer products of the popularity vectors
 \hypertarget{real-data-examples}{%
 \section{Applications}\label{real-data-examples}}
 
-In this section, our algorithms were applied 
-
-In the first real data example, we applied OSC to the Leeds Butterfly
-dataset \cite{Wang_2018} consisting of visual similarity measurements
+In the first example, we applied OSC to the Leeds Butterfly
+dataset \citep{Wang_2018} consisting of visual similarity measurements
 among 832 butterflies across 10 species. The graph was modified to match
-the example from \cite{noroozi2019estimation}: Only the $K=4$ most
+the example from \citet{noroozi2019estimation}: Only the $K=4$ most
 frequent species were considered, and the similarities were discretized
 to \(\{0, 1\}\) via thresholding. Fig. \ref{fig:butterfly} shows a
 sorted adjacency matrix sorted by the resultant clustering.
@@ -1086,15 +1087,16 @@ Comparing against the ground truth species labels, OSC achieves an adjusted Rand
 
 }
 
-\caption{Adjacency matrix of the Leeds Butterfly dataset after sorting by the clustering outputted by OSC.}\label{fig:butterfly}
+\caption{Adjacency matrix of the Leeds Butterfly dataset 
+after sorting by the clustering outputted by OSC.}\label{fig:butterfly}
 \end{figure}
 
 In the second example, we applied OSC to the British MPs Twitter network
-\cite{greene2013producing}, the Political Blogs network
-\cite{10.1145/1134271.1134277}, and the DBLP network
-\cite{NIPS2009_3855, 10.1007/978-3-642-15880-3_42}. For this data
+\citep{greene2013producing}, the Political Blogs network
+\citep{10.1145/1134271.1134277}, and the DBLP network
+\citep{NIPS2009_3855, 10.1007/978-3-642-15880-3_42}. For this data
 analysis, we subsetted the data as described in
-\cite{307cbeb9b1be48299388437423d94bf1} for their analysis of the
+\citet{307cbeb9b1be48299388437423d94bf1} for their analysis of the
 same networks. Our methods underperformed compared to modularity
 maximization, although performance is comparable. In addition, OSC's
 runtime is much lower than that of modularity maximization.
@@ -1174,13 +1176,13 @@ that connect the Stochastic Block Model and the Degree Corrected Block Model
 to the Random Dot Product Graph: 
 The SBM, DCBM, and PABM are successive generalizations of Block Models. 
 Similarly, the SBM is a RDPG for which each community corresponds to a point 
-(zero-dimensional subspace) \cite{lyzinski2014}, the DCBM is a RDPG 
+(zero-dimensional subspace) \citep{lyzinski2014}, the DCBM is a RDPG 
 for which each community corresponds to a line (one-dimensional subspace) 
-\cite{rubindelanchy2017consistency}, 
+\citep{rubindelanchy2017consistency}, 
 and the PABM is a GRDPG for which each community is a $K$-dimensional subspace. 
 
 The latent structure of the PABM can be recovered 
-via Adjacency Spectral Embedding \cite{rubindelanchy2017statistical}, 
+via Adjacency Spectral Embedding \citep{rubindelanchy2017statistical}, 
 which allows us to take advantage of this latent structure 
 for statistical inference. 
 Using the fact that the communities are represented by orthogonal subspaces, 
@@ -1189,7 +1191,7 @@ for which we have the theoretical guarantee that
 the number of misclustered vertices approaches zero 
 with high probability as the size of the graph increases. 
 This is a stronger result than previously proposed algorithms
-\cite{307cbeb9b1be48299388437423d94bf1},
+\citep{307cbeb9b1be48299388437423d94bf1},
 which only guarantee that the error rate (and not count) 
 approaches zero asymptotically.
 Parameter estimation can be performed in a similar fashion using the ASE, 
@@ -1198,7 +1200,7 @@ the per-parameter error approaches zero asymptotically.
 Both of these results are demonstrated via simulation study. 
 
 One proposed approach to community detection for the PABM 
-is an application of Sparse Subspace Clustering \cite{noroozi2019estimation}. 
+is an application of Sparse Subspace Clustering \citep{noroozi2019estimation}. 
 We show that the latent structure of the PABM leads to 
 both a straightforward justification for SSC for the PABM 
 as well as an improvement over the previous implementation.
@@ -1209,7 +1211,9 @@ This result is also demonstrated via simulation study.
 
 \appendix
 \renewcommand\refname{References}
-  \bibliography{misc.bib}
+% \bibliographystyle{plain}
+% \bibliography{misc.bib}
+\printbibliography
 
 \hypertarget{proofs}{%
 \section{Proofs of Theorem~\ref{theorem4} and Theorem~\ref{theorem5}}}
@@ -1218,8 +1222,8 @@ be the $n \times K^2$ matrices whose columns are the eigenvectors of \(P\) and \
 $K^2$ largest eigenvalues (in modulus), respectively. 
 We first state an important technical lemma for bounding the maximum
 $\ell_2$ norm difference between the rows of $\hat{V}_n$ and
-$V_n$. See \cite{cape_biometrika} and 
-\cite[Lemma~5]{rubindelanchy2017statistical} for a proof. 
+$V_n$. See \citet{cape_biometrika} and 
+\citet[Lemma~5]{rubindelanchy2017statistical} for a proof. 
 \begin{lemma}
   \label{lem:technical}
 Let $A \sim \mathrm{PABM}(\{\lambda^{(k \ell \ell)}\}_{K})$ be a $K$-blocks
@@ -1308,7 +1312,7 @@ these definitions are stated using the notations of the current paper.
 
  % We first recall the
 % notion of the inradius of a set of points. 
-\begin{definition}[Inradius \cite{soltanolkotabi2012, jmlr-v28-wang13}]
+\begin{definition}[Inradius \citep{soltanolkotabi2012, jmlr-v28-wang13}]
   \label{inradius}
 The inradius of a convex body $\mathcal{P}$, denoted by $r(\mathcal{P})$, is
 defined as the radius of the largest Euclidean ball inscribed in $\mathcal{P}$.
@@ -1640,7 +1644,7 @@ $\hat{\Lambda}_i^{(k \ell)}$ denote the $i$th rows of $\Lambda^{(k
 % orthogonal transformation by the rate given in Theorem 5 of
 % \citet{rubindelanchy2017statistical}.\\
 Furthermore, by looking at the proof of Theorem~5 in
-\cite{rubindelanchy2017statistical}, we see that $W^{*}$ is also
+\citep{rubindelanchy2017statistical}, we see that $W^{*}$ is also
 blocks diagonal with $2$ blocks where the positive eigenvalues of $M^{(k \ell)}$
 forming a block and the negative eigenvalues of $M^{(k \ell)}$ forming
 the remaining block. % \(U^\top \hat{U}\). 
