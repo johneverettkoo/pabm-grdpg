@@ -68,7 +68,8 @@
 \usepackage{float}
 \usepackage{mathtools}
 % \usepackage{natbib}
-\usepackage[backend=bibtex,style=authoryear,giveninits,natbib]{biblatex}
+\usepackage[backend=bibtex,style=authoryear,giveninits=true,natbib]{biblatex}
+\DeclareNameAlias{sortname}{last-first}
 \addbibresource{misc.bib}
 \renewbibmacro{in:}{%
   \ifentrytype{article}{}{%
