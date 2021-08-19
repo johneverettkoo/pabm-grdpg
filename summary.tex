@@ -105,13 +105,18 @@ Michael Trosset\\Department of Statistics, Indiana University}
 We connect two random graph models, the Popularity Adjusted Block Model
 (PABM) and the Generalized Random Dot Product Graph (GRDPG),
 by demonstrating that a PABM is a GRDPG in which communities correspond to 
-mutually orthogonal subspaces of latent vectors. This insight
-leads to the construction of improved algorithms for community detection
-and parameter estimation with PABM. Using established asymptotic
-properties of Adjacency Spectral Embedding for GRDPG, we derive
-asymptotic properties of these algorithms, including algorithms that
-rely on Sparse Subspace Clustering. We illustrate these properties
-via simulation study.
+mutually orthogonal subspaces of latent vectors. 
+This insight allows us to construct new algorithms for community detection
+and parameter estimation with the PABM, 
+as well as improve an existing algorithm 
+that relies on Sparse Subspace Clustering. 
+Using established asymptotic properties of 
+Adjacency Spectral Embedding for the GRDPG, 
+we derive asymptotic properties of these algorithms. 
+In particular, we demonstrate that the absolute number of 
+community detection errors tends to zero as 
+the number of graph vertices tends to infinity. 
+Simulation experiments illustrate these properties. 
 \end{abstract}
 
 \providecommand{\tightlist}{%
@@ -142,7 +147,7 @@ via simulation study.
 \hypertarget{introduction}{%
 \section{Introduction}\label{introduction}}
 
-Statistical inference on random graphs requires a suitable probability model.  A general probability model for unweighted and undirected graphs is the Bernoulli Graph, which assumes that edges occur as independent Bernoulli trials.  A Bernoulli Graph is characterized by an edge probability matrix $P=[P_{ij}]$, where an edge between vertices $i$ and $j$ occurs with success probability $P_{ij}$.  A trivial example of a Bernoulli Graph is the Erd\"{o}s-R\'{e}nyi model proposed by \citet{Gilbert:1959}, in which the vertices of the random graph are fixed and possible edges occur independently with fixed probability $P_{ij}=p$.  The requirement that $p$ is fixed is too strong for most applications, and various researchers have weakened that requirement in various ways.  The present work relates two lines of generalization.
+Statistical inference on random graphs requires a suitable probability model.  A general probability model for unweighted and undirected graphs is the Bernoulli Graph (also known as the inhomogeneous Er\"{o}s-R\'{e}nyi model), which assumes that edges occur as independent Bernoulli trials.  A Bernoulli Graph is characterized by an edge probability matrix $P=[P_{ij}]$, where an edge between vertices $i$ and $j$ occurs with success probability $P_{ij}$.  A trivial example of a Bernoulli Graph is the Erd\"{o}s-R\'{e}nyi model proposed by \citet{Gilbert:1959}, in which the vertices of the random graph are fixed and possible edges occur independently with fixed probability $P_{ij}=p$.  The requirement that $p$ is fixed is too strong for most applications, and various researchers have weakened that requirement in various ways.  The present work relates two lines of generalization.
 
 Network analysis is often concerned with community detection.  One form of community detection assumes that each vertex belongs to an unobserved community, with the probability of an edge between vertices $i$ and $j$ depending on the communities to which $i$ and $j$ belong.  Formally, one assigns each vertex $v_i$ a community label $z_i$ and assumes a Bernoulli Graph in which $P_{ij}$ is a function of $z_i$ and $z_j$.  Such models, called Block Models, define the goal of community detection as a problem in statistical inference: identify the true community (up to permutation of labels) to which each vertex belongs.
 
@@ -311,7 +316,7 @@ we denote the GRDPG as $(A, X) \sim \GRDPG_{p,q}(F, n)$.
 
 \begin{remark}
 We can use Adjacency Spectral Embedding (ASE) 
-\cite{rubindelanchy2017statistical} to recover the latent vectors of a GRDPG. 
+\citep{doi:10.1080/01621459.2012.699795} to recover the latent vectors of a GRDPG. 
 This procedure consists of taking the spectral decomposition of $A$ 
 (or $P$ if available) and choosing the $p$ most positive and $q$ most negative
 eigenvalues and their corresponding eigenvectors 
@@ -326,9 +331,9 @@ denoted as $\mathbb{O}(p, q)$.
 
 \begin{remark}
 The latent vectors that produce $X I_{p,q} X^\top = P$ are not unique
-\cite{rubindelanchy2017statistical}.
+\citep{rubindelanchy2017statistical}.
 More specifically, if $P_{ij} = x_i^\top I_{p, q} x_j$, 
-then we also have for any$Q \in \mathbb{O}(p, q)$,
+then we also have for any $Q \in \mathbb{O}(p, q)$,
 $(Q x_i)^\top I_{p, q} (Q x_j) = x_i^\top (Q^\top I_{p, q} Q) x_j =
 x_i^\top I_{p, q} x_j = P_{ij}$.
 Unlike in the RDPG case, transforming the latent positions via multiplication
@@ -704,8 +709,10 @@ as desired.
 % \textbf{Proof of Theorem \ref{theorem3}}. 
 Recall that \(X\) is block diagonal with each block
 corresponding to one community and hence \(X (X^\top X)^{-1} X^\top\) is also a
-block diagonal matrix with each block corresponding to a community. As $B = n VV^{\top} = n X (X^\top X)^{-1} X^\top$, we
-conclude that $B_{ij} = 0$ whenever vertices $i$ and $j$ belong to different communities.  
+block diagonal matrix with each block corresponding to a community. 
+As $B = n VV^{\top} = n X (X^\top X)^{-1} X^\top$, 
+we conclude that $B_{ij} = 0$ 
+whenever vertices $i$ and $j$ belong to different communities.  
 \end{proof}
 
 
@@ -720,7 +727,16 @@ exactly.
 
 Using \(A\) instead of \(P\) introduces error, which converges to \(0\)
 almost surely. We use this fact to motivate Orthogonal Spectral Clustering 
-(Alg. 1).
+(Alg. 1). 
+In order to show that OSC is consistent, 
+we introduce the sparsity factor $\rho_n \in (0, 1]$, 
+which can be characterized as the average expected degree of the vertices 
+divided by the number of vertices. 
+The situation is the same as in \cite{307cbeb9b1be48299388437423d94bf1} (PABM) 
+and \cite{rubindelanchy2017statistical} (GRDPG) in which the popularity vectors 
+are scaled as $\rho_n^{1/2} \lambda^{(k \ell)}$. 
+For ease of notation, we restrict our results to the case in which all 
+nonzero popularity parameters are greater than some positive minimum value.
 
 \begin{theorem}
 \label{theorem4}
@@ -736,12 +752,6 @@ O_P \Big( \frac{(\log n)^c}{\sqrt{n \rho_n}} \Big)
 This provides the result that for $i, j$ in different communities,
 $\hat{B}_{ij} \stackrel{a.s.}{\to} 0$.
 \end{theorem}
-
-The sparsity factor $\rho_n$ can be characterized as 
-the average expected degree of the vertices of the graph 
-divided by the number of vertices. 
-Thus Theorem \ref{theorem4} requires the average degree 
-to grow faster than $(\log n)^{4c}$.
 
 Theorems \ref{theorem2}, \ref{theorem3}, and \ref{theorem4} also provide
 a natural path toward using SSC for community detection. 
@@ -1165,50 +1175,32 @@ Village 46 & 0.052 & 0.463 & 0.078\\
 \hypertarget{discussion}{%
 \section{Discussion}\label{discussion}}
 
-The central result of this paper illustrates that the 
-Popularity Adjusted Block Model is a special case of the 
-Generalized Random Dot Product Graph and how this connection 
-can be exploited for community detection and parameter estimation. 
-Specifically, the PABM with $K$ communities is a GRDPG 
-for which each community is represented by a $K$-dimensional subspace 
-in the latent space, and the subspaces are orthogonal to each other. 
-This result can be viewed as a continuation of previous results 
-that connect the Stochastic Block Model and the Degree Corrected Block Model 
-to the Random Dot Product Graph: 
-The SBM, DCBM, and PABM are successive generalizations of Block Models. 
-Similarly, the SBM is a RDPG for which each community corresponds to a point 
-(zero-dimensional subspace) \citep{lyzinski2014}, the DCBM is a RDPG 
-for which each community corresponds to a line (one-dimensional subspace) 
-\citep{rubindelanchy2017consistency}, 
-and the PABM is a GRDPG for which each community is a $K$-dimensional subspace. 
+Our central result states that the Popularity Adjusted Block Model 
+is a special case of the Generalized Random Dot Product Graph. 
+In particular, the PABM with $K$ communities is a GRDPG 
+for which the communities are represented by 
+mutually orthogonal $K$-dimensional subspaces of the latent space. 
+This result extends previous results that connected the Stochastic Block Model and the Degree Corrected Block Model to Random Dot Product Graphs. 
+Replacing RDPGs with GRDPGs is a critical step in this line of research, as a PABM is not necessarily a RDPG. 
 
-The latent structure of the PABM can be recovered 
-via Adjacency Spectral Embedding \citep{rubindelanchy2017statistical}, 
-which allows us to take advantage of this latent structure 
-for statistical inference. 
-Using the fact that the communities are represented by orthogonal subspaces, 
-we propose Orthogonal Spectral Clustering for community detection, 
-for which we have the theoretical guarantee that 
-the number of misclustered vertices approaches zero 
-with high probability as the size of the graph increases. 
-This is a stronger result than previously proposed algorithms
-\citep{307cbeb9b1be48299388437423d94bf1},
-which only guarantee that the error rate (and not count) 
-approaches zero asymptotically.
-Parameter estimation can be performed in a similar fashion using the ASE, 
-for which we also prove that 
-the per-parameter error approaches zero asymptotically. 
-Both of these results are demonstrated via simulation study. 
+Because all Bernoulli Graphs are GRDPGs, it should be possible to invent and study new families of Bernoulli Graphs by characterizing them as special cases of GRDPGs and expliting the latent structures that define them. 
+The present work illustrates the powr of this approach. 
+We recover the latent structure of the PABM by Adjacency Spectral Embedding, then exploit that structure to improve statistical inference. 
+Exploiting the fact that PABM communities correspond to orthogonal subspaces, we propose Orthogonal Spectral Clustering for community detection and demonstrate that the number of misclassified vertices approaches zero with high probability as the size of the graph increases. 
+This is a stronger result than previously proposed algorithms \citep{307cbeb9b1be48299388437423d94bf1}, which only guarantee that the error rate (and not count) approaches zero asymptotically. 
+Parameter estimation can be performed in a similar fashion using the ASE, for which we also prove that the per-parameter error approaches zero asymptotically. 
 
-One proposed approach to community detection for the PABM 
-is an application of Sparse Subspace Clustering \citep{noroozi2019estimation}. 
-We show that the latent structure of the PABM leads to 
-both a straightforward justification for SSC for the PABM 
-as well as an improvement over the previous implementation.
-Our approach applies SSC on the ASE, 
-and we prove that the ASE of the PABM obeys the Subspace Detection Property
-with high probability if the graph is large. 
-This result is also demonstrated via simulation study. 
+A secondary benefit of the GRDPG approach is that the latent structure may be used to improve existing algorithms. 
+For example, one algorithm for PABM community detection \citep{noroozi2019estimation} relies on Sparse Subspace Clustering. 
+The latent structure of the PABM provides a natural justification for SSC for the PABM and leads to an improvement over the previous implementation. 
+The improved algorithm applies SSC to the ASE, and we prove that the ASE of the PABM obeys the Subspace Detection Property with high probability if the graph is large. 
+
+Finally, one might well inquire what one gains and what one sacrifices by assuming that a Bernoulli Graph is a PABM. 
+The GRDPG model offers a plausible way to pursue this inquiry. 
+Absent a known latent structure that can be exploited by specialized methods, the GRDPG-ASE approach transforms the problem of network community detection to the much-studied problem of clustering vectors in Euclidean space. 
+Communities of vertices are defined as clusters of latent vectors. 
+After ASE, a standard clustering algorithm, e.g., single linkage, is used ot infer the communities. 
+In future research, we intend to use such general algorithms as baselines and measure the efficiency of the PABM algorithms (and other specialized algorithms) by studying how much they improve on general algorithms when the specified latent structure obtains. 
 
 \appendix
 \renewcommand\refname{References}
@@ -1353,117 +1345,6 @@ and define the subspace incoherence for $\hat{V}^{(k)}$ by
 $$\mu^{(k)} = \mu(\hat{V}^{(k)}) = \max\limits_{v \in V^{(-k)}} \|W^{(k)} v\|_\infty.$$
 \end{definition}
 
-  
-
-% Our proof is based on Theorem~6 in \cite{jmlr-v28-wang13} that provide
-% sufficient conditions under which sparse subspace clustering based on
-% solving the optimization problem in Eq.~\eqref{eq:ssc} yields an
-% affinity matrix $B = |C| + |C^{\top}|$ satisfying the subspace
-% detection property of Definition~\ref{def:subspace_detection}.  
-% \begin{theorem}
-%   Let $d \geq 1$ and let $\mathcal{S}_1, \mathcal{S}_2, \dots, \mathcal{S}_{L}$ be
-%   subspaces of $\mathbb{R}^{d}$. 
-% Let $Y = [y_1 \mid y_2 \mid \dots \mid y_n]^{\top}$ be a $n \times d$ matrix
-% with rows $y_i \in \mathcal{S}_1 \cup \mathcal{S}_2 \cup
-% \dots \mathcal{S}_{L}$. Let $x_i = y_i + z_i$ and suppose that there
-% exists a finite $\delta \geq 0$ such that $\|z_i\| \leq \delta$ for
-% all $i$.
-% \end{theorem}
-
-% Our proof leverages
-% the conditions given in Theorem~6 of \cite{jmlr-v28-wang13} for
-% guaranteeing the subspace detection property of a noisy
-
-% Note that the rows
-% of $\sqrt{n}V$ satisfy the subspace detection property in
-% Definition~\ref{def:subspace_detection}. Now, by 
-% Lemma~\ref{lem:technical}, there exists an orthogonal transformation
-% $W$ such that the rows of $\sqrt{n}\hat{V}_n W$ are
-% uniformly close to the rows of $\sqrt{n} V_n$. 
-
-% Our proof leverages
-% the conditions given in Theorem~6 of \cite{jmlr-v28-wang13} for
-% guaranteeing the subspace detection property of a noisy
-
-% together with the uniform row-wise
-% error bound between $\hat{V}$ and $V$ as given in
-% Lemma~\ref{lem:technical}. 
-
-% We first recall the
-% notion of the inradius of a set of points. 
-% \begin{definition}[Inradius \cite{soltanolkotabi2012, jmlr-v28-wang13}]
-% The inradius of a convex body $\mathcal{P}$, denoted by $r(\mathcal{P})$, is
-% defined as the radius of the largest Euclidean ball inscribed in $\mathcal{P}$.
-% In addition, $r(X)$ for data matrix $X$ with rows $x_i^\top$ represents
-% the inradius of the symmetric convex hull of $X$.
-% \end{definition}
-
-% The next 
-
-% \begin{definition}[Subspace incoherence property \cite{jmlr-v28-wang13}]
-% \end{definition}
-
-
-
-% \begin{lemma}
-% \label{lemma2} % Let $\hat{V}$ be the eigenvectors of $A_n$
-% % corresponding to the $K^2$ largest eigenvalues in modulus. Let
-% % $\hat{V}^{(k)}$ denote the matrix formed by keeping only the rows of
-% % $\hat{V}$ corresponding to the $k^{th}$
-% % community and let $\hat{V}^{(-k)}$ denote the matrix formed by
-% % omitting the rows of $\hat{V}$
-% % corresponding to the $k^{th}$ community. Let $(\hat{v}_i^{(k)})^\top$ denote
-% % the $i$th row of $\hat{V}^{(k)}$ and $\hat{V}_{-i}^{(k)}$ be $\hat{V}^{(k)}$ with
-% % the $i^{th}$ row omitted. Let $V$, $V^{(k)}$, $V^{(-k)}$, and
-% % $v_i^{(k)}$ be defined similarly using the eigenvectors $V$ of
-% % $P_n$. Finally let $\mathcal{S}^{(k)}$ be the vector space spanned by the
-% % rows of $V^{(k)}$. 
-
-% % Now define $\nu_{i}^{(k)}$ for $k = 1,2,\dots,K$ and $i =
-% % 1,2,\dots,n_{k}$ as the solution of the following optimization problem
-% % $$\nu_{i}^{(k)} = \max_\eta (\hat{v}_i^{(k)})^\top \eta - \frac{1}{2
-% %   \lambda} \eta^\top \eta, \quad \text{subject to $\|V_{-i}^{(k)}
-% %   \eta\|_\infty \leq 1$.}$$
-% % Given $\nu_i^{(k)}$, let $\mathbb{P}_{\mathcal{S}^{(k)}}(\nu_i^{(k)})$
-% % be the vector in $\mathbb{R}^{K^2}$ corresponding to the orthogonal projection of $\nu_i^{(k)}$ onto the vector space
-% % $\mathcal{S}^{(k)}$ and define the projected dual direction $w_{i}^{(k)}$
-% % as
-% % $$w_i^{(k)} =
-% % \frac{\mathbb{P}_{\mathcal{S}^{(k)}}(\nu_i^{(k)})}{\|\mathbb{P}_{\mathcal{S}^{(k)}}(\nu_i^{(k)})\|}.$$
-% % Now let $W^{(k)} = \begin{bmatrix} w_1^{(k)} & \cdots & w_{n_k}^{(k)} \end{bmatrix}^\top$
-% % and define the subspace incoherence for $W^{(k)}$ by
-% % $$\mu^{(k)} = \mu(\hat{V}^{(k)}) = \max\limits_{v \in V^{(-k)}} \|W^{(k)} v\|_\infty.$$
-% Recall the notations in Definition~\ref{def:subspace_incoherence}. 
-% We then have
-% \begin{equation} \label{eq:mu-conv}
-% \mu^{(k)} = 0, \quad \text{for all $k = 1,2,\dots,K$.}
-% \end{equation}
-% \end{lemma}
-
-% \begin{proof} From Theorem \ref{theorem3} we have that the subspaces
-%   $\{\mathcal{S}^{(1)}, \dots, \mathcal{S}^{(K)}\}$
-%   are mutually orthogonal, i.e., $v^{\top} w = 0$ for all $v \in
-%   \mathcal{S}^{(k)}$ and $w \in \mathcal{S}^{(\ell)}$ with $k \not =
-%   \ell$. Now let $z \in \mathbb{R}^{K^2}$ be arbitrary and let
-%   $\tilde{z} = \mathbb{P}_{\mathcal{S}^{(k)}} z$ be the projection of
-%     $z$ onto $\mathcal{S}^{(k)}$. We then have $v^{\top} \tilde{z} =
-%     0$ for all $v \in V^{(-k)}$. Since $z$ is arbitrary, this implies $\|W^{(k)} v\|_{\infty} = 0$ for all $v
-%     \in V^{(-k)}$ and hence $\mu^{(k)} = 0$ as desired.
-% %   Therefore any vector projected to \(\mathcal{S}^{(k)}\)
-% % must be orthogonal to each row of \(V^{(-k)}\) and hence
-% %\(W^{(k)} v = 0\) for all $v \in \mathcal{S}^{(-k)}$, as desired.
-% \end{proof}
-
-% \begin{lemma}
-% \label{lemma3}
-% Let $(v_n^{(i)})^\top$ and $(\hat{v}_n^{(i)})^\top$ be the rows of $V_n$ and
-% $\hat{V}_n$ respectively. By \citet{rubindelanchy2017statistical},
-
-% \begin{equation} \label{eq:delta-conv}
-% \delta_n = \max_i \|\hat{v}_n^{(i)} - v_n^{(i)}\| \stackrel{a.s.}{\to} 0
-% \end{equation}
-% \end{lemma}
-
 With the above definitions in place, we are now ready to state our
 proof of Theorem~\ref{theorem5}.
 
@@ -1475,6 +1356,7 @@ such that $\sqrt{n} \hat{V}$ satisfies
 the subspace detection property in
 Definition~\ref{def:subspace_detection} whenever
 the following two conditions are satisfied
+
 \begin{gather}
   \label{eq:cond1}
   \mu^{(k)} < r^{(k)} \quad \text{for all $k = 1,2,\dots,K$}, \\
@@ -1482,37 +1364,16 @@ the following two conditions are satisfied
   \max_{i} \|W \hat{v}_{i} - v_{i}\| \leq \min_{k} \frac{r_*(r^{(k)} -
     \mu^{(k)})}{2 + 7 r^{(k)}}.
 \end{gather}
-% Furthermore, we can also choose the weighting parameter $\lambda$ in
-% the range
-% $$\frac{1}{r_* - 2 \delta - \delta^2} \leq \lambda \leq \min_{k}
-% \frac{r_k - \mu_k - 2 \delta_1}{\delta(1 + 
-% In other words, $\sqrt{n}\hat{V}_n$ 
-% small enough and the
-% subspace inradius is greater than the subspace incoherence for each
-% community \(k\).
+
 We now verify that for sufficiently large n, Eq.~\eqref{eq:cond1} and Eq.~\eqref{eq:cond2}
 holds with high probability.
-% satisfied with high probability. 
-% Indeed, let
-% The basis of this proof is Theorem 6 from \citet{jmlr-v28-wang13}, which states that the
-% subspace detection property holds if the noise in $\sqrt{n}\hat{V}$
-% as an estimate for $\sqrt{n} V$ is small enough and that the inradius
-% of the $\hat{V}^{(k)}$ are greater 
-% small enough and the
-% subspace inradius is greater than the subspace incoherence for each
-% community \(k\).
- % , let \(v_{-i}^{(k)}\) be the matrix \(V^{(k)}\) with the
-% \(i\)\textsuperscript{th} row removed. Then 
 
 {\bf Verifying Eq.~\eqref{eq:cond1}}. If $n$ is sufficiently large then
 there are enough vertices in each community $k$ so that
 $\mathrm{span}(V_{-i}^{(k)}) = \mathcal{S}^{(k)}$ for all $i$ and hence
-% spans its corresponding subspace (Theorem
-% \ref{theorem2}). 
-% We therefore have, for sufficiently large $n$, that 
 \(r^{(k)} = \min_{i} r(V_{-i}^{(k)}) > 0\) for
-all $k = 1,2,\dots,K$. % Eq.~\eqref{eq:cond1} then follows from the fact that $\mu^{(k)} = 0$ for all $k = 1,2,\dots,K.$
-% Indeed, from 
+all $k = 1,2,\dots,K$. 
+
 Next, by Theorem \ref{theorem3} we have that the subspaces
   $\{\mathcal{S}^{(1)}, \dots, \mathcal{S}^{(K)}\}$
   are mutually orthogonal, i.e., $v^{\top} w = 0$ for all $v \in
@@ -1525,19 +1386,12 @@ Next, by Theorem \ref{theorem3} we have that the subspaces
     =1,2,\dots,K$. Therefore $\mu^{(k)} < r^{(k)}$ for all $k =
     1=2,\dots,K$ as desired.
 
-% Lemma~\ref{lemma2} then implies, with high
-% Combining the above two facts, we have, for sufficiently large, that $n$ \(r^{(k)} > \mu_n^{(k)} = 0\) for all $k = 1,2\dots,K$.
-% where \(\mu_n^{(k)} = \mu(\hat{V}_n^{(k)})\) and \(n\) is large enough
-% such that \(\min\limits_{k, i} \text{rank}(V_{n, -i}^{(k)}) = K\).
-
 {\bf Verifying Eq.~\eqref{eq:cond2}}.
 Let $\delta = \max_{i} \sqrt{n} \|W
 \hat{v}_{i} - v_{i}\|$. Then from Lemma~\ref{lem:technical}, we have
 \(\delta \stackrel{a.s.}{\to} 0\) and hence
 $$\delta < \min_{k} \frac{r_* (r^{(k)} - \mu^{(k)})}{2 + 7 r^{(k)}}$$
 asymptotically almost surely. 
-% \(= \min\limits_k \frac{r_n r_n^{(k)}}{2 + 7 r_n^{(k)}}\) with
-% probability 1.
 
 In summary $\sqrt{n} \hat{V}$ satisfies the subspace detection property
 with probability converging to $1$ as \(n \to \infty\).
