@@ -107,7 +107,7 @@ We connect two random graph models, the Popularity Adjusted Block Model
 by demonstrating that a PABM is a GRDPG in which communities correspond to 
 mutually orthogonal subspaces of latent vectors. 
 This insight allows us to construct new algorithms for community detection
-and parameter estimation with the PABM, 
+and parameter estimation for the PABM, 
 as well as improve an existing algorithm 
 that relies on Sparse Subspace Clustering. 
 Using established asymptotic properties of 
@@ -147,83 +147,18 @@ Simulation experiments illustrate these properties.
 \hypertarget{introduction}{%
 \section{Introduction}\label{introduction}}
 
-Statistical inference on random graphs requires a suitable probability model.  A general probability model for unweighted and undirected graphs is the Bernoulli Graph (also known as the inhomogeneous Er\"{o}s-R\'{e}nyi model), which assumes that edges occur as independent Bernoulli trials.  A Bernoulli Graph is characterized by an edge probability matrix $P=[P_{ij}]$, where an edge between vertices $i$ and $j$ occurs with success probability $P_{ij}$.  A trivial example of a Bernoulli Graph is the Erd\"{o}s-R\'{e}nyi model proposed by \citet{Gilbert:1959}, in which the vertices of the random graph are fixed and possible edges occur independently with fixed probability $P_{ij}=p$.  The requirement that $p$ is fixed is too strong for most applications, and various researchers have weakened that requirement in various ways.  The present work relates two lines of generalization.
+Statistical inference on random graphs requires a suitable probability model. 
+A general probability model for unweighted and undirected graphs is the Bernoulli Graph (also known as the inhomogeneous Erd\"{o}s-R\'{e}nyi model), which assumes that edges occur as independent Bernoulli trials.  A Bernoulli Graph is characterized by an edge probability matrix $P=[P_{ij}]$, where an edge between vertices $i$ and $j$ occurs with success probability $P_{ij}$.  A trivial example of a Bernoulli Graph is the (homogeneous) Erd\"{o}s-R\'{e}nyi model proposed by \citet{Gilbert:1959}, in which the vertices of the random graph are fixed and possible edges occur independently with fixed probability $P_{ij}=p$.  The requirement that $p$ is fixed is too strong for most applications, and various researchers have weakened that requirement in various ways.  The present work relates two lines of generalization.
 
 Network analysis is often concerned with community detection.  One form of community detection assumes that each vertex belongs to an unobserved community, with the probability of an edge between vertices $i$ and $j$ depending on the communities to which $i$ and $j$ belong.  Formally, one assigns each vertex $v_i$ a community label $z_i$ and assumes a Bernoulli Graph in which $P_{ij}$ is a function of $z_i$ and $z_j$.  Such models, called Block Models, define the goal of community detection as a problem in statistical inference: identify the true community (up to permutation of labels) to which each vertex belongs.
 
 The classical Stochastic Block Model (SBM) of \citet{doi:10.1080/0022250X.1971.9989788} specifies that each edge probability $P_{ij}$ depends only on the labels $z_i$ and $z_j$, i.e., $P_{ij} = \omega_{z_,z_j}$.  Subsequent researchers have weakened this assumption.   The Degree-Corrected Block Model (DCBM) of \citet{Karrer_2011} assigns an additional parameter $\theta_i$ to each vertex and sets $P_{ij} = \theta_i \theta_j \omega_{z_,z_j}$. The Popularity Adjusted Block Model (PABM) of \citet{307cbeb9b1be48299388437423d94bf1} generalizes the DCBM, allowing heterogeneity of edge probabilities within and between communities while still maintaining distinct community structure.
 
-Another type of Bernoulli Graph was proposed by \citet*{10.1007/978-3-540-77004-6_11}.  A Random Dot Product Graph (RDPG) specifies that each vertex corresponds to a latent position vector in Euclidean space and that the probability of an edge between two vertices is the dot product of their latent position vectors.  Thus, if the latent positions $x_1,\ldots,x_n \in \mathbb{R}^d$ and $X = [\begin{array}{ccc} x_1 & \cdots & x_n \end{array} ]^\top$, then the edge probability matrix is $P = XX^\top$.  Clearly, any Bernoulli Graph with positive semidefinite $P$ is an RDPG.  The positive definite Euclidean inner product in the RDPG model was replaced by an indefinite inner product in \citet{rubindelanchy2017consistency}, resulting in the {\em Generalized}\/ RDPG (GRDPG).
+Another type of Bernoulli Graph was proposed by \citet*{10.1007/978-3-540-77004-6_11}.  A Random Dot Product Graph (RDPG) specifies that each vertex corresponds to a latent position vector in Euclidean space and that the probability of an edge between two vertices is the dot product of their latent position vectors.  Thus, if the latent positions are $x_1,\ldots,x_n \in \mathbb{R}^d$ and $X = [\begin{array}{ccc} x_1 & \cdots & x_n \end{array} ]^\top$, then the edge probability matrix is $P = XX^\top$.  Clearly, any Bernoulli Graph with positive semidefinite $P$ is an RDPG.  The positive definite Euclidean inner product in the RDPG model was replaced by an indefinite inner product in \citet{rubindelanchy2017consistency}, resulting in the {\em Generalized}\/ RDPG (GRDPG).
 
 In contrast to Block Models, neither RDPGs nor GRDPGs inherently specify distinct communities.  However, one can easily impose community structure by assuming that the latent positions lie in distinct clusters.  Hence, it is not surprising that Block Models can be studied by reformulating them as RDPGs or GRDPGs.  For example, an assortative SBM (an SBM for which $P$ is positive semidefinite) is equivalent to an RDPG for which all vertices in the same community correspond to the same latent position vector (\cite{lyzinski2014}).  Likewise, the DCBM is equivalent to an RDPG for which all vertices in the same community correspond to latent position vectors that lie on a straight line (\cite{lyzinski2014, rubindelanchy2017consistency}). 
 
 Because the edge probability matrix of a PABM is not necessarily positive semidefinite, a PABM is not necessarily an RDPG.   In Section \ref{connecting-the-pabm-to-the-grdpg} we demonstrate that every PABM is in fact a specific type of GRDPG for which the latent position vectors lie in distinct orthogonal subspaces, each subspace corresponding to a community.  This identification is our central result.  In Section \ref{methods}, we use the geometry of the GRDPG to derive more efficient algorithms for detecting the communities and estimating the parameters in the PABM.  We report the results of simulation studies in Section \ref{simulated-examples} and apply our methods to three well-known data sets in Section \ref{real-data-examples}. Section \ref{discussion} concludes.
-
-\begin{comment}
-
-Statistical inference on random graphs involves the
-partitioning of a graph into disconnected subgraphs or clusters. This is
-often motivated by the assumption that there exist underlying and
-unobserved communities to which each vertex of the graph belongs, and
-edges between pairs of vertices are determined by drawing from a
-probability distribution based on the community relationships between
-each pair. The goal of this analysis then is population community
-detection, or the recovery of the true underlying community labels for
-each vertex, up to permutation, with some additional parameter
-estimation being of possible interest, assuming some underlying
-probability model. 
-
-A general family of models that describe unweighted and undirected graphs is 
-the Bernoulli Graph, which is characterized by edge probability matrix $P$. 
-Edges between each pair of vertices $i$ and $j$ are drawn 
-as a Bernoulli trial with probability $P_{ij}$, for each 
-$0 \leq i < j \leq n$ and $n$ is the number of vertices in the graph. 
-Community detection methods often restrict this type of model 
-by assigning each vertex a community label $z_1, ..., z_n$ 
-and then setting each $P_{ij}$ as a function of the labels $z_i$ and $z_j$. 
-Such models are called Block Models. 
-
-One popular type of Block Model is the Stochastic Block Model (SBM),
-first proposed by \citet{doi:10.1080/0022250X.1971.9989788}, 
-which restricts each edge probability $P_{ij}$ as only depending on the labels 
-$z_i$ and $z_j$, i.e., $P_{ij} = \omega_{z_i, z_j}$. 
-Various generalizations of the SBM have since been utilized, 
-including the Degree-Corrected Block Model (DCBM), 
-introduced by \citet{Karrer_2011}, 
-which assigns an additional parameter $\theta_i$ to each vertex 
-and sets $P_{ij} = \theta_i \theta_j \omega_{z_i, z_j}$. 
-The Popularity Adjusted Block Model (PABM) was then introduced by
-\citet*{307cbeb9b1be48299388437423d94bf1} as a generalization of the
-DCBM to address the heterogeneity of edge probabilities within and
-between communities while still maintaining distinct community
-structure.
-
-Parallel to the families of Block Models is another type of Bernoulli Graph 
-called the Random Dot Product Graph (RDPG), proposed by
-\citet*{10.1007/978-3-540-77004-6_11}. 
-Under this model, each vertex of the graph
-can be represented by a vector in some latent space such that the edge
-probability between any pair of vertices is given by their corresponding
-dot product in the latent space, i.e., given a latent positions
-\(x_1, ..., x_n \in \mathbb{R}^d\), the edge probability matrix is
-\(P = X X^\top\) where 
-\(X = \begin{bmatrix} x_1 & \cdots & x_n \end{bmatrix}^\top\). 
-It can be shown that all Bernoulli Graphs with 
-positive semidefinite edge probability matrix $P$ is a type of RDPG. 
-For instance, the assortative
-SBM is equivalent to a special case of the RDPG for which all vertices
-of a given community share the same position in the latent space
-\cite{lyzinski2014}. A similar property exists for the DCBM, 
-which is equivalent to a RDPG in which vertices that belong to the same 
-community all lie in a line segment in the latent space 
-\cite{lyzinski2014, rubindelanchy2017consistency}. 
-Because the edge probability matrix for the PABM is not positive semidefinite, 
-we instead show that it is a special case of the 
-\emph{Generalized} Random Dot Product Graph (GRDPG) 
-in order to analyze the PABM as a latent space model 
-for community detection and parameter estimation. 
-
-\end{comment}
 
 \hypertarget{connecting-the-popularity-adjusted-block-model-to-the-generalized-random-dot-product-graph}{%
 \section{PABMs are GRDPGs}\label{connecting-the-popularity-adjusted-block-model-to-the-generalized-random-dot-product-graph}}
@@ -282,12 +217,12 @@ Now suppose that each block $P^{(k \ell)}$ can be written as the outer product o
   P^{(k \ell)} = \lambda^{(k \ell)} (\lambda^{(\ell k)})^\top
 \end{equation}
 
-for a set of $K^2$ popularity vectors $\{\lambda^{(st)}\}_{1 \leq
-  s \leq K, 1 \leq t \leq K}$ where each
+for a set of $K^2$ popularity vectors 
+$\{\lambda^{(st)}\}_{1 \leq s \leq K, 1 \leq t \leq K}$ where each
 $\lambda^{(st)}$ is a column vector of dimension $n_s$. Then a graph $G$
 is drawn from a PABM with parameters
 $\{\lambda^{(st)}\}$ if its adjacency matrix $A$
-satisfies $A \sim \mathrm{Bernoulli}(P)$.
+satisfies $A \sim \mathrm{BernoulliGraph}(P)$.
 \end{definition}
 
 We will use the notation \(A \sim \PABM(\{\lambda^{(k \ell)}\}_K)\) to denote
@@ -1179,12 +1114,16 @@ Our central result states that the Popularity Adjusted Block Model
 is a special case of the Generalized Random Dot Product Graph. 
 In particular, the PABM with $K$ communities is a GRDPG 
 for which the communities are represented by 
-mutually orthogonal $K$-dimensional subspaces of the latent space. 
-This result extends previous results that connected the Stochastic Block Model and the Degree Corrected Block Model to Random Dot Product Graphs. 
-Replacing RDPGs with GRDPGs is a critical step in this line of research, as a PABM is not necessarily a RDPG. 
+mutually orthogonal $K$-dimensional subspaces 
+of the $K^2$-dimensional latent space. 
+This result extends previous results that connected 
+the Stochastic Block Model and the Degree Corrected Block Model 
+to Random Dot Product Graphs. 
+Replacing RDPGs with GRDPGs is a critical step in this line of research, 
+as a PABM is not necessarily a RDPG. 
 
 Because all Bernoulli Graphs are GRDPGs, it should be possible to invent and study new families of Bernoulli Graphs by characterizing them as special cases of GRDPGs and expliting the latent structures that define them. 
-The present work illustrates the powr of this approach. 
+The present work illustrates the power of this approach. 
 We recover the latent structure of the PABM by Adjacency Spectral Embedding, then exploit that structure to improve statistical inference. 
 Exploiting the fact that PABM communities correspond to orthogonal subspaces, we propose Orthogonal Spectral Clustering for community detection and demonstrate that the number of misclassified vertices approaches zero with high probability as the size of the graph increases. 
 This is a stronger result than previously proposed algorithms \citep{307cbeb9b1be48299388437423d94bf1}, which only guarantee that the error rate (and not count) approaches zero asymptotically. 
