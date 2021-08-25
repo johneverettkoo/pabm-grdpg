@@ -70,7 +70,7 @@
 \usepackage{float}
 \usepackage{mathtools}
 % \usepackage{natbib}
-\usepackage[backend=bibtex,style=authoryear,giveninits=true,natbib]{biblatex}
+\usepackage[backend=bibtex,maxbibnames = 10,style=authoryear,giveninits=true,natbib]{biblatex}
 \DeclareNameAlias{sortname}{last-first}
 \addbibresource{misc.bib}
 \renewbibmacro{in:}{%
@@ -559,6 +559,7 @@ near subspaces.
 \subsection{Algorithms for Community Detection}\label{community-detection}}
 
 \begin{algorithm}[t]
+  \label{alg:osc}
   \DontPrintSemicolon
   \SetAlgoLined
   \KwData{Adjacency matrix $A$, number of communities $K$}
@@ -720,6 +721,7 @@ This allows us to obtain the subspace detection property
 in Theorem \ref{theorem5}. 
 
 \begin{algorithm}[t]
+  \label{alg:ssc}
   \DontPrintSemicolon
   \SetAlgoLined
   \caption{Sparse Subspace Clustering using LASSO.}
@@ -800,6 +802,7 @@ $\hat{\lambda}^{(k \ell)} = \hat{\sigma}^{(k \ell)} \hat{u}^{(k \ell)}$
 using the largest signular value of $A$ and its corresponding singular vectors. 
 
 \begin{algorithm}[t]
+  \label{alg:param_est}
   \DontPrintSemicolon
   \SetAlgoLined
   \caption{PABM parameter estimation.}
@@ -837,22 +840,28 @@ distribution, the popularity vectors \(\{\lambda^{(k \ell)}\}_K\) are drawn
 from two types of joint distributions depending on whether \(k = \ell\),
 the edge probability matrix \(P\) is constructed using the popularity
 vectors, and finally the adjacency matrix \(A\)
-is drawn from \(P\). OSC is then used for community detection, and this
-method is compared against SSC (\cite{noroozi2019estimation,soltanolkotabi2014})
-and MM (\cite{igraph, 307cbeb9b1be48299388437423d94bf1}). 
-True community labels are used
-with Algorithm 3 to estimate the popularity vectors
-\(\{\lambda^{(k \ell)}\}_K\), and this method is then compared against an
-MLE-based estimator described in \citet{noroozi2019estimation} and
+is drawn from \(P\). OSC (Algorithm~\ref{alg:osc}) is then used for community detection, and this
+method is compared against (1) SSC using the spectral embedding $\hat{V}$,
+c.f. Algorithm~\ref{alg:ssc}, (2) SSC using the rows of the
+observed adjacency matrix $A$ as is done in \citet{noroozi2019estimation}
+and (3) modularity maximization (MM) as is done in
+\citet{307cbeb9b1be48299388437423d94bf1}. 
+We also estimate the latent popularity vectors $\{\lambda^{(k \ell)}\}$
+by assuming that the true community labels are known and then apply
+Algorithm~\ref{alg:param_est}, and we compare this estimation method against an
+MLE-based estimator as described in \citet{noroozi2019estimation} and
 \citet{307cbeb9b1be48299388437423d94bf1}.
 
 Modularity Maximization is NP-hard, so
 \citet{307cbeb9b1be48299388437423d94bf1} used the Extreme Points
-(EP) algorithm (\cite{le2016}), which is \(O(n^{K - 1})\), as a greedy
-relaxation of the optimization problem. For these simulations, the
-Louvain algorithm was used for modularity maximization,
-as \citet{307cbeb9b1be48299388437423d94bf1}'s implementation proved to be
-prohibitively computationally expensive for \(K > 2\). For \(K = 2\), it
+(EP) algorithm (\cite{le2016}) as a greedy
+relaxation of the optimization problem; the EP algorithm has a running
+time of $O(n^{K-1})$ where $n$ is the number of vertices in the graph
+and $K$ is the number of communities.
+For these simulations we instead replace the EP algorithm with the
+Louvain algorithm for modularity maximization,
+as the implementation of the EP algorithm in
+\citet{307cbeb9b1be48299388437423d94bf1} is too computationally expensive for \(K > 2\). For \(K = 2\), it
 was verified that the Louvain algorithm produces comparable results
 to EP-MM.
 
@@ -860,7 +869,7 @@ Two implementations of SSC are shown here. The first method, denoted as
 SSC-A, treats the columns of the adjacency matrix \(A\) as points in
 \(\mathbb{R}^n\), as described in \citet{noroozi2019estimation}.
 The second method, denoted as SSC-ASE, first embeds \(A\) and then
-performs SSC on the embedding, as described in Algorithm 2. The 
+performs SSC on the embedding, as described in Algorithm~\ref{alg:ssc}. The 
 parameter \(\lambda\) that controls the sparsity of the SSC was chosen via a preliminary cross-validation
 experiment. For the final clustering step, a Gaussian Mixture Model was
 fit on the normalized Laplacian eigenmap of the affinity matrix \(B\).
@@ -919,10 +928,9 @@ For these examples, we set the following parameters:
   \(\lambda^{(k \ell)} \stackrel{\text{iid}}{\sim} \Betadist(1, 2)\) for
   \(k \neq \ell\)
 \end{itemize}
+Fifty simulations were performed for each combination of $n$ and $K$.
 
-\(50\) simulations were performed for each \((n, K)\) pair.
-
-Fig. \ref{fig:clust_err_ct_sim} shows the number of mislabeled vertices
+Fig.~\ref{fig:clust_err_ct_sim} shows the number of mislabeled vertices
 going to 0 for large \(n\). SSC on both the embedding and on the
 adjacency matrix produces similar trends for \(K > 2\). Weaker
 performance of SSC for \(K = 2\) can be attributed to the final spectral
@@ -946,7 +954,7 @@ A different choice of mixture distribution may result in better performance.
 \caption{Median and IQR of community detection error. Communities are approximately balanced. Simulations were repeated 50 times for each sample size.}\label{fig:clust_err_ct_sim}
 \end{figure}
 
-Given ground truth community labels, Algorithm 3 and the MLE-based
+Given ground truth community labels, Algorithm~\ref{alg:param_est} and the MLE-based
 plug-in estimators perform similarly, with root mean square
 error decaying at rate approximately \(n^{-1/2}\) (Fig. \ref{fig:lambda_est_k}). 
 We observe similar behavior when comparing errors 
@@ -1001,10 +1009,12 @@ parameters:
 \(50\) simulations were performed for each \((n, K)\) pair.
 
 We again see community detection error trending to 0 for OSC, as well as
-for SSC when \(K > 2\) (Fig. \ref{fig:clust_err_ct_sim_imba}). Alg. 3
-continues to see \(n^{-1/2}\) decay in parameter estimation error; 
-however, the MLE-based estimators for the popularity vectors decay at a slower 
-rate (Fig. \ref{fig:lambda_est_k_imba}). 
+for SSC when \(K > 2\) (Fig.~\ref{fig:clust_err_ct_sim_imba}). The
+estimation error for the parameters $\{\lambda^{k \ell}\}$ as given by
+Algorithm~\ref{alg:param_est} still decays to $0$ at rate $n^{-1/2}$;  
+however, the MLE-based estimators for the popularity vectors appear to
+decay at a slower 
+rate (Fig.~\ref{fig:lambda_est_k_imba}). 
 The reduced rate of decay is removed 
 if we reconstruct the edge probability blocks 
 by taking the outer products of the popularity vectors 
@@ -1013,7 +1023,6 @@ by taking the outer products of the popularity vectors
 \begin{figure}[H]
 
 {\centering \includegraphics{summary_files/figure-latex/clust_err_ct_sim_imba-1}
-
 }
 
 \caption{Median and IQR of community detection error. Communities are imbalanced. Simulations were repeated 50 times for each sample size.}\label{fig:clust_err_ct_sim_imba}
@@ -1040,16 +1049,15 @@ by taking the outer products of the popularity vectors
 \hypertarget{real-data-examples}{%
 \section{Applications}\label{real-data-examples}}
 
-In the first example, we applied OSC to the Leeds Butterfly
+In the first example, we applied OSC (Algorithm~\ref{alg:osc}) to the Leeds Butterfly
 dataset \citep{Wang_2018} consisting of visual similarity measurements
 among 832 butterflies across 10 species. The graph was modified to match
-the example from \citet{noroozi2019estimation}: Only the $K=4$ most
+the example from \citet{noroozi2019estimation}, i.e., only the $K=4$ most
 frequent species were considered, and the similarities were discretized
-to \(\{0, 1\}\) via thresholding. Fig. \ref{fig:butterfly} shows a
+to \(\{0, 1\}\) via thresholding. Fig.~\ref{fig:butterfly} shows a
 sorted adjacency matrix sorted by the resultant clustering.
 
 Comparing against the ground truth species labels, OSC achieves an adjusted Rand index of 92\%, while SSC on the ASE achieves an adjusted Rand index of 96\%. In comparison, SSC on the adjacency matrix yields an adjusted Rand index of 73\% \citep{noroozi2019estimation}.
->>>>>>> 08e715a2242ef7f3f92394d598119b189bdb2790
 
 \begin{figure}[H]
 
@@ -1067,21 +1075,17 @@ In the second example, we applied OSC to the British MPs Twitter network
 \citep{NIPS2009_3855, 10.1007/978-3-642-15880-3_42}. For this data
 analysis, we subsetted the data as described in
 \citet{307cbeb9b1be48299388437423d94bf1} for their analysis of the
-same networks. Our methods underperformed compared to modularity
-maximization, although performance is comparable. In addition, OSC's
-runtime is much lower than that of modularity maximization.
+same networks. Our methods slightly underperformed compared to modularity
+maximization, although performance is comparable. The run time of OSC
+is however much smaller than that of modularity maximization.
 
-\begin{figure}[H]
-
+\begin{figure}[tp]
 {\centering \includegraphics{summary_files/figure-latex/mp-1}
-
 }
-
 \caption{Adjacency matrices of (from left to right) the British MPs, Political Blogs, and DBLP networks after sorting by the clustering outputted by OSC.}\label{fig:mp}
 \end{figure}
 
 \begin{table}
-
 \caption{\label{tab:unnamed-chunk-6}Community detection error rates on the British MPs Twitter, Political Blogs, and DBLP networks using modularity maximization, sparse subspace clustering, and OSC.}
 \centering
 \begin{tabular}[t]{l|r|r|r}
@@ -1102,20 +1106,16 @@ In the third example, we analyzed the Karantaka villages data studied by
 networks from villages 12, 31, and 46 at the household level. The label
 of interest is the religious affiliation. The networks were truncated to
 religions ``1'' and ``2'', and vertices of degree 0 were removed. 
-The results are displayed in Fig. \ref{fig:households-figure} and 
-Table \ref{tab:households-table}.
+The results are displayed in Fig.~\ref{fig:households-figure} and 
+Table~\ref{tab:households-table}.
 
-\begin{figure}[H]
-
+\begin{figure}[tp]
 {\centering \includegraphics{summary_files/figure-latex/unnamed-chunk-7-1}
-
 }
-
 \caption{Adjacency matrix of the Karnataka villages data, arranged by the clustering produced by OSC (left). The villages studied here are, from left to right, 12, 31, and 46.}\label{fig:households-figure}
 \end{figure}
 
 \begin{table}
-
 \caption{\label{tab:households-table}Community detection error rates for identifying household religion.}
 \centering
 \begin{tabular}[t]{l|r|r|r}
@@ -1146,24 +1146,46 @@ to Random Dot Product Graphs.
 Replacing RDPGs with GRDPGs is a critical step in this line of research, 
 as a PABM is not necessarily a RDPG. 
 
-Because all Bernoulli Graphs are GRDPGs, it should be possible to invent and study new families of Bernoulli Graphs by characterizing them as special cases of GRDPGs and expliting the latent structures that define them. 
-The present work illustrates the power of this approach. 
-We recover the latent structure of the PABM by Adjacency Spectral Embedding, then exploit that structure to improve statistical inference. 
-Exploiting the fact that PABM communities correspond to orthogonal subspaces, we propose Orthogonal Spectral Clustering for community detection and demonstrate that the number of misclassified vertices approaches zero with high probability as the size of the graph increases. 
-This is a stronger result than previously proposed algorithms \citep{307cbeb9b1be48299388437423d94bf1}, which only guarantee that the error rate (and not count) approaches zero asymptotically. 
-Parameter estimation can be performed in a similar fashion using the ASE, for which we also prove that the per-parameter error approaches zero asymptotically. 
+Because all Bernoulli Graphs are GRDPGs, it should be possible to
+invent and study new families of Bernoulli Graphs by characterizing
+them as special cases of GRDPGs and exploiting the latent structures
+that define them.  The present work illustrates the power of this
+approach.  We recover the latent structure of the PABM by Adjacency
+Spectral Embedding, then exploit that structure to improve statistical
+inference.  Exploiting the fact that PABM communities correspond to
+orthogonal subspaces, we propose Orthogonal Spectral Clustering for
+community detection and demonstrate that the number of misclassified
+vertices approaches zero with high probability as the size of the
+graph increases.  This is a stronger result than previously proposed
+algorithms \citep{307cbeb9b1be48299388437423d94bf1}, which only
+guarantee that the error rate (and not count) approaches zero
+asymptotically.  Parameter estimation can be performed in a similar
+fashion using the ASE, for which we also prove that the per-parameter
+error approaches zero asymptotically.
 
-A secondary benefit of the GRDPG approach is that the latent structure may be used to improve existing algorithms. 
-For example, one algorithm for PABM community detection \citep{noroozi2019estimation} relies on Sparse Subspace Clustering. 
-The latent structure of the PABM provides a natural justification for SSC for the PABM and leads to an improvement over the previous implementation. 
-The improved algorithm applies SSC to the ASE, and we prove that the ASE of the PABM obeys the Subspace Detection Property with high probability if the graph is large. 
+A secondary benefit of the GRDPG approach is that the latent structure
+may be used to improve existing algorithms.  For example, one
+algorithm for PABM community detection \citep{noroozi2019estimation}
+relies on Sparse Subspace Clustering.  The latent structure of the
+PABM provides a natural justification for SSC for the PABM and leads
+to an improvement over the previous implementation.  The improved
+algorithm applies SSC to the ASE, and we prove that the ASE of the
+PABM obeys the Subspace Detection Property with high probability if
+the graph is large.
 
-Finally, one might well inquire what one gains and what one sacrifices by assuming that a Bernoulli Graph is a PABM. 
-The GRDPG model offers a plausible way to pursue this inquiry. 
-Absent a known latent structure that can be exploited by specialized methods, the GRDPG-ASE approach transforms the problem of network community detection to the much-studied problem of clustering vectors in Euclidean space. 
-Communities of vertices are defined as clusters of latent vectors. 
-After ASE, a standard clustering algorithm, e.g., single linkage, is used ot infer the communities. 
-In future research, we intend to use such general algorithms as baselines and measure the efficiency of the PABM algorithms (and other specialized algorithms) by studying how much they improve on general algorithms when the specified latent structure obtains. 
+Finally, one might well inquire what one gains and what one sacrifices
+by assuming that a Bernoulli Graph is a PABM.  The GRDPG model offers
+a plausible way to pursue this inquiry.  Absent a known latent
+structure that can be exploited by specialized methods, the GRDPG-ASE
+approach transforms the problem of network community detection to the
+much-studied problem of clustering vectors in Euclidean space.
+Communities of vertices are defined as clusters of latent vectors.
+After ASE, a standard clustering algorithm, e.g., single linkage, is
+used ot infer the communities.  In future research, we intend to use
+such general algorithms as baselines and measure the efficiency of the
+PABM algorithms (and other specialized algorithms) by studying how
+much they improve on general algorithms when the specified latent
+structure obtains.
 
 \appendix
 \renewcommand\refname{References}
@@ -1172,7 +1194,7 @@ In future research, we intend to use such general algorithms as baselines and me
 \printbibliography
 
 \hypertarget{proofs}{%
-\section{Proofs of Theorem~\ref{theorem4} and Theorem~\ref{theorem5}}}
+\section{Proofs of Theorem~\ref{theorem4}, Theorem~\ref{theorem5}, and Theorem~\ref{theorem6}}}
 Let \(V_n\) and \(\hat{V}_n\)
 be the $n \times K^2$ matrices whose columns are the eigenvectors of \(P\) and \(A\) corresponding to the
 $K^2$ largest eigenvalues (in modulus), respectively. 
@@ -1189,8 +1211,8 @@ $K^2$ largest eigenvalues in modulus, respectively.
 Let \((v_n^{(i)})^\top\) and \((\hat{v}_n^{(i)})^\top\) denote the $i$th 
 row of \(V_n\) and \(\hat{V}_n\), respectively. 
 Then there exists a constant $c > 1$ and an orthogonal matrix $W$ such
-that, with high probability,
-$$\max_{i} \|W \hat{v}_n^{(i)} - v_n^{(i)}\|  = O_P \Big(\frac{\log^{c}n}{n \sqrt{\rho_n}} \Big).$$
+that with high probability,
+$$\max_{i} \|W \hat{v}_n^{(i)} - v_n^{(i)}\|  = O\Big(\frac{\log^{c}n}{n \sqrt{\rho_n}} \Big).$$
 In particular we can take $c = 1 + \epsilon$ for any $\epsilon > 0$. 
 \end{lemma}
 
@@ -1263,12 +1285,13 @@ under which sparse subspace clustering based on solving the
 optimization problem in Eq.~\eqref{eq:ssc} yields an affinity matrix
 $B = |C| + |C^{\top}|$ satisfying the subspace detection property of
 Definition~\ref{def:subspace_detection}. We first recall a few
-definitions used in \cite{jmlr-v28-wang13}; for ease of exposition,
-these definitions are stated using the notations of the current paper. 
-
+definitions used in \citet{soltanolkotabi2012} and \citet{jmlr-v28-wang13}; for ease of exposition,
+these definitions are stated using the notations of the current
+paper and we will drop the explicit dependency on $n$ from our
+eigenvectors $\hat{V}_n$ of $A$ and $V_n$ of $P$.
  % We first recall the
 % notion of the inradius of a set of points. 
-\begin{definition}[Inradius \citep{soltanolkotabi2012, jmlr-v28-wang13}]
+\begin{definition}[Inradius]
   \label{inradius}
 The inradius of a convex body $\mathcal{P}$, denoted by $r(\mathcal{P})$, is
 defined as the radius of the largest Euclidean ball inscribed in $\mathcal{P}$.
@@ -1279,7 +1302,7 @@ inradius of the convex hull formed by $\{\pm x_1, \pm x_2, \dots, \pm x_n\}$.
 
 \begin{definition}[Subspace incoherence]
   \label{def:subspace_incoherence}
-Let $\hat{V}$ be the eigenvectors of $A_n$
+Let $\hat{V}$ be the eigenvectors of $A$
 corresponding to the $K^2$ largest eigenvalues in modulus. Let
 $\hat{V}^{(k)}$ denote the matrix formed by keeping only the rows of
 $\hat{V}$ corresponding to the $k^{th}$
@@ -1289,7 +1312,7 @@ corresponding to the $k^{th}$ community. Let $(\hat{v}_i^{(k)})^\top$ denote
 the $i$th row of $\hat{V}^{(k)}$ and $\hat{V}_{-i}^{(k)}$ be $\hat{V}^{(k)}$ with
 the $i^{th}$ row omitted. Let $V$, $V^{(k)}$, $V^{(-k)}$, and
 $v_i^{(k)}$ be defined similarly using the eigenvectors $V$ of
-$P_n$. Finally let $\mathcal{S}^{(k)}$ be the vector space spanned by the
+$P$. Finally let $\mathcal{S}^{(k)}$ be the vector space spanned by the
 rows of $V^{(k)}$. 
 
 Now define $\nu_{i}^{(k)}$ for $k = 1,2,\dots,K$ and $i =
@@ -1303,7 +1326,7 @@ $\mathcal{S}^{(k)}$ and define the projected dual direction $w_{i}^{(k)}$
 as
 $$w_i^{(k)} =
 \frac{\mathbb{P}_{\mathcal{S}^{(k)}}(\nu_i^{(k)})}{\|\mathbb{P}_{\mathcal{S}^{(k)}}(\nu_i^{(k)})\|}.$$
-Now let $W^{(k)} = \begin{bmatrix} w_1^{(k)} & \cdots & w_{n_k}^{(k)} \end{bmatrix}^\top$
+Now let $W^{(k)} = \bigl[ w_1^{(k)} \mid \cdots \mid w_{n_k}^{(k)} \bigr]^\top$
 and define the subspace incoherence for $\hat{V}^{(k)}$ by
 $$\mu^{(k)} = \mu(\hat{V}^{(k)}) = \max\limits_{v \in V^{(-k)}} \|W^{(k)} v\|_\infty.$$
 \end{definition}
@@ -1319,7 +1342,6 @@ such that $\sqrt{n} \hat{V}$ satisfies
 the subspace detection property in
 Definition~\ref{def:subspace_detection} whenever
 the following two conditions are satisfied
-
 \begin{gather}
   \label{eq:cond1}
   \mu^{(k)} < r^{(k)} \quad \text{for all $k = 1,2,\dots,K$}, \\
@@ -1327,7 +1349,6 @@ the following two conditions are satisfied
   \max_{i} \|W \hat{v}_{i} - v_{i}\| \leq \min_{k} \frac{r_*(r^{(k)} -
     \mu^{(k)})}{2 + 7 r^{(k)}}.
 \end{gather}
-
 We now verify that for sufficiently large n, Eq.~\eqref{eq:cond1} and Eq.~\eqref{eq:cond2}
 holds with high probability.
 
@@ -1371,7 +1392,7 @@ spans the subspace $\mathcal{S}^{(k)}$, then $a r^{(k)} > \mu^{(k)}$
 for any scalar $a > 0$. 
 \end{remark}
 
-\textbf{Proof of Theorem \ref{theorem6}}. Let \(P\) be
+\begin{proof}[Proof of Theorem \ref{theorem6}] Let \(P\) be
 organized by community such that \(P^{(k \ell)}\) denote the $n_k \times
 n_{\ell}$ matrix obtained by keeping only the rows of $P$
 corresponding to vertices in community $k$ and the columns of $P$
@@ -1391,7 +1412,7 @@ best rank-one approximation of $A^{(kk)}$. Define
 \(\hat{\lambda}^{(kk)}\) is the adjacency spectral embedding approximation of \(\lambda^{(kk)}\)
 and by Theorem 5 of \citet{rubindelanchy2017statistical}, we have
 %adjacency spectral embedding \(\hat{\lambda}^{(kk)}\) approximates
-$$\|\hat{\lambda}^{(kk)} - \lambda^{(kk)}\|_{\infty} = O\Bigl(\frac{(\log n_k)^c}{\sqrt{n_k}}\Bigr)$$
+$$\|\hat{\lambda}^{(kk)} - \lambda^{(kk)}\|_{\infty} = O\Bigl(\frac{\log n_k}{\sqrt{n_k}}\Bigr)$$
 with high probability. 
 Here $\|\cdot\|_{\infty}$ denote the $\ell_{\infty}$ norm of a vector.
 
@@ -1454,7 +1475,7 @@ by Theorem 5 of \citet{rubindelanchy2017statistical}, there
 exists an indefinite orthogonal transformation $W^{*}$ such that,  with
 high probability,
 $$\max_{i} |W^{*} \hat{\Lambda}_{i}^{(k \ell)} - \Lambda_{i}^{(k \ell)} \| =
-O\Bigl(\frac{(\log (n_k + n_{\ell}))^c}{\sqrt{n_k + n_{\ell}}}\Bigr)$$
+O\Bigl(\frac{\log (n_k + n_{\ell})}{\sqrt{n_k + n_{\ell}}}\Bigr)$$
 with high probability. Here $\Lambda_{i}^{(k \ell)}$ and
 $\hat{\Lambda}_i^{(k \ell)}$ denote the $i$th rows of $\Lambda^{(k
   \ell)}$ and $\hat{\Lambda}^{(k \ell)}$, respectively. 
@@ -1474,9 +1495,9 @@ eigenvalue, we see that $W^{*}$ is necessarily of the form $W^{*}
 Using this form for $W^{*}$, we obtain
 $$\max\{\|\hat{\lambda}^{(k \ell)} - \lambda^{(k \ell)}\|_{\infty},
 \|\hat{\lambda}^{(\ell k)} - \lambda^{(\ell k)}\|_{\infty}\}  =
-O\Bigl(\frac{(\log (n_k + n_{\ell}))^c}{\sqrt{n_k + n_{\ell}}}\Bigr)$$
+O\Bigl(\frac{\log(n_k + n_{\ell})}{\sqrt{n_k + n_{\ell}}}\Bigr)$$
 with high probability. Combining this bound with the bound for
 $\|\hat{\lambda}^{(kk)} - \lambda^{(kk)}\|_{\infty}$ given above
 yields Eq.~\eqref{eq:thm6} in Theorem~\ref{theorem6}. 
-
+\end{proof}
 \end{document}
