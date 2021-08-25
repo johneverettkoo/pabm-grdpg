@@ -377,7 +377,7 @@ used Modularity Maximization (MM) and the Extreme Points
 They were able to show that as the sample size increases, the proportion of
 misclassified community labels (up to permutation) goes to 0. 
 
-\citet*{noroozi2019estimation} used Sparse Subspace Clustering (SSC) for 
+\citet*{noroozi2019estimation} used Sparse Subspace Clustering (SSC) \cite{5206547} for 
 community detection in the PABM. 
 SSC is performed by solving an optimization problem for each observed point.
 Given $X \in \mathbb{R}^{n \times d}$ with vectors 
@@ -1154,7 +1154,7 @@ z.hat <- cluster.pabm(A, K)
 #   igraph::cluster_louvain() %>% 
 #   igraph::membership()
 
-# ari <- round(fossil::adj.rand.index(z, z.hat) * 100)
+ari <- round(fossil::adj.rand.index(z, z.hat) * 100)
 ```
 
 In the first real data example, we applied OSC to the Leeds Butterfly 
