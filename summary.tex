@@ -689,11 +689,11 @@ In order to show that OSC is consistent,
 we introduce the sparsity factor $\rho_n \in (0, 1]$, 
 which can be characterized as the average expected degree of the vertices 
 divided by the number of vertices. 
-The situation is the same as in \cite{307cbeb9b1be48299388437423d94bf1} (PABM) 
+The treatment is the same as in \cite{307cbeb9b1be48299388437423d94bf1} (PABM) 
 and \cite{rubindelanchy2017statistical} (GRDPG) in which the popularity vectors 
 are scaled as $\rho_n^{1/2} \lambda^{(k \ell)}$. 
-For ease of notation, we restrict our results to the case in which all 
-nonzero popularity parameters are greater than some positive minimum value.
+This results in the edge probability matrix being scaled as $\rho_n P$. 
+Since $\rho_n$ is unidentifiable, we use the convention that the popularity parameters are drawn such that $\|X\|_F = O(\sqrt{n})$ and require the $L^2$ norm of each row is bounded away from 0 and 1. 
 
 \begin{theorem}
 \label{theorem4}
@@ -704,10 +704,16 @@ and sparsity factor satisfying $n \rho_n = \omega(\log^{4}{n})$, we have
 \max_{i, j} |n \hat{v}_i^\top \hat{v}_j| =
 O\Big( \frac{\log n}{\sqrt{n \rho_n}} \Big)
 \end{equation}
-with high probability. Eq.~\eqref{eq:thm4} implies that for all pairs $(i, j)$ in different communities,
-we have $\hat{B}_{ij} \stackrel{a.s.}{\to} 0$ where the convergence is
-uniform over all pairs $(i,j)$. 
+with high probability. 
 \end{theorem}
+
+Eq.~\eqref{eq:thm4} implies that for all pairs $(i, j)$ in different communities,
+we have uniform convergence $\hat{B}_{ij} \stackrel{a.s.}{\to} 0$. 
+This allows us to identify the communities perfectly from $\hat{B}$ for large $n$. 
+For example, if we use edge thresholding to partition $\hat{B}$, 
+Theorem \ref{theorem4} implies that for any $\epsilon > 0$, 
+the number of edges of $\hat{B}$ between vertices of different communities 
+that are larger than $\epsilon$ converges to zero with probability 1. 
 
 Theorems \ref{theorem2}, \ref{theorem3}, and \ref{theorem4} also provide
 a natural path toward using SSC for community detection. 
@@ -882,20 +888,9 @@ where \(\sigma(v_i)\) is the true community label of vertex \(v_i\),
 a permutation operator. This is effectively the ``misclustering count''
 of clustering function \(\hat{\sigma}\).
 
-We also define two types of parameter estimation error. 
-First, we estimate the popularity vectors directly and compute the RMSE. 
-In this case, the ``true'' popularity vectors are derived from 
-taking the SVD of each edge probability block $P^{(k \ell)}$ 
-to avoid the unidentifiable multiplicative constants, i.e., 
-\[\text{RMSE}(\{\hat{\lambda}^{(k \ell)}\}, \{\tilde{\lambda}^{(k \ell)}\}) = 
-\Bigl(\frac{1}{n} \sum_{k < l} \min_{s = \pm 1} 
-\|s \hat{\lambda}^{(k \ell)} - \tilde{\lambda}^{(k \ell)} \|_2^2\Bigr)^{1/2}.\]
-We can also avoid the unidentifiable multiplicative constant more directly 
-by reconstructing each 
-$\hat{P}^{(k \ell)} = \hat{\lambda}^{(k \ell)} (\hat{\lambda}^{(\ell k)})^\top$, 
-which we use to define another parameter estimation error, i.e., 
-\[\text{RMSE}(\hat{P}, P) =
-\sum_{k,l} \sqrt{\frac{1}{n_k n_\ell} \|P^{(k \ell)} - \hat{P}^{(k \ell)}\|_F^2}.\]
+For parameter estimation, because the popularity parameters $\{\lambda_{ik}\}$ are unidentifiable, we instead estimate the edge probabilities $p_{ij} = \lambda_{i z_j} \lambda_{j, z_i}$. The parameter estimation error is the root mean square error between the true and estimated edge probabilities, which is equivalent to the Frobenius norm of $P$:
+
+$$\mathrm{RMSE}(\hat{P}, P) = \|\hat{P} - P\|_F.$$
 
 \hypertarget{balanced-communities}{%
 \subsection{Balanced Communities}\label{balanced-communities}}
