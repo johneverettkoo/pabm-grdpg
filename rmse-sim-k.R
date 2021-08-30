@@ -11,7 +11,7 @@ import::here(embedding, draw.graph, I.pq, generate.P.beta,
              .from = 'functions.R')
 
 # parallel backend
-doMC::registerDoMC(parallel::detectCores() / 2)
+doMC::registerDoMC(parallel::detectCores() - 2)
 
 # simulation params
 K.vec <- c(4, 3, 2)
@@ -27,7 +27,7 @@ rmse.df <- foreach(K = K.vec, .combine = dplyr::bind_rows) %do% {
   p <- K * (K + 1) / 2
   q <- K * (K - 1) / 2
   Ipq <- I.pq(p, q)
-  
+
   out <- foreach(n = n.vec, .combine = dplyr::bind_rows) %do% {
     print(paste('n =', n, 'K =', K))
     plyr::ldply(seq(iter), function(i) {
@@ -37,9 +37,9 @@ rmse.df <- foreach(K = K.vec, .combine = dplyr::bind_rows) %do% {
       A <- draw.graph(P)
       rmse <- lambda.rmse(P, A, z)
       rmse.mle <- lambda.rmse.mle(P, A, z)
-      dplyr::tibble(K = K, n = n, rmse = rmse, rmse.mle = rmse.mle) %>% 
+      dplyr::tibble(K = K, n = n, rmse = rmse, rmse.mle = rmse.mle) %>%
         return()
-    }, .parallel = TRUE) %>% 
+    }, .parallel = TRUE) %>%
       return()
   }
   gc()

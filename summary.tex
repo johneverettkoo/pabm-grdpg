@@ -888,9 +888,11 @@ where \(\sigma(v_i)\) is the true community label of vertex \(v_i\),
 a permutation operator. This is effectively the ``misclustering count''
 of clustering function \(\hat{\sigma}\).
 
-For parameter estimation, because the popularity parameters $\{\lambda_{ik}\}$ are unidentifiable, we instead estimate the edge probabilities $p_{ij} = \lambda_{i z_j} \lambda_{j, z_i}$. The parameter estimation error is the root mean square error between the true and estimated edge probabilities, which is equivalent to the Frobenius norm of $P$:
+For parameter estimation, because the popularity parameters $\{\lambda_{ik}\}$ are unidentifiable, we instead estimate the edge probabilities $p_{ij} = \lambda_{i z_j} \lambda_{j, z_i}$. The parameter estimation error is the root mean square error between the true and estimated edge probabilities, which is equivalent to the Frobenius norm of $P$ divided by the number of vertices:
 
-$$\mathrm{RMSE}(\hat{P}, P) = \|\hat{P} - P\|_F.$$
+$$\mathrm{RMSE}(\hat{P}, P) = \frac{1}{n} \|\hat{P} - P\|_F.$$
+
+We also note that unlike the MLE-based method \citep{307cbeb9b1be48299388437423d94bf1}, the ASE method of Algorithm 3 does not require community labels if all we are interested in is the edge probability matrix, $P$. The estimate $\hat{P}$ we obtain by combining the popularity vectors outputted by Algorithm 3 is equivalent to using the full ASE of $A$ to reconstruct the edge probability matrix. 
 
 \hypertarget{balanced-communities}{%
 \subsection{Balanced Communities}\label{balanced-communities}}
@@ -951,23 +953,11 @@ A different choice of mixture distribution may result in better performance.
 
 Given ground truth community labels, Algorithm~\ref{alg:param_est} and the MLE-based
 plug-in estimators perform similarly, with root mean square
-error decaying at rate approximately \(n^{-1/2}\) (Fig. \ref{fig:lambda_est_k}). 
-We observe similar behavior when comparing errors 
-in the edge probability blocks (Fig. \ref{fig:p_block_est}).
-
-\begin{figure}[H]
-
-{\centering \includegraphics{summary_files/figure-latex/lambda_est_k-1}
-
-}
-
-\caption{Median and IQR RMSE for popularity vectors from Algorithm 3 (red) compared against an MLE-based method (blue). Simulations were repeated 50 times for each sample size. Communities were drawn to be approximately balanced.}
-\label{fig:lambda_est_k}
-\end{figure}
+error decaying at rate approximately \(n^{-1/2}\) (Fig. \ref{fig:p_block_est}). 
 
 \begin{figure}[H]
 {\centering \includegraphics{summary_files/figure-latex/lambda_est_p-1}}
-\caption{Median and IQR RMSE for edge probability blocks reconstructed from the outputs of Algorithm 3 (red) compared against outputs of an MLE-based method (blue). Simulations were repeated 50 times for each sample size. Communities were drawn to be approximately balanced.}
+\caption{Median and IQR RMSE for edge probability matrices reconstructed from the outputs of Algorithm 3 (red) compared against outputs of an MLE-based method (blue). Simulations were repeated 50 times for each sample size. Communities were drawn to be approximately balanced.}
 \label{fig:p_block_est}
 \end{figure}
 
@@ -1004,15 +994,8 @@ parameters:
 \(50\) simulations were performed for each \((n, K)\) pair.
 
 We again see community detection error trending to 0 for OSC, as well as
-for SSC when \(K > 2\) (Fig.~\ref{fig:clust_err_ct_sim_imba}). The
-estimation error for the parameters $\{\lambda^{k \ell}\}$ as given by
-Algorithm~\ref{alg:param_est} still decays to $0$ at rate $n^{-1/2}$;  
-however, the MLE-based estimators for the popularity vectors appear to
-decay at a slower 
-rate (Fig.~\ref{fig:lambda_est_k_imba}). 
-The reduced rate of decay is removed 
-if we reconstruct the edge probability blocks 
-by taking the outer products of the popularity vectors 
+for SSC when \(K > 2\) (Fig.~\ref{fig:clust_err_ct_sim_imba}). 
+The parameter estimation error decays at rate $n^{-1/2}$ as in the balanced communities case
 (Fig. \ref{fig:lambda_est_p_imba}). 
 
 \begin{figure}[H]
@@ -1025,20 +1008,12 @@ by taking the outer products of the popularity vectors
 
 \begin{figure}[H]
 
-{\centering \includegraphics{summary_files/figure-latex/lambda_est_k_imba-1}
-
-}
-
-\caption{Median and IQR RMSE from Algorithm 3 (red) compared against an MLE-based method (blue). Simulations were repeated 50 times for each sample size. Communities were drawn to be imbalanced.}\label{fig:lambda_est_k_imba}
-\end{figure}
-
-\begin{figure}[H]
-
 {\centering \includegraphics{summary_files/figure-latex/lambda_est_p_imba-1}
 
 }
 
-\caption{Median and IQR RMSE of edge probability blocks derived from the outputs of Algorithm 3 (red) compared against an MLE-based method (blue). Simulations were repeated 50 times for each sample size. Communities were drawn to be imbalanced.}\label{fig:lambda_est_p_imba}
+\caption{Median and IQR RMSE of edge probabilities derived from the outputs of Algorithm 3 (red) compared against an MLE-based method (blue). Simulations were repeated 50 times for each sample size. Communities were drawn to be imbalanced.}
+\label{fig:lambda_est_p_imba}
 \end{figure}
 
 \hypertarget{real-data-examples}{%
@@ -1098,9 +1073,15 @@ DBLP & 0.028 & 0.087 & 0.059\\
 
 In the third example, we analyzed the Karantaka villages data studied by
 \citet{DVN/U3BIHX_2013}. We chose the \texttt{visitgo}
-networks from villages 12, 31, and 46 at the household level. The label
-of interest is the religious affiliation. The networks were truncated to
-religions ``1'' and ``2'', and vertices of degree 0 were removed. 
+networks from villages 12, 31, and 46 at the household level. 
+In these networks, each node is a household and each edge is 
+an interaction between members of pairs of households. 
+The label of interest is the religious affiliation. 
+The networks were truncated to religions ``1'' and ``2'', 
+and vertices of degree 0 were removed. 
+The villages were chosen based on there being an adequate number of nodes 
+between households within each religion. 
+
 The results are displayed in Fig.~\ref{fig:households-figure} and 
 Table~\ref{tab:households-table}.
 

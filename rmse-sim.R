@@ -10,7 +10,7 @@ import::here(embedding, draw.graph, I.pq,
              .from = 'functions.R')
 
 # parallel backend
-doMC::registerDoMC(parallel::detectCores())
+doMC::registerDoMC(parallel::detectCores() - 2)
 
 # simulation params
 K <- 2
@@ -62,5 +62,5 @@ rmse.df <- foreach(n = n.vec, .combine = dplyr::bind_rows) %do% {
     return()
 }
 
-readr::write_csv(rmse.df, 'rmse.csv')
+# readr::write_csv(rmse.df, 'rmse.csv')
 

@@ -241,14 +241,14 @@ lambda.rmse <- function(P, A, clustering) {
         lambda.hat <- estimate.lambda.block(A.block, TRUE)
         P.hat <- lambda.hat %*% t(lambda.hat)
         # return(sum((lambda - lambda.hat) ** 2))
-        return(norm(P.hat - P.block, 'F') / (n.k))
+        return(norm(P.hat - P.block, 'F') ** 2)
       } else {
         # lambdas <- estimate.lambda.block(P.block)
         lambda.hats <- estimate.lambda.block(A.block)
         # return(sum((lambdas[[1]] - lambda.hats[[1]]) ** 2) + 
         #          sum((lambdas[[2]] - lambda.hats[[2]]) ** 2))
         P.hat <- lambda.hats[[1]] %*% t(lambda.hats[[2]])
-        return(norm(P.hat - P.block, 'F') / sqrt(n.k * n.l))
+        return(2 * norm(P.hat - P.block, 'F') ** 2)
       }
     }) %>% 
       sum() %>% 
@@ -256,7 +256,8 @@ lambda.rmse <- function(P, A, clustering) {
   }) %>% 
     sum() %>% 
     # magrittr::divide_by(n * K) %>% 
-    # sqrt() %>% 
+    magrittr::divide_by(n ** 2) %>% 
+    sqrt() %>%
     return()
 }
 
@@ -321,7 +322,7 @@ lambda.rmse.mle <- function(P, A, z) {
         # lambda <- estimate.lambda.block(P.kk, TRUE)
         # return(sum((lambda - lambda.hat) ** 2))
         P.hat <- lambda.hat %*% t(lambda.hat)
-        return(norm(P.hat - P.kk, 'F') / (n.k))
+        return(norm(P.hat - P.kk, 'F') ** 2)
       } else {
         n.l <- n.vector[l]
         e.n.l <- rep(1, n.l)
@@ -341,7 +342,7 @@ lambda.rmse.mle <- function(P, A, z) {
         # return(sum((lambdas[[1]] - lambda.hat.kl) ** 2) + 
         #          sum((lambdas[[2]] - lambda.hat.lk) ** 2))
         P.hat <- lambda.hat.kl %*% t(lambda.hat.lk)
-        return(norm(P.kl - P.hat, 'F') / sqrt(n.k * n.l))
+        return(2 * norm(P.kl - P.hat, 'F') ** 2)
       }
     }) %>% 
       sum() %>% 
@@ -349,7 +350,8 @@ lambda.rmse.mle <- function(P, A, z) {
   }) %>% 
     sum() %>% 
     # magrittr::divide_by(n * K) %>% 
-    # sqrt() %>% 
+    magrittr::divide_by(n ** 2) %>% 
+    sqrt() %>%
     return()
 }
 
