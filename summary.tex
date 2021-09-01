@@ -352,8 +352,8 @@ $$\Pi = U I_{3, 1} U^\top = \begin{bmatrix} 1 & 0 & 0 & 0 \\
   0 & 1 & 0 & 0 \\
   0 & 0 & 0 & 1
 \end{bmatrix}.$$
-Furthermore, since $U$ is orthonormal and $I_{3, 1}$ is diagonal, $U I_{3, 1} U^\top$
-is also an eigendecomposition of $\Pi$ where the fixed
+Furthermore, as $U$ is orthonormal and $I_{3, 1}$ is diagonal, 
+$U I_{3, 1} U^\top$ is also an eigendecomposition of $\Pi$ where the fixed
 points of $\Pi$ are mapped to the eigenvectors $e_1$ and $e_4$
 while the cycles of order two are mapped to the eigenvectors  
 $\tfrac{1}{\sqrt{2}}(e_{2} + e_3)$ and $\tfrac{1}{\sqrt{2}}(e_{2} -
@@ -577,7 +577,7 @@ near subspaces.
 We previously stated one possible set of latent positions that result in
 the edge probability matrix of a PABM, \(P = (XU) I_{p, q} (XU)^\top\). If
 we have (or can estimate) \(XU\) directly, then both the community
-detection and parameter identification problem are trivial since \(U\)
+detection and parameter identification problem are trivial because \(U\)
 is orthonormal and fixed for each value of \(K\). However, direct
 identification or estimation of \(XU\) is not possible
 (\cite{rubindelanchy2017statistical}).
@@ -659,26 +659,37 @@ Under the condition that $\|\Lambda\|_F > 0$, where
 $\Lambda$ is the $n \times K$ matrix of popularity parameters, 
 Theorem \ref{theorem3} provides perfect community detection from \(P\).
 Letting \(|B|\) be the affinity matrix for graph \(G'\), 
-\(G'\) is partitioned into \(K\) disjoint subgraphs, as each of the
-\(K\) communities have no edges between them. 
-Then mapping each subgraph to a community provides a clustering with zero error 
-(up to permutation).
+where $|\cdot\|$ is applied entry-wise, 
+\(G'\) consists of \(K\) disjoint subgraphs, 
+as $G'$ has no edges between communities. 
+Then all that is left to identify the communities is 
+to assign each subgraph a community label. 
 
-In practice, we observe $A$ instead of $P$. 
-Using \(A\) instead of \(P\) to estimate $B$ as in Theorem \ref{theorem3} introduces error, 
-which converges to \(0\) almost surely. 
-This is shown via properties of the GRDPG and ASE. 
+In practice, we do not observe $P$ and instead observe $A$. 
+But because $A$ can be considered as an estimator of $P$, 
+one possible approach to community detection given $A$ is applying 
+Theorem \ref{theorem3} to $A$, and indeed, 
+the properties of the GRDPG and ASE suggest $\hat{B}$ constructed from $A$ 
+converges almost surely to $B$ constructed from $P$, 
+including the property that $\hat{B}_{ij} \stackrel{a.s.}{\to} 0$ 
+for pair $(i, j)$ in different communities. 
 We use this fact to motivate Orthogonal Spectral Clustering (Alg. 1). 
-In order to show that OSC is consistent, 
+In order to proceed with the proof that that OSC is consistent 
+(Theorem \ref{theorem4}), 
 we introduce the sparsity factor $\rho_n \in (0, 1]$, 
 which can be characterized as the average expected degree of the vertices 
 divided by the number of vertices. 
-The treatment is the same as in \citet{307cbeb9b1be48299388437423d94bf1} (PABM) 
-and \citet{rubindelanchy2017statistical} (GRDPG) in which the popularity vectors 
-are scaled as $\rho_n^{1/2} \lambda^{(k \ell)}$. 
-This results in the edge probability matrix being scaled as 
+The treatment of the sparsity factor is the same as in 
+\citet{307cbeb9b1be48299388437423d94bf1} (PABM) 
+and \citet{rubindelanchy2017statistical} (GRDPG) 
+in which the popularity vectors are scaled as 
+$\rho_n^{1/2} \lambda^{(k \ell)}$. 
+This results in the edge probabilities being scaled as 
 $P_{ij} = \rho_n \lambda_{i z_j} \lambda_{j z_i}$. 
-Since $\rho_n$ is unidentifiable, we use the convention that the popularity parameters are drawn such that $\|\Lambda\|_F = O(\sqrt{n})$ and require that the $L^2$ norm of each row is bounded away from 0 and 1. 
+Because $\rho_n$ is unidentifiable, 
+we use the convention that the popularity parameters are drawn such that
+$\|\Lambda\|_F = O(\sqrt{n})$ and 
+require that the $L^2$ norm of each row is bounded away from 0 and 1.
 
 \begin{theorem}
 \label{theorem4}
@@ -695,12 +706,13 @@ Thus for all pairs $(i, j)$ in different communities,
 we have uniform convergence $\hat{B}_{ij} \stackrel{a.s.}{\to} 0$. 
 \end{theorem}
 
-Theorem \ref{theorem4} provides an algorithm for community detection 
+Theorem \ref{theorem4} provides an approach for community detection 
 that results in zero community detection error as $n \to \infty$. 
 For example, if we use edge thresholding to partition $\hat{B}$, 
 Theorem \ref{theorem4} implies that for any $\epsilon > 0$, 
 the number of edges of $\hat{B}$ between vertices of different communities 
-that are larger than $\epsilon$ converges to zero with probability 1. 
+that are larger than $\epsilon$ converges to zero with probability 1 
+as $n$ increases. 
 
 Theorems \ref{theorem2}, \ref{theorem3}, and \ref{theorem4} also provide
 a natural path toward using SSC for community detection. 
@@ -773,7 +785,7 @@ and \(\sigma^{(k \ell)}\) is a scalar.
 Then \(\rho_n^{1/2} \lambda^{(k \ell)} = s_1 u^{(k \ell)}\)
 and \(\rho_n^{1/2} \lambda^{(\ell k)} = s_2 v^{(k \ell)}\) 
 for unidentifiable $s_1 s_2 = (\sigma^{(k \ell)})^2$.
-Since each $\lambda^{(k \ell)}$ is not strictly identifiable,
+Because each $\lambda^{(k \ell)}$ is not strictly identifiable,
 we instead estimate each 
 $\tilde{\lambda}^{(k \ell)} = \sigma^{(k \ell)} u^{(k \ell)}$. 
 Given the adjacency matrix \(A\)
@@ -997,7 +1009,7 @@ The parameter estimation error decays at rate $n^{-1/2}$ as in the balanced comm
 In the first example, we applied OSC (Algorithm~\ref{alg:osc}) to the Leeds Butterfly
 dataset \citep{Wang_2018} consisting of visual similarity measurements
 among 832 butterflies across 10 species. The graph was modified to match
-the example from \citet{noroozi2019estimation}, i.e., only the $K=4$ most
+the example from \citet{noroozi2019estimation}: Only the $K=4$ most
 frequent species were considered, and the similarities were discretized
 to \(\{0, 1\}\) via thresholding. Fig.~\ref{fig:butterfly} shows a
 sorted adjacency matrix sorted by the resultant clustering.
@@ -1309,16 +1321,17 @@ $\mathrm{span}(V_{-i}^{(k)}) = \mathcal{S}^{(k)}$ for all $i$ and hence
 all $k = 1,2,\dots,K$. 
 
 Next, by Theorem \ref{theorem3} we have that the subspaces
-  $\{\mathcal{S}^{(1)}, \dots, \mathcal{S}^{(K)}\}$
-  are mutually orthogonal, i.e., $v^{\top} w = 0$ for all $v \in
-  \mathcal{S}^{(k)}$ and $w \in \mathcal{S}^{(\ell)}$ with $k \not =
-  \ell$. Now let $z \in \mathbb{R}^{K^2}$ be arbitrary and let
-  $\tilde{z} = \mathbb{P}_{\mathcal{S}^{(k)}} z$ be the projection of
-    $z$ onto $\mathcal{S}^{(k)}$. We then have $v^{\top} \tilde{z} =
-    0$ for all $v \in V^{(-k)}$. Since $z$ is arbitrary, this implies $\|W^{(k)} v\|_{\infty} = 0$ for all $v
-    \in V^{(-k)}$ and hence $\mu^{(k)} = 0$ for all $k
-    =1,2,\dots,K$. Therefore $\mu^{(k)} < r^{(k)}$ for all $k =
-    1=2,\dots,K$ as desired.
+$\{\mathcal{S}^{(1)}, \dots, \mathcal{S}^{(K)}\}$
+are mutually orthogonal, i.e., $v^{\top} w = 0$ for all $v \in
+\mathcal{S}^{(k)}$ and $w \in \mathcal{S}^{(\ell)}$ with $k \not =
+\ell$. Now let $z \in \mathbb{R}^{K^2}$ be arbitrary and let
+$\tilde{z} = \mathbb{P}_{\mathcal{S}^{(k)}} z$ be the projection of
+$z$ onto $\mathcal{S}^{(k)}$. We then have $v^{\top} \tilde{z} =
+0$ for all $v \in V^{(-k)}$. Because $z$ is arbitrary, this implies 
+$\|W^{(k)} v\|_{\infty} = 0$ for all $v
+\in V^{(-k)}$ and hence $\mu^{(k)} = 0$ for all $k
+=1,2,\dots,K$. Therefore $\mu^{(k)} < r^{(k)}$ for all $k =
+1=2,\dots,K$ as desired.
 
 {\bf Verifying Eq.~\eqref{eq:cond2}}.
 Let $\delta = \max_{i} \sqrt{n} \|W
@@ -1337,7 +1350,7 @@ of $V$ has unit norm, i.e., $\|v_{i}\| = 1$  for all $i$. This
 assumption has the effect of scaling the $r^{(k)}$ so that $r^{(k)}
 \leq 1$ for all $k = 1,2,\dots,K$. We emphasize that this assumption
 has no effect on the proof of Theorem \ref{theorem5}. Indeed,
-since $\mu^{(k)} = 0$ for all $k$, as long as the rows of $V^{(k)}$
+because $\mu^{(k)} = 0$ for all $k$, as long as the rows of $V^{(k)}$
 spans the subspace $\mathcal{S}^{(k)}$, then $a r^{(k)} > \mu^{(k)}$ 
 for any scalar $a > 0$. 
 \end{remark}
@@ -1437,7 +1450,7 @@ Furthermore, by looking at the proof of Theorem~5 in
 blocks diagonal with $2$ blocks where the positive eigenvalues of $M^{(k \ell)}$
 forming a block and the negative eigenvalues of $M^{(k \ell)}$ forming
 the remaining block. % \(U^\top \hat{U}\). 
-Since $M^{(k \ell)}$ has one positive eigenvalue and one negative
+Because $M^{(k \ell)}$ has one positive eigenvalue and one negative
 eigenvalue, we see that $W^{*}$ is necessarily of the form $W^{*}
 = \Bigl[\begin{smallmatrix} 1 & 0 \\ 0 & - 1\end{smallmatrix}\Bigr]$
 % \((1, 1)\), and \(U^\top \hat{U}\) is block
