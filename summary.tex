@@ -646,24 +646,26 @@ V^{\top} V = I$. We thus conclude
 $$X (X^{\top} X)^{-1} X^{\top} = V (V^{\top} V)^{-1} V^{\top} = V V^{\top}$$
 as desired.
 
-To complete the proof of Theorem~\ref{theorem3}, recall that \(X\) is block diagonal with each block
-corresponding to one community and hence \(X (X^\top X)^{-1} X^\top\) is also a
+To complete the proof of Theorem~\ref{theorem3}, recall that \(X\) 
+is block diagonal with each block corresponding to one community, 
+and hence \(X (X^\top X)^{-1} X^\top\) is also a
 block diagonal matrix with each block corresponding to a community. 
 As $B = n VV^{\top} = n X (X^\top X)^{-1} X^\top$, 
 we conclude that $B_{ij} = 0$ 
 whenever vertices $i$ and $j$ belong to different communities.  
 \end{proof}
 
-Theorem \ref{theorem3} provides perfect community detection given \(P\).
-Letting \(|B|\) be the affinity matrix for graph \(G'\), \(G'\) is
-partitioned into at least \(K\) disjoint subgraphs because each of the
-\(K\) communities have no edges between them. Similar to the subspace
-detection property, it could be the case that some of the communities
-are represented by multiple disjoint subgraphs in \(G'\), in which case
-additional reconstruction is required to identify the communities
-exactly.
+Under the condition that $\|\Lambda\|_F > 0$, where 
+$\Lambda$ is the $n \times K$ matrix of popularity parameters, 
+Theorem \ref{theorem3} provides perfect community detection from \(P\).
+Letting \(|B|\) be the affinity matrix for graph \(G'\), 
+\(G'\) is partitioned into \(K\) disjoint subgraphs, as each of the
+\(K\) communities have no edges between them. 
+Then mapping each subgraph to a community provides a clustering with zero error 
+(up to permutation).
 
-Using \(A\) instead of \(P\) to estimate $B$ introduces error, 
+In practice, we observe $A$ instead of $P$. 
+Using \(A\) instead of \(P\) to estimate $B$ as in Theorem \ref{theorem3} introduces error, 
 which converges to \(0\) almost surely. 
 This is shown via properties of the GRDPG and ASE. 
 We use this fact to motivate Orthogonal Spectral Clustering (Alg. 1). 
@@ -854,14 +856,14 @@ experiment. For the final clustering step, a Gaussian Mixture Model was
 fit on the normalized Laplacian eigenmap of the affinity matrix \(B\).
 
 For comparing methods, we define the community detection error as:
-\[L_c(\hat{\sigma}, \sigma; \{v_i\}) =
+\[L_c(\hat{\sigma}, \sigma; V) =
 \min_\pi \sum_i I(\pi \circ \hat{\sigma}(v_i) = \sigma(v_i))\]
 where \(\sigma(v_i)\) is the true community label of vertex \(v_i\),
 \(\hat{\sigma}(v_i)\) is the predicted label of \(v_i\), and \(\pi\) is
 a permutation operator. This is effectively the ``misclustering count''
 of clustering function \(\hat{\sigma}\).
 
-For parameter estimation, because the popularity parameters $\{\lambda_{ik}\}$ are unidentifiable, we instead estimate the edge probabilities $p_{ij} = \lambda_{i z_j} \lambda_{j, z_i}$. The parameter estimation error is the root mean square error between the true and estimated edge probabilities, which is equivalent to the Frobenius norm of $P$ divided by the number of vertices:
+For parameter estimation, because the popularity parameters $\{\lambda_{ik}\}$ are unidentifiable, we instead estimate the edge probabilities $P_{ij} = \lambda_{i z_j} \lambda_{j, z_i}$. The parameter estimation error is the root mean square error between the true and estimated edge probabilities, which is equivalent to the Frobenius norm of $P$ divided by the number of vertices:
 
 $$\mathrm{RMSE}(\hat{P}, P) = \frac{1}{n} \|\hat{P} - P\|_F.$$
 
