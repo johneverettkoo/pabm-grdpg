@@ -768,18 +768,6 @@ that for all $n \geq N$, $\sqrt{n} \hat{V}$ obeys the subspace detection propert
 probability at least $1 - \epsilon$.  
 \end{theorem}
 
-%<<<<<<< HEAD
-%\begin{remark}
-%The proof of Theorem \ref{theorem5} is a direct consequence of Theorem 6
-%from  \cite{jmlr-v28-wang13} and the fact that the columns of
-%$V_n$ correspond to orthogonal subspaces. \cite{jmlr-v28-wang13} assume
-%that the points in the embedding are all of unit length, and while we apply
-%this normalization in the simulated examples, it is not strictly necessary
-%for Theorem \ref{theorem5} due to orthogonality.
-%\end{remark}
-%
-%=======
-%>>>>>>> 08e715a2242ef7f3f92394d598119b189bdb2790
 \hypertarget{parameter-estimation}{%
 \subsection{Algorithms for Parameter Estimation}\label{parameter-estimation}}
 
@@ -1056,7 +1044,6 @@ is however much smaller than that of modularity maximization.
 \end{figure}
 
 \begin{table}
-\caption{\label{tab:unnamed-chunk-6}Community detection error rates on the British MPs Twitter, Political Blogs, and DBLP networks using modularity maximization, sparse subspace clustering, and OSC.}
 \centering
 \begin{tabular}[t]{l|r|r|r}
 \hline
@@ -1069,9 +1056,12 @@ Political Blogs & 0.050 & 0.196 & 0.062\\
 DBLP & 0.028 & 0.087 & 0.059\\
 \hline
 \end{tabular}
+\caption{\label{tab:unnamed-chunk-6}Community detection error rates on the British MPs Twitter, Political Blogs, and DBLP networks using modularity maximization, sparse subspace clustering, and OSC.}
 \end{table}
 
-In the third example, we analyzed the Karantaka villages data studied by
+In the third example (Fig.~\ref{fig:households-figure} and 
+Table~\ref{tab:households-table}), 
+we analyzed the Karantaka villages data studied by
 \citet{DVN/U3BIHX_2013}. We chose the \texttt{visitgo}
 networks from villages 12, 31, and 46 at the household level. 
 In these networks, each node is a household and each edge is 
@@ -1082,9 +1072,6 @@ and vertices of degree 0 were removed.
 The villages were chosen based on there being an adequate number of nodes 
 between households within each religion. 
 
-The results are displayed in Fig.~\ref{fig:households-figure} and 
-Table~\ref{tab:households-table}.
-
 \begin{figure}[tp]
 {\centering \includegraphics{summary_files/figure-latex/unnamed-chunk-7-1}
 }
@@ -1092,7 +1079,6 @@ Table~\ref{tab:households-table}.
 \end{figure}
 
 \begin{table}
-\caption{\label{tab:households-table}Community detection error rates for identifying household religion.}
 \centering
 \begin{tabular}[t]{l|r|r|r}
 \hline
@@ -1105,6 +1091,7 @@ Village 31 & 0.125 & 0.066 & 0.110\\
 Village 46 & 0.052 & 0.463 & 0.078\\
 \hline
 \end{tabular}
+\caption{\label{tab:households-table}Community detection error rates for identifying household religion.}
 \end{table}
 
 \hypertarget{discussion}{%
