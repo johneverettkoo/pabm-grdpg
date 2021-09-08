@@ -736,15 +736,7 @@ matrix $V$ of eigenvectors (corresponding to the non-zero eigenvalues) of $P$. I
 up to orthogonal transformations and furthermore, due to the block
 diagonal structure of $X$, the rows of $V$ also lie on $K$ distinct orthogonal
 subspaces and hence $v_i^{\top} v_j = 0$ whenever $z_i \not = z_j$. 
-% The explicit form of \(XU\) represents points in \(\mathbb{R}^{K^2}\)
-% such that points within each community lie on \(K\)-dimensional
-% orthogonal subspaces. Multiplication by \(Q \in \mathbb{O}(p, q)\)
-% removes the orthogonality property but retains the property that each
-% community is represented by a \(K\)-dimensional subspace. Therefore, the
-% ASE of \(P\) still consists of subspaces 
-% that correspond to communities of the PABM, even if they are not orthogonal, 
-% suggesting the use of SSC. Before exploring SSC, we will first consider
-% a different approach.
+
 \begin{theorem}
 \label{theorem3}
 Let $P = V D V^\top$ be the spectral decomposition 
@@ -752,13 +744,11 @@ of the edge probability matrix.
 Let $B = n V V^\top$. 
 Assume $\lambda_{i z_i} > 0$ for each $i \in [n]$, 
 i.e., each vertex's popularity parameter to its own community is nonzero. 
-Then if vertices $i$ and $j$ are from different communities, $B_{ij} = 0$.
+Then $B_{ij} = 0$ if and only if 
+vertices $i$ and $j$ are in different communities.
 \end{theorem}
+
 \begin{proof}
-% \begin{lemma}
-% \label{lemma1}
-% Let $P = V D V^\top$ be the spectral decomposition of the edge probability 
-% matrix for a PABM.
 We first show that $V V^\top =
 \tilde{\Pi} X (X^\top X)^{-1} X^\top \tilde{\Pi}^{\top} $ where $X$ is 
 defined as in Eq.~\eqref{eq:xy}. Indeed, by Theorem 2, 
@@ -774,7 +764,8 @@ $Y = \tilde{Y} Q$. We then have
 \begin{equation*}
   \begin{split}
   Q^{\top} I_{p,q} Q &= I_{p,q} (Y^{\top} Y)^{-1} Y^{\top} \tilde{Y} I_{p,q}
-I_{p,q} I_{p,q} \tilde{Y}^{\top} Y (Y^{\top} Y)^{-1} I_{p,q} \\ &= I_{p,q} (Y^{\top} Y)^{-1} Y^{\top} Y I_{p,q}
+I_{p,q} I_{p,q} \tilde{Y}^{\top} Y (Y^{\top} Y)^{-1} I_{p,q} \\ 
+&= I_{p,q} (Y^{\top} Y)^{-1} Y^{\top} Y I_{p,q}
 Y^{\top} Y (Y^{\top} Y)^{-1} I_{p,q} =  I_{p,q}
 \end{split}
 \end{equation*}
@@ -836,43 +827,27 @@ for each pair $(i, j)$ in different communities.
   \caption{Orthogonal Spectral Clustering.}
 \end{algorithm}
 
-% In order to proceed with the proof that that OSC is consistent 
-% (Theorem \ref{theorem4}), 
-% we introduce the sparsity factor $\rho_n \in (0, 1]$, 
-% which can be characterized as the average expected degree of the vertices 
-% divided by the number of vertices. 
-% The treatment of the sparsity factor is the same as in 
-% \citet{307cbeb9b1be48299388437423d94bf1} (PABM) 
-% and \citet{rubindelanchy2017statistical} (GRDPG) 
-% in which the popularity vectors are scaled as 
-% $\rho_n^{1/2} \lambda^{(k \ell)}$. 
-% This results in the edge probabilities being scaled as 
-% $P_{ij} = \rho_n \lambda_{i z_j} \lambda_{j z_i}$. 
-% Because $\rho_n$ is unidentifiable, 
-% we use the convention that the popularity parameters are drawn such that
-% $\|\Lambda\|_F = O(\sqrt{n})$ and 
-% require that the $L^2$ norm of each row is bounded away from 0 and 1.
-
 \begin{theorem}
 \label{theorem4}
+Assume the setting of Theorem~\ref{theorem3}. 
 Let $\hat{B}$ with entries $\hat{B}_{ij}$ be the affinity matrix
-obtained from OSC as described in Algorithm~\ref{alg:osc}. Then for $n \rho_n = \omega(\log^{4}{n})$, we have
+obtained from OSC as described in Algorithm~\ref{alg:osc}. 
+Then for $n \rho_n = \omega(\log^{4}{n})$, we have
+
 \begin{equation} \label{eq:thm4a}
 \max_{i, j} |\hat{B}_{ij} - B_{ij}| = O\Big( \frac{\log n}{\sqrt{n \rho_n}} \Big)
 \end{equation}
-with high probability. In particular $\hat{B}_{ij} -
-B_{ij} \overset{\mathrm{a.s.}}{\rightarrow} 0$ where the convergence is
+
+with high probability. In particular 
+$\hat{B}_{ij} -B_{ij} \overset{\mathrm{a.s.}}{\rightarrow} 0$ 
+where the convergence is
 uniform over all $i,j$. Hence for all pairs $(i,j)$ in different
-communities we have
-% \begin{equation} \label{eq:thm4}
-% \max_{i, j} |n \hat{v}_i^\top \hat{v}_j| =
-% O\Big( \frac{\log n}{\sqrt{n \rho_n}} \Big)
-% \end{equation}
-% with high probability. 
-% Thus for all pairs $(i, j)$ in different communities,
-% we have uniform convergence 
-$\hat{B}_{ij} \overset{\mathrm{a.s}}{\rightarrow} 0$. 
+communities we have 
+$\hat{B}_{ij} \overset{\mathrm{a.s.}}{\rightarrow} 0$, 
+while for all pairs $(i, j)$ in the same community, 
+$\liminf_{n \to \infty} |\hat{B}_{ij}| > 0$ almost surely. 
 \end{theorem}
+
 Theorem~\ref{theorem4} guarantees that for any $\epsilon > 0$, 
 the number of edges of $\hat{B}$ between vertices of different communities 
 that are larger than $\epsilon$ converges to zero with probability
