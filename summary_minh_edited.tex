@@ -90,9 +90,10 @@
 
 \title{Popularity Adjusted Block Models are Generalized Random Dot Product Graphs}
 
-\author{John Koo\\Department of Statistics, Indiana University\\
-Minh Tang\\Department of Statistics, North Carolina State University\\
-Michael Trosset\\Department of Statistics, Indiana University}
+\author{John Koo\\Department of Statistics, Indiana University\\ \\
+Minh Tang\\Department of Statistics, North Carolina State University\\ \\
+Michael W. Trosset\\Department of Statistics, Indiana University\\ \\
+September 8, 2021}
 
 % \date{\vspace{-2.5em}}
 \date{}
@@ -233,6 +234,8 @@ We denote $A \sim \BG(P)$ as a graph with adjacency matrix $A$
 sampled from edge probability matrix $P$ in this manner. 
 If each vertex has a hidden label in $[K]$, 
 they are denoted as $z_1, ..., z_n$. 
+$\lambda_{ik}$ denotes the popularity parameter of vertex $i$ to community $k$. 
+$\Lambda$ is the $n \times K$ matrix of popularity parameters. 
 Finally, we denote 
 $X = \bigl[x_1 \mid \cdots \mid x_n\bigr]^\top \in \mathbb{R}^{n \times d}$ 
 as the matrix corresponding to a collection of $n$ latent vectors $x_1, ..., x_n \in \mathbb{R}^d$.
@@ -744,9 +747,12 @@ subspaces and hence $v_i^{\top} v_j = 0$ whenever $z_i \not = z_j$.
 % a different approach.
 \begin{theorem}
 \label{theorem3}
-Let $P = V D V^\top$ be the spectral decomposition of the edge probability
-matrix. Let $B = n V V^\top$. Then $B_{ij} = 0$ if vertices $i$ and $j$ are
-from different communities.
+Let $P = V D V^\top$ be the spectral decomposition 
+of the edge probability matrix. 
+Let $B = n V V^\top$. 
+Assume $\lambda_{i z_i} > 0$ for each $i \in [n]$, 
+i.e., each vertex's popularity parameter to its own community is nonzero. 
+Then if vertices $i$ and $j$ are from different communities, $B_{ij} = 0$.
 \end{theorem}
 \begin{proof}
 % \begin{lemma}
@@ -793,11 +799,8 @@ we conclude that $B_{ij} = 0$
 whenever vertices $i$ and $j$ belong to different communities.  
 \end{proof}
 
-Under the condition that $\|\Lambda\|_F > 0$, 
-Theorem \ref{theorem3} provides perfect community detection from \(P\).
-\footnote{This is excluding the special case in which vectors in each 
-subspace lie on mutually orthogonal sub-subspaces.}
-More specifically let \(|B|\) be the affinity matrix for graph \(G'\), 
+Theorem \ref{theorem3} provides perfect community detection from \(P\)\footnote{This excludes the pathological case in which $P_{ij} = 0$ for some $z_i = z_j$.}.
+More specifically, let \(|B|\) be the affinity matrix for graph \(G'\), 
 where $|\cdot|$ is applied entry-wise. Then
 \(G'\) consists of exactly \(K\) disjoint subgraphs, 
 as $G'$ has no edges between communities. 
@@ -873,7 +876,11 @@ $\hat{B}_{ij} \overset{\mathrm{a.s}}{\rightarrow} 0$.
 Theorem~\ref{theorem4} guarantees that for any $\epsilon > 0$, 
 the number of edges of $\hat{B}$ between vertices of different communities 
 that are larger than $\epsilon$ converges to zero with probability
-converging to one as $n$ increases. Thus, by using $\hat{B}$, we can 
+converging to one as $n$ increases. 
+Furthermore, if $P_{ij} > 0$ for each pair $(i, j)$ in the same community, 
+we can always find an $\epsilon > 0$ such that $\hat{B}_{ij} > \epsilon$ 
+with probability converging to one as $n$ increases. 
+Thus, by using $\hat{B}$, we can 
 perfectly recover all the latent community assignments $z_1, z_2,
 \dots, z_n$, i.e., the number of mis-clustered vertices is zero
 asymptotically almost surely. We note that Theorem~\ref{theorem4} is
@@ -1005,6 +1012,7 @@ O\bigg(\frac{\log n_k}{\sqrt{n_k}} \bigg)
 \end{equation}
 with high probability. Here $\|\cdot\|_{\infty}$ denotes the
 $\ell_\infty$ norm of a vector. Let $\hat{\Lambda}$ be the matrix
+
 $$\hat{\Lambda} = \begin{bmatrix} \hat{\lambda}^{(11)} &
   \hat{\lambda}^{(12)} & \cdots & \hat{\lambda}^{(1 K)} \\
   \hat{\lambda}^{(21)} &
@@ -1013,8 +1021,10 @@ $$\hat{\Lambda} = \begin{bmatrix} \hat{\lambda}^{(11)} &
    \hat{\lambda}^{(K1)} &
   \hat{\lambda}^{(K2)} & \cdots & \hat{\lambda}^{(K K)} 
 \end{bmatrix}$$
-and let $\hat{P} = \hat{\Lambda} I_{p,q}
-\hat{\Lambda}^{\top}$. Eq.~\eqref{eq:thm6} then implies
+
+and let $\hat{P} = \hat{X} U I_{p,q} U^\top \hat{X}^{\top}$ 
+where $\hat{X}$ is defined from $\hat{\Lambda}$ and $U$ is defined from $K$ as in Theorem~\ref{theorem2}. 
+Eq.~\eqref{eq:thm6} then implies
 \begin{equation}
 \label{eq:conv_prob}
 \frac{1}{n} \|\rho_n^{-1} \hat{P} - \rho_n^{-1} P\|_{F} = O((n
@@ -1027,11 +1037,12 @@ Eq.~\eqref{eq:thm6} guarantees that $n^{-1/2} \|\rho_n^{-1/2} \hat{\Lambda} -
 the mean square error for $\rho_n^{-1} (\hat{P} - P)$ converges to $0$ almost surely and
 furthermore the entries of $\rho_n^{-1}
 \hat{P}$ converge uniformly to the entries of $\rho_n^{-1} P$; recall that
-$\rho_n^{-1} P_{ij} = \lambda_{iz_j} \lambda_{j}z_i$. We note that
+$\rho_n^{-1} P_{ij} = \lambda_{iz_j} \lambda_{j z_i}$. We note that
 these results are stronger than existing results in
 \citet{307cbeb9b1be48299388437423d94bf1}; for example Theorem~2 in
 \citet{307cbeb9b1be48299388437423d94bf1} only guarantees $n^{-1/2} \|\rho_n^{-1/2} \hat{\Lambda} -
 \Lambda\|_{F} = o(1)$ as $n \rightarrow \infty$.
+
 \hypertarget{simulated-examples}{%
 \section{Simulation Study}\label{simulated-examples}}
 
@@ -1395,70 +1406,43 @@ We first state an important technical lemma for bounding the maximum
 $\ell_2$ norm difference between the rows of $\hat{V}_n$ and
 $V_n$. See \citet{cape_biometrika} and 
 \citet[Lemma~5]{rubindelanchy2017statistical} for a proof. 
+
 \begin{lemma}
-  \label{lem:technical}
+\label{lem:technical}
 Let $A \sim \mathrm{PABM}(\{\lambda^{(k \ell \ell)}\}_{K})$ be a $K$-blocks
-PABM graph on $n$ vertices and let \(V_n\) and \(\hat{V}_n\)
-be the $n \times K^2$ matrices whose columns are the eigenvectors of \(P\) and \(A\) corresponding to the
+PABM graph on $n$ vertices and let \(V\) and \(\hat{V}\)
+be the $n \times K^2$ matrices whose columns are the eigenvectors of 
+\(P\) and \(A\) corresponding to the
 $K^2$ largest eigenvalues in modulus, respectively.
-Let \((v_n^{(i)})^\top\) and \((\hat{v}_n^{(i)})^\top\) denote the $i$th 
-row of \(V_n\) and \(\hat{V}_n\), respectively. 
+Let \(v_i^\top\) and \(\hat{v}_i^\top\) denote the $i$th 
+row of \(V\) and \(\hat{V}\), respectively. 
 Then there exists a constant $c > 1$ and an orthogonal matrix $W$ such
 that with high probability,
-$$\max_{i} \|W \hat{v}_n^{(i)} - v_n^{(i)}\|  = O\Big(\frac{\log^{c}n}{n \sqrt{\rho_n}} \Big).$$
+$$\max_{i} \|W \hat{v}_i - v_i\|  = O\Big(\frac{\log^{c}n}{n \sqrt{\rho_n}} \Big).$$
 In particular we can take $c = 1 + \epsilon$ for any $\epsilon > 0$. 
 \end{lemma}
 
-
-%
-%then the \(ij\)\textsuperscript{th} element of
-%\(n X (X^\top X)^{-1} X^\top = n V V^\top = B\) is 0.
-
 \begin{proof}[Proof of Theorem~\ref{theorem4}]
-  Recall the notations in Lemma~\ref{lem:technical} and note that,
-  under our assumption that the latent vectors $\lambda^{(k \ell)}$
-  are all homogeneous, we have $\max_{i} \|v_n^{(i)}\| =
-  O(n^{-1/2})$. 
-%   Let \(V_n\) and \(\hat{V}_n\)
-% be the $n \times K^2$ matrices whose columns are the eigenvectors of \(P\) and \(A\) corresponding to the
-% \(K (K + 1) / 2\) most positive and \(K (K - 1) / 2\) most negative
-% eigenvalues, respectively. From Lemma~5 in
-% \citet{rubindelanchy2017statistical} we have, for some
-% \(W \in \mathbb{O}(K^2)\) and \(c > 0\), that
-% $$\|\hat{V} W - V\|_{2 \to \infty} = O_P \big(\frac{\log^{c}n}{n \sqrt{\rho_n}} \big).$$
-% We furthermore have \(\|V\|_{2 \to \infty} = O_P(n^{-1/2})\). 
-% Let
-% \((v_n^{(i)})^\top\) and \((\hat{v}_n^{(i)})^\top\) denote the $i$th 
-% row of \(V_n\) and \(\hat{V}_n\), respectively. 
-Next recall Theorem~\ref{theorem3}; in particular $B_{ij} = n(v_n^{(i)})^{\top}
-v_n^{(j)}$. % Now suppose that vertices $i$ and $j$ belongs to different
-% communities. Then $B_{ij} = 0$ and hence
-% Then for \(i\) and
-% \(j\) belonging to different
-% communities, we ha using the fact that \((v_n^{(i)})^\top v_n^{(j)} = 0\),
+Recall the notations in Lemma~\ref{lem:technical} and note that,
+under our assumption that the latent vectors $\lambda^{(k \ell)}$
+are all homogeneous, we have $\max_{i} \|v_i\| =
+O(n^{-1/2})$. 
+
+Next recall Theorem~\ref{theorem3}; in particular $B_{ij} = nv_i^{\top}
+v_j$. 
 We therefore have
 \[\begin{split}
- \max_{ij} |\hat{B}_{ij} - B_{ij}| &= \max_{ij} n |(\hat{v}_n^{(i)})^\top \hat{v}_n^{(j)} -
-(v_n^{(i)})^\top v_n^{(j)}| \\
-& \leq n \max_{ij} |(\hat{v}_n^{(i)})^\top W W^\top \hat{v}_n^{(j)} -
-(v_n^{(i)})^\top v_n^{(j)}| \\
-& \leq n \max_{i,j} \Bigl(\|W^{\top} \hat{v}_n^{(i)} - v_n^{(i)}\| \times \|\hat{v}_n^{(j)}\|
-+ \|W^{\top} \hat{v}_n^{(j)} - v_n^{(j)}\| \times \|v_n^{(i)}\|\Bigr) \\
-% & \leq 
-% \hat{V}_n W^\top W \hat{V}_n - V_n V_n^\top||_{2 \to \infty} \\
-% & = ||2 \hat{V}_n W V_n^\top - 2 V_n V_n^\top + \hat{V}_n W W^\top V_n^\top - 
-% 2 \hat{V}_n W V_n^\top + V_n V_n^\top||_{2 \to \infty} \\
-% & = ||2 (\hat{V}_n W - V_n) V_n^\top + 
-% (\hat{V}_n W - V_n) (\hat{V}_n W - V_n)^\top ||_{2 \to \infty} \\
-% & \leq 2 
-% &\leq  n \Bigl(\max_{ij}  \|W \hat{v}_n^{(i)}  - v_n^{(i)} \| \times \|\hat{v}_n^{(j)}\| +
-% n \|W \hat{v}_n^{(j)}  - v_n^{(j)} \| \times \|v_n^{(i)}\|\Bigr)
-% \\
-& \leq n \Bigl(\max_{ij}  \|W \hat{v}_n^{(i)}  - v_n^{(i)} \|^2 +  \|W
-\hat{v}_n^{(i)}  - v_n^{(i)} \| \times \|v_n^{(j)}\| +  \|W \hat{v}_n^{(j)}  - v_n^{(j)} \| \times \|v_n^{(i)}\|\Bigr) 
+ \max_{ij} |\hat{B}_{ij} - B_{ij}| &= \max_{ij} n |\hat{v}_i^\top \hat{v}_j -
+v_i^\top v_j| \\
+& \leq n \max_{ij} |\hat{v}_i^\top W W^\top \hat{v}_j -
+v_i^\top v_j| \\
+& \leq n \max_{i,j} \Bigl(\|W^{\top} \hat{v}_i - v_i\| \times \|\hat{v}_j\|
++ \|W^{\top} \hat{v}_j - v_j\| \times \|v_i\|\Bigr) \\
+& \leq n \Bigl(\max_{ij}  \|W \hat{v}_i  - v_i \|^2 +  \|W
+\hat{v}_i  - v_i \| \times \|v_j\| +  \|W \hat{v}_j  - v_j \| \times \|v_i\|\Bigr) 
 \\ &
-\leq n \max_{i} \|W \hat{v}_n^{(i)}  - v_n^{(i)} \|^2 + 2n \max_{i}
-\|W \hat{v}_n^{(i)}  - v_n^{(i)} \| \times \max_{j} \|v_n^{(j)}\|
+\leq n \max_{i} \|W \hat{v}_i  - v_i \|^2 + 2n \max_{i}
+\|W \hat{v}_i  - v_i \| \times \max_{j} \|v_j\|
 \\
 & = O \Big( \frac{\log^{c}{n}}{n^{1/2} \rho_n^{1/2}} \Big)
 \end{split}\]
@@ -1467,9 +1451,6 @@ Theorem~\ref{theorem4} follows from the above bound together with the
 conclusion in Theorem~\ref{theorem3} that $B_{ij} = 0$ whenever vertices $i$ and $j$
 belongs to different communities. 
 \end{proof}
-% Scaling all terms in the above inequality by \(n\), we obtain
-% $$|n (\hat{v}_n^{(i)})^\top \hat{v}_n^{(j)}| = O_P \Big( \frac{(\log n)^c}{\sqrt{n \rho_n}} \Big)$$
-% as desired.
 
 We now provide a proof of Theorem~\ref{theorem5}. Our proof is based
 on verifying the sufficient conditions given in Theorem~6 of
@@ -1481,7 +1462,7 @@ Definition~\ref{def:subspace_detection}. We first recall a few
 definitions used in \citet{soltanolkotabi2012} and \citet{jmlr-v28-wang13}; for ease of exposition,
 these definitions are stated using the notations of the current
 paper and we will drop the explicit dependency on $n$ from our
-eigenvectors $\hat{V}_n$ of $A$ and $V_n$ of $P$.
+eigenvectors $\hat{V}$ of $A$ and $V$ of $P$.
  % We first recall the
 % notion of the inradius of a set of points. 
 \begin{definition}[Inradius]
