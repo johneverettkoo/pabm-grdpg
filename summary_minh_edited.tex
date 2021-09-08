@@ -104,7 +104,8 @@ Michael Trosset\\Department of Statistics, Indiana University}
 \begin{abstract}
 We connect two random graph models, the Popularity Adjusted Block Model
 (PABM) and the Generalized Random Dot Product Graph (GRDPG),
-by demonstrating that a PABM is a special case of a GRDPG in which communities correspond to 
+by demonstrating that the PABM is a special case of 
+the GRDPG in which communities correspond to 
 mutually orthogonal subspaces of latent vectors. 
 This insight allows us to construct new algorithms for community detection
 and parameter estimation for the PABM, 
@@ -257,7 +258,8 @@ $$P_{ij} = \rho_n \lambda_{iz_j} \lambda_{jz_i}.$$
 % such that $A \sim \mathrm{Bernoulli}(P)$.
 % Let each vertex have a community label between $1$ and $K$.
 % Then $G$ is drawn from a Popularity Adjusted Block Model if
-  In a PABM each vertex $i$ has $K$ popularity parameters $\lambda_{i1}, \dots, \lambda_{iK}$, that describe its affinity
+In a PABM, each vertex $i$ has $K$ popularity parameters 
+$\lambda_{i1}, \dots, \lambda_{iK}$, that describe its affinity
 toward each of the $K$ communities. % , i.e., vertex $i$ has popularity parameters
 % $\lambda_{i1}, ..., \lambda_{iK}$, and  $P_{ij} = \lambda_{i z_j}
 % \lambda_{j z_i}$ for all $i \leq j$. 
@@ -273,10 +275,10 @@ vertices assigned to community $k$, for $k = 1,2\dots,K$.
 Note that $\tilde{P}^{(k \ell)} = (\tilde{P}^{(\ell k)})^\top$. Next
 let $\lambda^{(k \ell)} = \{\lambda_{i \ell} \colon z_i = k\} \in
 \mathbb{R}^{n_k}$; the elements of $\lambda^{(k \ell)}$ are the affinity parameters toward the $\ell$th community of
-all vertices in the $k$th community. Define $\lambda^{(\ell k)}$
+all vertices in the $k^{th}$ community. Define $\lambda^{(\ell k)}$
 analogously. Then each block $\tilde{P}^{(k \ell)}$ can be written as the outer product of two vectors:
 \begin{equation} \label{eq:pabm}
-  \tilde{P}^{(k \ell)} = \lambda^{(k \ell)} (\lambda^{(\ell k)})^{\top}.
+  \tilde{P}^{(k \ell)} = \rho_n \lambda^{(k \ell)} (\lambda^{(\ell k)})^{\top}.
 \end{equation}
 % for a set of $K^2$ popularity vectors 
 % $\{\lambda^{(st)}\}_{1 \leq s \leq K, 1 \leq t \leq K}$ where each
@@ -595,10 +597,10 @@ then collected into \(C\) and \(B\) as before.
 Let $X = \bigl[ x_1 \mid \cdots \mid x_n \bigr]^\top$ be noisy
 points sampled from $K$ subspaces, i.e., $x_i = y_i + z_i$ where the
 $y_i$ belongs to the union of $K$ subspaces and the $z_i$ are noise
-vectors. Let $\lambda \geq 0$ be given and
+vectors. Let $\vartheta \geq 0$ be given and
 let $C$ and $B$ be constructed from the
 solutions of LASSO problems as described in Eq.~\eqref{eq:ssc} with
-this given choice of $\lambda$. Then $X$
+this given choice of $\vartheta$. Then $X$
 is said to satisfy the subspace detection property 
 with sparsity parameter $\vartheta$ if each column of
 $C$ has nonzero $\ell_2$ norm and $B_{ij} = 0$ whenever $y_i$ and $y_j$ are
@@ -606,27 +608,27 @@ from different subspaces.
 \end{definition}
 
 \begin{remark}
-  One of the most common approach to show that SSC works for a noisy
-  sample $X$ is to show that 
-  $X$ satisfies the
-  subspace detection property for some choice of $\vartheta$; recall
-  that $\vartheta$ is the sparsity parameter $\vartheta$ for
+One of the most common approach to show that SSC works for a noisy
+sample $X$ is to show that 
+$X$ satisfies the
+subspace detection property for some choice of $\vartheta$; recall
+that $\vartheta$ is the sparsity parameter $\vartheta$ for
 the LASSO problems in Eq.~\eqref{eq:ssc}. However, this is not sufficient to
 guarantee that SSC perfectly recovers the underlying subspaces.
-More specifically
-if $X$ satisfies the
-subspace detection property then $B$ describes a graph with {\em at least}
-$K$ disconnected subgraphs, with the ideal case being that there are exactly $K$ subgraphs which map onto each
-subspace. Nevertheless it is also possible that the $K$ subspaces are represented by
+More specifically, if $X$ satisfies the 
+subspace detection property, 
+then $B$ describes a graph with {\em at least} $K$ disconnected subgraphs, 
+with the ideal case being that there are exactly $K$ subgraphs 
+which map onto each subspace. 
+Nevertheless it is also possible that the $K$ subspaces are represented by
 $K' > K$
 multiple disconnected subgraphs and we cannot, at least without a subsequent
 post-processing step, recover the $K$ subspaces directly from $B$;
 see \citet{sdp_sufficiency} and \citet{liu_ssc}
 for further discussions. Therefore in practice $B$ is usually treated as an
-affinity matrix and, as we allude to earlier, the rows of $B$ are partitioned using some
-clustering algorithm to obtain the final clustering. % Finally we note that the subspace detection property is contingent
-% on choosing a sufficiently large sparsity parameter $\vartheta$ for
-% the LASSO problems in Eq.~\eqref{eq:ssc}.
+affinity matrix and, as we allude to earlier, 
+the rows of $B$ are partitioned using some
+clustering algorithm to obtain the final clustering. 
 \end{remark}
 
 Theorem~\ref{theorem2} suggests that SSC is appropriate for community
@@ -719,7 +721,8 @@ $Q \in \mathbb{O}(p,q)$. %  as there is no
 % start with the true but unknown edge probability matrix $P$ we
 % will not be able to recover the latent positions \(XU\).
 However since \(Q\) is not necessarily an
-orthogonal matrix and hence, if $y_i$ denote the $i$th row of $Y$ then $\langle U^{\top} x_i, U^{\top} x_j \rangle
+orthogonal matrix and hence, if $y_i$ denote the $i^{th}$ row of $Y$, 
+then $\langle U^{\top} x_i, U^{\top} x_j \rangle
 \neq \langle y_i, y_j \rangle$.
 This prevents us from transferring the orthogonality property of
 \(XU\) directly to $Y$. 
@@ -789,10 +792,12 @@ As $B = n VV^{\top} = n \tilde{\Pi} X (X^\top X)^{-1} X^\top \tilde{\Pi}^{\top}$
 we conclude that $B_{ij} = 0$ 
 whenever vertices $i$ and $j$ belong to different communities.  
 \end{proof}
-Under the condition that $\|\Lambda\|_F > 0$, where 
-$\Lambda$ is the $n \times K$ matrix of popularity parameters, 
-Theorem \ref{theorem3} provides perfect community detection from
-\(P\). More specifically let \(|B|\) be the affinity matrix for graph \(G'\), 
+
+Under the condition that $\|\Lambda\|_F > 0$, 
+Theorem \ref{theorem3} provides perfect community detection from \(P\).
+\footnote{This is excluding the special case in which vectors in each 
+subspace lie on mutually orthogonal sub-subspaces.}
+More specifically let \(|B|\) be the affinity matrix for graph \(G'\), 
 where $|\cdot|$ is applied entry-wise. Then
 \(G'\) consists of exactly \(K\) disjoint subgraphs, 
 as $G'$ has no edges between communities. 
@@ -809,7 +814,8 @@ The following result leverages existing theoretical properties
 of ASE for estimating of latent positions in a GRDPG \citep{rubindelanchy2017statistical} to show that
 $\hat{B}$ converges almost surely to $B$; in particular 
  $\hat{B}_{ij} \stackrel{a.s.}{\to} 0$ 
-for pair $(i, j)$ in different communities. 
+for each pair $(i, j)$ in different communities. 
+
 \begin{algorithm}[tp]
   \label{alg:osc}
   \DontPrintSemicolon
@@ -852,7 +858,7 @@ obtained from OSC as described in Algorithm~\ref{alg:osc}. Then for $n \rho_n = 
 \max_{i, j} |\hat{B}_{ij} - B_{ij}| = O\Big( \frac{\log n}{\sqrt{n \rho_n}} \Big)
 \end{equation}
 with high probability. In particular $\hat{B}_{ij} -
-B_{ij} \overset{\mathrm{a.s}}{\rightarrow} 0$ where the convergence is
+B_{ij} \overset{\mathrm{a.s.}}{\rightarrow} 0$ where the convergence is
 uniform over all $i,j$. Hence for all pairs $(i,j)$ in different
 communities we have
 % \begin{equation} \label{eq:thm4}
@@ -933,7 +939,7 @@ Let $P$ describe the edge probability matrix of the PABM with
 $n$ vertices, and let $A \sim \Bernoulli(P)$.  Let $\hat{V}$ be the
 matrix of eigenvectors of $A$ corresponding to the $K^2$ largest
 eigenvalues in modulus. Then for any $\epsilon > 0$ 
-there exists a choice of $\lambda > 0$ and $N \in \mathbb{N}$ such
+there exists a choice of $\vartheta > 0$ and $N \in \mathbb{N}$ such
 that for all $n \geq N$, $\sqrt{n} \hat{V}$ obeys the subspace detection property with
 probability at least $1 - \epsilon$.  
 \end{theorem}
@@ -1088,7 +1094,7 @@ require the community labels if we are only interested in
 estimating $P$. More specifically we first compute the ASE
 $\hat{Z}$ of $A$ (see Remark~\ref{rem:ase}) and then compute $\hat{P}
 = \hat{Z} I_{p,q} \hat{Z}^{\top}$. The resulting estimate $\hat{P}$
-will have the same convergence rate as that given in Eq.(xxx).
+will have the same convergence rate as that given in Eq.~(\ref{eq:conv_prob}).
 % we obtain by
 % combining the popularity vectors outputted by
 % Algorithm~\ref{alg:param_est} is asymptotically
