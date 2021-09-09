@@ -698,7 +698,7 @@ detection and parameter identification problem are trivial because \(U\)
 is orthonormal and fixed for each value of \(K\). 
 However, direct
 identification or estimation of \(XU\) is possibly difficult 
-due to the non-identifiability of $XU$ (see Remark~\ref{rem:non_identifiable}).
+due to the non-identifiability of $XU$ (see Remark~\ref{rem:non_identifiable})
 when we are given only $P$. % of the latent
 % positions of a GRDPG.  
 % due to the
@@ -790,7 +790,7 @@ we conclude that $B_{ij} = 0$
 whenever vertices $i$ and $j$ belong to different communities.  
 \end{proof}
 
-Theorem \ref{theorem3} provides perfect community detection from \(P\)\footnote{This excludes the pathological case in which $P_{ij} = 0$ for some $z_i = z_j$.}.
+Theorem \ref{theorem3} provides perfect community detection from \(P\).% \footnote{This excludes the pathological case in which $P_{ij} = 0$ for some $z_i = z_j$.}.
 More specifically, let \(|B|\) be the affinity matrix for graph \(G'\), 
 where $|\cdot|$ is applied entry-wise. Then
 \(G'\) consists of exactly \(K\) disjoint subgraphs, 
@@ -833,11 +833,9 @@ Assume the setting of Theorem~\ref{theorem3}.
 Let $\hat{B}$ with entries $\hat{B}_{ij}$ be the affinity matrix
 obtained from OSC as described in Algorithm~\ref{alg:osc}. 
 Then for $n \rho_n = \omega(\log^{4}{n})$, we have
-
 \begin{equation} \label{eq:thm4a}
 \max_{i, j} |\hat{B}_{ij} - B_{ij}| = O\Big( \frac{\log n}{\sqrt{n \rho_n}} \Big)
 \end{equation}
-
 with high probability. In particular 
 $\hat{B}_{ij} -B_{ij} \overset{\mathrm{a.s.}}{\rightarrow} 0$ 
 where the convergence is
@@ -847,13 +845,12 @@ $\hat{B}_{ij} \overset{\mathrm{a.s.}}{\rightarrow} 0$,
 while for all pairs $(i, j)$ in the same community, 
 $\liminf_{n \to \infty} |\hat{B}_{ij}| > 0$ almost surely. 
 \end{theorem}
-
 Theorem~\ref{theorem4} guarantees that for any $\epsilon > 0$, 
 the number of edges of $\hat{B}$ between vertices of different communities 
 that are larger than $\epsilon$ converges to zero with probability
 converging to one as $n$ increases. 
-Furthermore, if $P_{ij} > 0$ for each pair $(i, j)$ in the same community, 
-we can always find an $\epsilon > 0$ such that $\hat{B}_{ij} > \epsilon$ 
+Furthermore we can always find an $\epsilon > 0$ such that if $i$ and
+$j$ are in the same community then $\hat{B}_{ij} > \epsilon$ 
 with probability converging to one as $n$ increases. 
 Thus, by using $\hat{B}$, we can 
 perfectly recover all the latent community assignments $z_1, z_2,
