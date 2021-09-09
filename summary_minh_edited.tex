@@ -790,7 +790,7 @@ we conclude that $B_{ij} = 0$
 whenever vertices $i$ and $j$ belong to different communities.  
 \end{proof}
 
-Theorem \ref{theorem3} provides perfect community detection from \(P\)\footnote{This excludes the pathological case in which $P_{ij} = 0$ for some $z_i = z_j$.}.
+Theorem \ref{theorem3} provides perfect community detection from \(P\).
 More specifically, let \(|B|\) be the affinity matrix for graph \(G'\), 
 where $|\cdot|$ is applied entry-wise. Then
 \(G'\) consists of exactly \(K\) disjoint subgraphs, 
@@ -852,8 +852,7 @@ Theorem~\ref{theorem4} guarantees that for any $\epsilon > 0$,
 the number of edges of $\hat{B}$ between vertices of different communities 
 that are larger than $\epsilon$ converges to zero with probability
 converging to one as $n$ increases. 
-Furthermore, if $P_{ij} > 0$ for each pair $(i, j)$ in the same community, 
-we can always find an $\epsilon > 0$ such that $\hat{B}_{ij} > \epsilon$ 
+We can always find an $\epsilon > 0$ such that $\hat{B}_{ij} > \epsilon$ 
 with probability converging to one as $n$ increases. 
 Thus, by using $\hat{B}$, we can 
 perfectly recover all the latent community assignments $z_1, z_2,
