@@ -192,7 +192,7 @@ equivalent to an RDPG for which all vertices in the same community
 correspond to the same latent position vector.
 Likewise, the DCBM is equivalent to an RDPG for which all vertices in
 the same community correspond to latent position vectors that lie on a
-straight line. %(\cite{lyzinski2014, rubindelanchy2017statistical}).
+straight line. 
 
 Because the edge probability matrix of a PABM is not necessarily
 positive semidefinite, a PABM is not necessarily an RDPG.  In Section
@@ -256,16 +256,9 @@ $$P_{ij} = \rho_n \lambda_{iz_j} \lambda_{jz_i}.$$
 
 \begin{remark}
   \label{rem:pabm_view2}
-% Let $P \in [0, 1]^{n \times n}$ be a symmetric edge probability matrix for a
-% graph $G = (V, E)$ with adjacency matrix $A$ 
-% such that $A \sim \mathrm{Bernoulli}(P)$.
-% Let each vertex have a community label between $1$ and $K$.
-% Then $G$ is drawn from a Popularity Adjusted Block Model if
 In a PABM, each vertex $i$ has $K$ popularity parameters 
 $\lambda_{i1}, \dots, \lambda_{iK}$, that describe its affinity
-toward each of the $K$ communities. % , i.e., vertex $i$ has popularity parameters
-% $\lambda_{i1}, ..., \lambda_{iK}$, and  $P_{ij} = \lambda_{i z_j}
-% \lambda_{j z_i}$ for all $i \leq j$. 
+toward each of the $K$ communities. 
 Another view of a PABM is as follows.
 Let $\tilde{P}$ be the matrix obtained by permuting the rows and
 columns of $P$ so that the vertices are arranged according to
@@ -282,14 +275,8 @@ all vertices in the $k^{th}$ community. Define $\lambda^{(\ell k)}$
 analogously. Then each block $\tilde{P}^{(k \ell)}$ can be written as the outer product of two vectors:
 \begin{equation} \label{eq:pabm}
   \tilde{P}^{(k \ell)} = \rho_n \lambda^{(k \ell)} (\lambda^{(\ell k)})^{\top}.
-\end{equation}
-% for a set of $K^2$ popularity vectors 
-% $\{\lambda^{(st)}\}_{1 \leq s \leq K, 1 \leq t \leq K}$ where each
-% $\lambda^{(st)}$ is a column vector of dimension $n_s$.
-% . Then a graph $G$
-% is drawn from a PABM with parameters
-% $\{\lambda^{(st)}\}$ if its adjacency matrix $A$
-% satisfies $A \sim \mathrm{BernoulliGraph}(P)$.
+\end{equation} 
+
 We will henceforth use the notation \(A \sim \PABM(\{\lambda^{(k
   \ell)}\}_K, \rho_n)\) to denote
 a random adjacency matrix \(A\) drawn from a PABM with $K$ communities, popularity parameters
@@ -330,23 +317,15 @@ and signature $(p,q)$ if $A \sim \BG(P)$ where the edge probability
 matrix $P$ is given
 by $P = \rho_n X I_{p,q} X^{\top}$, i.e., the entries of $P$ are of
 the form
+
 $$P_{ij} = \rho_n x_i^{\top} I_{p,q} x_j.$$
-% Let graph $G = (V, E)$ be drawn as $A \sim \BG(P)$ for some symmetric $P \in
-% [0,1]^{n \times n}$. 
-% If there exists a data matrix $X \in \mathbb{R}^{n \times d}$ such that
-% \begin{equation} \label{eq:grdpg}
-%   P = X I_{p,q} X^\top
-% \end{equation}
-% for some $d, p, q \in \mathbb{N}$ and $p + q = d$, then
-% $G$ is drawn from the Generalized Random Dot Product Graph 
-% with latent positions $x_1, ..., x_n \in \mathbb{R}^d$ and signature $(p, q)$.
+
 \end{definition}
 We will use the notation \(A \sim \GRDPG_{p,q}(X;\rho_n)\) to denote a random
 adjacency matrix \(A\) drawn from latent positions \(X\), sparsity
 parameter $\rho_n$ and signature
-\((p, q)\). % If instead of fixed latent positions, 
-% they are drawn $X_1, ..., X_n \iid F$, 
-% we denote the GRDPG as $(A, X) \sim \GRDPG_{p,q}(F, n)$.
+\((p, q)\). 
+
 \begin{remark}
   \label{rem:ase}
 We can use Adjacency Spectral Embedding (ASE) 
@@ -674,7 +653,7 @@ regarding the application of SSC to the rows of $A$.
 % of \(P\). More specifically, if points lie exactly on mutually
 % orthogonal subspaces, then the subspace detection property will hold
 % with probability 1, and this is exactly the case for the PABM (Theorem
-% ???). Much of our work is then built on
+% \ref{theorem2}). Much of our work is then built on
 % \citet{rubindelanchy2017statistical}, who describe the convergence
 % behavior of the ASE of \(A\) to the ASE of \(P\), and
 % \citet{jmlr-v28-wang13}, who show the necessary conditions for the
@@ -699,30 +678,12 @@ is orthonormal and fixed for each value of \(K\).
 However, direct
 identification or estimation of \(XU\) is possibly difficult 
 due to the non-identifiability of $XU$ (see Remark~\ref{rem:non_identifiable})
-when we are given only $P$. % of the latent
-% positions of a GRDPG.  
-% due to the
-% non-identifiability of \(XU\) when we are only given $P$, 
-% direct
-% identification or estimation of \(XU\) is possibly difficult 
-% if we are only given $P$. 
-% (\cite{rubindelanchy2017statistical}).
+when we are given only $P$. 
 More specifically, suppose we find a matrix $Y \in
 \mathbb{R}^{n \times K^2}$
 such that \(P = Y I_{p, q} Y^\top\). Then it is generally the case that
 we  \( Y = \tilde{\Pi} XU Q \) for some indefinite orthogonal matrix
-$Q \in \mathbb{O}(p,q)$. %  as there is no
-% general matrix decomposition that yield 
-% The explicit form of \(XU\) represents points in \(\mathbb{R}^{K^2}\)
-% such that points within each community lie on \(K\)-dimensional
-% orthogonal subspaces. Multiplication by \(Q \in \mathbb{O}(p, q)\)
-% removes the orthogonality property but retains the property that each
-% community is represented by a \(K\)-dimensional subspace. 
-% However, because $\tilde{\Pi}$ is unknown (indeed, if we know $\tilde{\Pi}$
-% then we also know the community labels), 
-% Therefore, even if we
-% start with the true but unknown edge probability matrix $P$ we
-% will not be able to recover the latent positions \(XU\).
+$Q \in \mathbb{O}(p,q)$. 
 However since \(Q\) is not necessarily an
 orthogonal matrix and hence, if $y_i$ denote the $i^{th}$ row of $Y$, 
 then $\langle U^{\top} x_i, U^{\top} x_j \rangle
@@ -790,7 +751,7 @@ we conclude that $B_{ij} = 0$
 whenever vertices $i$ and $j$ belong to different communities.  
 \end{proof}
 
-Theorem \ref{theorem3} provides perfect community detection from \(P\).% \footnote{This excludes the pathological case in which $P_{ij} = 0$ for some $z_i = z_j$.}.
+Theorem \ref{theorem3} provides perfect community detection from \(P\).
 More specifically, let \(|B|\) be the affinity matrix for graph \(G'\), 
 where $|\cdot|$ is applied entry-wise. Then
 \(G'\) consists of exactly \(K\) disjoint subgraphs, 
@@ -833,9 +794,11 @@ Assume the setting of Theorem~\ref{theorem3}.
 Let $\hat{B}$ with entries $\hat{B}_{ij}$ be the affinity matrix
 obtained from OSC as described in Algorithm~\ref{alg:osc}. 
 Then for $n \rho_n = \omega(\log^{4}{n})$, we have
+
 \begin{equation} \label{eq:thm4a}
 \max_{i, j} |\hat{B}_{ij} - B_{ij}| = O\Big( \frac{\log n}{\sqrt{n \rho_n}} \Big)
 \end{equation}
+
 with high probability. In particular 
 $\hat{B}_{ij} -B_{ij} \overset{\mathrm{a.s.}}{\rightarrow} 0$ 
 where the convergence is
@@ -845,12 +808,12 @@ $\hat{B}_{ij} \overset{\mathrm{a.s.}}{\rightarrow} 0$,
 while for all pairs $(i, j)$ in the same community, 
 $\liminf_{n \to \infty} |\hat{B}_{ij}| > 0$ almost surely. 
 \end{theorem}
+
 Theorem~\ref{theorem4} guarantees that for any $\epsilon > 0$, 
 the number of edges of $\hat{B}$ between vertices of different communities 
 that are larger than $\epsilon$ converges to zero with probability
 converging to one as $n$ increases. 
-Furthermore we can always find an $\epsilon > 0$ such that if $i$ and
-$j$ are in the same community then $\hat{B}_{ij} > \epsilon$ 
+We can always find an $\epsilon > 0$ such that $\hat{B}_{ij} > \epsilon$ 
 with probability converging to one as $n$ increases. 
 Thus, by using $\hat{B}$, we can 
 perfectly recover all the latent community assignments $z_1, z_2,
@@ -1078,11 +1041,6 @@ estimating $P$. More specifically we first compute the ASE
 $\hat{Z}$ of $A$ (see Remark~\ref{rem:ase}) and then compute $\hat{P}
 = \hat{Z} I_{p,q} \hat{Z}^{\top}$. The resulting estimate $\hat{P}$
 will have the same convergence rate as that given in Eq.~(\ref{eq:conv_prob}).
-% we obtain by
-% combining the popularity vectors outputted by
-% Algorithm~??? is asymptotically
-% equivalent to using the full ASE of $A$ to reconstruct the edge
-% probability matrix.
 
 \hypertarget{balanced-communities}{%
 \subsection{Balanced Communities}\label{balanced-communities}}
@@ -1576,10 +1534,6 @@ Now define \(\lambda^{(k \ell)} = \sigma_{k \ell} u^{(k \ell)}\) and
 \(\lambda^{(\ell k)} = \sigma_{k \ell}
 v^{(k \ell)}\).
 
-% (We can also note that
-% the SVD of \(P^{(lk)} = \sigma_{kl}^2 v^{(kl)} (u^{(kl)})^\top\), i.e.,
-% \(\sigma_{kl} = \sigma_{lk}\), \(u^{(kl)} = v^{(lk)}\), and
-% \(v^{(kl)} = u^{(lk)}\).)\\
 Next consider the Hermitian dilation
 
 \[M^{(k \ell)} = 2 \begin{bmatrix} 0 & P^{(k \ell)} \\ P^{(\ell k)} & 0 \end{bmatrix}\]
@@ -1603,13 +1557,7 @@ have latent positions in \(\mathbb{R}^2\) given by the $(n_k + n_{\ell}) \times 
 \end{bmatrix}.\]
 Now consider
 \[\hat{M}^{(k \ell)} = \begin{bmatrix} 0 & A^{(k \ell)} \\ A^{(\ell k)} & 0 \end{bmatrix}\]
-% Then \(\hat{M}^{(kl)} = M^{(kl)} + E'\) where
 
-% 
-E′=[0E⊤E0]
-
-% and \(E\) is the \(n_k \times n_\ell\) matrix of independent noise (to
-% generate the Bernoulli entries in \(A^{(kl)}\).\\
 We can then view \(\hat{M}^{(k \ell)}\) as an adjacency matrix drawn from
 the edge probabilities matrix \(M^{(k \ell)}\). Now suppose that the adjacency spectral
 embedding of $\hat{M}^{(k \ell)}$ is represented as the $(n_k +
@@ -1627,19 +1575,15 @@ O\Bigl(\frac{\log (n_k + n_{\ell})}{\sqrt{n_k + n_{\ell}}}\Bigr)$$
 with high probability. Here $\Lambda_{i}^{(k \ell)}$ and
 $\hat{\Lambda}_i^{(k \ell)}$ denote the $i$th rows of $\Lambda^{(k
   \ell)}$ and $\hat{\Lambda}^{(k \ell)}$, respectively. 
-% approximates the latent positions of \(M^{(kl)}\) up to indefinite
-% orthogonal transformation by the rate given in Theorem 5 of
-% \citet{rubindelanchy2017statistical}.\\
+
 Furthermore, by looking at the proof of Theorem~5 in
 \citep{rubindelanchy2017statistical}, we see that $W^{*}$ is also
 blocks diagonal with $2$ blocks where the positive eigenvalues of $M^{(k \ell)}$
 forming a block and the negative eigenvalues of $M^{(k \ell)}$ forming
-the remaining block. % \(U^\top \hat{U}\). 
+the remaining block. 
 Because $M^{(k \ell)}$ has one positive eigenvalue and one negative
 eigenvalue, we see that $W^{*}$ is necessarily of the form $W^{*}
 = \Bigl[\begin{smallmatrix} 1 & 0 \\ 0 & - 1\end{smallmatrix}\Bigr]$
-% \((1, 1)\), and \(U^\top \hat{U}\) is block
-% diagonal, resulting in \(W_* \stackrel{a.s.}{\to} I\). 
 Using this form for $W^{*}$, we obtain
 $$\max\{\|\hat{\lambda}^{(k \ell)} - \lambda^{(k \ell)}\|_{\infty},
 \|\hat{\lambda}^{(\ell k)} - \lambda^{(\ell k)}\|_{\infty}\}  =
