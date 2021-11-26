@@ -104,12 +104,13 @@ vertices.
 
 :::: {.column width=45%}
 
-**Example 1**: If every entry $P_{ij} = \theta$, then $A \sim \BG(P)$ is an Erdos-Renyi graph.  
+**Example 1**: If every entry $P_{ij} = \theta \in (0, 1)$, 
+then $A \sim \BG(P)$ is an Erdos-Renyi graph.  
 For this model, $A_{ij} \iid \Bernoulli(\theta)$.
 
 ```{r, fig.height = 2, fig.width = 2}
 n <- 2 ** 5
-p <- 1 / log(n)
+p <- 1 / 5
 P <- matrix(p, nrow = n, ncol = n)
 A <- draw.graph(P)
 qgraph::qgraph(A, vsize = 4)
@@ -186,7 +187,7 @@ Popularity Adjusted Block Model (Sengupta and Chen, 2017)
 * $P_{ij} = \lambda_{i z_j} \lambda_{j z_i}$
 * $K n$ parameters $\lambda_{ik}$
 
-# Community Detection and Parameter Estimation
+# Maximum Likelihood Estimation
 
 $$L(P) = \prod_{i < j} P_{ij}^{A_{ij}} (1 - P_{ij})^{1 - A_{ij}}$$
 

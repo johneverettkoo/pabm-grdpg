@@ -6,12 +6,14 @@ em.sbm <- function(A, eps = 1e-9, maxit = 100) {
   # using mean field approximation
   
   # Pi is an n by 2 matrix of estimated community probabilities
-  Pi <- initial.guess(A)
-  # n <- nrow(A)
-  # Pi <- matrix(runif(n * 2), nrow = n, ncol = 2)
-  # Pi <- sweep(Pi, 1, rowSums(Pi), `/`)
+  # Pi <- initial.guess(A)
+  n <- nrow(A)
+  Pi <- matrix(runif(n * 2), nrow = n, ncol = 2)
+  Pi <- sweep(Pi, 1, rowSums(Pi), `/`)
+
   # Theta is a K by K matrix of community edge probabilities
-  Theta <- m.step(A, Pi)
+  # start with some initial guess
+  Theta <- matrix(c(.9, .1, .1, .9), 2, 2)
   
   d.Pi <- eps + 1
   niter <- 0
@@ -28,7 +30,7 @@ em.sbm <- function(A, eps = 1e-9, maxit = 100) {
       break
     }
     
-    d.Pi <- norm(Pi - Pi.old, 'F') ** 2 / (n * 2)
+    d.Pi <- norm(Pi - Pi.old, 'F') ** 2 / prod(dim(Pi))
     # print(d.Pi)
     zhat <- apply(Pi, 1, which.max)
     print(compute.error(z, zhat))
@@ -99,11 +101,11 @@ compute.error <- function(z, zhat) {
   return(error)
 }
 
-n1 <- 50
-n2 <- 50
+n1 <- 20
+n2 <- 20
 n <- n1 + n2
 z <- c(rep(1, n1), rep(2, n2))
-p.within <- .3
+p.within <- .4
 p.between <- .1
 P <- matrix(p.between, nrow = n, ncol = n)
 P[seq(n1), seq(n1)] <- p.within
