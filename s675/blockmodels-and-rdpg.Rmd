@@ -1,0 +1,532 @@
+---
+output: 
+  beamer_presentation:
+    fig_crop: no
+    theme: 'default'
+    colortheme: 'beaver'
+    includes:
+      in_header: 
+        - page_headers.tex
+header-includes:
+- \usepackage{setspace}
+- \usepackage{float}
+- \usepackage{mathtools}
+- \usepackage{natbib}
+- \usepackage[linesnumbered,ruled,vlined]{algorithm2e} 
+- \setcitestyle{numbers,square,comma}
+- \usepackage{verbatim}
+- \usepackage{amsthm}
+- \usepackage{comment}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, 
+                      comment = NA, 
+                      warning = FALSE, 
+                      message = FALSE,
+                      fig.align = 'center',
+                      fig.lp = '')
+options(xtable.comment = FALSE, 
+        xtable.table.placement = 'H')
+library(ggplot2)
+import::from(magrittr, `%>%`)
+theme_set(theme_bw())
+
+set.seed(314159)
+source('~/dev/pabm-grdpg/functions.R')
+```
+
+## {.plain}
+
+\center
+
+\LARGE
+
+\textcolor{darkred}{Block Models\\and\\(Generalized) Random Dot Product Graphs}
+
+\normalsize
+
+STAT-S 675
+
+Fall 2021
+
+# Recall From Last Time ...
+
+\newcommand{\diag}{\text{diag}}
+\newcommand{\tr}{\text{Tr}}
+\newcommand{\blockdiag}{\text{blockdiag}}
+\newcommand{\indep}{\stackrel{\text{ind}}{\sim}}
+\newcommand{\iid}{\stackrel{\text{iid}}{\sim}}
+\newcommand{\Bernoulli}{\text{Bernoulli}}
+\newcommand{\Betadist}{\text{Beta}}
+\newcommand{\BG}{\text{BernoulliGraph}}
+\newcommand{\Cat}{\text{Categorical}}
+\newcommand{\Uniform}{\text{Uniform}}
+\newcommand{\RDPG}{\text{RDPG}}
+\newcommand{\GRDPG}{\text{GRDPG}}
+\newcommand{\PABM}{\text{PABM}}
+\newcommand{\argmin}{\mathrm{argmin}}
+
+* Let $G = (V, E)$ be an undirected and hollow graph with $|V| = n$ 
+and adjacency matrix $A$
+  * $A \in \mathbb{R}^{n \times n}$ is symmetric with zero diagonals
+* Suppose $G \sim F(\theta)$
+  * What kind of $F(\theta)$ make sense here?
+  * Given $F$ and observed $G$, how can we estimate $\theta$?
+  
+# Recall From Last Time ...
+
+<style type="text/css">
+.caption {
+    font-size: x-small;
+}
+</style>
+
+::: columns
+
+:::: {.column width=55%}
+
+$A_{ij} = \begin{cases} 
+1 & \exists \text{ edge between } i \text{ and } j \\
+0 & \text{else}
+\end{cases}$
+
+$A_{ji} = A_{ij}$ and $A_{ii} = 0$ $\forall i, j \in [n]$.
+
+\vspace*{1\baselineskip}
+
+$A \sim \BG(P)$ iff:
+
+1. $P \in [0, 1]^{n \times n}$ describes edge probabilities between pairs of 
+vertices.
+2. $A_{ij} \indep \Bernoulli(P_{ij})$ for each $i < j$.
+
+For estimation, we need to impose some structure on $P$.
+
+::::
+
+:::: {.column width=45%}
+
+**Example 1**: If every entry $P_{ij} = \theta \in (0, 1)$, 
+then $A \sim \BG(P)$ is an Erdos-Renyi graph.  
+For this model, $A_{ij} \iid \Bernoulli(\theta)$.
+
+```{r, fig.height = 2, fig.width = 2}
+n <- 2 ** 5
+p <- 1 / 5
+P <- matrix(p, nrow = n, ncol = n)
+A <- draw.graph(P)
+qgraph::qgraph(A, vsize = 4)
+```
+
+::::
+
+:::
+
+# Recall From Last Time ...
+
+Suppose each vertex $v_1, ..., v_n$ has hidden labels $z_1, ..., z_n \in [K]$,  
+and each $P_{ij}$ depends on labels $z_i$ and $z_j$.  
+Then $A \sim \BG(P)$ is a *block model*.
+
+**Example 2**: Stochastic Block Model with two communities
+
+::: columns
+
+:::: column
+
+* $z_1, ..., z_n \in \{1, 2\}$
+* $P_{ij} = \begin{cases} 
+p & z_i = z_j = 1 \\
+q & z_i = z_j = 2 \\
+r & z_i \neq z_j
+\end{cases}$
+
+* To make this an assortative SBM, set $p q > r^2$.
+* In this example, $p = 1/2$, $q = 1/4$, and $r = 1/8$.
+
+::::
+
+:::: column
+
+```{r, fig.height = 3, fig.width = 4, out.width = '100%'}
+n1 <- 2 ** 5
+n2 <- 2 ** 5
+n <- n1 + n2
+z <- c(rep(1, n1), rep(2, n2))
+p <- 1/2
+q <- 1/4
+r <- 1/8
+P <- matrix(r, nrow = n, ncol = n)
+P[seq(n1), seq(n1)] <- p
+P[seq(n1 + 1, n), seq(n1 + 1, n)] <- q
+A <- draw.graph(P)
+qgraph::qgraph(A, vsize = 4, groups = factor(z), legend = FALSE)
+```
+
+::::
+
+:::
+
+# Recall From Last Time ...
+
+Erdos-Renyi Model (1959)
+
+* $P_{ij} = \theta$ (not a block model)
+* 1 parameter $\theta$
+
+Stochastic Block Model (Lorrain and White, 1971)
+
+* $P_{ij} = \theta_{z_i z_j}$
+* $K (K + 1) / 2$ parameters $\theta_{kl}$
+
+Degree Corrected Block Model (Karrer and Newman, 2011)
+
+* $P_{ij} = \theta_{z_i z_j} \omega_i \omega_j$
+* $K (K + 1) / 2 + n$ parameters $\theta_{kl}$, $\omega_i$
+
+Popularity Adjusted Block Model (Sengupta and Chen, 2017)
+
+* $P_{ij} = \lambda_{i z_j} \lambda_{j z_i}$
+* $K n$ parameters $\lambda_{ik}$
+
+# Recall From Last Time ...
+
+Random Dot Product Graph $A \sim \RDPG(X)$  
+(Young and Scheinerman, 2007)
+
+* Latent vectors $x_1, ..., x_n \in \mathbb{R}^d$ such that 
+$x_i^\top x_j \in [0, 1]$
+* $A \sim \BG(X X^\top)$ where 
+$X = \begin{bmatrix} x_1 & \cdots & x_n \end{bmatrix}^\top$
+
+Generalized Random Dot Product Graph $A \sim \GRDPG_{p, q}(X)$  
+(Rubin-Delanchy, Cape, Tang, Priebe, 2020)
+
+* Latent vectors $x_1, ..., x_n \in \mathbb{R}^{p+q}$ such that 
+$x_i^\top I_{p, q} x_j \in [0, 1]$ and $I_{p, q} = \blockdiag(I_p, -I_q)$
+* $A \sim \BG(X I_{p, q} X^\top)$ where 
+$X = \begin{bmatrix} x_1 & \cdots & x_n \end{bmatrix}^\top$
+
+# Recall From Last Time ...
+
+### Adjacency Spectral Embedding
+
+To embed in $\mathbb{R}^d$, 
+
+1. Compute $A \approx \hat{V} \hat{\Lambda} \hat{V}^\top$ 
+where $\hat{\Lambda} \in \mathbb{R}^{d \times d}$ and 
+$\hat{V} \in \mathbb{R}^{n \times d}$.  
+For RDPG, use $d$ greatest eigenvalues; 
+for GRDPG, use $p$ most positive and $q$ most negative eigenvalues.
+
+2. For RDPG, let $\hat{X} = \hat{V} \hat{\Lambda}^{1/2}$; 
+for GRDPG, let $\hat{X} = \hat{V} |\hat{\Lambda}|^{1/2}$.
+
+\vspace*{.5\baselineskip}
+
+RDPG: $\max\limits_i \|\hat{x}_i - W x_i \| \stackrel{a.s.}{\to} 0$
+(Athreya et al., 2018)  
+GRDPG: 
+$\max\limits_i \|\hat{x}_i - Q x_i \| \stackrel{a.s.}{\to} 0$
+(Rubin-Delanchy et al., 2020)
+
+# Connecting Block Models to (G)RDPGs
+
+All Bernoulli Graphs are RDPG (if $P$ is 
+positive semidefinite)  
+or GRDPG (in general).
+
+**Example 2** (cont'd): Assortative SBM ($p q > r^2$) with $K = 2$
+
+::: columns
+
+:::: column
+
+$$P_{ij} = \begin{cases} 
+p & z_i = z_j = 1 \\
+q & z_i = z_j = 2 \\
+r & z_i \neq z_j
+\end{cases}$$
+
+```{r fig.height = 3, fig.width = 6, out.width = '100%'}
+qgraph::qgraph(A, vsize = 4, groups = factor(z), legend = FALSE)
+```
+
+::::
+
+:::: column
+
+$$P = 
+\begin{bmatrix} 
+P^{(11)} & P^{(12)} \\
+P^{(21)} & P^{(22)}
+\end{bmatrix} =
+X X^\top$$
+
+$$X = \begin{bmatrix} 
+\sqrt{p} & 0 \\
+\vdots & \vdots \\
+\sqrt{p} & 0 \\
+\sqrt{r^2 / p} & \sqrt{q - r^2 / p} \\
+\vdots & \vdots \\
+\sqrt{r^2 / p} & \sqrt{q - r^2 / p}
+\end{bmatrix}$$
+
+::::
+
+:::
+
+# Connecting the SBM to the RDPG
+
+**Example 2** (cont'd): If we want to perform community detection, 
+
+1. Note that $A$ is a RDPG because $P = X X^\top$.
+2. Compute the ASE $A \approx \hat{X} \hat{X}^\top$ with 
+$\hat{X} = \hat{V} \hat{\Lambda}^{1/2}$.
+3. Apply clustering algorithm (e.g., $K$-means) to $\hat{X}$,  
+noting that as $n \to \infty$, the ASE approaches point masses.
+
+```{r, fig.height = 5, fig.width = 5, out.width = '50%'}
+P.eigen = eigen(P)
+X <- P.eigen$vectors[, 1:2] %*% diag(P.eigen$values[1:2] ** .5)
+
+A.eigen <- eigen(A)
+X.hat <- A.eigen$vectors[, 1:2] %*% diag(A.eigen$values[1:2] ** .5)
+plot(X.hat, asp = 1, col = z * 2, xlab = NA, ylab = NA, 
+     main = 'ASE of the adjacency matrix drawn from SBM')
+points(X, pch = 16, col = z * 2)
+```
+
+# Connecting the DCBM to the RDPG
+
+**Example 3**: DCBM with two communities
+
+::: columns
+
+:::: column
+
+* $z_1, ..., z_n \in \{1, 2\}$
+* $P_{ij} = \begin{cases} 
+p \omega_i \omega_j & z_i, z_j = 1 \\
+q \omega_i \omega_j & z_i, z_j = 2 \\
+r \omega_i \omega_j & z_i \neq z_j
+\end{cases}$
+
+* To make this an assortative DCBM, set $p q > r^2$.
+* In this example, $p = q = 1/4$, $r = 1/2$, and $\omega_i \in (0, 1)$.
+
+::::
+
+:::: column
+
+```{r, fig.height = 4, fig.width = 4, out.width = '100%'}
+n1 <- 100
+n2 <- 100
+n <- n1 + n2
+z <- c(rep(1, n1), rep(2, n2))
+p <- 1/4
+q <- 1/4
+r <- 1/8
+omega <- rbeta(n, 2, 1)
+Omega <- tcrossprod(omega)
+P <- matrix(r, nrow = n, ncol = n)
+P[seq(n1), seq(n1)] <- p
+P[seq(n1 + 1, n), seq(n1 + 1, n)] <- q
+P <- P * Omega
+A <- draw.graph(P)
+qgraph::qgraph(A, vsize = 4, groups = factor(z), legend = FALSE)
+```
+
+::::
+
+:::
+
+# Connecting the DCBM to the RDPG
+
+**Example 3** (cont'd): Assortative DCBM ($p q > r^2$) with $K = 2$
+
+::: columns
+
+:::: column
+
+$$P_{ij} = \begin{cases} 
+p & z_i = z_j = 1 \\
+q & z_i = z_j = 2 \\
+r & z_i \neq z_j
+\end{cases}$$
+
+```{r fig.height = 5, fig.width = 6, out.width = '100%'}
+qgraph::qgraph(A, vsize = 4, groups = factor(z), legend = FALSE)
+```
+
+::::
+
+:::: column
+
+$$P = 
+\begin{bmatrix} 
+P^{(11)} & P^{(12)} \\
+P^{(21)} & P^{(22)}
+\end{bmatrix} =
+X X^\top$$
+
+$$X = \begin{bmatrix} 
+\sqrt{p} \omega_1 & 0 \\
+\vdots & \vdots \\
+\sqrt{p} \omega_{n_1} & 0 \\
+\sqrt{\frac{r^2}{p}} \omega_{n_1 + 1} & \sqrt{q - \frac{r^2}{p}} \omega_{n_1 + 1} \\
+\vdots & \vdots \\
+\sqrt{\frac{r^2}{p}} \omega_n & \sqrt{q - \frac{r^2}{p}} \omega_n
+\end{bmatrix}$$
+
+::::
+
+:::
+
+# Connecting the SBM to the RDPG
+
+**Example 3** (cont'd): If we want to perform community detection, 
+
+1. Note that $A$ is a RDPG because $P = X X^\top$.
+2. Compute the ASE $A \approx \hat{X} \hat{X}^\top$ with 
+$\hat{X} = \hat{V} \hat{\Lambda}^{1/2}$.
+3. Apply clustering algorithm on $\hat{X}$,  
+noting that as $n \to \infty$, the ASE approaches line segments.
+
+```{r, fig.height = 5, fig.width = 5, out.width = '50%'}
+P.eigen = eigen(P)
+X <- P.eigen$vectors[, 1:2] %*% diag(P.eigen$values[1:2] ** .5)
+
+A.eigen <- eigen(A)
+X.hat <- A.eigen$vectors[, 1:2] %*% diag(A.eigen$values[1:2] ** .5)
+plot(X.hat, 
+     # asp = 1, 
+     col = z * 2, 
+     xlab = NA, ylab = NA, 
+     main = 'ASE of the adjacency matrix drawn from DCBM')
+lines(rbind(c(0, 0), X[z == 1, ]), pch = 16, col = 2, lwd = 3)
+lines(rbind(c(0, 0), X[z == 2, ]), pch = 16, col = 4, lwd = 3)
+```
+
+# Assortative SBM and DCBM are RDPGs
+
+* $P$ is positive semidefinite $\implies$ RDPG
+* Number of embedding dimensions $=$ number of communities
+* Latent structure for the SBM are point masses,  
+latent structure for the DCBM are line segments
+* If the SBM or DCBM is not assortative, then $P$ is not positive semidefinite
+  * GRDPG instead of RDPG
+  * Number of embedding dimensions $=$ number of communities, 
+  except split by positive and negative eigenvalues
+  * ASE still converges to true latent positions up to multiplication by unidentifiable $Q \in \mathbb{O}(p, q)$
+  * Multiplication by $Q$ doesn't change overall latent structure
+
+# Demo
+
+# Connecting the PABM to the GRDPG
+
+**Def** Popularity Adjusted Block Model (Sengupta and Chen, 2017):
+
+Let each vertex $i \in [n]$ have $K$ popularity parameters
+$\lambda_{i1}, ..., \lambda_{iK} \in [0, 1]$. 
+Then $A \sim \PABM(P)$ if each $P_{ij} = \lambda_{i z_j} \lambda_{j z_i}$,  
+e.g., if $z_i = k$ and $z_j = l$, $P_{ij} = \lambda_{il} \lambda_{jk}$.
+
+**Lemma** (Noroozi, Rimal, and Pensky, 2020): 
+
+$A$ is sampled from a PABM if $P$ can be described as:
+
+1. Let each $P^{(kl)}$ denote the $n_k \times n_l$ matrix of edge probabilities 
+between communities $k$ and $l$. 
+2. Organize popularity parameters as vectors 
+$\lambda^{(kl)} \in \mathbb{R}^{n_k}$ 
+such that $\lambda^{(kl)}_i = \lambda_{k_i l}$ is the popularity parameter 
+of the $i$^th^ vertex of community $k$ towards community $l$. 
+3. Each block can be decomposed as 
+$P^{(kl)} = \lambda^{(kl)} (\lambda^{(lk)})^\top$.
+
+**Notation**: $A \sim \PABM(\{\lambda^{(kl)}\}_K)$.
+
+# Connecting the PABM to the GRDPG
+
+**Theorem**: $A \sim \PABM(\{\lambda^{(kl)}\}_K)$ is equivalent to 
+$A \sim \GRDPG_{p, q}(X U)$ with
+
+* $p = K (K + 1) / 2$, $q = K (K - 1) / 2$
+* $U \in \mathbb{O}(K^2)$
+* $X \in \mathbb{R}^{n \times K^2}$ is block diagonal and 
+composed of $\{\lambda^{(kl)}\}_K$ 
+with each block corresponding to a community.  
+
+$$X = \begin{bmatrix}
+\Lambda^{(1)} & \cdots & 0 \\
+0 & \ddots & 0 \\
+0 & \cdots & \Lambda^{(K)}
+\end{bmatrix} 
+\in \mathbb{R}^{n \times K^2}$$
+
+$$\Lambda^{(k)} = \begin{bmatrix} 
+\lambda^{(k1)} & \cdots & \lambda^{(kK)} 
+\end{bmatrix} 
+\in \mathbb{R}^{n_k \times K}$$
+
+# Connecting the PABM to the GRDPG
+
+::: columns
+
+:::: column
+
+$$X = \begin{bmatrix}
+\Lambda^{(1)} & \cdots & 0 \\
+0 & \ddots & 0 \\
+0 & \cdots & \Lambda^{(K)}
+\end{bmatrix}$$
+
+::::
+
+:::: column
+
+\vspace*{2\baselineskip}
+
+$$U \in \mathbb{O}(K^2)$$
+
+::::
+
+:::
+
+$$A \sim \PABM(\{\lambda^{(kl)}\}_K) \iff A \sim \GRDPG_{p, q}(X U)$$
+
+**Remark 1** (orthogonality of subspaces):
+If $y_i^\top$ and $y_j^\top$ are two rows of $X U$ corresponding 
+to different communities, then $y_i^\top y_j = 0$.
+
+**Remark 2** (non-uniqueness of the latent configuration):  
+If $A \sim \GRDPG_{p, q}(Y)$, then $A \sim \GRDPG_{p, q}(Y Q)$ for any $Q$ in 
+the indefinite orthogonal group with signature $p, q$.
+
+**Remark 3**: Communities correspond to subspaces even with linear transformation $Q \in \mathbb{O}(p, q)$, but this may break the orthogonality property.
+
+# Orthogonal Spectral Clustering
+
+**Theorem** (KTT): 
+If $P = V \Lambda V^\top$ and $B = n V V^\top$,  
+then $B_{ij} = 0$ if $z_i \neq z_j$.
+
+**Algorithm**: Orthogonal Spectral Clustering:
+
+1. Let $V$ be the eigenvectors of $A$ corresponding to the $K (K+1)/2$ most 
+positive and $K (K-1) / 2$ most negative eigenvalues.
+2. Compute $B = |n V V^\top|$ applying $|\cdot|$ entry-wise.
+3. Construct graph $G$ using $B$ as its similarity matrix.
+4. Partition $G$ into $K$ disconnected subgraphs.
+
+**Theorem** (KTT): 
+Let $\hat{B}_n$ with entries $\hat{B}_n^{(ij)}$ be the affinity matrix from OSC. 
+Then $\forall$ pairs $(i, j)$ belonging to different communities 
+and sparsity factor satisfying $n \rho_n = \omega\big((\log n)^{4c}\big)$, 
+
+$$
+\max_{i, j} \hat{B}^{(ij)}_n = 
+O_P \Big( \frac{(\log n)^c}{\sqrt{n \rho_n}} \Big)
+$$
