@@ -275,13 +275,17 @@ $$\hat{X} = \argmin_{X \in \mathbb{R}^{n \times (p+q)}} \|A - X I_{p,q} X^\top \
 
 * $A = V \Lambda V^\top$
 * $\hat{X} = V_{p,q} |\Lambda_{p,q}|^{1/2}$
-  * $V_{p,q} = \begin{bmatrix} V_{1:p} & | & V_{n-q+1:n} \end{bmatrix}$
+  * $V_{p,q} = \begin{bmatrix} V_{1:p} \mid V_{n-q+1:n} \end{bmatrix}$
   * $\Lambda_{p,q} = \diag(\lambda_1, ..., \lambda_p, \lambda_{n-q+1}, ..., \lambda_n)$
 * Not unique
   * If $\hat{X}$ is a solution, then so is $\hat{X} Q$
 * $\max_i \|\hat{x}_i - Q x_i \| \stackrel{a.s.}{\to} 0$ (Rubin-Delanchy et al., 2020)
 
+# R Demo
+
 # Next Time ...
+
+We can connect block models to the (G)RDPG
 
 * All $A \sim \BG(P)$ are GRDPGs
   * If $P$ is positive semidefinite, then it is a RDPG
