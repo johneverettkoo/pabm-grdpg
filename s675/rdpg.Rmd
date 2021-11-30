@@ -42,7 +42,7 @@ source('~/dev/pabm-grdpg/functions.R')
 
 \LARGE
 
-\textcolor{darkred}{Random Dot Product Graphs}
+\textcolor{darkred}{(Generalized) Random Dot Product Graphs}
 
 \normalsize
 
@@ -246,7 +246,9 @@ plot(Xhat, col = z * 2, asp = 1, main = 'ASE')
 # Random Dot Product Graph
 
 * For what types of graphs can we justify a latent structure?
-* Any $A \sim \BG(P)$ is a RDPG if $P$ is positive semidefinite
+* Any $A \sim \BG(P)$ is a RDPG if $P$ is positive semidefinite  
+$P = V \Lambda V^\top \implies X = V \sqrt{\Lambda}$  
+$X X^\top = V \sqrt{\Lambda} \sqrt{\Lambda} V^\top = V \Lambda V^\top = P$
 * Whether we think of a graph as a RDPG depends on whether the latent structure is useful
 * What about $P$ that are not positive semidefinite?
 
