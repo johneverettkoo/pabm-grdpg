@@ -1,7 +1,7 @@
 library(mclust)
 import::from('~/dev/pabm-grdpg/functions.R', draw.graph)
 
-em.sbm <- function(A, eps = 1e-9, maxit = 100) {
+em.sbm <- function(A, assortative = TRUE, eps = 1e-9, maxit = 100) {
   # EM for SBM with 2 communities
   # using mean field approximation
   
@@ -13,7 +13,11 @@ em.sbm <- function(A, eps = 1e-9, maxit = 100) {
 
   # Theta is a K by K matrix of community edge probabilities
   # start with some initial guess
-  Theta <- matrix(c(.9, .1, .1, .9), 2, 2)
+  if (assortative) {
+    Theta <- matrix(c(.9, .1, .1, .9), 2, 2) 
+  } else {
+    Theta <- matrix(c(.1, .9, .9, .1), 2, 2)
+  }
   
   d.Pi <- eps + 1
   niter <- 0
@@ -32,8 +36,8 @@ em.sbm <- function(A, eps = 1e-9, maxit = 100) {
     
     d.Pi <- norm(Pi - Pi.old, 'F') ** 2 / prod(dim(Pi))
     # print(d.Pi)
-    zhat <- apply(Pi, 1, which.max)
-    print(compute.error(z, zhat))
+    # zhat <- apply(Pi, 1, which.max)
+    # print(compute.error(z, zhat))
   }
   
   zhat <- apply(Pi, 1, which.max)

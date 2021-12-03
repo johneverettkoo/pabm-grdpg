@@ -1,5 +1,7 @@
 set.seed(475675)
 
+source('~/dev/pabm-grdpg/functions.R')
+
 n1 <- 200
 n2 <- 200
 n <- n1 + n2
@@ -26,8 +28,16 @@ plot(X.hat,
 norms <- apply(X.hat, 1, function(x) sqrt(sum(x ^ 2)))
 cosine.sim <- X.hat %*% t(X.hat) / tcrossprod(norms)
 eigen.cosine.sim <- eigen(cosine.sim, symmetric = TRUE)
-Y <- sweep(eigen.cosine.sim$vectors[, 1:2], 1, 
+Y <- sweep(eigen.cosine.sim$vectors[, 1:2], 2, 
            sqrt(eigen.cosine.sim$values[1:2]), `*`)
 plot(Y, col = z * 2, asp = 1)
 zhat <- kmeans(Y, 2)$cluster
 table(z, zhat)
+
+L <- diag(colSums(A)) - A
+L.eigen <- eigen(L, symmetric = TRUE)
+Y <- sweep(L.eigen$vectors[, c(n - 1, n - 2)], 2, sqrt(L.eigen$values[c(n - 1, n - 2)]), `/`)
+plot(Y, asp = 1, col = z * 2)
+
+em.out <- em.sbm(A, assortative = FALSE)
+table(em.out$z, z)

@@ -231,6 +231,45 @@ GRDPG:
 $\max\limits_i \|\hat{x}_i - Q x_i \| \stackrel{a.s.}{\to} 0$
 (Rubin-Delanchy et al., 2020)
 
+# Two Types of Bernoulli Graphs
+
+::: columns
+
+:::: column
+
+## Block Models
+
+* $P_{ij} = f(z_i, z_j)$
+
+* Community structure
+
+* Estimation via EM
+  * May require *ad hoc* approximations
+  * Can be sensitive to initial guess
+
+::::
+
+:::: column
+
+## (G)RDPGs
+
+* $P_{ij} = x_i^\top I_{p,q} x_j$
+
+* Latent space structure
+
+* Estimation via ASE
+  * Consistency theorem
+  * Straightforward algorithm
+  * Non-identifiable linear transformation
+
+::::
+
+:::
+
+## All Bernoulli Graph models are (G)RDPGs
+
+* Can we use this for inference on Block Models?
+
 # Connecting Block Models to (G)RDPGs
 
 All Bernoulli Graphs are RDPG (if $P$ is 
@@ -314,7 +353,7 @@ r \omega_i \omega_j & z_i \neq z_j
 \end{cases}$
 
 * To make this an assortative DCBM, set $p q > r^2$.
-* In this example, $p = q = 1/4$, $r = 1/2$, and $\omega_i \in (0, 1)$.
+* In this example, $p = q = 1/2$, $r = 1/8$, and $\omega_i \in (0, 1)$.
 
 ::::
 
@@ -325,8 +364,8 @@ n1 <- 100
 n2 <- 100
 n <- n1 + n2
 z <- c(rep(1, n1), rep(2, n2))
-p <- 1/4
-q <- 1/4
+p <- 1/2
+q <- 1/2
 r <- 1/8
 omega <- rbeta(n, 2, 1)
 Omega <- tcrossprod(omega)
@@ -351,9 +390,9 @@ qgraph::qgraph(A, vsize = 4, groups = factor(z), legend = FALSE)
 :::: column
 
 $$P_{ij} = \begin{cases} 
-p & z_i = z_j = 1 \\
-q & z_i = z_j = 2 \\
-r & z_i \neq z_j
+p \omega_i \omega_j & z_i, z_j = 1 \\
+q \omega_i \omega_j & z_i, z_j = 2 \\
+r \omega_i \omega_j & z_i \neq z_j
 \end{cases}$$
 
 ```{r fig.height = 5, fig.width = 6, out.width = '100%'}
