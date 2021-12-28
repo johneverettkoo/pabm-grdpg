@@ -25,11 +25,18 @@ clustering.df %>%
   ) %>% 
   ggplot() +
   theme_bw() + 
-  theme(text = element_text(size = 20)) + 
-  scale_x_log10(breaks = c(128, 256, 512, 1024, 2048, 4096)) +
+  theme(text = element_text(size = 20),
+        legend.position = 'bottom') + 
+  scale_x_log10(breaks = c(128, 256, 512, 1024, 2048, 4096),
+                labels = c(expression(2^7), 
+                           expression(2^8), 
+                           expression(2^9), 
+                           expression(2^10), 
+                           expression(2^11), 
+                           expression(2^12))) +
   # scale_x_continuous(breaks = c(128, 256, 512, 1024, 2048, 4096)) + 
   scale_y_log10() +
-  labs(y = 'community detection error count', 
+  labs(y = 'error count', 
        colour = NULL, shape = NULL, size = NULL) +
   geom_line(aes(x = n, y = med.err * n,
                 colour = 'OSC')) +
@@ -57,3 +64,39 @@ clustering.df %>%
                     colour = 'MM-Louvain'), width = .1) + 
   scale_colour_brewer(palette = 'Set1') + 
   facet_wrap(~ K, labeller = 'label_both')
+
+rmse.df %>% 
+  na.omit() %>% 
+  dplyr::group_by(K, n) %>% 
+  dplyr::summarise(median.rmse = median(rmse),
+                   q1.rmse = quantile(rmse, .25),
+                   q3.rmse = quantile(rmse, .75),
+                   median.rmse.mle = median(rmse.mle),
+                   q1.rmse.mle = quantile(rmse.mle, .25),
+                   q3.rmse.mle = quantile(rmse.mle, .75)) %>% 
+  dplyr::ungroup() %>% 
+  ggplot() +
+  theme_bw() + 
+  theme(text = element_text(size = 20),
+        legend.position = 'bottom') + 
+  geom_line(aes(x = n, y = median.rmse, colour = 'Algorithm 3')) + 
+  geom_point(aes(x = n, y = median.rmse, colour = 'Algorithm 3', shape = 'Algorithm 3'),
+             size = 3, alpha = .5) + 
+  geom_errorbar(aes(x = n, ymin = q1.rmse, ymax = q3.rmse,
+                    colour = 'Algorithm 3'), width = .1) + 
+  geom_line(aes(x = n, y = median.rmse.mle, colour = 'MLE-based')) + 
+  geom_point(aes(x = n, y = median.rmse.mle, colour = 'MLE-based', shape = 'MLE-based'),
+             size = 3, alpha = .5) + 
+  geom_errorbar(aes(x = n, ymin = q1.rmse.mle, ymax = q3.rmse.mle,
+                    colour = 'MLE-based'), width = .1) + 
+  scale_colour_brewer(palette = 'Set1') + 
+  labs(y = 'RMSE', colour = NULL, shape = NULL) + 
+  facet_wrap(~ K, labeller = 'label_both') + 
+  scale_y_log10() + 
+  scale_x_log10(breaks = c(128, 256, 512, 1024, 2048, 4096),
+                labels = c(expression(2^7), 
+                           expression(2^8), 
+                           expression(2^9), 
+                           expression(2^10), 
+                           expression(2^11), 
+                           expression(2^12)))
