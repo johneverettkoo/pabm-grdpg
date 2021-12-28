@@ -1,3 +1,4 @@
+data(karate, package = 'igraphdata')
 A <- as.matrix(igraph::as_adjacency_matrix(karate, type = 'both'))
 z <- igraph::vertex_attr(karate)$Faction
 n <- length(z)
@@ -5,7 +6,7 @@ qgraph::qgraph(A)
 eigen.A <- eigen(A, symmetric = TRUE)
 V <- eigen.A$vectors
 D <- eigen.A$values
-X <- sweep(V[, c(1:3, n)], 2, sqrt(abs(D[c(1:3, n)])), `/`)
+X <- sweep(V[, c(1:3, n)], 2, sqrt(abs(D[c(1:3, n)])), `*`)
 plot(X, asp = 1, col = z)
 pairs(X, asp = 1, col = z)
 

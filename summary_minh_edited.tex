@@ -121,6 +121,9 @@ the number of graph vertices tends to infinity.
 Simulation experiments illustrate these properties. 
 \end{abstract}
 
+\noindent%
+{\it Keywords:} network analysis, block models, generalized random dot product graphs, community detection, sparse subspace clustering
+
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 \newcommand{\diag}{\mathrm{diag}}
@@ -206,6 +209,8 @@ estimating the parameters in the PABM.  We report the results of
 simulation studies in Section \ref{simulated-examples} and apply our
 methods to three well-known data sets in Section
 \ref{real-data-examples}. Section \ref{discussion} concludes.
+Proofs of Theorems 1 and 2 are provided in the body of the text while proofs of 
+Theorems 3, 4, and 5 are provided in the Appendix. 
 
 \hypertarget{connecting-the-popularity-adjusted-block-model-to-the-generalized-random-dot-product-graph}{%
 \section{PABMs are GRDPGs}\label{connecting-the-popularity-adjusted-block-model-to-the-generalized-random-dot-product-graph}}
@@ -220,12 +225,11 @@ corresponding to a community.
 \hypertarget{notation}{%
 \subsection{Notation and Scope}\label{notation}}
 
-Let $G = (V, E)$ be an unweighted, undirected, 
-and hollow graph with vertex set $V$ ($|V| = n$) and edge set $E$. The matrix
+Let $G = (V, E)$ be an unweighted, undirected graph without self-loops, with vertex set $V$ ($|V| = n$) and edge set $E$. The matrix
 $A \in \{0, 1\}^{n \times n}$ represents the adjacency matrix of $G$ 
 such that $A_{ij} = 1$ if there exists an edge between vertices $i$ and $j$ 
-and $0$ otherwise. Because $G$ is symmetric and hollow,
-$A_{ij} = A_{ji}$ and $A_{ii} = 0$ for each $i, j \in [n]$. 
+and $0$ otherwise. 
+$A_{ij} = A_{ji}$ and $A_{ii} = 0$ for each $i, j \in [n]$ (where $[n] = \{1, 2, ..., n\}$). 
 We further restrict our analyses to Bernoulli graphs. 
 Let $P \in [0, 1]^{n \times n}$ be a symmetric matrix of edge probabilities. 
 Graph $G$ is sampled from $P$ by drawing $A_{ij} \indep \Bernoulli(P_{ij})$ 
@@ -332,7 +336,7 @@ We can use Adjacency Spectral Embedding (ASE)
 \citep{doi:10.1080/01621459.2012.699795} to recover the latent vectors of a GRDPG. 
 This procedure consists of taking the spectral decomposition of $A$ 
 (or $P$ if available) and choosing the $p$ most positive and $q$ most negative
-eigenvalues and their corresponding eigenvectors 
+eigenvalues, $D = \diag(\lambda_1, ..., \lambda_p, \lambda_{n - q + 1}, ..., \lambda_n)$, and their corresponding eigenvectors, $V \in \mathbb{R}^{n \times (p + q)}$,
 to construct the embedding $\hat{Z} = V |D|^{1/2}$. 
 \end{remark}
 
@@ -382,7 +386,8 @@ We will prove this theorem in two parts. First, for demonstration purposes, we f
 
 For the $K = 2$ case, the proof is straightforward. We will first work with
 the matrix $\tilde{P}$. Note that $\tilde{P}$ has the form
-$$P = \begin{bmatrix} P^{(11)} & P^{(12)} \\ P^{(21)} &
+
+$$\tilde{P} = \begin{bmatrix} P^{(11)} & P^{(12)} \\ P^{(21)} &
   P^{(22)} \end{bmatrix} = \begin{bmatrix} \lambda^{(11)} (\lambda^{(11)})^\top & \lambda^{(12)} (\lambda^{(21)})^\top \\
   \lambda^{(21)} (\lambda^{(12)})^\top & \lambda^{(22)}
   (\lambda^{(22)})^\top \end{bmatrix}.$$
@@ -468,7 +473,7 @@ where $U$ is a $K^2 \times K^2$ orthogonal matrix and hence
 \tilde{P} = X U I_{p, q} (X U)^\top.
 \end{equation}
 In summary we can describe the PABM with $K$ communities as a GRDPG with latent
-positions $\tilde{\Pi} X U$ and signature $(p,q) = \bigl( \tfrac{1}{2} K (K + 1) ,
+positions $\tilde{\Pi} X U$ and known signature $(p,q) = \bigl( \tfrac{1}{2} K (K + 1) ,
 \tfrac{1}{2} K (K - 1)\bigr)$.
 \end{proof}
 
@@ -556,11 +561,11 @@ goes to 0.
 The SSC algorithm can be described as follows: 
 Given \(X \in \mathbb{R}^{n \times d}\) with vectors
 \(x_i^\top \in \mathbb{R}^d\) as rows of \(X\), the optimization problem
-\(c_i = \argmin_{c} \|c\|_1\) subject to \(x_i = X c\) and
-\(c^{(i)} = 0\) is solved for each \(i = 1, ..., n\). The solutions are
+\(c_i = \argmin_{c} \|c\|_1\) subject to \(x_i = X^\top c\) and
+\(c^{(i)} = 0\), where $c^{(i)}$ is the $i^{th}$ entry of $c$, is solved for each \(i = 1, ..., n\). The solutions are
 collected collected into matrix
 \(C = \bigl[ c_1 \mid \cdots \mid c_n \bigr]^\top\) to
-construct an affinity matrix \(B = |C| + |C^\top|\). If each \(x_i\) lie
+construct an affinity matrix \(B = |C| + |C^\top|\). If each \(x_i\) lies
 exactly on one of \(K\) subspaces, \(B\) describes an undirected graph
 consisting of {\em at least} \(K\) disjoint subgraphs, i.e., \(B_{ij} = 0\) if
 \(x_i, x_j\) lie on different subspaces. If \(X\) instead represents
@@ -569,7 +574,7 @@ step may be required (e.g., edge thresholding or spectral clustering).
 
 In practice, due to presence of noise, SSC is often done by solving the LASSO problems
 \begin{equation} \label{eq:ssc}
-c_i = \argmin_c \frac{1}{2} \|x_i - X_{-i} c\|^2_2 + \vartheta \|c\|_1
+c_i = \argmin_c \frac{1}{2} \|x_i - X_{-i}^\top c\|^2_2 + \vartheta \|c\|_1
 \end{equation}
 for some sparsity parameter \(\vartheta > 0\). The \(c_i\) vectors are
 then collected into \(C\) and \(B\) as before.
@@ -590,11 +595,8 @@ from different subspaces.
 \end{definition}
 
 \begin{remark}
-One of the most common approach to show that SSC works for a noisy
-sample $X$ is to show that 
-$X$ satisfies the
-subspace detection property for some choice of $\vartheta$; recall
-that $\vartheta$ is the sparsity parameter $\vartheta$ for
+One common approach to show that SSC works for a noisy sample $X$ is to show that $X$ satisfies the subspace detection property for some choice of $\vartheta$; 
+recall that $\vartheta$ is the sparsity parameter for
 the LASSO problems in Eq.~\eqref{eq:ssc}. However, this is not sufficient to
 guarantee that SSC perfectly recovers the underlying subspaces.
 More specifically, if $X$ satisfies the 
@@ -630,8 +632,10 @@ $\tilde{\Pi} X U Q$ for any $n \times n$ permutation matrix $\tilde{\Pi}$.
 
 However, because we do not observe $P$ but rather only the noisy
 adjacency matrix $A \sim \BG(P)$, the natural approach then is
-to perform SSC on the rows of the spectral embedding of \(A\). We will
-show in Theorem~\ref{theorem5} that, with probability converging to
+to perform SSC on the rows of the spectral embedding of \(A\), 
+since they will still lie approximately on the $K$ subspaces 
+\citep{rubindelanchy2017statistical}. 
+We will show in Theorem~\ref{theorem5} that, with probability converging to
 one as $n \rightarrow \infty$, the rows of the ASE of $A$ also
 satisfy the subspace detection property. 
 Theorem~\ref{theorem5} builds upon existing work by
@@ -670,9 +674,8 @@ the edge probability matrix of a PABM, namely
 $\tilde{\Pi}$ is a permutation matrix.  
 Furthermore, the explicit form of \(XU\) represents points in \(\mathbb{R}^{K^2}\)
 such that points within each community lie on \(K\)-dimensional
-orthogonal subspaces, i.e. $\langle U^{\top} x_i, U^{\top} x_j \rangle = 0$ whenever $z_i \not = z_j$. 
-Thus if
-we have (or can estimate) \(XU\) directly, then both the community
+orthogonal subspaces, i.e. $\langle U^{\top} x_i, U^{\top} x_j \rangle = 0$ whenever $i$ and $j$ are in different communities. 
+Thus ifwe have (or can estimate) \(XU\) directly, then both the community
 detection and parameter identification problem are trivial because \(U\)
 is orthonormal and fixed for each value of \(K\). 
 However, direct
@@ -993,9 +996,11 @@ observed adjacency matrix $A$ as is done in \citet{noroozi2019estimation}
 and (3) modularity maximization (MM) as is done in
 \citet{307cbeb9b1be48299388437423d94bf1}. We denote the two SSC
 implementations using the rows of $A$ and using the spectral embedding
-of $A$ as SSC-A and SSC-ASE, respectively. The parameters \(\vartheta\)
-that controls the sparsity for SSC-A and SSC-ASE were chosen via a preliminary cross-validation
-experiment. The final clustering step of SSC-A and SSC-ASE was done
+of $A$ as SSC-A and SSC-ASE, respectively. 
+The parameters \(\vartheta\)
+that controls the sparsity for SSC-A and SSC-ASE were chosen via a preliminary cross-validation experiment. 
+In practice, $\vartheta$ that guarantee SDP (if it is possible for the particular simulated data) often result in more than $K$ disconnected subgraphs, so a smaller $\vartheta$ that does not guarantee SDP was chosen, 
+and the final clustering step of SSC-A and SSC-ASE was done
 by fitting a Gaussian Mixture Model to the normalized Laplacian
 eigenmap embeddings \citep{belkin03:_laplac} of the affinity matrix \(B\).
 We also estimate the latent popularity vectors $\{\lambda^{(k \ell)}\}$
@@ -1186,7 +1191,7 @@ frequent species were considered, and the similarities were discretized
 to \(\{0, 1\}\) via thresholding. Fig.~\ref{fig:butterfly} shows a
 sorted adjacency matrix sorted by the resultant clustering.
 
-Comparing against the ground truth species labels, OSC achieves an adjusted Rand index of 92\%, while SSC on the ASE achieves an adjusted Rand index of 96\%. In comparison, SSC on the adjacency matrix yields an adjusted Rand index of 73\% \citep{noroozi2019estimation}.
+Comparing against the ground truth species labels, \citet{noroozi2019estimation} report that SSC on the adjacency matrix achieves an adjusted Rand index of 73\% in their implementation, whereas OSC achieves 92\% and SSC on the ASE achieves 96\%. 
 
 \begin{figure}[H]
 
@@ -1322,10 +1327,6 @@ much they improve on general algorithms when the specified latent
 structure obtains.
 
 \appendix
-\renewcommand\refname{References}
-% \bibliographystyle{plain}
-% \bibliography{misc.bib}
-\printbibliography
 
 \hypertarget{proofs}{%
 \section{Proofs of Theorem~\ref{theorem4}, Theorem~\ref{theorem5}, and Theorem~\ref{theorem6}}}
@@ -1592,6 +1593,28 @@ with high probability. Combining this bound with the bound for
 $\|\hat{\lambda}^{(kk)} - \lambda^{(kk)}\|_{\infty}$ given above
 yields Eq.~\eqref{eq:thm6} in Theorem~\ref{theorem6}. 
 \end{proof}
+
+\bigskip
+\begin{center}
+{\large\bf SUPPLEMENTAL MATERIALS}
+\end{center}
+
+\begin{description}
+
+\item[Source files:] The source files used to compile this document can be found in summary.zip.
+
+\item[Data:] The data used in section 5 can be found in data.zip.
+
+\item[Code:] The code is not uploaded here but can be found online at \\
+\url{https://github.com/johneverettkoo/pabm-grdpg}.
+
+\end{description}
+
+\renewcommand\refname{References}
+% \bibliographystyle{plain}
+% \bibliography{misc.bib}
+\printbibliography
+
 \end{document}
 
 %%% Local Variables:
