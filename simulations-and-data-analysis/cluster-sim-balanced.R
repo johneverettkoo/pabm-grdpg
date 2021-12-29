@@ -11,7 +11,7 @@ import::from(foreach, foreach, `%do%`, `%dopar%`)
 library(mclust)
 library(ggplot2)
 setwd('~/dev/pabm-grdpg')
-source('code-for-review/functions.R')
+source('simulations-and-data-analysis/functions.R')
 
 # simulation parameters
 K.vec <- c(2, 3, 4)

@@ -101,8 +101,11 @@ ssc <- function(A,
                 lambda = .01,
                 parallel = FALSE,
                 normalize = TRUE,
-                scale = TRUE) {
+                scale = TRUE, 
+                d = K + 1,
+                offset = 0) {
   # subspace clustering on the ASE of a PABM
+  
   p <- K * (K + 1) / 2
   q <- K * (K - 1) / 2
   
@@ -129,14 +132,12 @@ ssc <- function(A,
     return(betahat)
   }, .parallel = parallel) %>% 
     abs()
-  B <- sweep(B, 2, apply(B, 2, max), `/`)
+    B <- sweep(B, 2, apply(B, 2, max), `/`)
   B[is.nan(B)] <- 0
   W <- B + t(B)
   L <- normalized.laplacian(W)
   L.eigen <- eigen(L, symmetric = TRUE)
-  X <- L.eigen$vectors[, seq(N, N - K)]
-  # X <- sweep(X, 2, apply(X, 2, mean), `-`)
-  # X <- sweep(X, 2, apply(X, 2, sd), `/`)
+  X <- L.eigen$vectors[, seq(N - offset, N - d + 1 - offset)]
   clustering <- mclust::Mclust(X, K, verbose = FALSE)$classification
   return(clustering)
 }
@@ -340,3 +341,142 @@ lambda.rmse.mle <- function(P, A, z) {
     sqrt() %>%
     return()
 }
+
+cluster.sg <- function(A) {
+  # adapted from code provided by sengupta and chen:
+  # a blockmodel for node popularity in networks with community structure
+  
+  f.PA<-function(A,b){	
+    K<-max(b)       # no. of communities
+    N<-nrow(A)      # no. of nodes
+    M<-matrix(NA,nrow=N,ncol=K)  # popularity matrix
+    O<-matrix(NA,nrow=K,ncol=K)  # community interaction matrix
+    for (i in 1:N){		# calculate M
+      for (r in 1:K){
+        nodes = which(b == r)
+        M[i,r] = sum(A[i,nodes])
+      }}
+    for (r in 1:K){		# calculate O
+      for (s in r:K){
+        nodes1 = which(b == r)
+        nodes2 = which(b == s)
+        O[r,s] = sum(A[nodes1,nodes2])
+        O[s,r] = O[r,s]
+      }}
+    list(M=M, O=O)
+  }
+  
+  Q.PA <- function(A, b){
+    foo<-f.PA(A,b)
+    O=foo$O; M = foo$M
+    s1 = sum(M*log(M),na.rm=TRUE) # na.rm = TRUE ignores M=0 cases as log(0) = NA
+    s2 = sum(O*log(O),na.rm=TRUE) # na.rm = TRUE ignores O=0 cases as log(0) = NA
+    return(2*s1-s2)
+  }
+  
+  f.DC<-function(A,b){	
+    K<-max(b)
+    O<-matrix(NA,nrow=K,ncol=K)  # interaction matrix
+    for (i in 1:K){		# calculate O
+      for (j in i:K){
+        nodes1 = which(b == i)
+        nodes2 = which(b == j)
+        O[i,j] = sum(A[nodes1,nodes2])
+        O[j,i] = O[i,j]
+      }}
+    list(O=O, d=rowSums(O))
+  }
+  
+  Q.DC <- function(A, b){
+    K <- max(b)
+    q <- matrix(0, nrow = K, ncol = K)
+    foo<-f.DC(A,b)
+    O<-foo$O; d<-foo$d 
+    for (i in 1:K){
+      for (j in 1:K){
+        if (O[i,j]>0){
+          q[i,j] = O[i,j]*log(O[i,j]/(d[i]*d[j]))}
+      }}
+    return(sum(q))
+  }	# formula for Q
+  
+  b.can = EPalgo(A,eps=0) # EP algorithm (no perturbation)
+  Q.PA.can = rep(NA, ncol(b.can))	# array to store Q values
+  Q.DC.can = rep(NA, ncol(b.can))	# array to store Q values
+  for (i in 1:ncol(b.can)){
+    #check if any cluster is empty
+    foo = rep(NA, 2)
+    for (clus in 1:2) {foo[clus]=sum(b.can[,i]==clus)}
+    if (min(foo)==0) {stop('Empty groups are not allowed')} 
+    Q.PA.can[i] = Q.PA(A, b=b.can[,i])   # fit PABM
+    Q.DC.can[i] = Q.DC(A, b=b.can[,i])   # fit DCBM
+  } # end of i for loop
+  foo1 = order(-Q.PA.can)[1] 
+  b.PA = b.can[,foo1]   # community assignment that maximises Q.PA
+  return(b.PA)
+}
+
+EPalgo<-function(A,eps=0){
+  # provided by sengupta and chen:
+  # a blockmodel for node popularity in networks with community structure
+  
+  ##### perturbed adj matrix ##### (Le pg 15, Amini 2013)
+  tau = eps*(mean(colSums(A))/nrow(A))
+  A = A + tau
+  
+  foo<-eigen(A, symmetric = TRUE)
+  val = abs(foo$values)			# pick the top 2
+  id = order(-val)				# eigenvalues of A and put
+  id_vec = id[1:2]				# their eigenvectors into a 2*N matrix
+  # columns of foo$vectors = eigenvectors of A
+  # we want a 2xn matrix whose rows are the leading eigenvectors
+  X = t(foo$vectors[,id_vec])		
+  y = X[,1:2]
+  
+  comms = 1:2
+  u <- list(comms)
+  v = expand.grid(rep(u, 2))
+  v = as.matrix(v)
+  # initialize with the parallelogram
+  epts = y%*%t(v)	# extreme pts are the columns of this matrix
+  b.can = t(v)	# candidate configurations.
+  row.names(b.can)=NULL
+  
+  ptm<-proc.time()
+  for (i in 3:ncol(X)){
+    b.can1 = rbind(b.can,rep(1,ncol(b.can)))
+    b.can2 = rbind(b.can,rep(2,ncol(b.can)))
+    b.can = cbind(b.can1,b.can2)
+    foo = X[,1:i]%*%b.can
+    hull = chull(t(foo))
+    epts = foo[,hull]
+    b.can = b.can[,hull]}	# next i = next row of X
+  proc.time()-ptm
+  
+  ##### remove invalid candidates
+  k = max(b.can)
+  foo = b.can
+  foo1 = NA
+  for (i in 1:ncol(b.can)){
+    foo2 = rep(NA,k)
+    for (clus in 1:k){foo2[clus]=sum(b.can[,i]==clus)}
+    if (min(foo2)==0){foo1 = c(foo1,i)}
+  }
+  if (length(foo1)>1) {foo1 = foo1[-1]
+  b.can = b.can[,-foo1]}
+  
+  ###### remove eqv candidates
+  foo1 = NA
+  for (i in 2:ncol(b.can)){
+    for (j in 1:i){
+      foo4 = abs(b.can[,i] - b.can[,j])
+      if (mean(foo4) == 1){ # this means b.can[,i] and b.can[,j] are exactly 1 apart
+        foo1 = c(foo1,i)
+        break}
+    }}
+  if (length(foo1)>1){
+    foo1 = foo1[-1]
+    b.can = b.can[,-foo1]
+  }
+  return(b.can)
+}	# end of function
