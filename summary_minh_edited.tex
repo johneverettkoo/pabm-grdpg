@@ -310,9 +310,8 @@ Let $p \geq 1$ and $q \geq 0$ be integers. Define $I_{p,q}$ as the
 block diagonal matrix $I_{p,q} = \Bigl[\begin{smallmatrix} I_{p} & 0
   \\ 0 & - I_{q} \end{smallmatrix} \Bigr]$ where $I_{p}$ and $I_{q}$
 are the identity matrices of dimensions $p \times p$ and $q \times q$
-respectively. Next let $\mathcal{X}$ be a subset of $\mathbb{R}^{d}$
-such that $x^{\top} I_{p,q} y \in [0,1]$ for all $x,y \in
-\mathcal{X}$. Let $X = \bigl[x_1 \mid \cdots \mid x_n\bigr]^{\top}$ be
+respectively. Next define $\mathcal{X} = \{x, y \in \mathbb{R}^d : x^\top I_{p,q} y \in [0, 1]\}$ where $d = p + q$. 
+Let $X = \bigl[x_1 \mid \cdots \mid x_n\bigr]^{\top}$ be
 a $n \times d$ matrix with rows $x_i \in \mathcal{X}$. A graph $G$
 with adjacency matrix $A$ is said to be a generalized random dot
 product graph with latent positions $X$, sparsity parameter $\rho_n
