@@ -251,10 +251,10 @@ as the matrix corresponding to a collection of $n$ latent vectors $x_1, ..., x_n
 \label{pabm}
 Let $K \geq 1$ be an integer and let $\Lambda \in \mathbb{R}^{n \times
   K}$ be a matrix with entries in $[0,1]$. Let $z_1, z_2, \dots, z_n
-\in \{1,2,\dots,K\}$. A graph $G$ with adjacency matrix $A$ is said to
+\in [K]$. A graph $G$ with adjacency matrix $A$ is said to
 be a popularity adjusted block model graph with $K$ communities, popularity vectors
 $\Lambda$, and sparsity parameter $\rho_n \in (0,1]$ if $A \sim \BG(P)$
-where the edge probability matrix $P$ has entries of the form
+where the edge probability matrix $P$ has entries $P_{ij}$, $i, j \in [n]$, of the form
 $$P_{ij} = \rho_n \lambda_{iz_j} \lambda_{jz_i}.$$
 \end{definition}
 
@@ -265,9 +265,8 @@ $\lambda_{i1}, \dots, \lambda_{iK}$, that describe its affinity
 toward each of the $K$ communities. 
 Another view of a PABM is as follows.
 Let $\tilde{P}$ be the matrix obtained by permuting the rows and
-columns of $P$ so that the vertices are arranged according to
-increasing values of the community assignments $z_i \in
-\{1,2,\dots,K\}$. Denote by $\tilde{P}^{(k \ell)}$ the $n_k \times n_{\ell}$
+columns of $P$ so that the vertices are reorganized by community memberships $z_i \in \{1,2,\dots,K\}$ in increasing order. 
+Denote by $\tilde{P}^{(k \ell)}$ the $n_k \times n_{\ell}$
 submatrix of $\tilde{P}$ corresponding to the
 edge probabilities between vertices in communities
 $k$ and $\ell$. Here $n_k = |\{ i \colon z_i = k\}|$ is the number of
@@ -1166,7 +1165,8 @@ to that in the balanced communities setting.
 \begin{figure}[H]
 {\centering \includegraphics{summary_files/figure-latex/clust_err_ct_sim_imba-1}
 }
-\caption{Median and IQR of community detection error. Communities are imbalanced. Simulations were repeated 50 times for each sample size.}\label{fig:clust_err_ct_sim_imba}
+\caption{Median and IQR of community detection error. Communities are imbalanced. 
+Simulations were repeated 50 times for each sample size.}\label{fig:clust_err_ct_sim_imba}
 \end{figure}
 
 \begin{figure}[H]
@@ -1180,6 +1180,68 @@ to that in the balanced communities setting.
 \label{fig:lambda_est_p_imba}
 \end{figure}
 
+\hypertarget{disassortative-models}{%
+\subsection{Disassortative Models}\label{disassortative-models}}
+
+\citet{rubindelanchy2017statistical} demonstrated the power of applying GRDPG-based approaches to disassortative block models. 
+Likewise, demonstrate that GRDPG-based algorithms OSC and SSC-ASE perform well on disassortative PABMs. 
+Simulations performed in this section are the same as those in Section \ref{balanced-communities} 
+with the exception of the distributions from which within and between-group popularity parameters are drawn. 
+Here, we draw these parameters such that the expected value is $1/3$ for the within-group popularity parameters 
+and $2/3$ for the between-group popularity parameters:
+
+\begin{itemize}
+\tightlist
+\item
+  Number of vertices \(n = 128, 256, 512, 1024, 2048, 4096\)
+\item
+  Number of underlying communities \(K = 2, 3, 4\)
+\item
+  Mixture parameters \(\alpha_k = \frac{k^{-1}}{\sum_{\ell=1}^K \ell^{-1}}\)
+  for \(k = 1, ..., K\)
+\item
+  Community labels
+  \(z_k \stackrel{\text{iid}}{\sim} \Multinomial(\alpha_1, ..., \alpha_K)\)
+\item
+  Within-group popularities
+  \(\lambda^{(kk)} \stackrel{\text{iid}}{\sim} \Betadist(1, 2)\)
+\item
+  Between-group popularities
+  \(\lambda^{(k \ell)} \stackrel{\text{iid}}{\sim} \Betadist(2, 1)\) for
+  \(k \neq \ell\)
+\end{itemize}
+
+Algorithms tested perform similarly on disassortative PABMs compared to the simulations in Sections \ref{balanced-communities} and \ref{imbalanced-communities} 
+(Fig. \ref{fig:clust_k_disassortative} and \ref{fig:lambda_est_disassortative}).
+
+\begin{remark}
+While we call the models in this section ``disassortative'', it is our view that the assortative/disassortative distinction is not pertinent to PABMs. 
+When viewed as GRDPGs, SBMs and DCBMs are assortative if the edge probability matrix $P$ is positive semidefinite 
+and disassortative if $P$ has negative eigenvalues \citep{rubindelanchy2017statistical}. 
+For the full rank PABM with a fixed $K$, $P$ will always have $K (K + 1) / 2$ positive eigenvalues and $K (K - 1) / 2$ negative eigenvalues.
+\end{remark}
+
+\begin{figure}[H]
+{\centering \includegraphics{summary_files/figure-latex/clust_err_k_disassortative}
+}
+\caption{Median and IQR of community detection error. Communities are approximately balanced. 
+Edge probabilities were drawn to be disassortative. 
+Simulations were repeated 50 times for each sample size.}\label{fig:clust_k_disassortative}
+\end{figure}
+
+\begin{figure}[H]
+{\centering \includegraphics{summary_files/figure-latex/lambda_est_disassortative}
+}
+\caption{Median and IQR RMSE of edge probabilities derived from the
+  outputs of Algorithm \ref{alg:param_est} (red) compared against an
+  MLE-based method (blue) described in
+  \cite{307cbeb9b1be48299388437423d94bf1}.
+  Simulations were repeated 50 times for each sample size. 
+  Communities were drawn to be approximately balanced.
+  Edge probabilities were drawn to be disassortative.}
+\label{fig:lambda_est_disassortative}
+\end{figure}
+
 \hypertarget{real-data-examples}{%
 \section{Applications}\label{real-data-examples}}
 
@@ -1191,7 +1253,9 @@ frequent species were considered, and the similarities were discretized
 to \(\{0, 1\}\) via thresholding. Fig.~\ref{fig:butterfly} shows a
 sorted adjacency matrix sorted by the resultant clustering.
 
-Comparing against the ground truth species labels, \citet{noroozi2019estimation} report that SSC on the adjacency matrix achieves an adjusted Rand index of 73\% in their implementation, whereas OSC achieves 92\% and SSC on the ASE achieves 96\%. 
+Comparing against the ground truth species labels, \citet{noroozi2019estimation} 
+report that SSC on the adjacency matrix achieves an adjusted Rand index of 73\% in their implementation, 
+whereas OSC achieves 92\% and SSC on the ASE achieves 96\%. 
 
 \begin{figure}[H]
 
