@@ -132,7 +132,7 @@ ssc <- function(A,
     return(betahat)
   }, .parallel = parallel) %>% 
     abs()
-    B <- sweep(B, 2, apply(B, 2, max), `/`)
+  B <- sweep(B, 2, apply(B, 2, max), `/`)
   B[is.nan(B)] <- 0
   W <- B + t(B)
   L <- normalized.laplacian(W)
