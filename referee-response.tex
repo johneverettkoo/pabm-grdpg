@@ -188,9 +188,10 @@ questions}\label{specific-comments-and-questions}}
   \textcolor{blue}{
   We thank the referee for the question. 
   The purpose of the additional material in the proof of Theorem 1 is to provide intuition for the arbitrary $K$ case. 
-  In particular, for the $K = 2$ case, we show that $\tilde{P} = X \Pi X^\top$ where $\Pi$ is a permutation matrix with 2 fixed points and 1 cycle of order 2, and the rows of $X$ consist of points that lie on 2 2-dimensional orthogonal subspaces. 
-  The idea is that this generalizes to larger $K$ such that $X$ consists of points that lie on $K$ $K$-dimensional orthogonal subspaces, and $\Pi$ is a permutation matrix with $K$ fixed points and $K^2 - K = K (K - 1)$ cycles of order 2. 
-  Then the eigenvalues of $\Pi$ are broken up by the following: $K$ $1$'s corresponding to the $K$ fixed points and $K (K - 1)$ pairs of $+1$ and $-1$ corresponding to the $K (K - 1)$ cycles of order 2. 
+  In particular, for the $K = 2$ case, we show that $\tilde{P} = X \Pi X^\top$ where $\Pi$ is a permutation matrix with 2 fixed points and 1 cycle of order 2, and the rows of $X$ consist of vectors that lie on two 2-dimensional orthogonal subspaces. 
+  The idea is that this generalizes to larger $K$ such that the rows of $X$ are vectors that lie on $K$ $K$-dimensional orthogonal subspaces, and $\Pi$ is a permutation matrix with $K$ fixed points and $K^2 - K = K (K - 1)$ cycles of order 2. 
+  Then the eigenvalues of $\Pi$ are broken up by the following: $K$ $1$'s corresponding to the $K$ fixed points and $K (K - 1)$ pairs of $+1$ and $-1$ corresponding to the $K (K - 1)$ cycles of order 2, 
+  resulting in $K (K + 1) / 2$ $+1$'s and $K (K - 1) / 2$ $-1$'s, i.e., the diagonal eigenvalue matrix of $\Pi$ is exactly $I_{K (K + 1) / 2, K (K - 1) / 2}$. 
   This gives us the embedding dimension ($\mathbb{R}^{K^2}$ broken up into $K (K + 1) / 2$ ``positive'' and $K (K - 1) / 2$ ``negative'' dimensions according to the eigenvalues of $\Pi$) as well as the structure ($K$ $K$-dimensional subspaces as described by the rows of $X$). 
   We have added additional details to the paper to address this. 
   }
@@ -209,7 +210,17 @@ questions}\label{specific-comments-and-questions}}
   Section 3.1. I found it confusing that community detection algorithms
   are detailed when \(P\) is assumed to be known and then methods for
   estimating \(P\) are recalled. A sentence in the beginning of this
-  section to expose what is presented could help the reader.
+  section to expose what is presented could help the reader.\\
+  \textcolor{blue}{
+  We thank the referee for the suggestion. 
+  The goal of estimation is not to estimate $P$ but to identify the community labels and estimate the popularity parameters. 
+  This is not immediately obvious even after observing $P$, observing $P$ does make estimation much easier. 
+  In the introduction to section 3 (before 3.1), we have added the following:
+  }\\
+  \textcolor{blue}{
+  ``In our methods, the data that are observed for estimation is the adjacency matrix, $A \sim \mathrm{PABM}(\{\lambda^{(k \ell)}\}_K, \rho_n)$, along with an assumed number of communities, $K$. 
+  To motivate some of the methods, we also consider community detection and parameter estimation in the case where we observe the edge probability matrix, $P$, noting that community memberships and popularity parameters are not immediately discernible from observing $P$.''
+  }
 \item
   p10, line 12. \(c^{(i)}\) is not defined.\\
   \textcolor{blue}{
@@ -228,7 +239,7 @@ questions}\label{specific-comments-and-questions}}
   \textcolor{blue}{The description of SSC now reads:
   }\\
   \textcolor{blue}{
-  The SSC algorithm can be described as follows: 
+  ``The SSC algorithm can be described as follows: 
   Given \(X \in \mathbb{R}^{n \times d}\) with vectors
   \(x_i^\top \in \mathbb{R}^d\) as rows of \(X\), the optimization problem
   \(c_i = \arg\min_{c} \|c\|_1\) subject to \(x_i = X^\top c\) and
@@ -243,7 +254,7 @@ questions}\label{specific-comments-and-questions}}
   If \(X\) instead represents points near \(K\) subspaces with some noise, 
   then this property may only hold approximately and thus 
   a final graph partitioning step may be required 
-  (e.g., edge thresholding or spectral clustering).
+  (e.g., edge thresholding or spectral clustering).''
   }
 \item
   p11, line 31. ``\ldots{} SSC on the spectral embedding of \(A\)''.
@@ -424,7 +435,10 @@ I only have some minor comments and a couple of questions:
   One possible reason for this may be because we failed to find the right hyperparameter for SSC-ASE. 
   }\\
   \textcolor{blue}{
-  Under ideal circumstances, we would be able to circumvent this issue altogether via the subspace detection property, but SDP does not necessarily guarantee a partitioning of the graph into exactly $K$ disjoint subgraphs but rather *at least* $K$ disjoint subgraphs, and in our simulations, we found that setting $\vartheta$ to the appropriate value to obtain SDP often results in greater than $K$ subgraphs, which is why we ended up choosing an "incorrect" $\vartheta$ for SSC and then performing the final clustering step.
+  Under ideal circumstances, we would be able to circumvent this issue altogether via the subspace detection property, but SDP does not necessarily guarantee a partitioning of the graph into exactly $K$ disjoint subgraphs but rather {\em at least} $K$ disjoint subgraphs, and in our simulations, we found that setting $\vartheta$ to the appropriate value to obtain SDP often results in greater than $K$ subgraphs, which is why we ended up choosing an ``incorrect'' $\vartheta$ for SSC and then performing the final clustering step.
+  }\\
+  \textcolor{blue}{
+  We also note that in our simulations, while SSC-ASE and SSC-A in the $K = 2$ case and MM-Louvain for all $K$ output labels such that the number of mislabeled vertices increases with $n$, the proportion of mislabeled vertices still decreases.
   }
 \item
   In the application section, MM performs better than OSC and SSC-ASE,
@@ -443,6 +457,8 @@ I only have some minor comments and a couple of questions:
   We have corrected the typo.
   }
 \end{itemize}
+
+\newpage
 
   \bibliography{misc.bib}
 

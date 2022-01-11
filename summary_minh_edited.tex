@@ -424,7 +424,7 @@ points of $\Pi$ are mapped to the eigenvectors $e_1$ and $e_4$
 while the cycles of order two are mapped to the eigenvectors  
 $\tfrac{1}{\sqrt{2}}(e_{2} + e_3)$ and $\tfrac{1}{\sqrt{2}}(e_{2} -
 e_3)$; here $e_i$ denote the $i^\mathrm{th}$ basis vector in $\mathbb{R}^{4}$. 
-Thus, another way of decomposing the edge probability matrix is $\tilde{P} = X \Pi X^\top$ where the rows of $X$ describe 2 2-dimensional orthogonal subpsaces and $\Pi$ is a permutation matrix. 
+Thus, another way of decomposing the edge probability matrix is $\tilde{P} = X \Pi X^\top$ where the rows of $X$ describe 2 2-dimensional orthogonal subspaces and $\Pi$ is a permutation matrix. 
 
 For the general case, we can extend $\tilde{P} = X \Pi X^\top$ to larger $K$. 
 We once again consider $\tilde{P}$ as defined in
@@ -543,8 +543,8 @@ Two inference objectives arise from the PABM:
   Parameter estimation (estimating \(\lambda^{(k \ell)}\)'s).
 \end{enumerate}
 
-In our methods, we assume that \(K\), the number of communities, is
-known beforehand and does not require estimation.
+In our methods, the data that are observed for estimation is the adjacency matrix, $A \sim \PABM(\{\lambda^{(k \ell)}\}_K, \rho_n)$, along with an assumed number of communities, $K$. 
+To motivate some of the methods, we also consider community detection and parameter estimation in the case where we observe the edge probability matrix, $P$, noting that community memberships and popularity parameters are not immediately discernible from observing $P$. 
 
 \hypertarget{related-work}{%
 \subsection{Previous Work}\label{related-work}}
@@ -679,7 +679,7 @@ $\tilde{\Pi}$ is a permutation matrix.
 Furthermore, the explicit form of \(XU\) represents points in \(\mathbb{R}^{K^2}\)
 such that points within each community lie on \(K\)-dimensional
 orthogonal subspaces, i.e. $\langle U^{\top} x_i, U^{\top} x_j \rangle = 0$ whenever $i$ and $j$ are in different communities. 
-Thus ifwe have (or can estimate) \(XU\) directly, then both the community
+Thus if we have (or can estimate) \(XU\) directly, then both the community
 detection and parameter identification problem are trivial because \(U\)
 is orthonormal and fixed for each value of \(K\). 
 However, direct
@@ -824,12 +824,11 @@ We can always find an $\epsilon > 0$ such that $\hat{B}_{ij} > \epsilon$
 with probability converging to one as $n$ increases. 
 Thus, by using $\hat{B}$, we can 
 perfectly recover all the latent community assignments $z_1, z_2,
-\dots, z_n$, i.e., the number of mis-clustered vertices is zero
+\dots, z_n$, i.e., the number of misclustered vertices is zero
 asymptotically almost surely. We note that Theorem~\ref{theorem4} is
 stronger than existing results in the literature; in particular
 Theorem~1 of \citet{307cbeb9b1be48299388437423d94bf1} (the paper that
-originally introduces the PABM model) only guarantees that the {\em
-  proportion} of mis-clustered vertices converges to $0$ as $n
+originally introduces the PABM model) only guarantees that the {\em proportion} of misclustered vertices converges to $0$ as $n
 \rightarrow \infty$. Furthermore Theorem~1
 of \citet{307cbeb9b1be48299388437423d94bf1} also requires the sparsity
 parameter $\rho_n$ to satisfies $n \rho_n^2 = \omega(\log^2{n})$ which
@@ -1162,7 +1161,7 @@ $K$. The results for community recovery and parameter estimations are
 presented in Fig.~\ref{fig:clust_err_ct_sim_imba} and Fig.~\ref{fig:lambda_est_p_imba}, respectively.
 
 From Fig.~\ref{fig:clust_err_ct_sim_imba} we once again see that the
-number of mis-labeled vertices trending to $0$ for OSC. The
+number of mislabeled vertices trending to $0$ for OSC. The
 performance of SSC-ASE is comparable to that of OSC for $K > 2$ but
 is worse when $K = 2$. Fig.~\ref{fig:lambda_est_p_imba} indicates that
 the parameter estimation error also decays at rate $n^{-1/2}$ similar
@@ -1390,7 +1389,7 @@ approach transforms the problem of network community detection to the
 much-studied problem of clustering vectors in Euclidean space.
 Communities of vertices are defined as clusters of latent vectors.
 After ASE, a standard clustering algorithm, e.g., single linkage, is
-used ot infer the communities.  In future research, we intend to use
+used to infer the communities.  In future research, we intend to use
 such general algorithms as baselines and measure the efficiency of the
 PABM algorithms (and other specialized algorithms) by studying how
 much they improve on general algorithms when the specified latent
