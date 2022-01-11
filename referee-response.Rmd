@@ -129,7 +129,33 @@ $c^{(i)}$ is the $i^{th}$ entry of column vector $c$.
 This has been added to the paper.
 }
 
-13. p10. I didn't understand the exposition of the SSC algorithm. 
+13. p10. I didn't understand the exposition of the SSC algorithm.  
+\textcolor{blue}{
+We thank the referee for the question. 
+We have added more detail to our description of the SSC algorithm. 
+In particular, we talk a bit about the intuition/motivation behind the algorithm. 
+This isn't added to the description, but $c$ and $c_i$ are column vectors of length $n$ and $c^{(i)}$ and $c_i^{(j)}$ are the $i^{th}$ and $j^{th}$ entries of vectors $c$ and $c_i$ respectively. 
+}  
+\textcolor{blue}{The description of SSC now reads:
+}  
+\textcolor{blue}{
+The SSC algorithm can be described as follows: 
+Given \(X \in \mathbb{R}^{n \times d}\) with vectors
+\(x_i^\top \in \mathbb{R}^d\) as rows of \(X\), the optimization problem
+\(c_i = \arg\min_{c} \|c\|_1\) subject to \(x_i = X^\top c\) and
+\(c^{(i)} = 0\), where $c^{(i)}$ is the $i^{th}$ entry of $c$, is solved for each \(i = [n]\). 
+The solutions are collected collected into matrix
+\(C = \bigl[ c_1 \mid \cdots \mid c_n \bigr]^\top\) to
+construct an affinity matrix \(B = |C| + |C^\top|\). If each \(x_i\) lies
+exactly on one of \(K\) subspaces, \(B\) describes an undirected graph
+consisting of {\em at least} \(K\) disjoint subgraphs, i.e., \(B_{ij} = 0\) if \(x_i, x_j\) lie on different subspaces. 
+The intuition here is that points that lie on the same subspace can be described as linear combinations of each other. 
+Thus, for each $c_i$, $c_i^{(j)}$ is zero if $x_i$ and $x_j$ belong to different subspaces and may be nonzero if they do. 
+If \(X\) instead represents points near \(K\) subspaces with some noise, 
+then this property may only hold approximately and thus 
+a final graph partitioning step may be required 
+(e.g., edge thresholding or spectral clustering).
+}
 
 14. p11, line 31. "... SSC on the spectral embedding of $A$". Could you support this assertion by references?  
 \textcolor{blue}{
@@ -179,7 +205,7 @@ Cursory numerical experiments suggest that OSC and SSC-ASE behave similarly for 
 \textcolor{blue}{
 Regarding computational complexity, because both OSC and SSC-ASE may have an arbitrary final processing step, we will focus on the complexity in constructing the affinity matrix $B$. 
 For OSC, this involves spectral decomposition followed by matrix multiplication of $n \times K^2$ and $K^2 \times n$ matrices, so the complexity is $O(n^3 + n^2 K^2)$. 
-For SSC-ASE, we again start with spectral decomposition, followed by $n$ LASSO problems with a design matrix of size $K^2 \times (n - 1)$, so the complexity is $O(n^3 + n^2 K^4 + n K^6)$. 
+For SSC-ASE, we again start with spectral decomposition, followed by $n$ LASSO problems with a design matrix of size $K^2 \times (n - 1)$, so the complexity is $O(n^3 + n^2 K^4 + n K^6)$ \cite{10.1214/009053604000000067}. 
 SSC-A involves solving $n$ LASSO regression problems each with design matrices of size $n \times (n - 1)$, so the complexity here is $O(n^4)$. 
 When $n \gg K^2$, we can see that OSC and SSC-ASE are both $O(n^3)$. 
 In practice, we have found that $K$ does not affect runtimes too much. 

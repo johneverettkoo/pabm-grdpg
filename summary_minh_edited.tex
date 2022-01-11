@@ -562,22 +562,27 @@ The SSC algorithm can be described as follows:
 Given \(X \in \mathbb{R}^{n \times d}\) with vectors
 \(x_i^\top \in \mathbb{R}^d\) as rows of \(X\), the optimization problem
 \(c_i = \argmin_{c} \|c\|_1\) subject to \(x_i = X^\top c\) and
-\(c^{(i)} = 0\), where $c^{(i)}$ is the $i^{th}$ entry of $c$, is solved for each \(i = 1, ..., n\). The solutions are
-collected collected into matrix
+\(c^{(i)} = 0\), where $c^{(i)}$ is the $i^{th}$ entry of $c$, is solved for each \(i = [n]\). 
+The solutions are collected collected into matrix
 \(C = \bigl[ c_1 \mid \cdots \mid c_n \bigr]^\top\) to
 construct an affinity matrix \(B = |C| + |C^\top|\). If each \(x_i\) lies
 exactly on one of \(K\) subspaces, \(B\) describes an undirected graph
-consisting of {\em at least} \(K\) disjoint subgraphs, i.e., \(B_{ij} = 0\) if
-\(x_i, x_j\) lie on different subspaces. If \(X\) instead represents
-points near \(K\) subspaces with some noise, a final graph partitioning
-step may be required (e.g., edge thresholding or spectral clustering).
+consisting of {\em at least} \(K\) disjoint subgraphs, i.e., \(B_{ij} = 0\) if \(x_i, x_j\) lie on different subspaces. 
+The intuition here is that points that lie on the same subspace can be described as linear combinations of each other. 
+Thus, for each $c_i$, $c_i^{(j)}$ is zero if $x_i$ and $x_j$ belong to different subspaces and may be nonzero if they do. 
+If \(X\) instead represents points near \(K\) subspaces with some noise, 
+then this property may only hold approximately and thus 
+a final graph partitioning step may be required 
+(e.g., edge thresholding or spectral clustering).
 
 In practice, due to presence of noise, SSC is often done by solving the LASSO problems
+
 \begin{equation} \label{eq:ssc}
 c_i = \argmin_c \frac{1}{2} \|x_i - X_{-i}^\top c\|^2_2 + \vartheta \|c\|_1
 \end{equation}
-for some sparsity parameter \(\vartheta > 0\). The \(c_i\) vectors are
-then collected into \(C\) and \(B\) as before.
+
+for some sparsity parameter \(\vartheta > 0\). 
+The \(c_i\) vectors are then collected into \(C\) and \(B\) as before.
 
 \begin{definition}[Subspace Detection Property]
   \label{def:subspace_detection}
