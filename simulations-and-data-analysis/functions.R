@@ -342,7 +342,7 @@ lambda.rmse.mle <- function(P, A, z) {
     return()
 }
 
-cluster.sg <- function(A) {
+cluster.sg <- function(A, K = 2) {
   # adapted from code provided by sengupta and chen:
   # a blockmodel for node popularity in networks with community structure
   
@@ -400,13 +400,13 @@ cluster.sg <- function(A) {
     return(sum(q))
   }	# formula for Q
   
-  b.can = EPalgo(A,eps=0) # EP algorithm (no perturbation)
+  b.can = EPalgo(A,eps=0, K = K) # EP algorithm (no perturbation)
   Q.PA.can = rep(NA, ncol(b.can))	# array to store Q values
   Q.DC.can = rep(NA, ncol(b.can))	# array to store Q values
   for (i in 1:ncol(b.can)){
     #check if any cluster is empty
-    foo = rep(NA, 2)
-    for (clus in 1:2) {foo[clus]=sum(b.can[,i]==clus)}
+    foo = rep(NA, K)
+    for (clus in 1:K) {foo[clus]=sum(b.can[,i]==clus)}
     if (min(foo)==0) {stop('Empty groups are not allowed')} 
     Q.PA.can[i] = Q.PA(A, b=b.can[,i])   # fit PABM
     Q.DC.can[i] = Q.DC(A, b=b.can[,i])   # fit DCBM
@@ -416,7 +416,7 @@ cluster.sg <- function(A) {
   return(b.PA)
 }
 
-EPalgo<-function(A,eps=0){
+EPalgo<-function(A,eps=0, K = 2){
   # provided by sengupta and chen:
   # a blockmodel for node popularity in networks with community structure
   
@@ -427,15 +427,15 @@ EPalgo<-function(A,eps=0){
   foo<-eigen(A, symmetric = TRUE)
   val = abs(foo$values)			# pick the top 2
   id = order(-val)				# eigenvalues of A and put
-  id_vec = id[1:2]				# their eigenvectors into a 2*N matrix
+  id_vec = id[1:K]				# their eigenvectors into a 2*N matrix
   # columns of foo$vectors = eigenvectors of A
   # we want a 2xn matrix whose rows are the leading eigenvectors
   X = t(foo$vectors[,id_vec])		
-  y = X[,1:2]
+  y = X[,1:K]
   
-  comms = 1:2
+  comms = 1:K
   u <- list(comms)
-  v = expand.grid(rep(u, 2))
+  v = expand.grid(rep(u, K))
   v = as.matrix(v)
   # initialize with the parallelogram
   epts = y%*%t(v)	# extreme pts are the columns of this matrix
@@ -443,14 +443,17 @@ EPalgo<-function(A,eps=0){
   row.names(b.can)=NULL
   
   ptm<-proc.time()
-  for (i in 3:ncol(X)){
-    b.can1 = rbind(b.can,rep(1,ncol(b.can)))
-    b.can2 = rbind(b.can,rep(2,ncol(b.can)))
-    b.can = cbind(b.can1,b.can2)
+  for (i in (K+1):ncol(X)){
+    # b.can1 = rbind(b.can,rep(1,ncol(b.can)))
+    # b.can2 = rbind(b.can,rep(2,ncol(b.can)))
+    # b.can = cbind(b.can1,b.can2)
+    b.can.list <- lapply(seq(K), function(k) rbind(b.can, rep(k, ncol(b.can))))
+    b.can <- do.call(cbind, b.can.list)
     foo = X[,1:i]%*%b.can
     hull = chull(t(foo))
     epts = foo[,hull]
-    b.can = b.can[,hull]}	# next i = next row of X
+    b.can = b.can[,hull]
+  }	# next i = next row of X
   proc.time()-ptm
   
   ##### remove invalid candidates
