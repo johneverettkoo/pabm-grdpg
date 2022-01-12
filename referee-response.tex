@@ -199,7 +199,6 @@ questions}\label{specific-comments-and-questions}}
   p8, line 14-21. I don't see why the permutation given by \(\Pi\) has
   \(K\) fixed points.\\
   \textcolor{blue}{
-  We thank the referee for the comment. 
   The purpose of Example 1 is to illustrate this explicitly. 
   Comparing matrices $X$ and $Y$, we can see that they share three columns: the first, fifth, and ninth. 
   The other columns are permuted. 
@@ -212,9 +211,8 @@ questions}\label{specific-comments-and-questions}}
   estimating \(P\) are recalled. A sentence in the beginning of this
   section to expose what is presented could help the reader.\\
   \textcolor{blue}{
-  We thank the referee for the suggestion. 
   The goal of estimation is not to estimate $P$ but to identify the community labels and estimate the popularity parameters. 
-  This is not immediately obvious even after observing $P$, observing $P$ does make estimation much easier. 
+  This is not immediately obvious even after observing $P$, although observing $P$ does make estimation much easier. 
   In the introduction to section 3 (before 3.1), we have added the following:
   }\\
   \textcolor{blue}{
@@ -233,7 +231,7 @@ questions}\label{specific-comments-and-questions}}
   \textcolor{blue}{
   We thank the referee for the question. 
   We have added more detail to our description of the SSC algorithm. 
-  In particular, we talk a bit about the intuition/motivation behind the algorithm. 
+  In particular, we describe the intuition/motivation behind the algorithm. 
   This isn't added to the description, but $c$ and $c_i$ are column vectors of length $n$ and $c^{(i)}$ and $c_i^{(j)}$ are the $i^{th}$ and $j^{th}$ entries of vectors $c$ and $c_i$ respectively. 
   }\\
   \textcolor{blue}{The description of SSC now reads:
@@ -260,19 +258,17 @@ questions}\label{specific-comments-and-questions}}
   p11, line 31. ``\ldots{} SSC on the spectral embedding of \(A\)''.
   Could you support this assertion by references?\\
   \textcolor{blue}{
-  We thank the referee for the question. 
   We have added, "... SSC on the rows of the spectral embedding of $A$, since they will still lie approximately on the $K$ subspaces \citep{rubindelanchy2017statistical}."
   }
 \item
   p12, line 13. It could help recall what the \(z_i, z_j\) are.\\
   \textcolor{blue}{
-  We have changed the wording for this bit to explicitly talk about community labels. 
+  We have changed $z_i$ to ``community labels''.
   }
 \item
   p14. Do you think that the OSC algorithm can retrieve other kinds of
   structure than assortative ones?\\
   \textcolor{blue}{
-  We thank the referee for the question.
   In response to this, we added a third simulation study with $\lambda_{kk} \sim Beta(1,2)$ and $\lambda_{kl} \sim Beta(2,1)$, resulting in an average within-community edge probability of $1/3$ and between-community edge probability of $2/3$. 
   Results of this simulation study are very similar to that of the first two and consistent with the theoretical results.
   }\\
@@ -286,7 +282,6 @@ questions}\label{specific-comments-and-questions}}
   misclassification rate to assess the recovery of the nodes
   clustering?\\
   \textcolor{blue}{
-  We thank the referee for the question.
   The first to datasets in section 5 refer to datasets analyzed by other PABM papers. 
   For the Leeds Butterfly dataset, while the paper with which we are comparing \citep{noroozi2019estimation} provides enough details to transform and preprocess the data to match their analysis, they do not provide code to run their clustering algorithm. 
   Therefore, we use their reported benchmark value, which is in the form of ARI. 
@@ -301,7 +296,6 @@ questions}\label{specific-comments-and-questions}}
   extent does the value of \(K\) impact the computational burden for the
   algorithms?\\
   \textcolor{blue}{
-  We thank the referee for the questions. 
   Regarding disassortativity, as mentioned in previous comments, we have added a third simulation study to address this. 
   Performance of the algorithms tested is similar to the other two simulation studies and consistent with the theory. 
   Regarding $K$, our algorithms require each $n_k$ to be large enough to span its subspace of dimension $K$, so we focused mostly on smaller values of $K$. 
@@ -319,7 +313,6 @@ questions}\label{specific-comments-and-questions}}
   Again, in your application on the Leeds butterfly dataset, why did you
   limit your analysis to \(K = 4\)?\\
   \textcolor{blue}{
-  We thank the referee for the question. 
   For the Leeds butterfly dataset, we wanted to compare results of OSC and SSC-ASE to an analysis performed by another group studying the PABM \citep{noroozi2019estimation}. 
   In their results, they describe how they removed some of the nodes and discretized the edges, which we replicate in our analysis. 
   }
@@ -417,7 +410,6 @@ I only have some minor comments and a couple of questions:
   models or weighted graphs or any other types of graphs than binary
   undirected ones?\\
   \textcolor{blue}{
-  We thank the referee for the question. 
   For directed graphs, the ASE provides a consistent estimator and thus should also work here \citep{doi:10.1080/01621459.2012.699795}. 
   For weighted graphs, if $A_{ij}$ can be an estimator for $P_{ij}$ (e.g., if $A_{ij} \sim \mathrm{Poisson}(P_{ij})$), then all of the theory should transfer over to those models as well, 
   and we believe that the theory can be adapted to other models where $g(A_{ij})$ is an estimator for $P_{ij}$. 
@@ -430,7 +422,6 @@ I only have some minor comments and a couple of questions:
   understand why this has an impact on the performance for \(K = 2\),
   but not for \(K \geq 3\).\\
   \textcolor{blue}{
-  We thank the referee for raising the concern. 
   We are not entirely clear on why this happens for $K = 2$, but when comparing the normalized Laplacian eigenmaps of the affinity matrix $B$ for various $K$, we see that when $K > 2$, the points appear much closer to Gaussian mixtures, whereas with $K = 2$, there is some separation by community, but they do not appear as Gaussian mixtures, at least for the simulated data. 
   One possible reason for this may be because we failed to find the right hyperparameter for SSC-ASE. 
   }\\
@@ -445,7 +436,6 @@ I only have some minor comments and a couple of questions:
   while in the simulation study the opposite is observed. What is the
   reason for the different behavior?\\
   \textcolor{blue}{
-  We thank the referee for the question. 
   In the application section, we analyze data that are not necessarily generated by the PABM (or any known model). 
   While all three algorithms are specific to the PABM, they might all behave differently to the different ways in which the model is misspecified. 
   There is also the question of hyperparameter tuning, especially in the case of SSC-ASE, and we spent a bit more time tweaking the hyperparameters, resulting in performance that is a bit closer to that of MM. 
