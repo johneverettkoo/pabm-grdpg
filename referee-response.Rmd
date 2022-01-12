@@ -43,7 +43,8 @@ The following sections are individual referee comments and our responses (highli
 The interest of this paper is to provide new perspectives on PABM (theoretical and algorithmic). The theoretical results are sound. However, the algorithmic results shown in the simulations are not really impressive since they are done in settings that do not appear very challenging. Indeed, they are done with fixed numbers of communities which are quite low (no more than 4) and only with assortative structure (larger probabilities of connections within a community than between two communities). Therefore, I think the paper needs a more challenging simulation study and the question of the choice of the number of communities needs to be addressed at least with some heuristic that works in simulation studies if theoretical results are not reachable. Moreover, some points on the exposition could be made clearer. I have specific comments below where I ask for some clarifications and detail how the simulation study could be improved in my opinion. 
 
 \textcolor{blue}{
-We thank the referee for the feedback. The concerns addressed here are answered in the following section. 
+We thank the referee for the feedback. 
+The concerns addressed here are answered in the following section. 
 In particular, we make sure to address the concerns about the simulation studies. 
 }
 
@@ -51,7 +52,6 @@ In particular, we make sure to address the concerns about the simulation studies
 
 1. p4. What is a hollow graph?  
 \textcolor{blue}{
-We thank the referee for the question. 
 We changed the terminology a bit here and throughout the paper 
 and specify that the analysis assumes $G$ is an unweighted and undirected graph with no self-loops (no edge directly from itself to itself), 
 so $A$ is binary and symmetric with zeros on the diagonal. 
@@ -69,7 +69,6 @@ This has been added. $[n] = \{1, 2, ..., n\}$.
 
 4. p4. Definition 1. Do you consider a probability distribution on $z_1, ..., z_n$? Please give the range of variation of $(i, j)$ when you define $P_{ij}$.  
 \textcolor{blue}{
-We thank the referee for the question and suggestion. 
 We have included the range of $(i, j)$ in the definition. 
 In regard to the probability distribution on the labels $z_1, ..., z_n$, none of the theorems require this, although some do require that each $n_k$ be sufficiently large, so it did not factor into our definitions and analyses. 
 One thing that was discussed was a possibility of a Bayesian analysis of the PABM, and we have some results using Variational Inference and Mean Field Approximation, but we believe that this is a topic for another paper. 
@@ -77,20 +76,18 @@ One thing that was discussed was a possibility of a Bayesian analysis of the PAB
 
 5. p4. line 50. Instead of "increasing values of the community assignments", you could write "reorganized by community memberships".  
 \textcolor{blue}{
-We thank the referee for the suggestion. This has been changed.
+This has been changed.
 }
 
 6. p5. Definition 2. I do not understand the definition of the subset $\mathcal{X}$. 
 Is it $x \in \mathcal{X}$ if for all $y \in \mathbb{R}^d$ we have $x^\top I_{p,q} y$ or is $\mathcal{X}$ a subset on $(\mathbb{R}^d)^2$? 
 Please clearly state that $d = p + q$ (not stated before Definition 3).  
 \textcolor{blue}{
-We thank the referee for the suggestion. 
 We clarify the definition of the subset as $\mathcal{X} = \{x, y \in \mathbb{R}^d : x^\top I_{p, q} y \in [0, 1]\}$ and add that $d = p + q$. 
 }
 
 7. p6. Remark 2. What are $\hat{Z}$, $V$, and $D$?  
 \textcolor{blue}{
-We thank the referee for the question. 
 We now include in the remark the $D$ is the diagonal matrix of the $p$ most positive and $q$ most negative eigenvalues of $A$ (or $P$), $V$ is the matrix of corresponding eigenvectors, and $\hat{Z}$ is the embedding $V |D|^{1/2}$.
 }
 
@@ -101,7 +98,6 @@ We have corrected the typo.
 
 9. p7 line 40-46. I don't understand the interest of this paragraph.  
 \textcolor{blue}{
-We thank the referee for the question. 
 The purpose of the additional material in the proof of Theorem 1 is to provide intuition for the arbitrary $K$ case. 
 In particular, for the $K = 2$ case, we show that $\tilde{P} = X \Pi X^\top$ where $\Pi$ is a permutation matrix with 2 fixed points and 1 cycle of order 2, and the rows of $X$ consist of vectors that lie on two 2-dimensional orthogonal subspaces. 
 The idea is that this generalizes to larger $K$ such that the rows of $X$ are vectors that lie on $K$ $K$-dimensional orthogonal subspaces, and $\Pi$ is a permutation matrix with $K$ fixed points and $K^2 - K = K (K - 1)$ cycles of order 2. 
@@ -133,14 +129,12 @@ To motivate some of the methods, we also consider community detection and parame
 
 12. p10, line 12. $c^{(i)}$ is not defined.  
 \textcolor{blue}{
-We thank the referee for pointing this out. 
 $c^{(i)}$ is the $i^{th}$ entry of column vector $c$. 
 This has been added to the paper.
 }
 
 13. p10. I didn't understand the exposition of the SSC algorithm.  
 \textcolor{blue}{
-We thank the referee for the question. 
 We have added more detail to our description of the SSC algorithm. 
 In particular, we describe the intuition/motivation behind the algorithm. 
 This isn't added to the description, but $c$ and $c_i$ are column vectors of length $n$ and $c^{(i)}$ and $c_i^{(j)}$ are the $i^{th}$ and $j^{th}$ entries of vectors $c$ and $c_i$ respectively. 
@@ -279,7 +273,7 @@ SSC-ASE does rely on the latent configuration, but we show that the orthogonalit
 \textcolor{blue}{
 That said, looking back at the latent configuration in Theorem 1, we can see that a $K$-dimensional (not $K^2$-dimensional) latent configuration is sufficient for clustering. 
 If we are able to obtain this exact embedding, this would greatly reduce the number of dimensions required for the embedding. 
-In practice, this isn't always possible due to the nonidentifiability issue (in particular, determining which of the $K$ out of $K^2$ eigenvectors should be used).
+In practice, this isn't always possible due to the nonidentifiability issue (in particular, determining which of the $K$ out of $K^2$ eigenvectors should be used, although we have found via numerical experiments that community detection is often possible with the $2^{nd}$ to the $(K+1)^{st}$ embedding dimensions).
 }
 
 * This is clearly beyond the scope of the paper, but I wonder if there is a straightforward way to adapt the proposed methods to directed models or weighted graphs or any other types of graphs than binary undirected ones?  

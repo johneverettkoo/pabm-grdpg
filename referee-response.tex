@@ -116,7 +116,8 @@ specific comments below where I ask for some clarifications and detail
 how the simulation study could be improved in my opinion.
 
 \textcolor{blue}{
-We thank the referee for the feedback. The concerns addressed here are answered in the following section. 
+We thank the referee for the feedback. 
+The concerns addressed here are answered in the following section. 
 In particular, we make sure to address the concerns about the simulation studies. 
 }
 
@@ -129,7 +130,6 @@ questions}\label{specific-comments-and-questions}}
 \item
   p4. What is a hollow graph?\\
   \textcolor{blue}{
-  We thank the referee for the question. 
   We changed the terminology a bit here and throughout the paper 
   and specify that the analysis assumes $G$ is an unweighted and undirected graph with no self-loops (no edge directly from itself to itself), 
   so $A$ is binary and symmetric with zeros on the diagonal. 
@@ -150,7 +150,6 @@ questions}\label{specific-comments-and-questions}}
   \(z_1, ..., z_n\)? Please give the range of variation of \((i, j)\)
   when you define \(P_{ij}\).\\
   \textcolor{blue}{
-  We thank the referee for the question and suggestion. 
   We have included the range of $(i, j)$ in the definition. 
   In regard to the probability distribution on the labels $z_1, ..., z_n$, none of the theorems require this, although some do require that each $n_k$ be sufficiently large, so it did not factor into our definitions and analyses. 
   One thing that was discussed was a possibility of a Bayesian analysis of the PABM, and we have some results using Variational Inference and Mean Field Approximation, but we believe that this is a topic for another paper. 
@@ -160,7 +159,7 @@ questions}\label{specific-comments-and-questions}}
   assignments'', you could write ``reorganized by community
   memberships''.\\
   \textcolor{blue}{
-  We thank the referee for the suggestion. This has been changed.
+  This has been changed.
   }
 \item
   p5. Definition 2. I do not understand the definition of the subset
@@ -169,13 +168,11 @@ questions}\label{specific-comments-and-questions}}
   \(\mathcal{X}\) a subset on \((\mathbb{R}^d)^2\)? Please clearly state
   that \(d = p + q\) (not stated before Definition 3).\\
   \textcolor{blue}{
-  We thank the referee for the suggestion. 
   We clarify the definition of the subset as $\mathcal{X} = \{x, y \in \mathbb{R}^d : x^\top I_{p, q} y \in [0, 1]\}$ and add that $d = p + q$. 
   }
 \item
   p6. Remark 2. What are \(\hat{Z}\), \(V\), and \(D\)?\\
   \textcolor{blue}{
-  We thank the referee for the question. 
   We now include in the remark the $D$ is the diagonal matrix of the $p$ most positive and $q$ most negative eigenvalues of $A$ (or $P$), $V$ is the matrix of corresponding eigenvectors, and $\hat{Z}$ is the embedding $V |D|^{1/2}$.
   }
 \item
@@ -186,7 +183,6 @@ questions}\label{specific-comments-and-questions}}
 \item
   p7 line 40-46. I don't understand the interest of this paragraph.\\
   \textcolor{blue}{
-  We thank the referee for the question. 
   The purpose of the additional material in the proof of Theorem 1 is to provide intuition for the arbitrary $K$ case. 
   In particular, for the $K = 2$ case, we show that $\tilde{P} = X \Pi X^\top$ where $\Pi$ is a permutation matrix with 2 fixed points and 1 cycle of order 2, and the rows of $X$ consist of vectors that lie on two 2-dimensional orthogonal subspaces. 
   The idea is that this generalizes to larger $K$ such that the rows of $X$ are vectors that lie on $K$ $K$-dimensional orthogonal subspaces, and $\Pi$ is a permutation matrix with $K$ fixed points and $K^2 - K = K (K - 1)$ cycles of order 2. 
@@ -222,14 +218,12 @@ questions}\label{specific-comments-and-questions}}
 \item
   p10, line 12. \(c^{(i)}\) is not defined.\\
   \textcolor{blue}{
-  We thank the referee for pointing this out. 
   $c^{(i)}$ is the $i^{th}$ entry of column vector $c$. 
   This has been added to the paper.
   }
 \item
   p10. I didn't understand the exposition of the SSC algorithm.\\
   \textcolor{blue}{
-  We thank the referee for the question. 
   We have added more detail to our description of the SSC algorithm. 
   In particular, we describe the intuition/motivation behind the algorithm. 
   This isn't added to the description, but $c$ and $c_i$ are column vectors of length $n$ and $c^{(i)}$ and $c_i^{(j)}$ are the $i^{th}$ and $j^{th}$ entries of vectors $c$ and $c_i$ respectively. 
@@ -402,7 +396,7 @@ I only have some minor comments and a couple of questions:
   \textcolor{blue}{
   That said, looking back at the latent configuration in Theorem 1, we can see that a $K$-dimensional (not $K^2$-dimensional) latent configuration is sufficient for clustering. 
   If we are able to obtain this exact embedding, this would greatly reduce the number of dimensions required for the embedding. 
-  In practice, this isn't always possible due to the nonidentifiability issue (in particular, determining which of the $K$ out of $K^2$ eigenvectors should be used).
+  In practice, this isn't always possible due to the nonidentifiability issue (in particular, determining which of the $K$ out of $K^2$ eigenvectors should be used, although we have found via numerical experiments that community detection is often possible with the $2^{nd}$ to the $(K+1)^{st}$ embedding dimensions).
   }
 \item
   This is clearly beyond the scope of the paper, but I wonder if there
