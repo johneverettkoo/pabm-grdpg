@@ -275,7 +275,7 @@ SSC-ASE does rely on the latent configuration, but we show that the orthogonalit
 }  
 \textcolor{blue}{
 That said, looking back at the latent configuration in Theorem 1, we can see that a $K$-dimensional (not $K^2$-dimensional) latent configuration is sufficient for clustering. 
-If we are able to obtain this exact embedding, this would greatly reduce the number of dimensions required for the embedding. 
+If we are able to obtain this exact embedding, this would greatly reduce the number of dimensions required for the clustering 
 In practice, this isn't always possible due to the nonidentifiability issue (in particular, determining which of the $K$ out of $K^2$ eigenvectors should be used, although we have found via numerical experiments that community detection is often possible with the $2^{nd}$ to the $(K+1)^{st}$ embedding dimensions).
 }
 
