@@ -143,16 +143,16 @@ questions}\label{specific-comments-and-questions}}
 \item
   p4. Please define the set \([n]\).\\
   \textcolor{blue}{
-  This has been added. $[n] = \{1, 2, ..., n\}$. 
+  We added $[n] = \{1, 2, ..., n\}$. 
   }
 \item
   p4. Definition 1. Do you consider a probability distribution on
   \(z_1, ..., z_n\)? Please give the range of variation of \((i, j)\)
   when you define \(P_{ij}\).\\
   \textcolor{blue}{
-  We have included the range of $(i, j)$ in the definition. 
-  In regard to the probability distribution on the labels $z_1, ..., z_n$, none of the theorems require this, although some do require that each $n_k$ be sufficiently large, so it did not factor into our definitions and analyses. 
-  One thing that was discussed was a possibility of a Bayesian analysis of the PABM, and we have some results using Variational Inference and Mean Field Approximation, but we believe that this is a topic for another paper. 
+  The range of $(i, j)$ is now included in the definition. 
+  In regard to the probability distribution on the labels $z_1, ..., z_n$, none of our theorems use this, although some do require that each $n_k$ be sufficiently large, so it did not factor into our definitions and analyses. 
+  One thing that was discussed was the possibility of a Bayesian analysis of the PABM, and we have some results using Variational Inference and Mean Field Approximation, but we believe that this is a topic for another paper. 
   }
 \item
   p4. line 50. Instead of ``increasing values of the community
@@ -168,12 +168,12 @@ questions}\label{specific-comments-and-questions}}
   \(\mathcal{X}\) a subset on \((\mathbb{R}^d)^2\)? Please clearly state
   that \(d = p + q\) (not stated before Definition 3).\\
   \textcolor{blue}{
-  We clarify the definition of the subset as $\mathcal{X} = \{x, y \in \mathbb{R}^d : x^\top I_{p, q} y \in [0, 1]\}$ and add that $d = p + q$. 
+  We now define the subset as $\mathcal{X} = \{x, y \in \mathbb{R}^d : x^\top I_{p, q} y \in [0, 1]\}$ with $d = p + q$. 
   }
 \item
   p6. Remark 2. What are \(\hat{Z}\), \(V\), and \(D\)?\\
   \textcolor{blue}{
-  We now include in the remark the $D$ is the diagonal matrix of the $p$ most positive and $q$ most negative eigenvalues of $A$ (or $P$), $V$ is the matrix of corresponding eigenvectors, and $\hat{Z}$ is the embedding $V |D|^{1/2}$.
+  Remark 2 now includes that $D$ is the diagonal matrix of the $p$ most positive and $q$ most negative eigenvalues of $A$ (or $P$), $V$ is the matrix of corresponding eigenvectors, and $\hat{Z}$ is the embedding $V |D|^{1/2}$.
   }
 \item
   top of p7. \(\tilde{P}\) instead of \({P}\).\\
@@ -183,9 +183,9 @@ questions}\label{specific-comments-and-questions}}
 \item
   p7 line 40-46. I don't understand the interest of this paragraph.\\
   \textcolor{blue}{
-  The purpose of the additional material in the proof of Theorem 1 is to provide intuition for the arbitrary $K$ case. 
+  The purpose of the additional material in the proof of Theorem 1 is to provide intuition for the arbitrary $K$ case by starting with $K = 2$. 
   In particular, for the $K = 2$ case, we show that $\tilde{P} = X \Pi X^\top$ where $\Pi$ is a permutation matrix with 2 fixed points and 1 cycle of order 2, and the rows of $X$ consist of vectors that lie on two 2-dimensional orthogonal subspaces. 
-  The idea is that this generalizes to larger $K$ such that the rows of $X$ are vectors that lie on $K$ $K$-dimensional orthogonal subspaces, and $\Pi$ is a permutation matrix with $K$ fixed points and $K^2 - K = K (K - 1)$ cycles of order 2. 
+  This then generalizes to larger $K$ such that the rows of $X$ are vectors that lie on $K$ $K$-dimensional orthogonal subspaces, and $\Pi$ is a permutation matrix with $K$ fixed points and $K^2 - K = K (K - 1)$ cycles of order 2. 
   Then the eigenvalues of $\Pi$ are broken up by the following: $K$ $1$'s corresponding to the $K$ fixed points and $K (K - 1)$ pairs of $+1$ and $-1$ corresponding to the $K (K - 1)$ cycles of order 2, 
   resulting in $K (K + 1) / 2$ $+1$'s and $K (K - 1) / 2$ $-1$'s, i.e., the diagonal eigenvalue matrix of $\Pi$ is exactly $I_{K (K + 1) / 2, K (K - 1) / 2}$. 
   This gives us the embedding dimension ($\mathbb{R}^{K^2}$ broken up into $K (K + 1) / 2$ ``positive'' and $K (K - 1) / 2$ ``negative'' dimensions according to the eigenvalues of $\Pi$) as well as the structure ($K$ $K$-dimensional subspaces as described by the rows of $X$). 
@@ -198,8 +198,7 @@ questions}\label{specific-comments-and-questions}}
   The purpose of Example 1 is to illustrate this explicitly. 
   Comparing matrices $X$ and $Y$, we can see that they share three columns: the first, fifth, and ninth. 
   The other columns are permuted. 
-  From Example 1 (as well as the proof of Theorem 1 for $K = 2$), it should be clear how this property holds for larger $K$. 
-  The proof of Theorem 1 for arbitrary $K$ should then confirm the intuition based on $K = 2$ and $3$. 
+  The proof of Theorem 1 then generalizes this to arbitrary $K$. 
   }
 \item
   Section 3.1. I found it confusing that community detection algorithms
@@ -208,12 +207,13 @@ questions}\label{specific-comments-and-questions}}
   section to expose what is presented could help the reader.\\
   \textcolor{blue}{
   The goal of estimation is not to estimate $P$ but to identify the community labels and estimate the popularity parameters. 
-  This is not immediately obvious even after observing $P$, although observing $P$ does make estimation much easier. 
+  This is not immediately obvious even if we know $P$ beforehand, although having $P$ does make estimation much easier. 
   In the introduction to section 3 (before 3.1), we have added the following:
   }\\
   \textcolor{blue}{
   ``In our methods, the data that are observed for estimation is the adjacency matrix, $A \sim \mathrm{PABM}(\{\lambda^{(k \ell)}\}_K, \rho_n)$, along with an assumed number of communities, $K$. 
-  To motivate some of the methods, we also consider community detection and parameter estimation in the case where we observe the edge probability matrix, $P$, noting that community memberships and popularity parameters are not immediately discernible from observing $P$.''
+  To motivate our methods, we also consider community detection and parameter estimation in the case where we know the edge probability matrix, $P$, beforehand, noting that community memberships and popularity parameters are not immediately discernible from $P$ itself. 
+  After establishing methods for community detection and parameter estimation from $P$, we use the consistency property of the ASE \citep{doi:10.1080/01621459.2012.699795,rubindelanchy2017statistical} to demonstrate that the same methods work for $A$ almost surely as $n \to \infty$.''
   }
 \item
   p10, line 12. \(c^{(i)}\) is not defined.\\
@@ -226,7 +226,6 @@ questions}\label{specific-comments-and-questions}}
   \textcolor{blue}{
   We have added more detail to our description of the SSC algorithm. 
   In particular, we describe the intuition/motivation behind the algorithm. 
-  This isn't added to the description, but $c$ and $c_i$ are column vectors of length $n$ and $c^{(i)}$ and $c_i^{(j)}$ are the $i^{th}$ and $j^{th}$ entries of vectors $c$ and $c_i$ respectively. 
   }\\
   \textcolor{blue}{The description of SSC now reads:
   }\\
@@ -241,7 +240,8 @@ questions}\label{specific-comments-and-questions}}
   construct an affinity matrix \(B = |C| + |C^\top|\). If each \(x_i\) lies
   exactly on one of \(K\) subspaces, \(B\) describes an undirected graph
   consisting of {\em at least} \(K\) disjoint subgraphs, i.e., \(B_{ij} = 0\) if \(x_i, x_j\) lie on different subspaces. 
-  The intuition here is that points that lie on the same subspace can be described as linear combinations of each other. 
+  The intuition here is that vectors that lie on the same subspace can be described as linear combinations of each other, assuming the number of vectors in the subspace is greater than the dimensionality of the subspace. 
+  Then once sparsity is enforced, for each $c_i$, its $j^{th}$ element $c_i^{(j)}$ is zero if $x_j$ belongs to a subspace that doesn't contain $x_i$, resulting in $B_{ij} = 0$. 
   Thus, for each $c_i$, $c_i^{(j)}$ is zero if $x_i$ and $x_j$ belong to different subspaces and may be nonzero if they do. 
   If \(X\) instead represents points near \(K\) subspaces with some noise, 
   then this property may only hold approximately and thus 
@@ -252,7 +252,7 @@ questions}\label{specific-comments-and-questions}}
   p11, line 31. ``\ldots{} SSC on the spectral embedding of \(A\)''.
   Could you support this assertion by references?\\
   \textcolor{blue}{
-  We have added, "... SSC on the rows of the spectral embedding of $A$, since they will still lie approximately on the $K$ subspaces \citep{rubindelanchy2017statistical}."
+  We have added, ``... SSC on the rows of the spectral embedding of $A$, since they will still lie approximately on the $K$ subspaces \citep{rubindelanchy2017statistical}.''
   }
 \item
   p12, line 13. It could help recall what the \(z_i, z_j\) are.\\
@@ -263,8 +263,8 @@ questions}\label{specific-comments-and-questions}}
   p14. Do you think that the OSC algorithm can retrieve other kinds of
   structure than assortative ones?\\
   \textcolor{blue}{
-  In response to this, we added a third simulation study with $\lambda_{kk} \sim Beta(1,2)$ and $\lambda_{kl} \sim Beta(2,1)$, resulting in an average within-community edge probability of $1/3$ and between-community edge probability of $2/3$. 
-  Results of this simulation study are very similar to that of the first two and consistent with the theoretical results.
+  We added a third simulation study with $\lambda_{kk} \sim Beta(1,2)$ and $\lambda_{kl} \sim Beta(2,1)$, resulting in an average within-community edge probability of $1/3$ and between-community edge probability of $2/3$. 
+  Results of this simulation study are very similar to that of the first two and consistent with the theory.
   }\\
   \textcolor{blue}{
   On a related note, it is our view that the distinction between assortative and disassortative is not very important for the PABM, at least when it is viewed as a type of GRDPG. 
@@ -283,7 +283,10 @@ questions}\label{specific-comments-and-questions}}
   For all other analyses (simulation and real data), we use misclassification error (whether rate or count). 
   }
 \item
-  Do you consider sparsity in the simulated adjacency matrices?
+  Do you consider sparsity in the simulated adjacency matrices?\\
+  \textcolor{blue}{
+  Sparsity was not considered in our analyses and algorithms.
+  }
 \item
   Why do you limit your simulation to assortative structure? Is it
   possible to see the results with a larger value of \(K\)? To what
@@ -423,7 +426,8 @@ I only have some minor comments and a couple of questions:
   Under ideal circumstances, we would be able to circumvent this issue altogether via the subspace detection property, but SDP does not necessarily guarantee a partitioning of the graph into exactly $K$ disjoint subgraphs but rather {\em at least} $K$ disjoint subgraphs, and in our simulations, we found that setting $\vartheta$ to the appropriate value to obtain SDP often results in greater than $K$ subgraphs, which is why we ended up choosing an ``incorrect'' $\vartheta$ for SSC and then performing the final clustering step.
   }\\
   \textcolor{blue}{
-  We also note that in our simulations, while SSC-ASE and SSC-A in the $K = 2$ case and MM-Louvain for all $K$ output labels such that the number of mislabeled vertices increases with $n$, the proportion of mislabeled vertices still decreases.
+  We also note that in our simulations, while SSC-ASE and SSC-A in the $K = 2$ case and MM-Louvain for all $K$ output estimated labels such that the number of mislabeled vertices increases with $n$, the proportion of mislabeled vertices still decreases. 
+  For instance, in section 4.1 for, the error count for SSC-ASE for $K = 2$ is around 20 when $n = 128$ and around 100 when $n = 4096$, resulting in an error rate of around $16\%$ for $n = 128$ and $2\%$ for $n = 4096$. 
   }
 \item
   In the application section, MM performs better than OSC and SSC-ASE,

@@ -544,7 +544,8 @@ Two inference objectives arise from the PABM:
 \end{enumerate}
 
 In our methods, the data that are observed for estimation is the adjacency matrix, $A \sim \PABM(\{\lambda^{(k \ell)}\}_K, \rho_n)$, along with an assumed number of communities, $K$. 
-To motivate some of the methods, we also consider community detection and parameter estimation in the case where we observe the edge probability matrix, $P$, noting that community memberships and popularity parameters are not immediately discernible from observing $P$. 
+To motivate our methods, we also consider community detection and parameter estimation in the case where we know the edge probability matrix, $P$, beforehand, noting that community memberships and popularity parameters are not immediately discernible from $P$ itself. 
+After establishing methods for community detection and parameter estimation from $P$, we use the consistency property of the ASE \citep{doi:10.1080/01621459.2012.699795,rubindelanchy2017statistical} to demonstrate that the same methods work for $A$ almost surely as $n \to \infty$.
 
 \hypertarget{related-work}{%
 \subsection{Previous Work}\label{related-work}}
@@ -568,11 +569,10 @@ The solutions are collected collected into matrix
 construct an affinity matrix \(B = |C| + |C^\top|\). If each \(x_i\) lies
 exactly on one of \(K\) subspaces, \(B\) describes an undirected graph
 consisting of {\em at least} \(K\) disjoint subgraphs, i.e., \(B_{ij} = 0\) if \(x_i, x_j\) lie on different subspaces. 
-The intuition here is that points that lie on the same subspace can be described as linear combinations of each other. 
-Thus, for each $c_i$, $c_i^{(j)}$ is zero if $x_i$ and $x_j$ belong to different subspaces and may be nonzero if they do. 
+The intuition here is that vectors that lie on the same subspace can be described as linear combinations of each other, assuming the number of vectors in the subspace is greater than the dimensionality of the subspace. 
+Then once sparsity is enforced, for each $c_i$, its $j^{th}$ element $c_i^{(j)}$ is zero if $x_j$ belongs to a subspace that doesn't contain $x_i$, resulting in $B_{ij} = 0$. 
 If \(X\) instead represents points near \(K\) subspaces with some noise, 
-then this property may only hold approximately and thus 
-a final graph partitioning step may be required 
+then this property may only hold approximately and thus a final graph partitioning step may be required 
 (e.g., edge thresholding or spectral clustering).
 
 In practice, due to presence of noise, SSC is often done by solving the LASSO problems
@@ -1220,10 +1220,11 @@ OSC, SSC-ASE, and SSC-A perform similarly on disassortative PABMs compared to th
 (Fig. \ref{fig:clust_k_disassortative} and \ref{fig:lambda_est_disassortative}).
 
 \begin{remark}
-While we call the models in this section ``disassortative'', it is our view that the assortative/disassortative distinction is not pertinent to PABMs. 
-When viewed as GRDPGs, SBMs and DCBMs are assortative if the edge probability matrix $P$ is positive semidefinite 
-and disassortative if $P$ has negative eigenvalues \citep{rubindelanchy2017statistical}. 
-For the full rank PABM with a fixed $K$, $P$ will always have $K (K + 1) / 2$ positive eigenvalues and $K (K - 1) / 2$ negative eigenvalues regardless of whether edge probabilities within groups is higher than edge probabilities between groups. 
+While we call the models in this section ``disassortative'', it is our view that the assortative/disassortative distinction is not applicable to PABMs due to its flexibility. 
+Unlike the SBM and DCBM, in the PABM, each vertex is free to have a higher affinity to its own community or to other communities, independent of each other. 
+In other words, within the same community, $v_i$ may have a larger popularity parameter to its own community whereas $v_j$ may have a larger popularity parameter to a different community. 
+Furthermore, when viewed as GRDPGs, the assortativity or disassortativity of SBMs and DCBMs affects whether $P$ is positive semidefinite, which affects ASE-based approaches to analyzing the graph \citep{rubindelanchy2017statistical}, 
+but in the full rank PABM, $P$ is never positive semidefinite and will always have $K (K + 1) / 2$ positive eigenvalues and $K (K - 1) / 2$ negative eigenvalues. 
 \end{remark}
 
 \begin{figure}[H]
