@@ -563,7 +563,7 @@ The SSC algorithm can be described as follows:
 Given \(X \in \mathbb{R}^{n \times d}\) with vectors
 \(x_i^\top \in \mathbb{R}^d\) as rows of \(X\), the optimization problem
 \(c_i = \argmin_{c} \|c\|_1\) subject to \(x_i = X^\top c\) and
-\(c^{(i)} = 0\), where $c^{(i)}$ is the $i^{th}$ entry of $c$, is solved for each \(i = [n]\). 
+\(c^{(i)} = 0\), where $c^{(i)}$ is the $i^{th}$ entry of $c$, is solved for each \(i \in [n]\). 
 The solutions are collected collected into matrix
 \(C = \bigl[ c_1 \mid \cdots \mid c_n \bigr]^\top\) to
 construct an affinity matrix \(B = |C| + |C^\top|\). If each \(x_i\) lies
