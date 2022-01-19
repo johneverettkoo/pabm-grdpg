@@ -44,7 +44,7 @@ The interest of this paper is to provide new perspectives on PABM (theoretical a
 
 \textcolor{blue}{
 We thank the referee for the feedback. 
-The concerns addressed here are answered in the following section. 
+The concerns addressed here are answered below. 
 In particular, we make sure to address the concerns about the simulation studies. 
 }
 
@@ -71,7 +71,8 @@ We added $[n] = \{1, 2, ..., n\}$.
 \textcolor{blue}{
 The range of $(i, j)$ is now included in the definition. 
 In regard to the probability distribution on the labels $z_1, ..., z_n$, none of our theorems use this, although some do require that each $n_k$ be sufficiently large, so it did not factor into our definitions and analyses. 
-One thing that was discussed was the possibility of a Bayesian analysis of the PABM, and we have some results using Variational Inference and Mean Field Approximation, but we believe that this is a topic for another paper. 
+More specifically, the convergence rate of Theorem 5 depends on each $n_k$, and for convergence, we require that $n_k \to \infty$. 
+While none of the theorems explicitly require this, in practice, we also require that each $n_k$ is large enough for the latent vectors in the $k^th$ community to span its subspace. 
 }
 
 5. p4. line 50. Instead of "increasing values of the community assignments", you could write "reorganized by community memberships".  
