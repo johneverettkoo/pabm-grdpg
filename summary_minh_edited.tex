@@ -572,7 +572,7 @@ consisting of {\em at least} \(K\) disjoint subgraphs, i.e., \(B_{ij} = 0\) if \
 The intuition here is that vectors that lie on the same subspace can be described as linear combinations of each other, assuming the number of vectors in the subspace is greater than the dimensionality of the subspace. 
 Then once sparsity is enforced, for each $c_i$, its $j^{th}$ element $c_i^{(j)}$ is zero if $x_j$ belongs to a subspace that doesn't contain $x_i$, resulting in $B_{ij} = 0$. 
 If \(X\) instead represents points near \(K\) subspaces with some noise, 
-then this property may only hold approximately and thus a final graph partitioning step may be required 
+then this property may only hold approximately and a final graph partitioning step may be required 
 (e.g., edge thresholding or spectral clustering).
 
 In practice, due to presence of noise, SSC is often done by solving the LASSO problems
