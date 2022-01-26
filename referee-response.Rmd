@@ -163,7 +163,12 @@ a final graph partitioning step may be required
 
 14. p11, line 31. "... SSC on the spectral embedding of $A$". Could you support this assertion by references?  
 \textcolor{blue}{
-We have added, ``... SSC on the rows of the spectral embedding of $A$, since they will still lie approximately on the $K$ subspaces \citep{rubindelanchy2017statistical}.''
+There are no references for this, as it is a novel idea. 
+SSC has been proposed for community detection for the PABM but for the rows of $A$ rather than the ASE of $A$ \citep{noroozi2019estimation}. 
+The motivation for our implementation is from Theorem 1, which says that the PABM is a GRDPG for which the latent positions are comprised of subspaces. 
+}  
+\textcolor{blue}{
+We have added, ``... SSC on the rows of the spectral embedding of $A$, since the embedding of $P$ consists of $K$ subspaces (Theorem 1), and so the embedding of $A$ will lie approximately on the $K$ subspaces \citep{rubindelanchy2017statistical}.''
 }
 
 15. p12, line 13. It could help recall what the $z_i, z_j$ are.  
