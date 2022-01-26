@@ -168,7 +168,7 @@ SSC has been proposed for community detection for the PABM but for the rows of $
 The motivation for our implementation is from Theorem 1, which says that the PABM is a GRDPG for which the latent positions are comprised of subspaces. 
 }  
 \textcolor{blue}{
-We have added, ``... SSC on the rows of the spectral embedding of $A$, since the embedding of $P$ consists of $K$ subspaces (Theorem 1), and so the embedding of $A$ will lie approximately on the $K$ subspaces \citep{rubindelanchy2017statistical}.''
+We have added, ``... SSC on the rows of the spectral embedding of $A$, since the embedding of $P$ consists of $K$ subspaces (Theorem 1), and so the embedding of $A$ will lie approximately on the $K$ subspaces.''
 }
 
 15. p12, line 13. It could help recall what the $z_i, z_j$ are.  
