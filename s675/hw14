@@ -1,0 +1,76 @@
+STT-S 475/675, Fall 2021
+
+Due Friday, December 10
+
+
+In the R script provided is a function that generates P for an SBM with K = 2. 
+Here is an example for creating P with n1 = n2 = 20, 
+within-community edge probability for community 1 = 0.2, 
+within-community edge probability for community 2 = 0.2, 
+and between-community edge probability = 0.1:
+
+p11 <- .2
+p12 <- .1
+p22 <- .2
+
+n1 <- 20
+n2 <- 20
+
+Pz <- sbm.edge.prob.matrix(n1, n2, p11, p22, p12)
+P <- Pz$P  # edge probability matrix
+z <- Pz$z  # labels
+
+There is also a function for sampling A from P:
+
+A <- draw.graph(P)
+
+You can visualize this A using the qgraph package 
+(this will be slow for large graphs):
+
+qgraph::qgraph(A)
+qgraph::qgraph(A, groups = factor(z))
+
+There is also a function for adjacency spectral embedding. 
+Keep in mind the correct values of p and q here. 
+Since this is an assortative SBM with K = 2, p = 2 and q = 0. 
+If we had a disassortative SBM with K = 2, then p = 1 and q = 1. 
+If you are not sure what to use here, take a look at the eigenvalues of P. 
+
+Xhat <- ase(A, p = 2, q = 0)
+plot(Xhat, col = z, asp = 1)
+
+We know that the ASE of an SBM consists of points aggregated around K points 
+(in this case, K = 2), and these points represent the communities. 
+So a plausible clustering method on the ASE of an SBM is K-means with K = 2.
+
+kmeans.out <- kmeans(Xhat, 2)
+
+The kmeans function in R returns both the cluster labels and the cluster centers. 
+Use the cluster labels to calculate the accuracy of our ASE + K-means algorithm:
+
+compute.error(kmeans.out$cluster, z)
+
+And use the cluster centers to compute the within and between community edge probabilities:
+
+theta.hat <- estimate.sbm.probs.from.kmeans(kmeans.out)
+
+And compute the squared error of the parameters:
+
+sum((p11 - theta.hat$p11) ^ 2 + (p12 - theta.hat$p12) ^ 2 + (p22 - theta.hat$p22) ^ 2)
+
+Your task: Use the R functions provided and the example code above 
+to construct SBM edge probability matrices with the following:
+
+p11 = p22 = 0.2
+p12 = 0.1
+
+n1 = n2 = 20, 40, 60, 80, 100
+
+Then for each of the 5 edge probability matrices, P:
+
+1. Sample A from P
+2. Apply ASE + K-means
+3. Compute the classification error for the labels
+4. Compute the squared error for the parameters. 
+
+Plot and describe your results. 

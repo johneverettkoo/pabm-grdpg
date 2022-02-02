@@ -1,0 +1,223 @@
+---
+output: 
+  beamer_presentation:
+    fig_crop: no
+    theme: 'default'
+    colortheme: 'beaver'
+    includes:
+      in_header: 
+        - page_headers.tex
+header-includes:
+- \usepackage{setspace}
+- \usepackage{float}
+- \usepackage{mathtools}
+- \usepackage{natbib}
+- \usepackage[linesnumbered,ruled,vlined]{algorithm2e} 
+- \setcitestyle{numbers,square,comma}
+- \usepackage{verbatim}
+- \usepackage{amsthm}
+- \usepackage{comment}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, 
+                      comment = NA, 
+                      warning = FALSE, 
+                      message = FALSE,
+                      fig.align = 'center',
+                      fig.lp = '')
+options(xtable.comment = FALSE, 
+        xtable.table.placement = 'H')
+library(ggplot2)
+import::from(magrittr, `%>%`)
+theme_set(theme_bw())
+
+set.seed(314159)
+source('~/dev/pabm-grdpg/functions.R')
+```
+
+## {.plain}
+
+\center
+
+\LARGE
+
+\textcolor{darkred}{Generative Models for Graphs}
+
+\normalsize
+
+STAT-S 675
+
+Fall 2021
+
+# Introduction
+
+\newcommand{\diag}{\text{diag}}
+\newcommand{\tr}{\text{Tr}}
+\newcommand{\blockdiag}{\text{blockdiag}}
+\newcommand{\indep}{\stackrel{\text{ind}}{\sim}}
+\newcommand{\iid}{\stackrel{\text{iid}}{\sim}}
+\newcommand{\Bernoulli}{\text{Bernoulli}}
+\newcommand{\Betadist}{\text{Beta}}
+\newcommand{\BG}{\text{BernoulliGraph}}
+\newcommand{\Cat}{\text{Categorical}}
+\newcommand{\Uniform}{\text{Uniform}}
+\newcommand{\RDPG}{\text{RDPG}}
+\newcommand{\GRDPG}{\text{GRDPG}}
+\newcommand{\PABM}{\text{PABM}}
+
+* Let $G = (V, E)$ be an undirected and hollow graph with $|V| = n$ 
+and adjacency matrix $A$
+  * $A \in \mathbb{R}^{n \times n}$ is symmetric with zero diagonals
+* Suppose $G \sim F(\theta)$
+  * What kind of $F(\theta)$ make sense here?
+  * Given $F$ and observed $G$, how can we estimate $\theta$?
+
+# Bernoulli Graphs
+
+<style type="text/css">
+.caption {
+    font-size: x-small;
+}
+</style>
+
+::: columns
+
+:::: {.column width=55%}
+
+$A_{ij} = \begin{cases} 
+1 & \exists \text{ edge between } i \text{ and } j \\
+0 & \text{else}
+\end{cases}$
+
+$A_{ji} = A_{ij}$ and $A_{ii} = 0$ $\forall i, j \in [n]$.
+
+\vspace*{1\baselineskip}
+
+$A \sim \BG(P)$ iff:
+
+1. $P \in [0, 1]^{n \times n}$ describes edge probabilities between pairs of 
+vertices.
+2. $A_{ij} \indep \Bernoulli(P_{ij})$ for each $i < j$.
+
+For estimation, we need to impose some structure on $P$.
+
+::::
+
+:::: {.column width=45%}
+
+**Example 1**: If every entry $P_{ij} = \theta \in (0, 1)$, 
+then $A \sim \BG(P)$ is an Erdos-Renyi graph.  
+For this model, $A_{ij} \iid \Bernoulli(\theta)$.
+
+```{r, fig.height = 2, fig.width = 2}
+n <- 2 ** 5
+p <- 1 / 5
+P <- matrix(p, nrow = n, ncol = n)
+A <- draw.graph(P)
+qgraph::qgraph(A, vsize = 4)
+```
+
+::::
+
+:::
+
+# Block Models
+
+Suppose each vertex $v_1, ..., v_n$ has hidden labels $z_1, ..., z_n \in [K]$,  
+and each $P_{ij}$ depends on labels $z_i$ and $z_j$.  
+Then $A \sim \BG(P)$ is a *block model*.
+
+**Example 2**: Stochastic Block Model with two communities
+
+::: columns
+
+:::: column
+
+* $z_1, ..., z_n \in \{1, 2\}$
+* $P_{ij} = \begin{cases} 
+p & z_i = z_j = 1 \\
+q & z_i = z_j = 2 \\
+r & z_i \neq z_j
+\end{cases}$
+
+* To make this an assortative SBM, set $p q > r^2$.
+* In this example, $p = 1/2$, $q = 1/4$, and $r = 1/8$.
+
+::::
+
+:::: column
+
+```{r, fig.height = 3, fig.width = 4, out.width = '100%'}
+n1 <- 2 ** 5
+n2 <- 2 ** 5
+n <- n1 + n2
+z <- c(rep(1, n1), rep(2, n2))
+p <- 1/2
+q <- 1/4
+r <- 1/8
+P <- matrix(r, nrow = n, ncol = n)
+P[seq(n1), seq(n1)] <- p
+P[seq(n1 + 1, n), seq(n1 + 1, n)] <- q
+A <- draw.graph(P)
+qgraph::qgraph(A, vsize = 4, groups = factor(z), legend = FALSE)
+```
+
+::::
+
+:::
+
+# Block Models
+
+Erdos-Renyi Model (1959)
+
+* $P_{ij} = \theta$ (not a block model)
+* 1 parameter $\theta$
+
+Stochastic Block Model (Lorrain and White, 1971)
+
+* $P_{ij} = \theta_{z_i z_j}$
+* $K (K + 1) / 2$ parameters $\theta_{kl}$
+
+Degree Corrected Block Model (Karrer and Newman, 2011)
+
+* $P_{ij} = \theta_{z_i z_j} \omega_i \omega_j$
+* $K (K + 1) / 2 + n$ parameters $\theta_{kl}$, $\omega_i$
+
+Popularity Adjusted Block Model (Sengupta and Chen, 2017)
+
+* $P_{ij} = \lambda_{i z_j} \lambda_{j z_i}$
+* $K n$ parameters $\lambda_{ik}$
+
+# Maximum Likelihood Estimation
+
+$$L(P) = \prod_{i < j} P_{ij}^{A_{ij}} (1 - P_{ij})^{1 - A_{ij}}$$
+
+* Erdos-Renyi: $L(\theta) = \prod_{i < j} \theta^{A_{ij}} (1 - \theta)^{1 - A_{ij}}$  
+$\implies \hat{\theta} = \frac{\sum_{i < j} A_{ij}}{n (n - 1) / 2}$
+
+* SBM: $L(\vec{z}, \{\theta_{kl}\}) = \prod_{i < j} \prod_{k, l}^K \theta_{kl}^{A_{ij} z_{ik} z_{jl}} (1 - \theta_{kl})^{(1 - A_{ij}) z_{ik} z_{jl}}$  
+Computing MLEs for $\vec{z}$ and $\{\theta_{kl}\}$ is NP-hard
+
+* DCBM, PABM ...
+
+# Expectation Maximization for SBM
+
+$$\ell(\vec{z}, \{\theta_{kl}\}) = \sum_{i,j} \sum_{k, l}^K A_{ij} z_{ik} z_{jl} \log \theta_{kl} + (1 - A_{ij}) z_{ik} z_{jl} \log (1 - \theta_{kl})$$
+
+* Mean field approximation: Assume the labels $z_{ik}$ are independent  
+
+* E-step: 
+$E[z_{ik}] = \pi_{ik}$ 
+$\propto \exp \big(\sum_{j \neq i} \sum_l \pi_{jl} (A_{ij} \log \theta_{kl} + (1 - A_{ij}) \log (1 - \theta_{kl})) \big)$
+
+* M-step: 
+$\hat{\theta}_{kl} = \frac{\sum_{i < j} A_{ij} \pi_{ik} \pi_{jl}}{\sum_{i < j} \pi_{ik} \pi_{jl}}$
+
+* Similar types of approaches for DCBM and PABM
+
+* Mean field approximation may or may not be correct
+
+# Implementation
+
+* Demo
