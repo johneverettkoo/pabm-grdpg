@@ -309,7 +309,10 @@ Let $p \geq 1$ and $q \geq 0$ be integers. Define $I_{p,q}$ as the
 block diagonal matrix $I_{p,q} = \Bigl[\begin{smallmatrix} I_{p} & 0
   \\ 0 & - I_{q} \end{smallmatrix} \Bigr]$ where $I_{p}$ and $I_{q}$
 are the identity matrices of dimensions $p \times p$ and $q \times q$
-respectively. Next define $\mathcal{X} = \{x, y \in \mathbb{R}^d : x^\top I_{p,q} y \in [0, 1]\}$ where $d = p + q$. 
+respectively. Denote $d = p + q$ and let $\mathcal{X}$ be a subset of $\mathbb{R}^d$ such
+that, for any $x \in \mathcal{X}$ and $y \in \mathcal{X}$, we have
+$x^{\top} I_{p,q} y \in [0,1]$. 
+% Next define $\mathcal{X} = \{x, y \in \mathbb{R}^d : x^\top I_{p,q} y \in [0, 1]\}$ where $d = p + q$. 
 Let $X = \bigl[x_1 \mid \cdots \mid x_n\bigr]^{\top}$ be
 a $n \times d$ matrix with rows $x_i \in \mathcal{X}$. A graph $G$
 with adjacency matrix $A$ is said to be a generalized random dot
@@ -318,27 +321,16 @@ product graph with latent positions $X$, sparsity parameter $\rho_n
 and signature $(p,q)$ if $A \sim \BG(P)$ where the edge probability
 matrix $P$ is given
 by $P = \rho_n X I_{p,q} X^{\top}$, i.e., the entries of $P$ are of
-the form
-
-$$P_{ij} = \rho_n x_i^{\top} I_{p,q} x_j.$$
-
+the form $P_{ij} = \rho_n x_i^{\top} I_{p,q} x_j.$
 \end{definition}
 We will use the notation \(A \sim \GRDPG_{p,q}(X;\rho_n)\) to denote a random
 adjacency matrix \(A\) drawn from latent positions \(X\), sparsity
 parameter $\rho_n$ and signature
 \((p, q)\). 
 
-\begin{remark}
-  \label{rem:ase}
-We can use Adjacency Spectral Embedding (ASE) 
-\citep{doi:10.1080/01621459.2012.699795} to recover the latent vectors of a GRDPG. 
-This procedure consists of taking the spectral decomposition of $A$ 
-(or $P$ if available) and choosing the $p$ most positive and $q$ most negative
-eigenvalues, $D = \diag(\lambda_1, ..., \lambda_p, \lambda_{n - q + 1}, ..., \lambda_n)$, and their corresponding eigenvectors, $V \in \mathbb{R}^{n \times (p + q)}$,
-to construct the embedding $\hat{Z} = V |D|^{1/2}$. 
-\end{remark}
 
 \begin{definition}[Indefinite Orthogonal Group]
+  \label{def:indefinite}
 The indefinite orthogonal group with signature $(p, q)$ is
 the set $\{Q \in \mathbb{R}^{d \times d} \colon Q I_{p, q} Q^{\top} = I_{p, q}\}$,
 denoted as $\mathbb{O}(p, q)$. Here $d = p + q$. 
@@ -351,10 +343,41 @@ The latent vectors that produce $X I_{p,q} X^\top = P$ are not unique
 More specifically, if $P_{ij} = x_i^\top I_{p, q} x_j$, 
 then we also have for any $Q \in \mathbb{O}(p, q)$ that
 $(Q x_i)^\top I_{p, q} (Q x_j) = x_i^\top (Q^\top I_{p, q} Q) x_j =
-x_i^\top I_{p, q} x_j = P_{ij}$.
-Unlike in the RDPG case, transforming the latent positions via multiplication
+x_i^\top I_{p, q} x_j = P_{ij}$. Unlike in the RDPG case, transforming the latent positions via multiplication
 by $Q \in \mathbb{O}(p, q)$ does not necessarily maintain interpoint angles or
 distances.
+\end{remark}
+
+\begin{remark}
+  \label{rem:ase}
+We can use Adjacency Spectral Embedding (ASE) 
+\citep{doi:10.1080/01621459.2012.699795} to recover the latent vectors of a GRDPG. 
+This procedure consists of taking the spectral decomposition of $A$
+and keeping the $p + q$ largest eigenvalues (in modulus) and
+corresponding eigenvectors of $A$. More specifically, let $A$ be an $n
+\times n$ adjacency matrix and denote the
+eigendecomposition of $A$ as
+$$A = \sum_{i} \hat{\lambda}_i \hat{v}_i \hat{v}_i^{\top}, \quad
+\text{where} \,\,
+|\hat{\lambda}|_1 \geq |\hat{\lambda}_2| \geq \dots \geq
+|\hat{\lambda}_n|.$$
+Now let $\hat{D}$ be a diagonal matrix whose diagonal entries are
+the eigenvalues
+$\{\hat{\lambda}_i\}_{i=1}^{d}$ arranged in decreasing values (not in
+decreasing modulus). Let $\hat{V}$ be the $n \times d$ matrix whose
+columns are the corresponding eigenvectors $\{\hat{v}_i\}_{i=1}^{d}$
+arranged in the same order as the diagonal entries of $\hat{D}$. Now
+define $\hat{Z} = \hat{V} |\hat{D}|^{1/2}$ where the $|\cdot|$
+operation is applied elementwise to the entries of $\hat{D}$. Then
+$\hat{Z}$ serves as an estimate of $X$, up to some non-identifiable
+orthogonal transformation $Q$ as described in
+Definition~\ref{def:indefinite} and
+Remark~\ref{rem:non_identifiable}. 
+% choosing the $p$ most positive and $q$ most negative
+% eigenvalues, $D = \diag(\lambda_1, ..., \lambda_p, \lambda_{n - q +
+%   1}, ..., \lambda_n)$, and their corresponding eigenvectors, $\hat{V}
+% \in \mathbb{R}^{n \times (p + q)}$, to construct the embedding
+%$\hat{Z} = V |D|^{1/2}$. More specifically, 
 \end{remark}
 
 \hypertarget{connecting-the-pabm-to-the-grdpg}{%
