@@ -41,7 +41,7 @@ clustering.df <- foreach(rho = rho.vec, .combine = dplyr::bind_rows) %do% {
     clustering.ssc.A <- ssc2(A, K, sparsity, 
                              normalize = TRUE, parallel = FALSE)
     error.ssc.A <- 1 - cluster.acc(clustering.ssc.A, z)
-    out.df <- dplyr::tibble(K = K, n = n,
+    out.df <- dplyr::tibble(K = K, n = n, rho = rho, 
                             error.osc = error.osc,
                             error.ssc.ase = error.ssc,
                             error.louvain = error.louvain,
@@ -57,7 +57,7 @@ gc()
 readr::write_csv(clustering.df, 'clustering-sparsity.csv')
 
 clustering.df %>%
-  dplyr::group_by(n, K) %>%
+  dplyr::group_by(rho) %>%
   dplyr::summarise(
     med.err = median(error.osc),
     first.q = quantile(error.osc, .25),
@@ -79,29 +79,29 @@ clustering.df %>%
   scale_x_log10(breaks = c(128, 256, 512, 1024, 2048, 4096)) +
   labs(y = 'community detection error count', 
        colour = NULL, shape = NULL) +
-  geom_line(aes(x = n, y = med.err * n,
+  geom_line(aes(x = rho, y = med.err * n,
                 colour = 'OSC')) +
-  geom_point(aes(x = n, y = med.err * n,
+  geom_point(aes(x = rho, y = med.err * n,
                  colour = 'OSC', shape = 'OSC')) +
-  geom_errorbar(aes(x = n, ymin = first.q * n, ymax = third.q * n,
+  geom_errorbar(aes(x = rho, ymin = first.q * n, ymax = third.q * n,
                     colour = 'OSC'), width = .1) + 
-  geom_line(aes(x = n, y = med.err.ssc * n,
+  geom_line(aes(x = rho, y = med.err.ssc * n,
                 colour = 'SSC-ASE')) +
-  geom_point(aes(x = n, y = med.err.ssc * n,
+  geom_point(aes(x = rho, y = med.err.ssc * n,
                  colour = 'SSC-ASE', shape = 'SSC-ASE')) +
-  geom_errorbar(aes(x = n, ymin = first.q.ssc * n, ymax = third.q.ssc * n,
+  geom_errorbar(aes(x = rho, ymin = first.q.ssc * n, ymax = third.q.ssc * n,
                     colour = 'SSC-ASE'), width = .1) +
-  geom_line(aes(x = n, y = med.err.ssc.A * n,
+  geom_line(aes(x = rho, y = med.err.ssc.A * n,
                 colour = 'SSC-A')) +
-  geom_point(aes(x = n, y = med.err.ssc.A * n,
+  geom_point(aes(x = rho, y = med.err.ssc.A * n,
                  colour = 'SSC-A', shape = 'SSC-A')) +
-  geom_errorbar(aes(x = n, ymin = first.q.ssc.A * n, ymax = third.q.ssc.A * n,
+  geom_errorbar(aes(x = rho, ymin = first.q.ssc.A * n, ymax = third.q.ssc.A * n,
                     colour = 'SSC-A'), width = .1) +
-  geom_line(aes(x = n, y = med.err.louvain * n,
+  geom_line(aes(x = rho, y = med.err.louvain * n,
                 colour = 'MM-Louvain')) + 
-  geom_point(aes(x = n, y = med.err.louvain * n,
+  geom_point(aes(x = rho, y = med.err.louvain * n,
                  colour = 'MM-Louvain', shape = 'MM-Louvain')) + 
-  geom_errorbar(aes(x = n, ymin = first.q.louvain * n, ymax = third.q.louvain * n,
+  geom_errorbar(aes(x = rho, ymin = first.q.louvain * n, ymax = third.q.louvain * n,
                     colour = 'MM-Louvain'), width = .1) + 
   scale_colour_brewer(palette = 'Set1') + 
   facet_wrap(~ K, labeller = 'label_both')
