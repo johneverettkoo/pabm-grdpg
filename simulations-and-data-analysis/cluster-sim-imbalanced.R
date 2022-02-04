@@ -2,7 +2,7 @@
 # compares OSC, SSC-ASE, SSC-A, and Louvain (stand-in for MM)
 # simulations are for imbalanced community sizes
 # configuration as-is parallelizes simulations across 10 threads
-# which uses ~20 GB memory at its peak
+# which uses ~32 GB memory at its peak
 # modify line 29 to increase/decrease parallelization (and memory use)
 
 # packages, functions, etc.
@@ -26,7 +26,7 @@ n.vec <- rev(n.vec)
 K.vec <- rev(K.vec)
 set.seed(314159)
 
-doMC::registerDoMC(10)
+doMC::registerDoMC(16)
 
 # clustering simulation
 clustering.df <- foreach(K = K.vec, .combine = dplyr::bind_rows) %do% {
@@ -40,7 +40,8 @@ clustering.df <- foreach(K = K.vec, .combine = dplyr::bind_rows) %do% {
       A <- draw.graph(P)
       clustering.osc <- cluster.pabm(A, K, use.all = TRUE, normalize = FALSE)
       error.osc <- 1 - cluster.acc(clustering.osc, z, reorder.mat)
-      clustering.ssc <- ssc(A, K, K / n, normalize = TRUE, scale = FALSE)
+      clustering.ssc <- ssc(A, K, sparsity, normalize = TRUE, scale = FALSE,
+                            offset = 1, d = K - 1)
       error.ssc <- 1 - cluster.acc(clustering.ssc, z, reorder.mat)
       clustering.louvain <- mod.max(A)
       error.louvain <- 1 - cluster.acc(clustering.louvain, z)
@@ -52,7 +53,7 @@ clustering.df <- foreach(K = K.vec, .combine = dplyr::bind_rows) %do% {
                            error.ssc.ase = error.ssc,
                            error.louvain = error.louvain,
                            error.ssc.A = error.ssc.A)
-      gc()
+      # gc()
       return(out)
     } %>% 
       return()
@@ -63,7 +64,7 @@ clustering.df <- foreach(K = K.vec, .combine = dplyr::bind_rows) %do% {
 
 gc()
 
-readr::write_csv(clustering.df, 'clustering-k-imbalanced.csv')
+# readr::write_csv(clustering.df, 'clustering-k-imbalanced.csv')
 
 clustering.df %>%
   dplyr::group_by(n, K) %>%
@@ -85,32 +86,41 @@ clustering.df %>%
   ggplot() +
   theme_bw() + 
   theme(text = element_text(size = 10)) + 
-  scale_x_log10(breaks = c(128, 256, 512, 1024, 2048, 4096)) +
-  labs(y = 'community detection error count', 
+  scale_x_log10(breaks = c(128, 256, 512, 1024, 2048, 4096),
+                labels = c(expression(2^7), 
+                           expression(2^8), 
+                           expression(2^9), 
+                           expression(2^10), 
+                           expression(2^11), 
+                           expression(2^12))) +
+  theme(text = element_text(size = 20),
+        legend.position = 'bottom') + 
+  scale_y_log10() + 
+  labs(y = 'error count', 
        colour = NULL, shape = NULL) +
   geom_line(aes(x = n, y = med.err * n,
                 colour = 'OSC')) +
   geom_point(aes(x = n, y = med.err * n,
-                 colour = 'OSC', shape = 'OSC')) +
+                 colour = 'OSC', shape = 'OSC'), size = 3) +
   geom_errorbar(aes(x = n, ymin = first.q * n, ymax = third.q * n,
                     colour = 'OSC'), width = .1) + 
   geom_line(aes(x = n, y = med.err.ssc * n,
                 colour = 'SSC-ASE')) +
   geom_point(aes(x = n, y = med.err.ssc * n,
-                 colour = 'SSC-ASE', shape = 'SSC-ASE')) +
+                 colour = 'SSC-ASE', shape = 'SSC-ASE'), size = 3) +
   geom_errorbar(aes(x = n, ymin = first.q.ssc * n, ymax = third.q.ssc * n,
                     colour = 'SSC-ASE'), width = .1) +
   geom_line(aes(x = n, y = med.err.ssc.A * n,
                 colour = 'SSC-A')) +
   geom_point(aes(x = n, y = med.err.ssc.A * n,
-                 colour = 'SSC-A', shape = 'SSC-A')) +
+                 colour = 'SSC-A', shape = 'SSC-A'), size = 3) +
   geom_errorbar(aes(x = n, ymin = first.q.ssc.A * n, ymax = third.q.ssc.A * n,
                     colour = 'SSC-A'), width = .1) +
   geom_line(aes(x = n, y = med.err.louvain * n,
-                colour = 'MM-Louvain')) + 
+                colour = 'MM-Louvain')) +
   geom_point(aes(x = n, y = med.err.louvain * n,
-                 colour = 'MM-Louvain', shape = 'MM-Louvain')) + 
+                 colour = 'MM-Louvain', shape = 'MM-Louvain'), size = 3) +
   geom_errorbar(aes(x = n, ymin = first.q.louvain * n, ymax = third.q.louvain * n,
-                    colour = 'MM-Louvain'), width = .1) + 
+                    colour = 'MM-Louvain'), width = .1) +
   scale_colour_brewer(palette = 'Set1') + 
   facet_wrap(~ K, labeller = 'label_both')
