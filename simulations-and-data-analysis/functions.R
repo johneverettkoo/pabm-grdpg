@@ -239,7 +239,7 @@ ssc2 <- function(A,
   return(clustering)
 }
 
-lambda.rmse <- function(P, A, clustering) {
+lambda.rmse <- function(P, A, clustering, rho = 1) {
   K <- max(clustering)
   n <- nrow(A)
   n.vector <- sapply(seq(K), function(k) sum(clustering == k))
@@ -271,6 +271,7 @@ lambda.rmse <- function(P, A, clustering) {
     # magrittr::divide_by(n * K) %>% 
     magrittr::divide_by(n ** 2) %>% 
     sqrt() %>%
+    magrittr::divide_by(rho) %>% 
     return()
 }
 
@@ -292,7 +293,7 @@ estimate.lambda.block <- function(P.block, within = FALSE) {
   }
 }
 
-lambda.rmse.mle <- function(P, A, z) {
+lambda.rmse.mle <- function(P, A, z, rho = 1) {
   K <- max(z)
   n <- nrow(A)
   n.vector <- sapply(seq(K), function(k) sum(z == k))
@@ -339,6 +340,7 @@ lambda.rmse.mle <- function(P, A, z) {
     # magrittr::divide_by(n * K) %>% 
     magrittr::divide_by(n ** 2) %>% 
     sqrt() %>%
+    magrittr::divide_by(rho) %>% 
     return()
 }
 
