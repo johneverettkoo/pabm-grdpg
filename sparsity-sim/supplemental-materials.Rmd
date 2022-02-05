@@ -1,0 +1,178 @@
+---
+title: Supplemental Materials for "Popularity Adjusted Block Models are Generalized Random Dot Product Graphs"
+authors: John Koo, Minh Tang, Michael Trosset
+# author: John Koo
+# author2: Minh Tang
+# author3: Michael Trosset
+output:
+  pdf_document:
+    keep_tex: true
+    citation_package: natbib
+    number_sections: yes
+# output:
+#   bookdown::pdf_document2:
+#     citation_package: natbib
+#     number_citations: yes
+# output: html_document
+# output: rticles::rss_article
+fontsize: 12pt
+# geometry: "left=1in,right=1in,top=1in,bottom=1in"
+urlcolor: blue
+header-includes:
+- \usepackage{float}
+- \usepackage{mathtools}
+- \usepackage{natbib}
+- \usepackage[linesnumbered,ruled,vlined]{algorithm2e} 
+- \setcitestyle{numbers,square,comma}
+- \usepackage{verbatim}
+- \usepackage{amsthm}
+- \usepackage{comment}
+bibliography: misc.bib
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = FALSE, 
+                      # eval = FALSE,
+                      comment = NA, 
+                      warning = FALSE, 
+                      message = FALSE, 
+                      fig.pos = 'H', 
+                      fig.align = 'center', 
+                      fig.height = 3, 
+                      fig.width = 5, 
+                      fig.dpi = 300)
+
+options(xtable.comment = FALSE, 
+        xtable.table.placement = 'H')
+```
+
+```{r}
+import::from(magrittr, `%>%`)
+library(ggplot2)
+
+theme_set(theme_bw())
+```
+
+\newcommand{\diag}{\mathrm{diag}}
+\newcommand{\tr}{\mathrm{Tr}}
+\newcommand{\blockdiag}{\mathrm{blockdiag}}
+\newcommand{\indep}{\stackrel{\mathrm{ind}}{\sim}}
+\newcommand{\iid}{\stackrel{\mathrm{iid}}{\sim}}
+\newcommand{\Bernoulli}{\mathrm{Bernoulli}}
+\newcommand{\Betadist}{\mathrm{Beta}}
+\newcommand{\BG}{\mathrm{BernoulliGraph}}
+\newcommand{\PABM}{\mathrm{PABM}}
+\newcommand{\RDPG}{\mathrm{RDPG}}
+\newcommand{\GRDPG}{\mathrm{GRDPG}}
+\newcommand{\Multinomial}{\mathrm{Multinomial}}
+
+# Sparsity Simulation Study
+
+In this simulation study, we use the same setup as in the simulations for balanced communities but with fixed $K = 3$ and $n = 2^{11}$ and vary the sparsity parameter $\rho \in (0, 1]$ (this was fixed at $\rho_n = 1$ for the previous simulations. 
+More specifically, 
+
+* Number of vertices $n = 2048$
+* Number of underlying communities $K = 3$
+* Sparsity parameter $\rho_n = 0.1, 0.3, 0.5, 0.7, 0.9$
+* Mixture parameters $\alpha_k = 1 / K$ for $k = 1, ..., K$ (i.e., each community label has an equal probability of being drawn)
+* Community labels $z_k \iid \Multinomial(\alpha_1, ..., \alpha_K)$
+* Within-group popularities $\lambda^{(kk)} \iid \Betadist(2, 1)$
+* Between-group popularities $\lambda^{(k \ell)} \iid \Betadist(1, 2)$ for $k \neq \ell$
+
+Fifty simulations were performed for each combination of $n$ and $K$. 
+The results for community detection and parameter estimation error are shown in Fig. \ref{fig:sparsity_sim}. 
+Community detection error is defined as the number of misclustered vertices. 
+Parameter estimation error is defined as $\frac{1}{n} \|P - \hat{P}\|_F$ where 
+$\hat{P}$ is the estimated edge probability matrix.
+
+```{r sparsity_sim, fig.cap = 'Community detection error counts (left) and popularity parameter RMSEs (right) for $n = 2048$ and $K = 3$ and varying $\\rho_n$. Simulations were repeated 50 times for each $\\rho_n$.', fig.width = 13, fig.height = 5, out.width = '100%'}
+clustering.df <- readr::read_csv('../clustering-sparsity.csv')
+
+clustering.plot <- clustering.df %>%
+  dplyr::group_by(n, K, rho) %>%
+  dplyr::summarise(
+    med.err = median(error.osc),
+    first.q = quantile(error.osc, .25),
+    third.q = quantile(error.osc, .75),
+    med.err.ssc = median(error.ssc.ase),
+    first.q.ssc = quantile(error.ssc.ase, .25),
+    third.q.ssc = quantile(error.ssc.ase, .75),
+    med.err.louvain = median(error.louvain),
+    first.q.louvain = quantile(error.louvain, .25),
+    third.q.louvain = quantile(error.louvain, .75),
+    med.err.ssc.A = median(error.ssc.A),
+    first.q.ssc.A = quantile(error.ssc.A, .25),
+    third.q.ssc.A = quantile(error.ssc.A, .75)
+  ) %>% 
+  dplyr::ungroup() %>% 
+  ggplot() +
+  theme_bw() + 
+  theme(text = element_text(size = 20),
+        legend.position = 'bottom') + 
+  scale_x_continuous(breaks = c(0.1, 0.3, 0.5, 0.7, 0.9)) +
+  scale_y_log10() +
+  labs(y = 'error count', 
+       x = expression(rho[n]), 
+       colour = NULL, shape = NULL, size = NULL) +
+  geom_line(aes(x = rho, y = med.err * n,
+                colour = 'OSC')) +
+  geom_point(aes(x = rho, y = med.err * n,
+                 colour = 'OSC', shape = 'OSC'), size = 3) +
+  geom_errorbar(aes(x = rho, ymin = first.q * n, ymax = third.q * n,
+                    colour = 'OSC'), width = .05) + 
+  geom_line(aes(x = rho, y = med.err.ssc * n,
+                colour = 'SSC-ASE')) +
+  geom_point(aes(x = rho, y = med.err.ssc * n,
+                 colour = 'SSC-ASE', shape = 'SSC-ASE'), size = 3) +
+  geom_errorbar(aes(x = rho, ymin = first.q.ssc * n, ymax = third.q.ssc * n,
+                    colour = 'SSC-ASE'), width = .05) +
+  geom_line(aes(x = rho, y = med.err.ssc.A * n,
+                colour = 'SSC-A')) +
+  geom_point(aes(x = rho, y = med.err.ssc.A * n,
+                 colour = 'SSC-A', shape = 'SSC-A'), size = 3) +
+  geom_errorbar(aes(x = rho, ymin = first.q.ssc.A * n, ymax = third.q.ssc.A * n,
+                    colour = 'SSC-A'), width = .05) +
+  geom_line(aes(x = rho, y = med.err.louvain * n,
+                colour = 'MM-Louvain')) + 
+  geom_point(aes(x = rho, y = med.err.louvain * n,
+                 colour = 'MM-Louvain', shape = 'MM-Louvain'), size = 3) + 
+  geom_errorbar(aes(x = rho, ymin = first.q.louvain * n, ymax = third.q.louvain * n,
+                    colour = 'MM-Louvain'), width = .05) + 
+  scale_colour_brewer(palette = 'Set1')
+
+rmse.df <- readr::read_csv('../rmse-sparsity.csv')
+
+rmse.plot <- rmse.df %>% 
+  na.omit() %>% 
+  dplyr::group_by(K, n, rho) %>% 
+  dplyr::summarise(median.rmse = median(rmse),
+                   q1.rmse = quantile(rmse, .25),
+                   q3.rmse = quantile(rmse, .75),
+                   median.rmse.mle = median(rmse.mle),
+                   q1.rmse.mle = quantile(rmse.mle, .25),
+                   q3.rmse.mle = quantile(rmse.mle, .75)) %>% 
+  dplyr::ungroup() %>% 
+  ggplot() +
+  theme_bw() + 
+  theme(text = element_text(size = 20),
+        legend.position = 'bottom') + 
+  geom_line(aes(x = rho, y = median.rmse, colour = 'Algorithm 3')) + 
+  geom_point(aes(x = rho, y = median.rmse, colour = 'Algorithm 3', shape = 'Algorithm 3'),
+             size = 3, alpha = .5) + 
+  geom_errorbar(aes(x = rho, ymin = q1.rmse, ymax = q3.rmse,
+                    colour = 'Algorithm 3'), width = .05) + 
+  geom_line(aes(x = rho, y = median.rmse.mle, colour = 'MLE-based')) + 
+  geom_point(aes(x = rho, y = median.rmse.mle, colour = 'MLE-based', shape = 'MLE-based'),
+             size = 3, alpha = .5) + 
+  geom_errorbar(aes(x = rho, ymin = q1.rmse.mle, ymax = q3.rmse.mle,
+                    colour = 'MLE-based'), width = .05) + 
+  scale_colour_brewer(palette = 'Set1') + 
+  labs(y = 'RMSE', x = expression(rho[n]), colour = NULL, shape = NULL) + 
+  scale_y_log10() + 
+  scale_x_continuous(breaks = c(0.1, 0.3, 0.5, 0.7, 0.9))
+
+gridExtra::grid.arrange(grobs = list(clustering.plot, rmse.plot), nrow = 1)
+```
+
+# Choice of $\vartheta$ for the Subspace Detection Property
+
