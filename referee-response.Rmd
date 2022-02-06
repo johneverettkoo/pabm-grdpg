@@ -98,7 +98,7 @@ The range of $(i, j)$ is now included in the definition; in particular
 we wrote in Section 2.1 that ``$1 \leq i < j \leq n$.''
 In regard to the probability distribution on the labels $z_1, ...,
 z_n$, none of our theoretical assume anything about the distribution
-of the $\{z_i\}$; we do, however, occassionally assume that the $n_k$
+of the $\{z_i\}$; we do, however, occasionally assume that the $n_k$
 are sufficiently large for each $k = 1,2,\dots, K$. More specifically 
 the convergence rate of Theorem 5 depends on the $n_k$, i.e., for
 convergence we require that $n_k \to \infty$ as $n \rightarrow

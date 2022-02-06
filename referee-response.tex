@@ -130,31 +130,43 @@ questions}\label{specific-comments-and-questions}}
 \item
   p4. What is a hollow graph?\\
   \textcolor{blue}{
-  We changed the terminology a bit here and throughout the paper 
-  and specify that the analysis assumes $G$ is an unweighted and undirected graph with no self-loops (no edge directly from itself to itself), 
-  so $A$ is binary and symmetric with zeros on the diagonal. 
-  }
+  We changed the terminology a bit here and throughout the paper and
+  specify that the analysis assumes $G$ is an unweighted and undirected
+  graph with no self-loops 
+  (no edge directly from itself to itself), 
+  so $A$ is binary and symmetric with zeros on the diagonal. The phrase
+  ``hollow graph'' is no longer used.  }
 \item
   p4. \(G\) as a graph is non-oriented or undirected and \(A\) is
   symmetric.\\
   \textcolor{blue}{
-  We have made minor edits clarifying the structure of $G$ and $A$. 
+  We have made minor edits clarifying the structure of $G$ and $A$. In
+  particular we assume throughout the paper that $G$ is undirected and $A$ is
+  symmetric. 
   }
 \item
   p4. Please define the set \([n]\).\\
   \textcolor{blue}{
-  We added $[n] = \{1, 2, ..., n\}$. 
+  We added $[n] = \{1, 2, ..., n\}$ at the beginning of Section~2.1. 
   }
 \item
   p4. Definition 1. Do you consider a probability distribution on
   \(z_1, ..., z_n\)? Please give the range of variation of \((i, j)\)
   when you define \(P_{ij}\).\\
   \textcolor{blue}{
-  The range of $(i, j)$ is now included in the definition. 
-  In regard to the probability distribution on the labels $z_1, ..., z_n$, none of our theorems use this, although some do require that each $n_k$ be sufficiently large, so it did not factor into our definitions and analyses. 
-  More specifically, the convergence rate of Theorem 5 depends on each $n_k$, and for convergence, we require that $n_k \to \infty$. 
-  While none of the theorems explicitly require this, in practice, we also require that each $n_k$ is large enough for the latent vectors in the $k^th$ community to span its subspace. 
-  }
+  The range of $(i, j)$ is now included in the definition; in particular
+  we wrote in Section 2.1 that ``$1 \leq i < j \leq n$.''
+  In regard to the probability distribution on the labels $z_1, ...,
+  z_n$, none of our theoretical assume anything about the distribution
+  of the $\{z_i\}$; we do, however, occasionally assume that the $n_k$
+  are sufficiently large for each $k = 1,2,\dots, K$. More specifically 
+  the convergence rate of Theorem 5 depends on the $n_k$, i.e., for
+  convergence we require that $n_k \to \infty$ as $n \rightarrow
+  \infty$. In practice, we also require that each $n_k$ is large enough
+  so that the latent vectors in the $k$th community span its
+  subspace; this is a rather mild requirement, e.g., if the latent vectors in the $k$th community lies in a
+  general position (are linearly independent), then we only require $n_k
+  \geq K$.}
 \item
   p4. line 50. Instead of ``increasing values of the community
   assignments'', you could write ``reorganized by community
@@ -169,8 +181,9 @@ questions}\label{specific-comments-and-questions}}
   \(\mathcal{X}\) a subset on \((\mathbb{R}^d)^2\)? Please clearly state
   that \(d = p + q\) (not stated before Definition 3).\\
   \textcolor{blue}{
-  We now define the subset as $\mathcal{X} = \{x, y \in \mathbb{R}^d : x^\top I_{p, q} y \in [0, 1]\}$ with $d = p + q$. 
-  }
+  We now denote $d = p + q$ in Definition 2 and define $\mathcal{X}$ as a subset of $\mathbb{R}^{d}$ such
+  that for any $x \in \mathcal{X}$ and $y \in \mathcal{X}$, we have
+  $x^{\top} I_{p,q} y \in [0,1]$. }
 \item
   p6. Remark 2. What are \(\hat{Z}\), \(V\), and \(D\)?\\
   \textcolor{blue}{

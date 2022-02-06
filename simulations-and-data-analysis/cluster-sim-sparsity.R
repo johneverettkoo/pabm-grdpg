@@ -1,5 +1,6 @@
 # simulation study for clustering algorithms
 # compares OSC, SSC-ASE, SSC-A, and Louvain (stand-in for MM)
+# for varying values of rho, the sparsity parameter
 # simulations are for balanced community sizes
 # configuration as-is parallelizes simulations across 16 threads
 
@@ -11,6 +12,8 @@ library(ggplot2)
 setwd('~/dev/pabm-grdpg')
 source('simulations-and-data-analysis/functions.R')
 
+doMC::registerDoMC(16)
+
 # simulation parameters
 n <- 2048
 K <- 3
@@ -18,10 +21,9 @@ a1 <- 2
 b1 <- 1
 a2 <- 1
 b2 <- 2
-sparsity <- 1e-2
-rho.vec <- seq(.1, 1, .1)
-
-doMC::registerDoMC(16)
+sparsity <- 1e-2  # for lasso within ssc
+iter <- 50
+rho.vec <- seq(.1, .9, .2)
 
 # clustering simulation
 clustering.df <- foreach(rho = rho.vec, .combine = dplyr::bind_rows) %do% {
@@ -34,7 +36,7 @@ clustering.df <- foreach(rho = rho.vec, .combine = dplyr::bind_rows) %do% {
     A <- draw.graph(P)
     clustering.osc <- cluster.pabm(A, K, use.all = TRUE, normalize = FALSE)
     error.osc <- 1 - cluster.acc(clustering.osc, z, reorder.mat)
-    clustering.ssc <- ssc(A, K, K / n, normalize = TRUE, scale = FALSE)
+    clustering.ssc <- ssc(A, K, sparsity, normalize = TRUE, scale = FALSE)
     error.ssc <- 1 - cluster.acc(clustering.ssc, z, reorder.mat)
     clustering.louvain <- mod.max(A)
     error.louvain <- 1 - cluster.acc(clustering.louvain, z)
@@ -57,7 +59,7 @@ gc()
 readr::write_csv(clustering.df, 'clustering-sparsity.csv')
 
 clustering.df %>%
-  dplyr::group_by(rho) %>%
+  dplyr::group_by(rho, K, n) %>%
   dplyr::summarise(
     med.err = median(error.osc),
     first.q = quantile(error.osc, .25),
@@ -76,7 +78,6 @@ clustering.df %>%
   ggplot() +
   theme_bw() + 
   theme(text = element_text(size = 10)) + 
-  scale_x_log10(breaks = c(128, 256, 512, 1024, 2048, 4096)) +
   labs(y = 'community detection error count', 
        colour = NULL, shape = NULL) +
   geom_line(aes(x = rho, y = med.err * n,
@@ -103,5 +104,4 @@ clustering.df %>%
                  colour = 'MM-Louvain', shape = 'MM-Louvain')) + 
   geom_errorbar(aes(x = rho, ymin = first.q.louvain * n, ymax = third.q.louvain * n,
                     colour = 'MM-Louvain'), width = .1) + 
-  scale_colour_brewer(palette = 'Set1') + 
-  facet_wrap(~ K, labeller = 'label_both')
+  scale_colour_brewer(palette = 'Set1')
