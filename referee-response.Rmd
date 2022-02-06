@@ -119,12 +119,30 @@ Please clearly state that $d = p + q$ (not stated before Definition 3).
 \textcolor{blue}{
 We now denote $d = p + q$ in Definition 2 and define $\mathcal{X}$ as a subset of $\mathbb{R}^{d}$ such
 that for any $x \in \mathcal{X}$ and $y \in \mathcal{X}$, we have
-$x^{\top} I_{p,q} y \in [0,1]$. }
+$x^{\top} I_{p,q} y \in [0,1]$. One simple way to construct such a set
+$\mathcal{X}$ is to first find a collection of $K$ vectors
+$\mathcal{S} = \{\nu_1, \nu_2, \dots, \nu_K\} \subset \mathbb{R}^{d}$
+where $\nu_i^{\top} I_{p,q} \nu_j \in [0,1]$ for all $i,j$ and then define $\mathcal{X}$
+as 
+$$\mathcal{X} = \mathrm{conv}(\mathcal{S}) = \{x = \sum_{i} \lambda_i \nu_i \colon \lambda_i \geq 0 \,\, \text{for all $i$}, \sum_{i} \lambda_i =
+1\}.$$
+}
 
 7. p6. Remark 2. What are $\hat{Z}$, $V$, and $D$?  
 \textcolor{blue}{
-Remark 2 now includes that $D$ is the diagonal matrix of the $p$ most positive and $q$ most negative eigenvalues of $A$ (or $P$), $V$ is the matrix of corresponding eigenvectors, and $\hat{Z}$ is the embedding $V |D|^{1/2}$.
-}
+We had rewrote Remark~2 to more clearly described the matrices
+$\hat{Z}$, $V$ and $D$. To avoid confusion, we now use $\hat{D}$ to
+denote the diagonal matrix whose diagonal entries are the $d = p + q$
+largest eigenvalues (in modulus) of $A$ and we use $\hat{V}$ to denote
+the $n \times d$ matrix whose columns are the corresponding
+eigenvectors. We then use $\hat{Z} = \hat{V} |\hat{D}|^{1/2}$ (where
+the $|\cdot|$ operation is applied elementwise) to denote the
+adjacency spectral embedding (ASE) of $A$ into $\mathbb{R}^{d}$; that is
+to say, the $i$th row of $\hat{Z}$ represents an estimate of the
+latent position $X_i$ (up to some non-identifiability transformation
+$Q \in \mathbb{O}(p,q)$). We also reorganized the paper slightly so
+that the definition and remarks about the non-identifiability of the
+latent positions $X$ in a GRDPG are presented before discussing ASE. }
 
 8. top of p7. $\tilde{P}$ instead of ${P}$.  
 \textcolor{blue}{
@@ -133,21 +151,46 @@ We have corrected the typo.
 
 9. p7 line 40-46. I don't understand the interest of this paragraph.  
 \textcolor{blue}{
-The purpose of the additional material in the proof of Theorem 1 is to provide intuition for the arbitrary $K$ case by starting with $K = 2$. 
-In particular, for the $K = 2$ case, we show that $\tilde{P} = X \Pi X^\top$ where $\Pi$ is a permutation matrix with 2 fixed points and 1 cycle of order 2, and the rows of $X$ consist of vectors that lie on two 2-dimensional orthogonal subspaces. 
-This then generalizes to larger $K$ such that the rows of $X$ are vectors that lie on $K$ $K$-dimensional orthogonal subspaces, and $\Pi$ is a permutation matrix with $K$ fixed points and $K^2 - K = K (K - 1)$ cycles of order 2. 
-Then the eigenvalues of $\Pi$ are broken up by the following: $K$ $1$'s corresponding to the $K$ fixed points and $K (K - 1)$ pairs of $+1$ and $-1$ corresponding to the $K (K - 1)$ cycles of order 2, 
-resulting in $K (K + 1) / 2$ $+1$'s and $K (K - 1) / 2$ $-1$'s, i.e., the diagonal eigenvalue matrix of $\Pi$ is exactly $I_{K (K + 1) / 2, K (K - 1) / 2}$. 
-This gives us the embedding dimension ($\mathbb{R}^{K^2}$ broken up into $K (K + 1) / 2$ ``positive'' and $K (K - 1) / 2$ ``negative'' dimensions according to the eigenvalues of $\Pi$) as well as the structure ($K$ $K$-dimensional subspaces as described by the rows of $X$). 
-We have added additional details to the paper to address this. 
+The purpose of the additional material in the proof of Theorem 1 is to
+first present the proof in the special case when $K = 2$ so as to
+build intuition for the general case of $K \geq 2$. 
+More specificially for $K = 2$ we show that $\tilde{P} = X \Pi X^\top$
+where $\Pi$ is a permutation matrix with 2 fixed points and 1 cycle of
+order 2, and the latent vectors lie in the union of two $2$-dimensional
+orthogonal subspaces, i.e., and the rows of $X$ consist of
+vectors that lie in $\mathcal{S}_1 \cup \mathcal{S}_2$ where
+$\mathcal{S}_1$ and $\mathcal{S}_2$ are both $2$-dimensional
+subspaces of $\mathbb{R}^{4}$, $\mathcal{S}_1 \cap \mathcal{S}_2 = \{0\}$, and $x^{\top} y
+= 0$ for all $x \in \mathcal{S}_1, y \in \mathcal{S}_2$. 
+This then generalizes to larger $K$ such that the rows of $X$ are now
+vectors that lie in the union of $K$ orthogonal subspaces
+$\mathcal{S}_1 \cup \mathcal{S}_2 \cup \dots \mathcal{S}_K$ where each
+$\mathcal{S}_k$ is a $K$-dimensional subspace of $\mathbb{R}^{K^2}$,
+and $\Pi$ is a permutation matrix with 
+$K$ fixed points and $K (K - 1)$ cycles of order 2. The permutation
+matrix $\Pi$ then has $K(K-1)/2$ eigenvalues equal to $-1$ (due
+to the $K(K-1)$ cycles of order $2$) and $K(K+1)/2$ eigenvalues equal
+to $1$ (due to the $K(K-1)$ cycles of order $2$ together with the $K$
+fixed points). We can thus write $\Pi = U I_{K(K+1)/2,K(K-1)/2}
+U^{\top}$. We have revised the paper to more clearly present the above
+observations. See also Example~1 on page 9 of the revised manuscript
+and the response to comment $10$ below.
 }
 
 10. p8, line 14-21. I don't see why the permutation given by $\Pi$ has $K$ fixed points.  
 \textcolor{blue}{
-The purpose of Example 1 is to illustrate this explicitly. 
-Comparing matrices $X$ and $Y$, we can see that they share three columns: the first, fifth, and ninth. 
-The other columns are permuted. 
-The proof of Theorem 1 then generalizes this to arbitrary $K$. 
+Example 1 illustrates these fixed points explicitly for $K = 3$. 
+More specifically, comparing the matrices $X$ and $Y$, we see that
+they have three columns in common: the first, fifth, and ninth. 
+The other columns are permuted. The proof of Theorem 1 then
+generalizes this to arbitrary $K$. In particular by the construction
+of $X$, each column of $X$ has exactly one non-zero block
+corresponding to some vector $\lambda_{k \ell} \in \mathbb{R}^{k}$. The fixed
+points are then the columns with indices $r(K+1) +1 $ for $0 \leq r
+\leq K-1$; these columns contain the vectors $\lambda_{kk}$ for
+$1 \leq k \leq K$. The cycles of order $2$ swap the columns of $X$
+containing the vectors $\lambda_{k \ell}$ and $\lambda_{\ell k}$ for
+the $\tbinom{K}{2}$ pairs $(k,\ell)$ with $k \not = \ell$. 
 }
 
 11. Section 3.1. I found it confusing that community detection algorithms are detailed when $P$ is assumed to be known and then methods for estimating $P$ are recalled. A sentence in the beginning of this section to expose what is presented could help the reader.  

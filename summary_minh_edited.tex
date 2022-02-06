@@ -341,7 +341,7 @@ denoted as $\mathbb{O}(p, q)$. Here $d = p + q$.
 The latent vectors that produce $X I_{p,q} X^\top = P$ are not unique
 \citep{rubindelanchy2017statistical}.
 More specifically, if $P_{ij} = x_i^\top I_{p, q} x_j$, 
-then we also have for any $Q \in \mathbb{O}(p, q)$ that
+then for any $Q \in \mathbb{O}(p, q)$ we also have 
 $(Q x_i)^\top I_{p, q} (Q x_j) = x_i^\top (Q^\top I_{p, q} Q) x_j =
 x_i^\top I_{p, q} x_j = P_{ij}$. Unlike in the RDPG case, transforming the latent positions via multiplication
 by $Q \in \mathbb{O}(p, q)$ does not necessarily maintain interpoint angles or
@@ -361,18 +361,17 @@ $$A = \sum_{i} \hat{\lambda}_i \hat{v}_i \hat{v}_i^{\top}, \quad
 \text{where} \,\,
 |\hat{\lambda}|_1 \geq |\hat{\lambda}_2| \geq \dots \geq
 |\hat{\lambda}_n|.$$
-Now let $\hat{D}$ be a diagonal matrix whose diagonal entries are
-the eigenvalues
-$\{\hat{\lambda}_i\}_{i=1}^{d}$ arranged in decreasing values (not in
-decreasing modulus). Let $\hat{V}$ be the $n \times d$ matrix whose
+Let $\hat{D}$ be a diagonal matrix whose diagonal entries are
+the eigenvalues $\{\hat{\lambda}_i\}_{i=1}^{d}$ arranged in decreasing values (not in
+decreasing modulus) and let $\hat{V}$ be the $n \times d$ matrix whose
 columns are the corresponding eigenvectors $\{\hat{v}_i\}_{i=1}^{d}$
 arranged in the same order as the diagonal entries of $\hat{D}$. Now
 define $\hat{Z} = \hat{V} |\hat{D}|^{1/2}$ where the $|\cdot|$
 operation is applied elementwise to the entries of $\hat{D}$. Then
 $\hat{Z}$ serves as an estimate of $X$, up to some non-identifiable
 orthogonal transformation $Q$ as described in
-Definition~\ref{def:indefinite} and
-Remark~\ref{rem:non_identifiable}. 
+Remark~\ref{rem:non_identifiable} and Definition~\ref{def:indefinite};
+see \citet{rubindelanchy2017statistical} for further details.
 % choosing the $p$ most positive and $q$ most negative
 % eigenvalues, $D = \diag(\lambda_1, ..., \lambda_p, \lambda_{n - q +
 %   1}, ..., \lambda_n)$, and their corresponding eigenvectors, $\hat{V}
@@ -403,7 +402,9 @@ community labels (see Remark~\ref{rem:pabm_view2}).
 \end{theorem}
 
 \begin{proof}
-We will prove this theorem in two parts. First, for demonstration purposes, we focus on the case for $K = 2$. Then we generalize this to $K \geq 2$. 
+We will prove this theorem in two parts. First, for demonstration
+purposes, we focus on the case when $K = 2$ to build intuition. 
+The general case of $K \geq 2$ is presented later.  
 
 For the $K = 2$ case, the proof is straightforward. We will first work with
 the matrix $\tilde{P}$. Note that $\tilde{P}$ has the form
@@ -447,7 +448,9 @@ points of $\Pi$ are mapped to the eigenvectors $e_1$ and $e_4$
 while the cycles of order two are mapped to the eigenvectors  
 $\tfrac{1}{\sqrt{2}}(e_{2} + e_3)$ and $\tfrac{1}{\sqrt{2}}(e_{2} -
 e_3)$; here $e_i$ denote the $i^\mathrm{th}$ basis vector in $\mathbb{R}^{4}$. 
-Thus, another way of decomposing the edge probability matrix is $\tilde{P} = X \Pi X^\top$ where the rows of $X$ describe 2 2-dimensional orthogonal subspaces and $\Pi$ is a permutation matrix. 
+Thus, another way of decomposing the edge probability matrix is
+$\tilde{P} = X \Pi X^\top$ where the rows of $X$ lie in the union of
+two 2-dimensional orthogonal subspaces and $\Pi$ is a permutation matrix. 
 
 For the general case, we can extend $\tilde{P} = X \Pi X^\top$ to larger $K$. 
 We once again consider $\tilde{P}$ as defined in
@@ -479,12 +482,12 @@ It is then straightforward to verify that
 We therefore have $\tilde{P} = X Y^\top$. 
 Similar to the $K = 2$ case, we also have $Y = X \Pi$ for some permutation matrix
 $\Pi$ and hence $\tilde{P} = X \Pi X^\top$.
-The permutation described by $\Pi$ has $K$ fixed points, which correspond to
+The permutation described by $\Pi$ now has $K$ fixed points, which correspond to
 $K$ eigenvalues equal to $1$ with corresponding eigenvectors $e_k$ where
-$k = r (K + 1) + 1$ for $r = 0, ..., K - 1$. It also has
-$\binom{K}{2} = K (K - 1) / 2$ cycles of order $2$. Each cycle corresponds to
+$k = r (K + 1) + 1$ for $0 \leq r \leq K - 1$. It also has
+$\tbinom{K}{2}$ cycles of order $2$. Each cycle corresponds to
 a pair of eigenvalues $\{-1,+1\}$ and a pair of eigenvectors
-$\{(e_s + e_t)/\sqrt{2},(e_s - e_t)/ \sqrt{2}\}$.
+$\{(e_s + e_t)/\sqrt{2},(e_s - e_t)/ \sqrt{2}\}$. 
 
 Let $p = K (K + 1) / 2$ and $q = K (K - 1) / 2$. 
 We therefore have
