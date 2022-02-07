@@ -64,7 +64,7 @@ improved in my opinion.
 \textcolor{blue}{
 We thank the referee for the feedback. 
 The concerns addressed here are answered below. 
-In particular, we make sure to address the concerns about the simulation studies. 
+In particular, we made considerable effort to address the referees' concerns about the simulation studies. 
 }
 
 ## Specific comments and questions
@@ -157,10 +157,10 @@ build intuition for the general case of $K \geq 2$.
 More specificially for $K = 2$ we show that $\tilde{P} = X \Pi X^\top$
 where $\Pi$ is a permutation matrix with 2 fixed points and 1 cycle of
 order 2, and the latent vectors lie in the union of two $2$-dimensional
-orthogonal subspaces, i.e., and the rows of $X$ consist of
+orthogonal subspaces, i.e., the rows of $X$ consist of
 vectors that lie in $\mathcal{S}_1 \cup \mathcal{S}_2$ where
 $\mathcal{S}_1$ and $\mathcal{S}_2$ are both $2$-dimensional
-subspaces of $\mathbb{R}^{4}$, $\mathcal{S}_1 \cap \mathcal{S}_2 = \{0\}$, and $x^{\top} y
+subspaces of $\mathbb{R}^{4}$ with $\mathcal{S}_1 \cap \mathcal{S}_2 = \{0\}$ and $x^{\top} y
 = 0$ for all $x \in \mathcal{S}_1, y \in \mathcal{S}_2$. 
 This then generalizes to larger $K$ such that the rows of $X$ are now
 vectors that lie in the union of $K$ orthogonal subspaces
@@ -186,7 +186,7 @@ The other columns are permuted. The proof of Theorem 1 then
 generalizes this to arbitrary $K$. In particular by the construction
 of $X$, each column of $X$ has exactly one non-zero block
 corresponding to some vector $\lambda_{k \ell} \in \mathbb{R}^{k}$. The fixed
-points are then the columns with indices $r(K+1) +1 $ for $0 \leq r
+points of $\Pi$ are then the columns with indices $r(K+1) +1 $ for $0 \leq r
 \leq K-1$; these columns contain the vectors $\lambda_{kk}$ for
 $1 \leq k \leq K$. The cycles of order $2$ swap the columns of $X$
 containing the vectors $\lambda_{k \ell}$ and $\lambda_{\ell k}$ for
@@ -195,14 +195,23 @@ the $\tbinom{K}{2}$ pairs $(k,\ell)$ with $k \not = \ell$.
 
 11. Section 3.1. I found it confusing that community detection algorithms are detailed when $P$ is assumed to be known and then methods for estimating $P$ are recalled. A sentence in the beginning of this section to expose what is presented could help the reader.  
 \textcolor{blue}{
-The goal of estimation is not to estimate $P$ but to identify the community labels and estimate the popularity parameters. 
-This is not immediately obvious even if we know $P$ beforehand, although having $P$ does make estimation much easier. 
-In the introduction to section 3 (before 3.1), we have added the following:
-}  
-\textcolor{blue}{
-``In our methods, the data that are observed for estimation is the adjacency matrix, $A \sim \mathrm{PABM}(\{\lambda^{(k \ell)}\}_K, \rho_n)$, along with an assumed number of communities, $K$. 
-To motivate our methods, we also consider community detection and parameter estimation in the case where we know the edge probability matrix, $P$, beforehand, noting that community memberships and popularity parameters are not immediately discernible from $P$ itself. 
-After establishing methods for community detection and parameter estimation from $P$, we use the consistency property of the ASE \citep{doi:10.1080/01621459.2012.699795,rubindelanchy2017statistical} to demonstrate that the same methods work for $A$ almost surely as $n \to \infty$.''
+We thank the referee for pointing out this issue. We had revised the
+manuscript to include the line "In our methods, the data that are
+observed is only the adjacency matrix $A \sim
+\mathrm{PABM}(\{\lambda^{(k \ell)}\}_K, \rho_n)$ along with an assumed
+number of communities, $K$. To motivate our methods, we first
+consider community detection and parameter estimation in the case
+where we know the edge probability matrix, $P$, beforehand, noting
+that community memberships and popularity parameters are not
+immediately discernible from $P$ itself. After establishing methods
+for community detection and parameter estimation from $P$, we use the
+consistency property of ASE to demonstrate that the same methods work
+for $A$ almost surely as $n \to \infty$." Indeed, the assumption of
+known $P$ helps motivate Algorithm $1$ through Algorithm~3 and the
+theoretical results in Theorem~2. Theorem 3 and Theorem 4 then follows
+by leveraging the consistency properties for adjacency spectral embedding
+to show that community recovery and parameters estimation using $A$ is asymptotically equivalent to
+community recover and paraemters estimation using the true but unknown $P$. 
 }
 
 12. p10, line 12. $c^{(i)}$ is not defined.  
@@ -213,12 +222,9 @@ This has been added to the paper.
 
 13. p10. I didn't understand the exposition of the SSC algorithm.  
 \textcolor{blue}{
-We have added more detail to our description of the SSC algorithm. 
-In particular, we describe the intuition/motivation behind the algorithm. 
-}  
-\textcolor{blue}{The description of SSC now reads:
-}  
-\textcolor{blue}{
+We have added more details to our description of SSC to
+provide further intuition/motivation behind the
+algorithm. The description of SSC now reads:
 ``The SSC algorithm can be described as follows: 
 Given \(X \in \mathbb{R}^{n \times d}\) with vectors
 \(x_i^\top \in \mathbb{R}^d\) as rows of \(X\), the optimization problem
@@ -229,23 +235,32 @@ The solutions are collected into matrix
 construct an affinity matrix \(B = |C| + |C^\top|\). If each \(x_i\) lies
 exactly on one of \(K\) subspaces, \(B\) describes an undirected graph
 consisting of {\em at least} \(K\) disjoint subgraphs, i.e., \(B_{ij} = 0\) if \(x_i, x_j\) lie on different subspaces. 
-The intuition here is that vectors that lie on the same subspace can be described as linear combinations of each other, assuming the number of vectors in the subspace is greater than the dimensionality of the subspace. 
-Then once sparsity is enforced, for each $c_i$, its $j^{th}$ element $c_i^{(j)}$ is zero if $x_j$ belongs to a subspace that doesn't contain $x_i$, resulting in $B_{ij} = 0$. 
-Thus, for each $c_i$, $c_i^{(j)}$ is zero if $x_i$ and $x_j$ belong to different subspaces and may be nonzero if they do. 
-If \(X\) instead represents points near \(K\) subspaces with some noise, 
-then this property may only hold approximately and 
+The intuition here is that vectors that lie on the same subspace can
+be described as linear combinations of each other, assuming the number
+of vectors in the subspace is greater than the dimensionality of the
+subspace. Thus, for each $c_i$, $c_i^{(j)}$ is zero whenever $x_i$ and $x_j$ belong to different subspaces and may be nonzero otherwise. If \(X\) instead represents points near \(K\) subspaces with some noise, 
+then this property will only hold approximately and 
 a final graph partitioning step may be required 
 (e.g., edge thresholding or spectral clustering).''
 }
 
 14. p11, line 31. "... SSC on the spectral embedding of $A$". Could you support this assertion by references?  
 \textcolor{blue}{
-There are no references for this, as it is a novel idea. 
-SSC has been proposed for community detection for the PABM but for the rows of $A$ rather than the ASE of $A$ \citep{noroozi2019estimation}. 
-The motivation for our implementation is from Theorem 1, which says that the PABM is a GRDPG for which the latent positions are comprised of subspaces. 
-}  
-\textcolor{blue}{
-We have added, ``... SSC on the rows of the spectral embedding of $A$, since the embedding of $P$ consists of $K$ subspaces (Theorem 1), and so the embedding of $A$ will lie approximately on the $K$ subspaces.''
+There are no references for this, as it is, to the best of our knowledge, a novel idea. 
+We emphasize that while SSC has been proposed for community detection
+for PABM (see e.g., \citep{noroozi2019estimation}), these work apply SSC
+directly on the rows of $A$ (which are binary vectors in
+$\mathbb{R}^{n}$) rather than on the ASE of $A$ (which are real-valued
+vectors in $\mathbb{R}^{d}$ where $d \ll n$). The motivation behind
+our use of SSC comes  from Theorem 1 wherein we show that the latent
+vectors for PABM lie on the union of orthogonal subspaces in $\mathbb{R}^{d}$ and hence,
+by the consistency properties of ASE, the rows of the estimated
+eigenvectors $\hat{V}$ also lies close to the union of orthogonal
+subspaces in $\mathbb{R}^{d}$. In contrast, while the rows of $P$ do lie exactly on the
+union of $K$ orthogonal subspaces in $\mathbb{R}^{n}$, the rows of $A$
+(which are now noisy binary vectors) could be quite far from the
+corresponding rows of $P$ and hence need not lie close to the union
+of any $K$ orthogonal subspaces in $\mathbb{R}^{n}$ 
 }
 
 15. p12, line 13. It could help recall what the $z_i, z_j$ are.  
@@ -255,52 +270,92 @@ We have changed $z_i$ to ``community labels''.
 
 16. p14. Do you think that the OSC algorithm can retrieve other kinds of structure than assortative ones?  
 \textcolor{blue}{
-We added a third simulation study with $\lambda_{kk} \sim Beta(1,2)$ and $\lambda_{kl} \sim Beta(2,1)$, resulting in an average within-community edge probability of $1/3$ and between-community edge probability of $2/3$. 
-Results of this simulation study are very similar to that of the first two and consistent with the theory.
+The OSC algorithm works for any PABM parameters setting and is thus
+agnostic to the particular structure (such as assortativity vs
+disassortativity). We had revised the manuscript to include an
+additional simulation demonstrating this claim (see Section 4.3). In
+particular Section~4.3 considers a PABM setting wherein
+$\lambda_{kk}$ is a vector in $\mathbb{R}^{n_k}$ whose elements
+are i.i.d $\mathrm{Beta}(1,2)$ random variables and $\lambda_{k\ell}$ is a
+vector in $\mathbb{R}^{n_k}$ whose elements are i.i.d $\mathrm{Beta}(2,1)$
+random variables. This result in an average within-community edge
+probability of $1/3$ and a between-community edge
+probability of $2/3$. The results for this simultation setting are
+very similar to those presented in the original manuscript and is also
+consistent with the theoretical results in the paper.
 }  
 \textcolor{blue}{
-On a related note, it is our view that the distinction between assortative and disassortative is not very important for the PABM, at least when it is viewed as a type of GRDPG. 
-In the case of the SBM and DCBM, it can be shown that the rank of $P$ (and therefore the number of embedding dimensions) is equal to $K$, but assortativity or disassortativity determines how many positive and negative eigenvalues $P$ has \citep{rubindelanchy2017statistical}. 
-In the case of the PABM, the number of positive eigenvalues is always $K (K + 1) / 2$ and the number of negative eigenvalues is always $K (K - 1) / 2$, (assuming each community spans its respective subspace). 
+On a related note, it is our view that the distinction between
+assortative and disassortative is not always meaningful for the
+PABM. Indeed, unlike the SBM, in the PABM each vertex is free to have a higher affinity to its
+own community or to other communities. For example, suppose vertex $i$
+belongs to community $1$. Then the average probability of an edge
+between vertex $i$ and another vertex in community $1$ is $n^{-1}
+\rho_n 
+\lambda_{i1} \sum_{j} \lambda_{j1}$ while the average probability of an edge between vertex $i$ and another vertex in community $k \not =
+1$ is $n^{-1} \rho_n \lambda_{ik} \sum_{j} \lambda_{j1}$ and thus, on
+average, vertex $i$ have more affinity with vertices in community $k \not =
+1$ whenever $\lambda_{i1} < \lambda_{ik}$
 }
 
 17. Sections 4 and 5. Why do you use either the ARI criterion or the misclassification rate to assess the recovery of the nodes clustering?  
 \textcolor{blue}{
-The first to datasets in section 5 refer to datasets analyzed by other PABM papers. 
-For the Leeds Butterfly dataset, while the paper with which we are comparing \citep{noroozi2019estimation} provides enough details to transform and preprocess the data to match their analysis, they do not provide code to run their clustering algorithm. 
-Therefore, we use their reported benchmark value, which is in the form of ARI. 
-In order to make an apples-to-apples comparison, we report the ARI for OSC and SSC-ASE here as well. 
-For all other analyses (simulation and real data), we use misclassification error (whether rate or count). 
+The first two datasets that we analyzed in section 5 had also been analyzed
+in previous papers on the PABM. In particular the
+Leeds Butterfly dataset was analyzed in \citep{noroozi2019estimation}
+and while \citep{noroozi2019estimation} provides enough details
+for us to preprocess the data to match their analysis, they do not
+provide code to run their clustering algorithm (which is based on SSC
+applied to the rows of $A$). Therefore we used their reported
+benchmark values, which are given in terms of ARI. 
+In order to make an apples-to-apples comparison, we also report the ARI for OSC and SSC-ASE here as well. 
+For all other analyses (simulation and real data), we use the
+misclassification error rate/count. 
 }
 
 18. Do you consider sparsity in the simulated adjacency matrices?  
 \textcolor{blue}{
-Sparsity was not considered in our analyses and algorithms.
+Sparsity was not considered in our analyses and algorithms. (Fix this)
 }
 
 19. Why do you limit your simulation to assortative structure? 
 Is it possible to see the results with a larger value of $K$? 
 To what extent does the value of $K$ impact the computational burden for the algorithms?  
 \textcolor{blue}{
-Regarding disassortativity, as mentioned in previous comments, we have added a third simulation study to address this. 
-Performance of the algorithms tested is similar to the other two simulation studies and consistent with the theory. 
-Regarding $K$, our algorithms require each $n_k$ to be large enough to span its subspace of dimension $K$, so we focused mostly on smaller values of $K$. 
-Cursory numerical experiments suggest that OSC and SSC-ASE behave similarly for larger $K$ provided that $n$ is large enough. 
+As we discussed in the response to comment
+$14$, we have added a third simulation to address the issue of disassortativity (see Section
+4.3 of the revised manuscript). The performance of all the algorithm
+for the setting in Section~4.3 is qualitatively similar to those
+presented earlier in Section~4.1 and Section~4.2 and is consistent with the theory. 
+Regarding $K$, our algorithms require each $n_k$ to be large enough to span its subspace of dimension $K$, so we focused mostly on smaller values of $K$. Cursory numerical experiments suggest that OSC and SSC-ASE behave similarly for larger $K$ provided that $n$ is large enough. 
 }  
 \textcolor{blue}{
-Regarding computational complexity, because both OSC and SSC-ASE may have an arbitrary final processing step, we will focus on the complexity in constructing the affinity matrix $B$. 
-For OSC, this involves spectral decomposition followed by matrix multiplication of $n \times K^2$ and $K^2 \times n$ matrices, so the complexity is $O(n^3 + n^2 K^2)$. 
-For SSC-ASE, we again start with spectral decomposition, followed by $n$ LASSO problems with a design matrix of size $K^2 \times (n - 1)$, so the complexity is $O(n^3 + n^2 K^4 + n K^6)$ \cite{10.1214/009053604000000067}. 
-SSC-A involves solving $n$ LASSO regression problems each with design matrices of size $n \times (n - 1)$, so the complexity here is $O(n^4)$. 
-When $n \gg K^2$, we can see that OSC and SSC-ASE are both $O(n^3)$. 
-In practice, we have found that $K$ does not affect runtimes too much. 
+As for the computational complexity of the algorithms, the main bottleneck for OSC and
+SSC-ASE is the construction of the affinity matrix $B$. 
+For OSC, this involves a (truncated) spectral decomposition to extract the
+$K^2$ largest eigenvalues in modulus (and their corresponding
+eigenvectors) followed by a matrix multiplication of $n \times K^2$
+and $K^2 \times n$ matrices, so the time complexity is of the order $O(n^2 K^2)$. 
+For SSC-ASE (applying SSC on the rows of the adjacency spectral
+embedding $\hat{V}$) we again start with spectral decomposition, followed by
+$n$ LASSO problems with a design matrix of size 
+$K^2 \times (n - 1)$, so the complexity is $O(n^2 K^2 + n^2 K^4 + n K^6)$ \cite{10.1214/009053604000000067}. 
+SSC-A (applying SSC on the rows of $A$) as proposed in \cite{noroozi2019estimation} involves solving $n$ LASSO regression problems each with design matrices of size $n \times (n - 1)$, so the complexity here is $O(n^4)$. 
+When $n \gg K^2$, we can see that OSC and SSC-ASE are both $O(n^2 K^2)$. 
+In practice the choice of parameter $K$ does not affect
+runtimes too much. For the simulation studies we only considered $K
+\leq 4$ as values of $K \geq 5$ will in general, require larger values of $n$ to achieve 
+comparable estimation accuracy as $K \leq 4$. 
 }
 
 20. Again, in your application on the Leeds butterfly dataset, why did you limit your analysis to $K = 4$?  
 \textcolor{blue}{
-For the Leeds butterfly dataset, we wanted to compare results of OSC and SSC-ASE to an analysis performed by another group studying the PABM \citep{noroozi2019estimation}. 
-In their results, they describe how they removed some of the nodes and discretized the edges, which we replicate in our analysis. 
-}
+For the Leeds butterfly dataset, we wanted to compare our results
+using OSC and SSC-ASE to an earlier analysis using SSC on the rows of
+$A$ (see \citep{noroozi2019estimation}). In their analysis they
+describe how they removed some of the nodes (corresponding to the
+other butterfly species) so that the resulting dataset only include the
+$K = 4$ butterfly species as considered in our paper.}
 
 21. Please specify in the text that the proofs for Theorems 3, 4, and 5 are given in the Appendix.  
 \textcolor{blue}{
@@ -353,13 +408,31 @@ While it is true that there are an infinite number of latent configurations that
 }  
 \textcolor{blue}{
 Therefore, the dimensionality of the latent configuration is not in question, only what kind of effect multiplication by unidentifiable $Q$ has on the configuration. 
-The OSC algorithm circumvents the nonidentifiability of the latent configuration by only considering the entries of $B = n V V^\top$. 
-SSC-ASE does rely on the latent configuration, but we show that the orthogonality property holds for the particular embedding we perform for this algorithm. 
+The OSC algorithm circumvents the nonidentifiability of the latent
+configuration by only considering the entries of $\hat{B} = n \hat{V}
+\hat{V}^{\top}$ as $n\hat{V}\hat{V}^{\top}$ is, by the asymptotic properties of
+adjacency spectral embedding, close to $n VV^{\top}$ and $n V
+V^{\top}$ is always unique (the orthogonal projection onto a column
+space is always unique). Similarly, SSC-ASE also circumvents this non-identifiability
+by only using the rows of $n^{1/2} \hat{V}$ as two rows $\hat{v}_i$ and
+$\hat{v}_j$ of $\hat{V}$ belonging to different subspaces, i.e.,
+different communities, will also
+have $n \hat{v}_i^{\top} \hat{v}_j \approx 0$. 
 }  
 \textcolor{blue}{
-That said, looking back at the latent configuration in Theorem 1, we can see that a $K$-dimensional (not $K^2$-dimensional) latent configuration is sufficient for clustering. 
-If we are able to obtain this exact embedding, this would greatly reduce the number of dimensions required for the clustering 
-In practice, this isn't always possible due to the nonidentifiability issue (in particular, determining which of the $K$ out of $K^2$ eigenvectors should be used, although we have found via numerical experiments that community detection is often possible with the $2^{nd}$ to the $(K+1)^{st}$ embedding dimensions).
+That said, looking back at the latent configuration in Theorem 1, we
+can see that a $K$-dimensional (not $K^2$-dimensional) embedding is
+sufficient for clustering, i.e., the embedding corresponding to the
+diagonal blocks $\lambda_{11}, \lambda_{22}, \dots, \lambda_{KK}$. 
+If we are able to find this embedding then this would greatly reduce
+the number of dimensions required for the community
+recovery/clustering. In practice, this isn't always possible due to
+the nonidentifiability issue; in particular, determining which of the
+$K$ out of $K^2$ eigenvectors should be used is the main difficulty.
+Nevertheless we have found via numerical experiments that community
+detection is often possible using only the eigenvectors corresponding
+to the $2^\mathrm{nd}$ to the $(K+1)^\mathrm{st}$ largest eigenvalues
+of $A$. 
 }
 
 * This is clearly beyond the scope of the paper, but I wonder if there is a straightforward way to adapt the proposed methods to directed models or weighted graphs or any other types of graphs than binary undirected ones?  
@@ -374,24 +447,52 @@ We hope to address these topics in future research.
 The authors explain the bad performance by the use of gaussian mixtures in the last clustering step. 
 However, I don't understand why this has an impact on the performance for $K = 2$, but not for $K \geq 3$.  
 \textcolor{blue}{
-We are not entirely clear on why this happens for $K = 2$, but when comparing the normalized Laplacian eigenmaps of the affinity matrix $B$ for various $K$, we see that when $K > 2$, the points appear much closer to Gaussian mixtures, whereas with $K = 2$, there is some separation by community, but they do not appear as Gaussian mixtures, at least for the simulated data. 
-One possible reason for this may be because we failed to find the right hyperparameter for SSC-ASE. 
+We are not entirely clear on why this happens for $K = 2$, but when
+comparing the normalized Laplacian eigenmaps of the affinity matrix
+$B$ for various $K$, we see that when $K > 2$, the points appear much
+closer to Gaussian mixtures, whereas with $K = 2$, while there is some
+separation by community, they do not appear as Gaussian mixtures. 
+One possible reason for this may be because we failed to find the
+right value for the hyperparameter $\vartheta$ for SSC-ASE. 
 }  
 \textcolor{blue}{
-Under ideal circumstances, we would be able to circumvent this issue altogether via the subspace detection property, but SDP does not necessarily guarantee a partitioning of the graph into exactly $K$ disjoint subgraphs but rather {\em at least} $K$ disjoint subgraphs, and in our simulations, we found that setting $\vartheta$ to the appropriate value to obtain SDP often results in greater than $K$ subgraphs, which is why we ended up choosing an ``incorrect'' $\vartheta$ for SSC and then performing the final clustering step.
+More specifically, under ideal circumstances, we would be able to
+circumvent the issue of selecting the hyperparameter $\vartheta$ by
+using the theoretical value that ensures, with high probability, the rows of $\hat{V}$ satisfy the subspace
+detection property (SDP). However, as other researchers had pointed out (see
+e.g., \citep{sdp_sufficiency,liu_ssc}, the fact that SDP is satisfied
+does not guarantee that the affinity matrix $B$ represents a graph
+with $K$ connected components but rather a graph with {\em at least}
+$K$ connected component. Indeed, we found in our simulations that
+setting $\vartheta$ to the theoretical values that guarantees 
+SDP often results in $B$ having more than $K$ connected components.
+This is why we choose to do spectral clustering on $B$, i.e., we first
+compute the normalized Laplacian embeddings using $B$ before
+clustering the rows of this embedding using Gaussian mixtures
+modeling. 
 }  
 \textcolor{blue}{
-We also note that in our simulations, while SSC-ASE and SSC-A in the $K = 2$ case and MM-Louvain for all $K$ output estimated labels such that the number of mislabeled vertices increases with $n$, the proportion of mislabeled vertices still decreases. 
-For instance, in section 4.1 for, the error count for SSC-ASE for $K = 2$ is around 20 when $n = 128$ and around 100 when $n = 4096$, resulting in an error rate of around $16\%$ for $n = 128$ and $2\%$ for $n = 4096$. 
+Finally we note that in our simulations the proportion of mislabeled
+vertices does decreases as $n$ increases. 
+For instance, in section 4.1, if $K = 2$ then the average number of mis-clustered
+vertices for SSC-ASE is around 20 when $n = 128$ and around 100 when
+$n = 4096$; this correspond to an error rate of around $16\%$ and
+$2\%$, respectively.
 }
 
 * In the application section, MM performs better than OSC and SSC-ASE, while in the simulation study the opposite is observed. 
 What is the reason for the different behavior?  
 \textcolor{blue}{
 In the application section, we analyze data that are not necessarily generated by the PABM (or any known model). 
-While all three algorithms are specific to the PABM, they might all behave differently to the different ways in which the model is misspecified. 
-There is also the question of hyperparameter tuning, especially in the case of SSC-ASE, and we spent a bit more time tweaking the hyperparameters, resulting in performance that is a bit closer to that of MM. 
-}
+While all three algorithms are specific to the PABM, they might behave
+differently to the different ways in which the model is
+misspecified. Finally, we note that Section~5 analyzed three real
+datasets. For the first dataset (Leeds butterfly) we didn't run the MM
+algorithm as the original implementation of MM used in 
+\cite{307cbeb9b1be48299388437423d94bf1} is extremely slow when $K = 4$. For
+the second dataset (British MP's), the accuracy of MM is slightly
+better than that of OSC. Finally, for the last dataset (Karantaka
+villages), the accuracy of MM is slightly worse than that of OSC. }
 
 * Typo on p. 10: $X c$ should be $X^\top c$. 
 Likewise, $X_{-i} c$ is to be replaced with $X_{-i}^\top c$.  
