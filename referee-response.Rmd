@@ -315,7 +315,8 @@ misclassification error rate/count.
 
 18. Do you consider sparsity in the simulated adjacency matrices?  
 \textcolor{blue}{
-Sparsity was not considered in our analyses and algorithms. (Fix this)
+We have added another simulation in the supplemental materials. 
+In this simulation, we fix $n = 2048$ and $K = 3$ and vary $\rho \in (0, 1)$. 
 }
 
 19. Why do you limit your simulation to assortative structure? 
