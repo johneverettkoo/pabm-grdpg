@@ -211,7 +211,7 @@ known $P$ helps motivate Algorithm $1$ through Algorithm~3 and the
 theoretical results in Theorem~2. Theorem 3 and Theorem 4 then follows
 by leveraging the consistency properties for adjacency spectral embedding
 to show that community recovery and parameters estimation using $A$ is asymptotically equivalent to
-community recover and paraemters estimation using the true but unknown $P$. 
+community recover and parameters estimation using the true but unknown $P$. 
 }
 
 12. p10, line 12. $c^{(i)}$ is not defined.  
@@ -281,7 +281,7 @@ are i.i.d $\mathrm{Beta}(1,2)$ random variables and $\lambda_{k\ell}$
 vector in $\mathbb{R}^{n_k}$ whose elements are i.i.d $\mathrm{Beta}(2,1)$
 random variables. This result in an average within-community edge
 probability of $1/3$ and a between-community edge
-probability of $2/3$. The results for this simultation setting are
+probability of $2/3$. The results for this simulation setting are
 very similar to those presented in the original manuscript and is also
 consistent with the theoretical results in the paper.
 }  
@@ -448,7 +448,7 @@ the number of dimensions required for the community
 recovery/clustering. In practice, this isn't always possible due to
 the nonidentifiability issue; in particular, determining which of the
 $K$ out of $K^2$ eigenvectors should be used is the main difficulty.
-Nevertheless we have found via numerical experiments that accuracte community
+Nevertheless we have found via numerical experiments that accurate community
 recovery is generally possible when we use only the eigenvectors corresponding
 to the $2^\mathrm{nd}$ to the $(K+1)^\mathrm{st}$ largest eigenvalues
 of $A$. 
