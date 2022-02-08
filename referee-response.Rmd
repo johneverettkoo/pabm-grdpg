@@ -130,7 +130,7 @@ $$\mathcal{X} = \mathrm{conv}(\mathcal{S}) = \{x = \sum_{i} \lambda_i \nu_i \col
 
 7. p6. Remark 2. What are $\hat{Z}$, $V$, and $D$?  
 \textcolor{blue}{
-We had rewrote Remark~2 to more clearly described the matrices
+We have rewritten Remark~2 to more clearly describe the matrices
 $\hat{Z}$, $V$ and $D$. To avoid confusion, we now use $\hat{D}$ to
 denote the diagonal matrix whose diagonal entries are the $d = p + q$
 largest eigenvalues (in modulus) of $A$ and we use $\hat{V}$ to denote
@@ -138,7 +138,7 @@ the $n \times d$ matrix whose columns are the corresponding
 eigenvectors. We then use $\hat{Z} = \hat{V} |\hat{D}|^{1/2}$ (where
 the $|\cdot|$ operation is applied elementwise) to denote the
 adjacency spectral embedding (ASE) of $A$ into $\mathbb{R}^{d}$; that is
-to say, the $i$th row of $\hat{Z}$ represents an estimate of the
+to say, the $i^{th}$ row of $\hat{Z}$ represents an estimate of the
 latent position $X_i$ (up to some non-identifiability transformation
 $Q \in \mathbb{O}(p,q)$). We also reorganized the paper slightly so
 that the definition and remarks about the non-identifiability of the
@@ -196,7 +196,7 @@ the $\tbinom{K}{2}$ pairs $\{k,\ell\}$ with $k \not = \ell$.
 11. Section 3.1. I found it confusing that community detection algorithms are detailed when $P$ is assumed to be known and then methods for estimating $P$ are recalled. A sentence in the beginning of this section to expose what is presented could help the reader.  
 \textcolor{blue}{
 We thank the referee for pointing out this issue. We had revised the
-manuscript to include the line "In our methods, the data that are
+manuscript to include the line ``In our methods, the data that are
 observed is only the adjacency matrix $A \sim
 \mathrm{PABM}(\{\lambda^{(k \ell)}\}_K, \rho_n)$ along with an assumed
 number of communities, $K$. To motivate our methods, we first
@@ -206,12 +206,12 @@ that community memberships and popularity parameters are not
 immediately discernible from $P$ itself. After establishing methods
 for community detection and parameter estimation from $P$, we use the
 consistency property of ASE to demonstrate that the same methods work
-for $A$ almost surely as $n \to \infty$." Indeed, the assumption of
+for $A$ almost surely as $n \to \infty$.'' Indeed, the assumption of
 known $P$ helps motivate Algorithm $1$ through Algorithm~3 and the
 theoretical results in Theorem~2. Theorem 3 and Theorem 4 then follows
 by leveraging the consistency properties for adjacency spectral embedding
-to show that community recovery and parameters estimation using $A$ is asymptotically equivalent to
-community recover and parameters estimation using the true but unknown $P$. 
+to show that community recovery and parameters estimation using $A$ is asymptotically equivalent to community recovery and parameter estimation 
+using the true but unknown $P$. 
 }
 
 12. p10, line 12. $c^{(i)}$ is not defined.  
@@ -253,9 +253,9 @@ directly on the rows of $A$ (which are binary vectors in
 $\mathbb{R}^{n}$) rather than on the ASE of $A$ (which are real-valued
 vectors in $\mathbb{R}^{d}$ where $d \ll n$). The motivation behind
 our use of SSC comes  from Theorem 1 wherein we show that the latent
-vectors for PABM lie on the union of orthogonal subspaces in $\mathbb{R}^{d}$ and hence,
+vectors for the PABM lie on the union of orthogonal subspaces in $\mathbb{R}^{d}$ and hence,
 by the consistency properties of ASE, the rows of the estimated
-eigenvectors $\hat{V}$ also lies close to the union of orthogonal
+eigenvectors $\hat{V}$ also lie close to the union of orthogonal
 subspaces in $\mathbb{R}^{d}$. In contrast, while the rows of $P$ do lie exactly on the
 union of $K$ subspaces in $\mathbb{R}^{n}$, the rows of $A$
 (which are now noisy binary vectors) could be quite far from the
@@ -272,7 +272,7 @@ We have changed $z_i$ to ``community labels''.
 \textcolor{blue}{
 The OSC algorithm works for any PABM parameters setting and is thus
 agnostic to the particular structure (such as assortativity vs
-disassortativity). We had revised the manuscript to include an
+disassortativity). We have revised the manuscript to include an
 additional simulation demonstrating this claim (see Section 4.3). In
 particular Section~4.3 considers a PABM setting wherein
 $\lambda_{kk}$ is a vector in $\mathbb{R}^{n_k}$ whose elements
@@ -295,7 +295,7 @@ between vertex $i$ and another vertex in community $1$ is $n^{-1}
 \rho_n 
 \lambda_{i1} \sum_{j} \lambda_{j1}$ while the average probability of an edge between vertex $i$ and another vertex in community $k \not =
 1$ is $n^{-1} \rho_n \lambda_{ik} \sum_{j} \lambda_{j1}$ and thus, on
-average, vertex $i$ have more affinity with vertices in community $k \not =
+average, vertex $i$ has more affinity with vertices in community $k \not =
 1$ whenever $\lambda_{i1} < \lambda_{ik}$
 }
 
@@ -411,7 +411,7 @@ Related to this issue, is the latent space of the proof of Theorem 1 the smalles
 \textcolor{blue}{
 We thank the referee for the questions. 
 While it is true that there are an infinite number of latent configurations that generate the PABM, based on Theorem 1 and GRDPG results by \citet{rubindelanchy2017statistical}, we can conclusively say the following: 
-\\1. If $P$ is the edge probabilities matrix for a PABM with $K$
+\\1. If $P$ is the edge probability matrix for a PABM with $K$
 blocks then $P$ is of rank $K^2$ and furthermore $P$ has $K (K + 1) /
 2$ positive eigenvalues and $K (K - 1) / 2$ negative eigenvalues. 
 \\2. Therefore, viewed as a GRDPG, the latent vectors $X$ can be
@@ -420,10 +420,10 @@ $K^2$ is the smallest possible dimension. Furthermore the latent
 vectors will always lie on the union of $K$ disjoint $K$-dimensional subspaces---in the configuration outlined by Theorem 1, these subspaces are orthogonal, but the multiplication by arbitrary $Q \in \mathbb{O}(p, q)$ that results in the same $P$ may skew the subspaces making them no longer orthogonal (although they will still be $K$ $K$-dimensional subspaces), 
 \\3. The matrix $B = n V V^\top$, where $V$ is the $n \times K^2$
 matrix of eigenvectors of $P$ (corresponding to the non-zero
-eigenvalues of $P$), is such that $B_{ij} = 0$ if and only
+eigenvalues of $P$) is such that $B_{ij} = 0$ if and only
 if vertices $i$ and $j$ are in different communities, i.e.,
 $v_i^{\top} v_j = 0$ if and only if vertices $i$ and $j$ are in
-different communities; here $v_i$ denote the $i$th row of $V$. 
+different communities; here $v_i$ denote the $i^{th}$ row of $V$. 
 }  
 \textcolor{blue}{
 Therefore, the dimensionality of the latent configuration is not in question, only what kind of effect multiplication by unidentifiable $Q$ has on the configuration. 
@@ -436,7 +436,8 @@ space is always unique). Similarly, SSC-ASE also circumvents the
 non-identifiability of the latent positions
 by using only the rows of $n^{1/2} \hat{V}$ as two rows $\hat{v}_i$ and
 $\hat{v}_j$ belonging to different communities will 
-have $n \hat{v}_i^{\top} \hat{v}_j \approx 0$. 
+have $n \hat{v}_i^{\top} \hat{v}_j \approx 0$ 
+(as Theorem 3 states that $n \hat{v}_i^\top \hat{v}_j \stackrel{a.s.}{\to} 0$). 
 }  
 \textcolor{blue}{
 That said, if we look at the latent configuration in Theorem 1 then we
@@ -487,15 +488,14 @@ setting $\vartheta$ to the theoretical values that guarantees
 SDP often results in $B$ having more than $K$ connected components.
 This is why we choose to do spectral clustering on $B$, i.e., we first
 compute the normalized Laplacian embeddings using $B$ before
-clustering the rows of this embedding using Gaussian mixtures
-modeling. 
+clustering the rows of this embedding using Gaussian mixture models. 
 }  
 \textcolor{blue}{
 Finally we note that in our simulations the proportion of mislabeled
 vertices does decreases as $n$ increases. 
 For instance, in section 4.1, if $K = 2$ then the average number of mis-clustered
 vertices for SSC-ASE is around 20 when $n = 128$ and around 100 when
-$n = 4096$; this correspond to an error rate of around $16\%$ and
+$n = 4096$; this corresponds to an error rate of around $16\%$ and
 $2\%$, respectively.
 }
 
