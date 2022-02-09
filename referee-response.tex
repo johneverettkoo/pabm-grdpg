@@ -157,15 +157,15 @@ questions}\label{specific-comments-and-questions}}
   The range of $(i, j)$ is now included in the definition; in particular
   we wrote in Section 2.1 that ``$1 \leq i < j \leq n$.''
   In regard to the probability distribution on the labels $z_1, ...,
-  z_n$, none of our theoretical assume anything about the distribution
+  z_n$, none of our theoretical results assume anything about the distribution
   of the $\{z_i\}$; we do, however, occasionally assume that the $n_k$
   are sufficiently large for each $k = 1,2,\dots, K$. More specifically 
   the convergence rate of Theorem 5 depends on the $n_k$, i.e., for
   convergence we require that $n_k \to \infty$ as $n \rightarrow
   \infty$. In practice, we also require that each $n_k$ is large enough
   so that the latent vectors in the $k$th community span its
-  subspace; this is a rather mild requirement, e.g., if the latent vectors in the $k$th community lies in a
-  general position (are linearly independent), then we only require $n_k
+  subspace; this is a rather mild requirement, e.g., if the latent vectors in the $k$th community lie in 
+  general positions then we only require $n_k
   \geq K$.}
 \item
   p4. line 50. Instead of ``increasing values of the community
@@ -194,7 +194,7 @@ questions}\label{specific-comments-and-questions}}
 \item
   p6. Remark 2. What are \(\hat{Z}\), \(V\), and \(D\)?\\
   \textcolor{blue}{
-  We had rewrote Remark~2 to more clearly described the matrices
+  We have rewritten Remark~2 to more clearly describe the matrices
   $\hat{Z}$, $V$ and $D$. To avoid confusion, we now use $\hat{D}$ to
   denote the diagonal matrix whose diagonal entries are the $d = p + q$
   largest eigenvalues (in modulus) of $A$ and we use $\hat{V}$ to denote
@@ -202,7 +202,7 @@ questions}\label{specific-comments-and-questions}}
   eigenvectors. We then use $\hat{Z} = \hat{V} |\hat{D}|^{1/2}$ (where
   the $|\cdot|$ operation is applied elementwise) to denote the
   adjacency spectral embedding (ASE) of $A$ into $\mathbb{R}^{d}$; that is
-  to say, the $i$th row of $\hat{Z}$ represents an estimate of the
+  to say, the $i^{th}$ row of $\hat{Z}$ represents an estimate of the
   latent position $X_i$ (up to some non-identifiability transformation
   $Q \in \mathbb{O}(p,q)$). We also reorganized the paper slightly so
   that the definition and remarks about the non-identifiability of the
@@ -218,7 +218,7 @@ questions}\label{specific-comments-and-questions}}
   The purpose of the additional material in the proof of Theorem 1 is to
   first present the proof in the special case when $K = 2$ so as to
   build intuition for the general case of $K \geq 2$. 
-  More specificially for $K = 2$ we show that $\tilde{P} = X \Pi X^\top$
+  More specifically for $K = 2$ we show that $\tilde{P} = X \Pi X^\top$
   where $\Pi$ is a permutation matrix with 2 fixed points and 1 cycle of
   order 2, and the latent vectors lie in the union of two $2$-dimensional
   orthogonal subspaces, i.e., the rows of $X$ consist of
@@ -250,12 +250,12 @@ questions}\label{specific-comments-and-questions}}
   The other columns are permuted. The proof of Theorem 1 then
   generalizes this to arbitrary $K$. In particular by the construction
   of $X$, each column of $X$ has exactly one non-zero block
-  corresponding to some vector $\lambda_{k \ell} \in \mathbb{R}^{k}$. The fixed
+  corresponding to some vector $\lambda_{k \ell} \in \mathbb{R}^{n_k}$. The fixed
   points of $\Pi$ are then the columns with indices $r(K+1) +1 $ for $0 \leq r
   \leq K-1$; these columns contain the vectors $\lambda_{kk}$ for
   $1 \leq k \leq K$. The cycles of order $2$ swap the columns of $X$
   containing the vectors $\lambda_{k \ell}$ and $\lambda_{\ell k}$ for
-  the $\tbinom{K}{2}$ pairs $(k,\ell)$ with $k \not = \ell$. 
+  the $\tbinom{K}{2}$ pairs $\{k,\ell\}$ with $k \not = \ell$. 
   }
 \item
   Section 3.1. I found it confusing that community detection algorithms
@@ -264,22 +264,22 @@ questions}\label{specific-comments-and-questions}}
   section to expose what is presented could help the reader.\\
   \textcolor{blue}{
   We thank the referee for pointing out this issue. We had revised the
-  manuscript to include the line "In our methods, the data that are
+  manuscript to include the line ``In our methods, the data that are
   observed is only the adjacency matrix $A \sim
   \mathrm{PABM}(\{\lambda^{(k \ell)}\}_K, \rho_n)$ along with an assumed
   number of communities, $K$. To motivate our methods, we first
   consider community detection and parameter estimation in the case
-  where we know the edge probability matrix, $P$, beforehand, noting
+  where we know the edge probability matrix $P$ beforehand, noting
   that community memberships and popularity parameters are not
   immediately discernible from $P$ itself. After establishing methods
   for community detection and parameter estimation from $P$, we use the
   consistency property of ASE to demonstrate that the same methods work
-  for $A$ almost surely as $n \to \infty$." Indeed, the assumption of
+  for $A$ almost surely as $n \to \infty$.'' Indeed, the assumption of
   known $P$ helps motivate Algorithm $1$ through Algorithm~3 and the
   theoretical results in Theorem~2. Theorem 3 and Theorem 4 then follows
   by leveraging the consistency properties for adjacency spectral embedding
-  to show that community recovery and parameters estimation using $A$ is asymptotically equivalent to
-  community recover and paraemters estimation using the true but unknown $P$. 
+  to show that community recovery and parameters estimation using $A$ is asymptotically equivalent to community recovery and parameter estimation 
+  using the true but unknown $P$. 
   }
 \item
   p10, line 12. \(c^{(i)}\) is not defined.\\
@@ -301,7 +301,7 @@ questions}\label{specific-comments-and-questions}}
   The solutions are collected into matrix
   \(C = \bigl[ c_1 \mid \cdots \mid c_n \bigr]^\top\) to
   construct an affinity matrix \(B = |C| + |C^\top|\). If each \(x_i\) lies
-  exactly on one of \(K\) subspaces, \(B\) describes an undirected graph
+  exactly on one of \(K\) subspaces then \(B\) describes an undirected graph
   consisting of {\em at least} \(K\) disjoint subgraphs, i.e., \(B_{ij} = 0\) if \(x_i, x_j\) lie on different subspaces. 
   The intuition here is that vectors that lie on the same subspace can
   be described as linear combinations of each other, assuming the number
@@ -322,14 +322,14 @@ questions}\label{specific-comments-and-questions}}
   $\mathbb{R}^{n}$) rather than on the ASE of $A$ (which are real-valued
   vectors in $\mathbb{R}^{d}$ where $d \ll n$). The motivation behind
   our use of SSC comes  from Theorem 1 wherein we show that the latent
-  vectors for PABM lie on the union of orthogonal subspaces in $\mathbb{R}^{d}$ and hence,
+  vectors for the PABM lie on the union of orthogonal subspaces in $\mathbb{R}^{d}$ and hence,
   by the consistency properties of ASE, the rows of the estimated
-  eigenvectors $\hat{V}$ also lies close to the union of orthogonal
+  eigenvectors $\hat{V}$ also lie close to the union of orthogonal
   subspaces in $\mathbb{R}^{d}$. In contrast, while the rows of $P$ do lie exactly on the
-  union of $K$ orthogonal subspaces in $\mathbb{R}^{n}$, the rows of $A$
+  union of $K$ subspaces in $\mathbb{R}^{n}$, the rows of $A$
   (which are now noisy binary vectors) could be quite far from the
   corresponding rows of $P$ and hence need not lie close to the union
-  of any $K$ orthogonal subspaces in $\mathbb{R}^{n}$ 
+  of any $K$ subspaces in $\mathbb{R}^{n}$ 
   }
 \item
   p12, line 13. It could help recall what the \(z_i, z_j\) are.\\
@@ -342,15 +342,16 @@ questions}\label{specific-comments-and-questions}}
   \textcolor{blue}{
   The OSC algorithm works for any PABM parameters setting and is thus
   agnostic to the particular structure (such as assortativity vs
-  disassortativity). We had revised the manuscript to include an
+  disassortativity). We have revised the manuscript to include an
   additional simulation demonstrating this claim (see Section 4.3). In
   particular Section~4.3 considers a PABM setting wherein
   $\lambda_{kk}$ is a vector in $\mathbb{R}^{n_k}$ whose elements
-  are i.i.d $\mathrm{Beta}(1,2)$ random variables and $\lambda_{k\ell}$ is a
+  are i.i.d $\mathrm{Beta}(1,2)$ random variables and $\lambda_{k\ell}$
+  (for $k \not = \ell$) is a
   vector in $\mathbb{R}^{n_k}$ whose elements are i.i.d $\mathrm{Beta}(2,1)$
   random variables. This result in an average within-community edge
   probability of $1/3$ and a between-community edge
-  probability of $2/3$. The results for this simultation setting are
+  probability of $2/3$. The results for this simulation setting are
   very similar to those presented in the original manuscript and is also
   consistent with the theoretical results in the paper.
   }\\
@@ -364,7 +365,7 @@ questions}\label{specific-comments-and-questions}}
   \rho_n 
   \lambda_{i1} \sum_{j} \lambda_{j1}$ while the average probability of an edge between vertex $i$ and another vertex in community $k \not =
   1$ is $n^{-1} \rho_n \lambda_{ik} \sum_{j} \lambda_{j1}$ and thus, on
-  average, vertex $i$ have more affinity with vertices in community $k \not =
+  average, vertex $i$ has more affinity with vertices in community $k \not =
   1$ whenever $\lambda_{i1} < \lambda_{ik}$
   }
 \item
@@ -388,7 +389,12 @@ questions}\label{specific-comments-and-questions}}
   Do you consider sparsity in the simulated adjacency matrices?\\
   \textcolor{blue}{
   We have added another simulation in the supplemental materials. 
-  In this simulation, we fix $n = 2048$ and $K = 3$ and vary $\rho \in (0, 1)$. 
+  In this simulation, we fix $n = 2048$ and $K = 3$ and vary $\rho \in
+  (0, 1)$. In particular we see that the performance of all algorithms
+  deteriorate significantly as the graphs become sparser. Nevertheless
+  it appears that the accuracy of OSC is always comparable and/or better
+  than the remaining algorithms for all levels of the sparsity
+  considered.
   }
 \item
   Why do you limit your simulation to assortative structure? Is it
@@ -398,10 +404,9 @@ questions}\label{specific-comments-and-questions}}
   \textcolor{blue}{
   As we discussed in the response to comment
   $14$, we have added a third simulation to address the issue of disassortativity (see Section
-  4.3 of the revised manuscript). The performance of all the algorithm
+  4.3 of the revised manuscript). The performance of all algorithms
   for the setting in Section~4.3 is qualitatively similar to those
   presented earlier in Section~4.1 and Section~4.2 and is consistent with the theory. 
-  Regarding $K$, our algorithms require each $n_k$ to be large enough to span its subspace of dimension $K$, so we focused mostly on smaller values of $K$. Cursory numerical experiments suggest that OSC and SSC-ASE behave similarly for larger $K$ provided that $n$ is large enough. 
   }\\
   \textcolor{blue}{
   As for the computational complexity of the algorithms, the main bottleneck for OSC and
@@ -415,11 +420,15 @@ questions}\label{specific-comments-and-questions}}
   $n$ LASSO problems with a design matrix of size 
   $K^2 \times (n - 1)$, so the complexity is $O(n^2 K^2 + n^2 K^4 + n K^6)$ \cite{10.1214/009053604000000067}. 
   SSC-A (applying SSC on the rows of $A$) as proposed in \cite{noroozi2019estimation} involves solving $n$ LASSO regression problems each with design matrices of size $n \times (n - 1)$, so the complexity here is $O(n^4)$. 
-  When $n \gg K^2$, we can see that OSC and SSC-ASE are both $O(n^2 K^2)$. 
   In practice the choice of parameter $K$ does not affect
   runtimes too much. For the simulation studies we only considered $K
   \leq 4$ as values of $K \geq 5$ will in general, require larger values of $n$ to achieve 
-  comparable estimation accuracy as $K \leq 4$. 
+  comparable estimation accuracy as $K \leq 4$.  Indeed, consider for
+  example estimating the entries of the edge probabilities matrix
+  $P$. Then the rank of $P$ is equal to $K^2$ and hence, for a given $n$, estimation of
+  $P$ when $K = 4$ is considerably simpler than estimation of $P$ when
+  $K = 6$. Cursory numerical experiments suggest that OSC and
+  SSC-ASE behave similarly for larger $K$ provided that $n$ is large enough. 
   }
 \item
   Again, in your application on the Leeds butterfly dataset, why did you
@@ -504,10 +513,19 @@ I only have some minor comments and a couple of questions:
   \textcolor{blue}{
   We thank the referee for the questions. 
   While it is true that there are an infinite number of latent configurations that generate the PABM, based on Theorem 1 and GRDPG results by \citet{rubindelanchy2017statistical}, we can conclusively say the following: 
-  \\1. The embedding dimension is $K^2$ with $K (K + 1) / 2$ positive and $K (K - 1) / 2$ negative eigenvalues, 
-  \\2. The latent structure will always consist of $K$ $K$-dimensional subspaces---in the configuration outlined by Theorem 1, these subspaces are orthogonal, but the multiplication by arbitrary $Q \in \mathbb{O}(p, q)$ that results in the same $P$ may skew the subspaces making them no longer orthogonal (although they will still be $K$ $K$-dimensional subspaces), 
-  \\3. $B = n V V^\top$, where $V$ is the $n \times K^2$ matrix of eigenvectors of $P$, will always be such that $B_{ij} = 0$ if and only if vertices $i$ and $j$ are in different communities. 
-  \\4. The rows of $V$ are such that the inner product of the $i^{th}$ and $j^{th}$ rows is zero if and only if vertices $i$ and $j$ are in different communities. 
+  \\1. If $P$ is the edge probability matrix for a PABM with $K$
+  blocks then $P$ is of rank $K^2$ and furthermore $P$ has $K (K + 1) /
+  2$ positive eigenvalues and $K (K - 1) / 2$ negative eigenvalues. 
+  \\2. Therefore, viewed as a GRDPG, the latent vectors $X$ can be
+  represented as vectors in $\mathbb{R}^{K^2}$ and 
+  $K^2$ is the smallest possible dimension. Furthermore the latent
+  vectors will always lie on the union of $K$ disjoint $K$-dimensional subspaces---in the configuration outlined by Theorem 1, these subspaces are orthogonal, but the multiplication by arbitrary $Q \in \mathbb{O}(p, q)$ that results in the same $P$ may skew the subspaces making them no longer orthogonal (although they will still be $K$ $K$-dimensional subspaces), 
+  \\3. The matrix $B = n V V^\top$, where $V$ is the $n \times K^2$
+  matrix of eigenvectors of $P$ (corresponding to the non-zero
+  eigenvalues of $P$) is such that $B_{ij} = 0$ if and only
+  if vertices $i$ and $j$ are in different communities, i.e.,
+  $v_i^{\top} v_j = 0$ if and only if vertices $i$ and $j$ are in
+  different communities; here $v_i$ denote the $i^{th}$ row of $V$. 
   }\\
   \textcolor{blue}{
   Therefore, the dimensionality of the latent configuration is not in question, only what kind of effect multiplication by unidentifiable $Q$ has on the configuration. 
@@ -516,15 +534,16 @@ I only have some minor comments and a couple of questions:
   \hat{V}^{\top}$ as $n\hat{V}\hat{V}^{\top}$ is, by the asymptotic properties of
   adjacency spectral embedding, close to $n VV^{\top}$ and $n V
   V^{\top}$ is always unique (the orthogonal projection onto a column
-  space is always unique). Similarly, SSC-ASE also circumvents this non-identifiability
-  by only using the rows of $n^{1/2} \hat{V}$ as two rows $\hat{v}_i$ and
-  $\hat{v}_j$ of $\hat{V}$ belonging to different subspaces, i.e.,
-  different communities, will also
-  have $n \hat{v}_i^{\top} \hat{v}_j \approx 0$. 
+  space is always unique). Similarly, SSC-ASE also circumvents the
+  non-identifiability of the latent positions
+  by using only the rows of $n^{1/2} \hat{V}$ as two rows $\hat{v}_i$ and
+  $\hat{v}_j$ belonging to different communities will 
+  have $n \hat{v}_i^{\top} \hat{v}_j \approx 0$ 
+  (as Theorem 3 states that $n \hat{v}_i^\top \hat{v}_j \stackrel{a.s.}{\to} 0$). 
   }\\
   \textcolor{blue}{
-  That said, looking back at the latent configuration in Theorem 1, we
-  can see that a $K$-dimensional (not $K^2$-dimensional) embedding is
+  That said, if we look at the latent configuration in Theorem 1 then we
+  see that a $K$-dimensional (not $K^2$-dimensional) embedding is
   sufficient for clustering, i.e., the embedding corresponding to the
   diagonal blocks $\lambda_{11}, \lambda_{22}, \dots, \lambda_{KK}$. 
   If we are able to find this embedding then this would greatly reduce
@@ -532,8 +551,8 @@ I only have some minor comments and a couple of questions:
   recovery/clustering. In practice, this isn't always possible due to
   the nonidentifiability issue; in particular, determining which of the
   $K$ out of $K^2$ eigenvectors should be used is the main difficulty.
-  Nevertheless we have found via numerical experiments that community
-  detection is often possible using only the eigenvectors corresponding
+  Nevertheless we have found via numerical experiments that accurate community
+  recovery is generally possible when we use only the eigenvectors corresponding
   to the $2^\mathrm{nd}$ to the $(K+1)^\mathrm{st}$ largest eigenvalues
   of $A$. 
   }
@@ -576,15 +595,14 @@ I only have some minor comments and a couple of questions:
   SDP often results in $B$ having more than $K$ connected components.
   This is why we choose to do spectral clustering on $B$, i.e., we first
   compute the normalized Laplacian embeddings using $B$ before
-  clustering the rows of this embedding using Gaussian mixtures
-  modeling. 
+  clustering the rows of this embedding using Gaussian mixture models. 
   }\\
   \textcolor{blue}{
   Finally we note that in our simulations the proportion of mislabeled
   vertices does decreases as $n$ increases. 
   For instance, in section 4.1, if $K = 2$ then the average number of mis-clustered
   vertices for SSC-ASE is around 20 when $n = 128$ and around 100 when
-  $n = 4096$; this correspond to an error rate of around $16\%$ and
+  $n = 4096$; this corresponds to an error rate of around $16\%$ and
   $2\%$, respectively.
   }
 \item
