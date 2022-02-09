@@ -268,6 +268,7 @@ of any $K$ subspaces in $\mathbb{R}^{n}$
 We have changed $z_i$ to ``community labels''.
 }
 
+
 16. p14. Do you think that the OSC algorithm can retrieve other kinds of structure than assortative ones?  
 \textcolor{blue}{
 The OSC algorithm works for any PABM parameters setting and is thus
@@ -276,12 +277,12 @@ disassortativity). We have revised the manuscript to include an
 additional simulation demonstrating this claim (see Section 4.3). In
 particular Section~4.3 considers a PABM setting wherein
 $\lambda_{kk}$ is a vector in $\mathbb{R}^{n_k}$ whose elements
-are i.i.d $\mathrm{Beta}(1,2)$ random variables and $\lambda_{k\ell}$
+are i.i.d. $\mathrm{Beta}(1,2)$ random variables and $\lambda_{k\ell}$
 (for $k \not = \ell$) is a
-vector in $\mathbb{R}^{n_k}$ whose elements are i.i.d $\mathrm{Beta}(2,1)$
-random variables. This result in an average within-community edge
-probability of $1/3$ and a between-community edge
-probability of $2/3$. The results for this simulation setting are
+vector in $\mathbb{R}^{n_k}$ whose elements are i.i.d. $\mathrm{Beta}(2,1)$
+random variables. This result in an average within-community popularity 
+parameter of $1/3$ and a between-community popularity
+parameter of $2/3$. The results for this simulation setting are
 very similar to those presented in the original manuscript and is also
 consistent with the theoretical results in the paper.
 }  
@@ -330,13 +331,21 @@ Is it possible to see the results with a larger value of $K$?
 To what extent does the value of $K$ impact the computational burden for the algorithms?  
 \textcolor{blue}{
 As we discussed in the response to comment
-$14$, we have added a third simulation to address the issue of disassortativity (see Section
+$16$, we have added a third simulation to address the issue of disassortativity (see Section
 4.3 of the revised manuscript). The performance of all algorithms
 for the setting in Section~4.3 is qualitatively similar to those
 presented earlier in Section~4.1 and Section~4.2 and is consistent with the theory. 
 }  
 \textcolor{blue}{
-As for the computational complexity of the algorithms, the main bottleneck for OSC and
+For the simulation studies, we only considered $K \leq 4$ as larger $K$ will, 
+in general, require larger values of $n$ to achieve comparable estimation accuracy as lower values of $K$. 
+Indeed, consider for example estimating the entries of the edge probabilities matrix $P$. 
+Then the rank of $P$ is equal to $K^2$ and hence, for a given $n$, estimation of $P$ when $K = 4$ is considerably simpler than estimation of $P$ when $K = 6$. 
+We have performed some cursory numerical experiments that suggest that OSC does behave similarly to the $K \leq 4$ cases, given sufficient $n$, which is consistent with the theory. 
+}  
+\textcolor{blue}{
+As for the computational complexity of the algorithms, 
+the main bottleneck for OSC and
 SSC-ASE is the construction of the affinity matrix $B$. 
 For OSC, this involves a (truncated) spectral decomposition to extract the
 $K^2$ largest eigenvalues in modulus (and their corresponding
@@ -348,14 +357,8 @@ $n$ LASSO problems with a design matrix of size
 $K^2 \times (n - 1)$, so the complexity is $O(n^2 K^2 + n^2 K^4 + n K^6)$ \cite{10.1214/009053604000000067}. 
 SSC-A (applying SSC on the rows of $A$) as proposed in \cite{noroozi2019estimation} involves solving $n$ LASSO regression problems each with design matrices of size $n \times (n - 1)$, so the complexity here is $O(n^4)$. 
 In practice the choice of parameter $K$ does not affect
-runtimes too much. For the simulation studies we only considered $K
-\leq 4$ as values of $K \geq 5$ will in general, require larger values of $n$ to achieve 
-comparable estimation accuracy as $K \leq 4$.  Indeed, consider for
-example estimating the entries of the edge probabilities matrix
-$P$. Then the rank of $P$ is equal to $K^2$ and hence, for a given $n$, estimation of
-$P$ when $K = 4$ is considerably simpler than estimation of $P$ when
-$K = 6$. Cursory numerical experiments suggest that OSC and
-SSC-ASE behave similarly for larger $K$ provided that $n$ is large enough. 
+runtimes too much in our simulation studies, 
+largely because SSC-A takes up the bulk of the runtime. 
 }
 
 20. Again, in your application on the Leeds butterfly dataset, why did you limit your analysis to $K = 4$?  
