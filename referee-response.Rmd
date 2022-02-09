@@ -475,9 +475,8 @@ One possible reason for this may be because we failed to find the
 right value for the hyperparameter $\vartheta$ for SSC-ASE. 
 }  
 \textcolor{blue}{
-More specifically, under ideal circumstances, we would be able to
-circumvent the issue of selecting the hyperparameter $\vartheta$ by
-using the theoretical value that ensures, with high probability, the rows of $\hat{V}$ satisfy the subspace
+More specifically, under ideal circumstances, we can set the hyperparameter $\vartheta$ to
+the theoretical values that ensure, with high probability, the rows of $\hat{V}$ satisfy the subspace
 detection property (SDP). However, as other researchers had pointed out (see
 e.g., \citep{sdp_sufficiency,liu_ssc}, the fact that SDP is satisfied
 does not guarantee that the affinity matrix $B$ represents a graph
@@ -491,12 +490,13 @@ clustering the rows of this embedding using Gaussian mixtures
 modeling. 
 }  
 \textcolor{blue}{
-Finally we note that in our simulations the proportion of mislabeled
-vertices does decreases as $n$ increases. 
-For instance, in section 4.1, if $K = 2$ then the average number of mis-clustered
-vertices for SSC-ASE is around 20 when $n = 128$ and around 100 when
+Finally we emphasize that in our simulations the proportion of mislabeled
+vertices does decreases as $n$ increases. For instance, in section 4.1, if $K = 2$ then the average number of mis-clustered vertices for SSC-ASE is around 20 when $n = 128$ and around 100 when
 $n = 4096$; this correspond to an error rate of around $16\%$ and
-$2\%$, respectively.
+$2\%$, respectively. In other words SSC-ASE also works quite well for $K =
+2$ as the proportion of mis-clustered vertices decreases to $0$ as $n$
+increases; it is only when we compared the number of mis-clustered
+vertices that $K = 2$ performs worse compared to $K \geq 3$. 
 }
 
 * In the application section, MM performs better than OSC and SSC-ASE, while in the simulation study the opposite is observed. 
