@@ -453,9 +453,11 @@ $\tilde{P} = X \Pi X^\top$ where the rows of $X$ lie in the union of
 two 2-dimensional orthogonal subspaces and $\Pi$ is a permutation matrix. 
 
 For the general case, we can extend $\tilde{P} = X \Pi X^\top$ to larger $K$. 
+For a more concrete example of this, refer to Example~1. 
 We once again consider $\tilde{P}$ as defined in
 Remark~\ref{rem:pabm_view2}.  
 We first define the following matrices
+
 \begin{gather}
 \label{eq:xy}
 \Lambda^{(k)} = \begin{bmatrix} \lambda^{(k1)} \mid \cdots \mid \lambda^{(kK)} \end{bmatrix}
@@ -467,7 +469,9 @@ L^{(k)} = \mathrm{blockdiag}(\lambda^{(1k)}, \dots, \lambda^{(Kk)}) \in
 Y = \begin{bmatrix} L^{(1)} \mid \cdots \mid L^{(K)} \end{bmatrix} \in
 \mathbb{R}^{n \times K^2}.
 \end{gather}
+
 It is then straightforward to verify that
+
 \begin{gather*}
   XY^{\top} = \mathrm{blockdiag}(\Lambda^{(1)}, \dots,
 \Lambda^{(K)}) \begin{bmatrix} L_1^{\top} \\ \vdots \\
