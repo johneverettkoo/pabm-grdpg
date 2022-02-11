@@ -574,7 +574,7 @@ Two inference objectives arise from the PABM:
 \end{enumerate}
 
 In our methods, the data that are observed for estimation is the adjacency matrix, $A \sim \PABM(\{\lambda^{(k \ell)}\}_K, \rho_n)$, along with an assumed number of communities, $K$. 
-To motivate our methods, we first consider community detection and parameter estimation in the case where we know the edge probability matrix, $P$, beforehand, noting that community memberships and popularity parameters are not immediately discernible from $P$ itself. 
+To motivate our methods, we first consider community detection and parameter estimation in the case where we know the edge probability matrix $P$ beforehand, noting that community memberships and popularity parameters are not immediately discernible from $P$ itself. 
 After establishing methods for community detection and parameter estimation from $P$, we use the consistency property of the ASE \citep{doi:10.1080/01621459.2012.699795,rubindelanchy2017statistical} to demonstrate that the same methods work for $A$ almost surely as $n \to \infty$.
 
 \hypertarget{related-work}{%
@@ -717,7 +717,7 @@ when we are given only $P$.
 More specifically, suppose we find a matrix $Y \in
 \mathbb{R}^{n \times K^2}$
 such that \(P = Y I_{p, q} Y^\top\). Then it is generally the case that
-we  \( Y = \tilde{\Pi} XU Q \) for some indefinite orthogonal matrix
+\( Y = \tilde{\Pi} XU Q \) for some indefinite orthogonal matrix
 $Q \in \mathbb{O}(p,q)$. 
 However since \(Q\) is not necessarily an
 orthogonal matrix and hence, if $y_i$ denote the $i^{th}$ row of $Y$, 
