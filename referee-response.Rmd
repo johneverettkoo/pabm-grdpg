@@ -62,9 +62,9 @@ some clarifications and detail how the simulation study could be
 improved in my opinion.
 
 \textcolor{blue}{
-We thank the referee for the feedback. 
-The concerns addressed here are answered below. 
-In particular, we made considerable effort to address the referees' concerns about the simulation studies. 
+We thank the referee for the feedback. The referee's comments are
+answered below. 
+In particular, we made considerable effort to address the referee's concerns about the simulation studies. 
 }
 
 ## Specific comments and questions
@@ -336,14 +336,24 @@ for the setting in Section~4.3 is qualitatively similar to those
 presented earlier in Section~4.1 and Section~4.2 and is consistent with the theory. 
 }  
 \textcolor{blue}{
-For the simulation studies, we only considered $K \leq 4$ as larger $K$ will, 
-in general, require larger values of $n$ to achieve comparable estimation accuracy as lower values of $K$ and SSC-A 
-(where SSC is applied to the rows of the adjacency matrix) takes a very long time to run when $n$ is large  (see the discussion about computational complexity below). 
-Our theoretical results are limit results and work for any choice of $K$ as long as $n$ is large. The reason for needing large $n$ when $K$ increases is that the rank of $P$ is equal to $K^2$ and hence, for a given $n$, estimation of $P$ when $K$ is say $4$ is considerably simpler than estimation of $P$ when $K$ is say $8$. 
-We have performed some cursory numerical experiments and found that OSC and SSC-ASE for $K = 8$ and $n = 4096$ behave similarly to $K \leq 4$ and $n = 1024$.
+For the simulation studies, we only considered $K \leq 4$ as larger
+$K$ will, in general, require larger values of $n$ to achieve
+comparable estimation accuracy as lower values of $K$. The running
+time for a simulation studies when $n$ is large then becomes quite
+prohibitive, and this is due mainly to the running-time of the SSC-A
+algorithm (see the discussion about computationaly
+complexity); the running time of the SSC-ASE and OSC is still
+reasonable when we increases $n$. We believe that our current simulation
+studies (including the new section 4.3) is sufficiently
+comprehensive to illustrate our theoretical results results; indeed
+our theoretical results are large-sample results and is valid for any
+choice of $K$. The only reason for needing large
+$n$ when $K$ increases is that the rank of $P$ is equal to $K^2$ and
+hence, for a given $n$, estimation of $P$ when $K$ is say $4$ is
+considerably simpler than estimation of $P$ when $K$ is say $8$. 
 }  
 \textcolor{blue}{
-As for the computational complexity of the algorithms, 
+For the computational complexity of the algorithms, 
 the main bottleneck for OSC and
 SSC-ASE is the construction of the affinity matrix $B$. 
 For OSC, this involves a (truncated) spectral decomposition to extract the
@@ -479,11 +489,13 @@ right value for the hyperparameter $\vartheta$ for SSC-ASE.
 \textcolor{blue}{
 More specifically, under ideal circumstances, we can set the hyperparameter $\vartheta$ to
 the theoretical values that ensure, with high probability, the rows of $\hat{V}$ satisfy the subspace
-detection property (SDP). However, as other researchers had pointed out (see
-e.g., \citep{sdp_sufficiency,liu_ssc}, the fact that SDP is satisfied
+detection property (SDP). However, as other researchers had pointed
+out that, even in the context of sparse subspace clustering where the points lie
+exactly on a union of $K$ subspaces, the fact that SDP is satisfied
 does not guarantee that the affinity matrix $B$ represents a graph
 with $K$ connected components but rather a graph with {\em at least}
-$K$ connected component. Indeed, we found in our simulations that
+$K$ connected component (see e.g., \citep{liu_ssc,sdp_sufficiency,}).
+Indeed, we found in our simulations that
 setting $\vartheta$ to the theoretical values that guarantees 
 SDP often results in $B$ having more than $K$ connected components.
 This is why we choose to do spectral clustering on $B$, i.e., we first
