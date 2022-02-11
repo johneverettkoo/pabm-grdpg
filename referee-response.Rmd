@@ -320,8 +320,7 @@ We have added another simulation in the supplemental materials.
 In this simulation, we fix $n = 2048$ and $K = 3$ and vary $\rho \in
 (0, 1)$. In particular we see that the performance of all algorithms
 deteriorate significantly as the graphs become sparser. Nevertheless
-it appears that the accuracy of OSC is always comparable and/or better
-than the remaining algorithms for all levels of the sparsity
+the accuracy of OSC is always comparable and/or better than the remaining algorithms for all levels of the sparsity
 considered.
 }
 
@@ -330,7 +329,7 @@ Is it possible to see the results with a larger value of $K$?
 To what extent does the value of $K$ impact the computational burden for the algorithms?  
 \textcolor{blue}{
 As we discussed in the response to comment
-$14$, we have added a third simulation to address the issue of disassortativity (see Section
+$16$, we have added a third simulation to address the issue of disassortativity (see Section
 4.3 of the revised manuscript). The performance of all algorithms
 for the setting in Section~4.3 is qualitatively similar to those
 presented earlier in Section~4.1 and Section~4.2 and is consistent with the theory. 
@@ -354,7 +353,7 @@ comparable estimation accuracy as $K \leq 4$.  Indeed, consider for
 example estimating the entries of the edge probabilities matrix
 $P$. Then the rank of $P$ is equal to $K^2$ and hence, for a given $n$, estimation of
 $P$ when $K = 4$ is considerably simpler than estimation of $P$ when
-$K = 6$. Cursory numerical experiments suggest that OSC and
+$K = 8$. Cursory numerical experiments suggest that OSC and
 SSC-ASE behave similarly for larger $K$ provided that $n$ is large enough. 
 }
 

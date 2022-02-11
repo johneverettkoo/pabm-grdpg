@@ -602,11 +602,9 @@ then this property may only hold approximately and a final graph partitioning st
 (e.g., edge thresholding or spectral clustering).
 
 In practice, due to presence of noise, SSC is often done by solving the LASSO problems
-
 \begin{equation} \label{eq:ssc}
 c_i = \argmin_c \frac{1}{2} \|x_i - X_{-i}^\top c\|^2_2 + \vartheta \|c\|_1
 \end{equation}
-
 for some sparsity parameter \(\vartheta > 0\). 
 The \(c_i\) vectors are then collected into \(C\) and \(B\) as before.
 
