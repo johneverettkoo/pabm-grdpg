@@ -46,7 +46,7 @@ rmse.df <- foreach(K = K.vec, .combine = dplyr::bind_rows) %do% {
   return(out)
 }
 
-readr::write_csv(rmse.df, 'rmse-k-disassortative.csv')
+readr::write_csv(rmse.df, 'simulation-results/param-est-disassortative.csv')
 
 rmse.df %>% 
   na.omit() %>% 

@@ -64,7 +64,7 @@ clustering.df <- foreach(K = K.vec, .combine = dplyr::bind_rows) %do% {
 
 gc()
 
-readr::write_csv(clustering.df, 'clustering-k.csv')
+readr::write_csv(clustering.df, 'simulation-results/cluster-sim-balanced.csv')
 
 clustering.df %>%
   dplyr::group_by(n, K) %>%
@@ -87,6 +87,7 @@ clustering.df %>%
   theme_bw() + 
   theme(text = element_text(size = 10)) + 
   scale_x_log10(breaks = c(128, 256, 512, 1024, 2048, 4096)) +
+  scale_y_log10() + 
   labs(y = 'community detection error count', 
        colour = NULL, shape = NULL) +
   geom_line(aes(x = n, y = med.err * n,

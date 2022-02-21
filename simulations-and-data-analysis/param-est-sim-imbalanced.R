@@ -46,7 +46,7 @@ rmse.df <- foreach(K = K.vec, .combine = dplyr::bind_rows) %do% {
   return(out)
 }
 
-readr::write_csv(rmse.df, 'rmse-k-imbalanced.csv')
+readr::write_csv(rmse.df, 'simulation-results/param-estim-sim-imbalanced.csv')
 
 rmse.df %>% 
   na.omit() %>% 

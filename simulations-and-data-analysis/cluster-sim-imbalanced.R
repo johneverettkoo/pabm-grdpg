@@ -64,7 +64,7 @@ clustering.df <- foreach(K = K.vec, .combine = dplyr::bind_rows) %do% {
 
 gc()
 
-# readr::write_csv(clustering.df, 'clustering-k-imbalanced.csv')
+readr::write_csv(clustering.df, 'simulation-results/cluster-sim-imbalanced.csv')
 
 clustering.df %>%
   dplyr::group_by(n, K) %>%

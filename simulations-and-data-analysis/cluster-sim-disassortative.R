@@ -62,7 +62,7 @@ clustering.df <- foreach(K = K.vec, .combine = dplyr::bind_rows) %do% {
 
 gc()
 
-readr::write_csv(clustering.df, 'clustering-k-disassortative.csv')
+readr::write_csv(clustering.df, 'simulation-results/clustering-k-disassortative.csv')
 
 clustering.df %>%
   dplyr::group_by(n, K) %>%
