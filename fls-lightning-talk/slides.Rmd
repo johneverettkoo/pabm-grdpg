@@ -1,0 +1,621 @@
+---
+title: Popularity Adjusted Block Models are Generalized Random Dot Product Graphs
+subtitle: Future Leaders Summit 2022 Lightning Presentation
+author: John Koo, Indiana University
+date: 'April 2022'
+output: 
+  beamer_presentation:
+    fig_crop: no
+    theme: 'default'
+    colortheme: 'beaver'
+    includes:
+      in_header: page_headers.tex
+header-includes:
+- \usepackage{setspace}
+- \usepackage{float}
+- \usepackage{mathtools}
+- \usepackage{natbib}
+- \usepackage[linesnumbered,ruled,vlined]{algorithm2e} 
+- \setcitestyle{numbers,square,comma}
+- \usepackage{verbatim}
+- \usepackage{amsthm}
+- \usepackage{comment}
+- \usepackage{graphicx}
+- \setbeamertemplate{itemize items}[circle]
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, 
+                      comment = NA, 
+                      warning = FALSE, 
+                      message = FALSE,
+                      fig.align = 'center',
+                      fig.lp = '')
+options(xtable.comment = FALSE, 
+        xtable.table.placement = 'H')
+library(ggplot2)
+import::from(magrittr, `%>%`)
+theme_set(theme_bw())
+
+source('~/dev/pabm-grdpg/functions.R')
+set.seed(314159)
+```
+
+## Contributors
+
+::: columns
+
+:::: {.column width='33%'}
+
+```{r, out.width = '100px'}
+knitr::include_graphics('john-koo.jpeg')
+```
+
+John Koo,  
+PhD Student in Statistical Science,  
+Indiana University
+
+::::
+
+:::: {.column width='33%'}
+
+```{r, out.width = '100px'}
+knitr::include_graphics('minh-tang.jpg')
+```
+
+Minh Tang,  
+Assistant Professor of Statistics,  
+NC State University
+
+::::
+
+:::: {.column width='33%'}
+
+```{r, out.width = '100px'}
+knitr::include_graphics('michael-trosset.jpg')
+```
+
+Michael Trosset,  
+Professor of Statistics,  
+Indiana University
+
+::::
+
+:::
+
+## Community Detection for Networks
+
+\newcommand{\diag}{\text{diag}}
+\newcommand{\tr}{\text{Tr}}
+\newcommand{\blockdiag}{\text{blockdiag}}
+\newcommand{\indep}{\stackrel{\text{ind}}{\sim}}
+\newcommand{\iid}{\stackrel{\text{iid}}{\sim}}
+\newcommand{\Bernoulli}{\text{Bernoulli}}
+\newcommand{\Betadist}{\text{Beta}}
+\newcommand{\BG}{\text{BernoulliGraph}}
+\newcommand{\Cat}{\text{Categorical}}
+\newcommand{\Uniform}{\text{Uniform}}
+\newcommand{\RDPG}{\text{RDPG}}
+\newcommand{\GRDPG}{\text{GRDPG}}
+\newcommand{\PABM}{\text{PABM}}
+
+```{r out.width = '50%', fig.height = 3, fig.width = 4}
+Pz <- generate.P.beta(64, 4, 4, 1, 1, 4)
+P <- Pz$P
+z <- Pz$clustering
+A <- draw.graph(P)
+qgraph::qgraph(A, groups = factor(z), legend = FALSE)
+```
+
+How can we cluster the nodes of a network?
+
+Statistical inference (parametric approach):
+
+1. Define a generative model for graph: 
+$G \mid z_1, ..., z_n, \vec{\theta} \sim P(\vec{z}, \vec{\theta})$.
+2. Develop a method for obtaining estimators: 
+$f(G) = (\hat{\vec{z}}, \hat{\vec{\theta}})$.
+3. Identify asymptotic properties of estimators: 
+$(\hat{\vec{z}}, \hat{\vec{\theta}}) \to (\vec{z}, \vec{\theta})$.
+
+## Overview
+
+<style type="text/css">
+.caption {
+    font-size: x-small;
+}
+</style>
+
+1. Block Models and the Popularity Adjusted Block Model
+
+2. Generalized Random Dot Product Graphs
+
+3. Connecting the PABM to the GRDPG
+
+4. Community Detection for the PABM
+
+# Block Models
+
+## Bernoulli Graphs
+
+<style type="text/css">
+.caption {
+    font-size: x-small;
+}
+</style>
+
+::: columns
+
+:::: {.column width=62.5%}
+
+Let $G = (V, E)$ be an undirected and unweighted graph with $|V| = n$.
+
+$G$ is described by adjacency matrix $A$ such that
+$A_{ij} = \begin{cases} 
+1 & \exists \text{ edge between } i \text{ and } j \\
+0 & \text{else}
+\end{cases}$
+
+$A_{ji} = A_{ij}$ and $A_{ii} = 0$ $\forall i, j \in [n]$.
+
+\vspace*{1\baselineskip}
+
+$A \sim \BG(P)$ iff:
+
+1. $P \in [0, 1]^{n \times n}$ describes edge probabilities between pairs of 
+vertices.
+2. $A_{ij} \indep \Bernoulli(P_{ij})$ for each $i < j$.
+
+::::
+
+:::: {.column width=37.5%}
+
+**Example 1**: If every entry $P_{ij} = \theta$, then $A \sim \BG(P)$ is an Erdos-Renyi graph.  
+For this model, $A_{ij} \iid \Bernoulli(\theta)$.
+
+```{r, fig.height = 2, fig.width = 2}
+n <- 2 ** 5
+p <- 1 / log(n)
+P <- matrix(p, nrow = n, ncol = n)
+A <- draw.graph(P)
+qgraph::qgraph(A, vsize = 4)
+```
+
+::::
+
+:::
+
+## Block Models
+
+Suppose each vertex $v_1, ..., v_n$ has labels $z_1, ..., z_n \in \{1, ..., K\}$,  
+and each $P_{ij}$ depends on labels $z_i$ and $z_j$.  
+Then $A \sim \BG(P)$ is a *block model*.
+
+**Example 2**: Stochastic Block Model with two communities
+
+::: columns
+
+:::: column
+
+* $z_1, ..., z_n \in \{1, 2\}$
+* $P_{ij} = \begin{cases} 
+p & z_i = z_j = 1 \\
+q & z_i = z_j = 2 \\
+r & z_i \neq z_j
+\end{cases}$
+
+* To make this an assortative SBM, set $p q > r^2$.
+* In this example, $p = 1/2$, $q = 1/4$, and $r = 1/8$.
+
+::::
+
+:::: column
+
+```{r, fig.height = 3, fig.width = 4, out.width = '100%'}
+n1 <- 2 ** 5
+n2 <- 2 ** 5
+n <- n1 + n2
+z <- c(rep(1, n1), rep(2, n2))
+p <- 1/2
+q <- 1/4
+r <- 1/8
+P <- matrix(r, nrow = n, ncol = n)
+P[seq(n1), seq(n1)] <- p
+P[seq(n1 + 1, n), seq(n1 + 1, n)] <- q
+A <- draw.graph(P)
+qgraph::qgraph(A, vsize = 4, groups = factor(z), legend = FALSE)
+```
+
+::::
+
+:::
+  
+## Block Models
+
+Erdos-Renyi Model (1959)
+
+* $P_{ij} = \theta$ (not a block model)
+* 1 parameter $\theta$
+
+Stochastic Block Model (Lorrain and White, 1971)
+
+* $P_{ij} = \theta_{z_i z_j}$
+* $K (K + 1) / 2$ parameters $\theta_{kl}$
+
+Degree Corrected Block Model (Karrer and Newman, 2011)
+
+* $P_{ij} = \theta_{z_i z_j} \omega_i \omega_j$
+* $K (K + 1) / 2 + n$ parameters $\theta_{kl}$, $\omega_i$
+
+Popularity Adjusted Block Model (Sengupta and Chen, 2017)
+
+* $P_{ij} = \lambda_{i z_j} \lambda_{j z_i}$
+* $K n$ parameters $\lambda_{ik}$
+
+## Popularity Adjusted Block Model
+
+**Def** Popularity Adjusted Block Model (Sengupta and Chen, 2017):
+
+Let each vertex $i \in [n]$ have $K$ popularity parameters
+$\lambda_{i1}, ..., \lambda_{iK} \in [0, 1]$. 
+Then $A \sim \PABM(P)$ if each $P_{ij} = \lambda_{i z_j} \lambda_{j z_i}$,  
+e.g., if $z_i = k$ and $z_j = l$, $P_{ij} = \lambda_{il} \lambda_{jk}$.
+
+**Lemma** (Noroozi, Rimal, and Pensky, 2020): 
+
+$A$ is sampled from a PABM if $P$ can be described as:
+
+1. Let each $P^{(kl)}$ denote the $n_k \times n_l$ matrix of edge probabilities 
+between communities $k$ and $l$. 
+2. Organize popularity parameters as vectors 
+$\lambda^{(kl)} \in \mathbb{R}^{n_k}$ 
+such that $\lambda^{(kl)}_i = \lambda_{k_i l}$ is the popularity parameter 
+of the $i$^th^ vertex of community $k$ towards community $l$. 
+3. Each block can be decomposed as 
+$P^{(kl)} = \lambda^{(kl)} (\lambda^{(lk)})^\top$.
+
+**Notation**: $A \sim \PABM(\{\lambda^{(kl)}\}_K)$.
+
+# Generalized Random Dot Product Graphs
+
+## (Generalized) Random Dot Product Graph Model
+
+Random Dot Product Graph $A \sim \RDPG(X)$  
+(Young and Scheinerman, 2007)
+
+* Latent vectors $x_1, ..., x_n \in \mathbb{R}^d$ such that 
+$x_i^\top x_j \in [0, 1]$
+* $A \sim \BG(X X^\top)$ where 
+$X = \begin{bmatrix} x_1 & \cdots & x_n \end{bmatrix}^\top$
+
+Generalized Random Dot Product Graph $A \sim \GRDPG_{p, q}(X)$  
+(Rubin-Delanchy, Cape, Tang, Priebe, 2020)
+
+* Latent vectors $x_1, ..., x_n \in \mathbb{R}^{p+q}$ such that 
+$x_i^\top I_{p, q} x_j \in [0, 1]$ and $I_{p, q} = \blockdiag(I_p, -I_q)$
+* $A \sim \BG(X I_{p, q} X^\top)$ where 
+$X = \begin{bmatrix} x_1 & \cdots & x_n \end{bmatrix}^\top$
+
+If latent vectors $X_1, ..., X_n \iid F$, then we write 
+$(A, X) \sim \RDPG(F, n)$ or $(A, X) \sim \GRDPG_{p, q}(F, n)$.
+
+## (Generalized) Random Dot Product Graph Model
+
+### Recovery/Estimation
+
+Want to estimate $X$ from $A$, or alternatively, 
+interpoint distances, inner products, or angles.
+
+### Adjacency Spectral Embedding
+
+To embed in $\mathbb{R}^d$, 
+
+1. Compute $A \approx \hat{V} \hat{\Lambda} \hat{V}^\top$ 
+where $\hat{\Lambda} \in \mathbb{R}^{d \times d}$ and 
+$\hat{V} \in \mathbb{R}^{n \times d}$.  
+For RDPG, use $d$ greatest eigenvalues; 
+for GRDPG, use $p$ most positive and $q$ most negative eigenvalues.
+
+2. For RDPG, let $\hat{X} = \hat{V} \hat{\Lambda}^{1/2}$; 
+for GRDPG, let $\hat{X} = \hat{V} |\hat{\Lambda}|^{1/2}$.
+
+\vspace*{.5\baselineskip}
+
+RDPG: $\max\limits_i \|\hat{X}_i - W_n X_i \| \stackrel{a.s.}{\to} 0$
+(Athreya et al., 2018)  
+GRDPG: 
+$\max\limits_i \|\hat{X}_i - Q_n X_i \| \stackrel{a.s.}{\to} 0$
+(Rubin-Delanchy et al., 2020)
+
+# Connecting the PABM to the GRDPG
+
+## Connecting Block Models to the (G)RDPG Model
+
+All Bernoulli Graphs are RDPG (if $P$ is 
+positive semidefinite)  
+or GRDPG (in general).
+
+**Example 2** (cont'd): Assortative SBM ($p q > r^2$) with $K = 2$
+
+::: columns
+
+:::: column
+
+$$P_{ij} = \begin{cases} 
+p & z_i = z_j = 1 \\
+q & z_i = z_j = 2 \\
+r & z_i \neq z_j
+\end{cases}$$
+
+```{r fig.height = 3, fig.width = 6, out.width = '100%'}
+qgraph::qgraph(A, vsize = 4, groups = factor(z), legend = FALSE)
+```
+
+::::
+
+:::: column
+
+$$P = 
+\begin{bmatrix} 
+P^{(11)} & P^{(12)} \\
+P^{(21)} & P^{(22)}
+\end{bmatrix} =
+X X^\top$$
+
+$$X = \begin{bmatrix} 
+\sqrt{p} & 0 \\
+\vdots & \vdots \\
+\sqrt{p} & 0 \\
+\sqrt{r^2 / p} & \sqrt{q - r^2 / p} \\
+\vdots & \vdots \\
+\sqrt{r^2 / p} & \sqrt{q - r^2 / p}
+\end{bmatrix}$$
+
+::::
+
+:::
+
+## Connecting Block Models to the (G)RDPG Model
+
+**Example 2** (cont'd): If we want to perform community detection, 
+
+1. Note that $A$ is a RDPG because $P = X X^\top$.
+2. Compute the ASE $A \approx \hat{X} \hat{X}^\top$ with 
+$\hat{X} = \hat{V} \hat{\Lambda}^{1/2}$.
+3. Apply clustering algorithm (e.g., $K$-means) to $\hat{X}$,  
+noting that as $n \to \infty$, the ASE approaches point masses.
+
+```{r, fig.height = 5, fig.width = 5, out.width = '50%'}
+P.eigen = eigen(P)
+X <- P.eigen$vectors[, 1:2] %*% diag(P.eigen$values[1:2] ** .5)
+
+A.eigen <- eigen(A)
+X.hat <- A.eigen$vectors[, 1:2] %*% diag(A.eigen$values[1:2] ** .5)
+plot(X.hat, asp = 1, col = z * 2, xlab = NA, ylab = NA, 
+     main = 'ASE of the adjacency matrix drawn from SBM')
+points(X, pch = 16, col = z * 2)
+```
+
+## Connecting Block Models to the (G)RDPG Model
+
+::: columns
+
+:::: column
+
+```{r, out.width = '50%', fig.height = 2.5, fig.width = 2.5}
+par(mar = rep(1.75, 4))
+plot(X, asp = 1, col = z, xlab = NA, ylab = NA, main = 'SBM: Point masses')
+```
+
+\vspace*{.5\baselineskip}
+
+```{r, out.width = '50%', fig.height = 2.5, fig.width = 2.5}
+par(mar = rep(1.75, 4))
+omega <- rbeta(n, 1, 1)
+dc.matrix <- omega %*% t(omega)
+P.dcbm <- P * dc.matrix
+dcbm.eigen <- eigen(P.dcbm)
+X.dcbm <- dcbm.eigen$vectors[, 1:2] %*% diag(dcbm.eigen$values[1:2] ** .5)
+plot(X.dcbm, asp = 1, col = z, xlab = NA, ylab = NA, main = 'DCBM: Rays')
+
+```
+
+::::
+
+:::: column
+
+\vspace*{0\baselineskip}
+
+```{r, out.width = '100%', fig.height = 4, fig.width = 4}
+par(mar = rep(1.75, 4))
+Pz <- generate.P.beta(n * 10)
+P <- Pz$P
+z <- Pz$clustering
+X <- embedding(P, 3, 1)
+pairs(X, col = z, asp = 1, pch = '.', main = 'PABM: Orthogonal subspaces')
+```
+
+::::
+
+:::
+
+## Connecting the PABM to the GRDPG
+
+**Theorem** (KTT): $A \sim \PABM(\{\lambda^{(kl)}\}_K)$ is equivalent to 
+$A \sim \GRDPG_{p, q}(X U)$ with
+
+* $p = K (K + 1) / 2$, $q = K (K - 1) / 2$
+* $U \in \mathbb{O}(K^2)$
+* $X \in \mathbb{R}^{n \times K^2}$ is block diagonal and 
+composed of $\{\lambda^{(kl)}\}_K$ 
+with each block corresponding to a community.  
+
+$$X = \begin{bmatrix}
+\Lambda^{(1)} & \cdots & 0 \\
+0 & \ddots & 0 \\
+0 & \cdots & \Lambda^{(K)}
+\end{bmatrix} 
+\in \mathbb{R}^{n \times K^2}$$
+
+$$\Lambda^{(k)} = \begin{bmatrix} 
+\lambda^{(k1)} & \cdots & \lambda^{(kK)} 
+\end{bmatrix} 
+\in \mathbb{R}^{n_k \times K}$$
+
+## Connecting the PABM to the GRDPG
+
+::: columns
+
+:::: column
+
+$$X = \begin{bmatrix}
+\Lambda^{(1)} & \cdots & 0 \\
+0 & \ddots & 0 \\
+0 & \cdots & \Lambda^{(K)}
+\end{bmatrix}$$
+
+::::
+
+:::: column
+
+\vspace*{2\baselineskip}
+
+$$U \in \mathbb{O}(K^2)$$
+
+::::
+
+:::
+
+$$A \sim \PABM(\{\lambda^{(kl)}\}_K) \iff A \sim \GRDPG_{p, q}(X U)$$
+
+**Remark 1** (orthogonality of subspaces):
+If $y_i^\top$ and $y_j^\top$ are two rows of $X U$ corresponding 
+to different communities, then $y_i^\top y_j = 0$.
+
+**Remark 2** (non-uniqueness of the latent configuration):  
+If $A \sim \GRDPG_{p, q}(Y)$, then $A \sim \GRDPG_{p, q}(Y Q)$ for any $Q$ in 
+the indefinite orthogonal group with signature $p, q$.
+
+**Remark 3**: Communities correspond to subspaces even with linear transformation $Q \in \mathbb{O}(p, q)$, but this may break the orthogonality property.
+
+# Community Detection for the PABM
+
+## Orthogonal Spectral Clustering
+
+**Theorem** (KTT): 
+If $P = V \Lambda V^\top$ and $B = n V V^\top$,  
+then $B_{ij} = 0$ if $z_i \neq z_j$.
+
+**Algorithm**: Orthogonal Spectral Clustering:
+
+1. Let $V$ be the eigenvectors of $A$ corresponding to the $K (K+1)/2$ most 
+positive and $K (K-1) / 2$ most negative eigenvalues.
+2. Compute $B = |n V V^\top|$ applying $|\cdot|$ entry-wise.
+3. Construct graph $G$ using $B$ as its similarity matrix.
+4. Partition $G$ into $K$ disconnected subgraphs.
+
+**Theorem** (KTT): 
+Let $\hat{B}_n$ with entries $\hat{B}_n^{(ij)}$ be the affinity matrix from OSC. 
+Then $\forall$ pairs $(i, j)$ belonging to different communities 
+and sparsity factor satisfying $n \rho_n = \omega\big((\log n)^{4c}\big)$, 
+
+$$
+\max_{i, j} \hat{B}^{(ij)}_n = 
+O_P \Big( \frac{(\log n)^c}{\sqrt{n \rho_n}} \Big)
+$$
+
+## Sparse Subspace Clustering
+
+**Corollary**: The ASE of $A \sim \PABM(\{\lambda^{(kl)}\}_K)$ lies near a collection of $K$-dimensional subspaces in $K^2$ dimensions.
+
+**Algorithm**: Sparse Subspace Clustering (Elhamifar & Vidal, 2009):
+
+1. Solve $n$ optimization problems $c_i = \arg\min_c \|c\|_1$ 
+subject to $x_i = X^\top c$ and $c^{(i)} = 0$.  
+This is typically performed via LASSO: 
+$c_i = \arg\min \frac{1}{2} \|x_i - X_{-i}^\top c\|_2^2 + \lambda \|c\|_1$
+2. Compile solutions $C = \begin{bmatrix} c_1 & \cdots & c_n \end{bmatrix}$.
+3. Construct affinity matrix $B = |C| + |C^\top|$.
+
+## Sparse Subspace Clustering
+
+**Theorem** (KTT): 
+
+Let 
+
+* $P_n$ describe the edge probability matrix of the PABM with $n$ vertices, and 
+$A_n \sim \BG(P_n)$;
+* $\hat{V}_n$ be the matrix of eigenvectors of $A_n$ corresponding to the 
+$K (K + 1) / 2$ most positive and $K (K - 1) / 2$ most negative eigenvalues. 
+
+Then 
+
+* For some $\lambda > 0$ and $N < \infty$, $\sqrt{n} \hat{V}_n$ obeys the Subspace Detection Property with probability 1 when $n > N$.
+
+Remarks:
+
+* For large $n$, we can identify $\lambda$ for SDP (Wang and Xu, 2016).
+* SDP does not guarantee community detection.
+
+## Simulation Results
+
+```{r, fig.height = 3, fig.width = 8, out.width = '100%'}
+clustering.df <- readr::read_csv('~/dev/pabm-grdpg/simulation-results/cluster-sim-balanced.csv')
+
+clustering.df %>%
+  dplyr::group_by(n, K) %>%
+  dplyr::summarise(
+    med.err = median(error.osc),
+    first.q = quantile(error.osc, .25),
+    third.q = quantile(error.osc, .75),
+    med.err.ssc = median(error.ssc.ase),
+    first.q.ssc = quantile(error.ssc.ase, .25),
+    third.q.ssc = quantile(error.ssc.ase, .75),
+    med.err.louvain = median(error.louvain),
+    first.q.louvain = quantile(error.louvain, .25),
+    third.q.louvain = quantile(error.louvain, .75),
+    med.err.ssc.A = median(error.ssc.A),
+    first.q.ssc.A = quantile(error.ssc.A, .25),
+    third.q.ssc.A = quantile(error.ssc.A, .75)
+  ) %>% 
+  dplyr::ungroup() %>% 
+  ggplot() +
+  theme_bw() + 
+  theme(legend.position = 'bottom') + 
+  scale_x_log10(breaks = c(128, 256, 512, 1024, 2048, 4096),
+                labels = c(expression(2^7), 
+                           expression(2^8), 
+                           expression(2^9), 
+                           expression(2^10), 
+                           expression(2^11), 
+                           expression(2^12))) +
+  scale_y_log10() + 
+  labs(y = 'community detection error count', 
+       colour = NULL, shape = NULL) +
+  geom_line(aes(x = n, y = med.err * n,
+                colour = 'OSC')) +
+  geom_point(aes(x = n, y = med.err * n,
+                 colour = 'OSC', shape = 'OSC')) +
+  geom_errorbar(aes(x = n, ymin = first.q * n, ymax = third.q * n,
+                    colour = 'OSC'), width = .1) + 
+  geom_line(aes(x = n, y = med.err.ssc * n,
+                colour = 'SSC-ASE')) +
+  geom_point(aes(x = n, y = med.err.ssc * n,
+                 colour = 'SSC-ASE', shape = 'SSC-ASE')) +
+  geom_errorbar(aes(x = n, ymin = first.q.ssc * n, ymax = third.q.ssc * n,
+                    colour = 'SSC-ASE'), width = .1) +
+  geom_line(aes(x = n, y = med.err.ssc.A * n,
+                colour = 'SSC-A')) +
+  geom_point(aes(x = n, y = med.err.ssc.A * n,
+                 colour = 'SSC-A', shape = 'SSC-A')) +
+  geom_errorbar(aes(x = n, ymin = first.q.ssc.A * n, ymax = third.q.ssc.A * n,
+                    colour = 'SSC-A'), width = .1) +
+  geom_line(aes(x = n, y = med.err.louvain * n,
+                colour = 'MM-Louvain')) + 
+  geom_point(aes(x = n, y = med.err.louvain * n,
+                 colour = 'MM-Louvain', shape = 'MM-Louvain')) + 
+  geom_errorbar(aes(x = n, ymin = first.q.louvain * n, ymax = third.q.louvain * n,
+                    colour = 'MM-Louvain'), width = .1) + 
+  scale_colour_brewer(palette = 'Set1') + 
+  facet_wrap(~ K, labeller = 'label_both')
+```
