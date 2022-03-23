@@ -115,7 +115,7 @@ Statistical inference (parametric approach):
 $G \mid z_1, ..., z_n, \vec{\theta} \sim P(\vec{z}, \vec{\theta})$.
 2. Develop a method for obtaining estimators: 
 $f(G) = (\hat{\vec{z}}, \hat{\vec{\theta}})$.
-3. Identify asymptotic properties of estimators: 
+3. Describe asymptotic properties of estimators: 
 $(\hat{\vec{z}}, \hat{\vec{\theta}}) \to (\vec{z}, \vec{\theta})$.
 
 ## Overview
