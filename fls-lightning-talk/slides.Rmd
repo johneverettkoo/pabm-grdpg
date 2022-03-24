@@ -186,9 +186,6 @@ q & z_i = z_j = 2 \\
 r & z_i \neq z_j
 \end{cases}$
 
-* To make this an assortative SBM, set $p q > r^2$.
-* In this example, $p = 1/2$, $q = 1/4$, and $r = 1/8$.
-
 ::::
 
 :::: column
@@ -218,8 +215,7 @@ qgraph::qgraph(A, vsize = 4, groups = factor(z), legend = FALSE)
 
 Let each vertex $i \in [n]$ have $K$ popularity parameters
 $\lambda_{i1}, ..., \lambda_{iK} \in [0, 1]$. 
-Then $A \sim \PABM(\{\lambda_{ik}\}_K)$ if each $P_{ij} = \lambda_{i z_j} \lambda_{j z_i}$,  
-e.g., if $z_i = k$ and $z_j = l$, $P_{ij} = \lambda_{il} \lambda_{jk}$.
+Then $A \sim \PABM(\{\lambda_{ik}\}_K)$ if each $P_{ij} = \lambda_{i z_j} \lambda_{j z_i}$. 
 
 **Lemma** (Noroozi, Rimal, and Pensky, 2020): 
 
@@ -390,7 +386,7 @@ $$\Lambda^{(k)} = \begin{bmatrix}
 \end{bmatrix} 
 \in \mathbb{R}^{n_k \times K}$$
 
-$$A \sim \PABM(\{\lambda^{(kl)}\}_K) \iff A \sim \GRDPG_{p, q}(X U)$$
+$$A \sim \PABM(\{\lambda_{ik}\}_K) \iff A \sim \GRDPG_{p, q}(X U)$$
 
 ## Orthogonal Spectral Clustering
 
