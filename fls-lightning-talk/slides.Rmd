@@ -118,24 +118,6 @@ $f(G) = (\hat{\vec{z}}, \hat{\vec{\theta}})$.
 3. Describe asymptotic properties of estimators: 
 $(\hat{\vec{z}}, \hat{\vec{\theta}}) \to (\vec{z}, \vec{\theta})$.
 
-## Overview
-
-<style type="text/css">
-.caption {
-    font-size: x-small;
-}
-</style>
-
-1. Block Models and the Popularity Adjusted Block Model
-
-2. Generalized Random Dot Product Graphs
-
-3. Connecting the PABM to the GRDPG
-
-4. Community Detection for the PABM
-
-# Block Models
-
 ## Bernoulli Graphs
 
 <style type="text/css">
@@ -229,28 +211,6 @@ qgraph::qgraph(A, vsize = 4, groups = factor(z), legend = FALSE)
 ::::
 
 :::
-  
-## Block Models
-
-Erdos-Renyi Model (1959)
-
-* $P_{ij} = \theta$ (not a block model)
-* 1 parameter $\theta$
-
-Stochastic Block Model (Lorrain and White, 1971)
-
-* $P_{ij} = \theta_{z_i z_j}$
-* $K (K + 1) / 2$ parameters $\theta_{kl}$
-
-Degree Corrected Block Model (Karrer and Newman, 2011)
-
-* $P_{ij} = \theta_{z_i z_j} \omega_i \omega_j$
-* $K (K + 1) / 2 + n$ parameters $\theta_{kl}$, $\omega_i$
-
-Popularity Adjusted Block Model (Sengupta and Chen, 2017)
-
-* $P_{ij} = \lambda_{i z_j} \lambda_{j z_i}$
-* $K n$ parameters $\lambda_{ik}$
 
 ## Popularity Adjusted Block Model
 
@@ -258,7 +218,7 @@ Popularity Adjusted Block Model (Sengupta and Chen, 2017)
 
 Let each vertex $i \in [n]$ have $K$ popularity parameters
 $\lambda_{i1}, ..., \lambda_{iK} \in [0, 1]$. 
-Then $A \sim \PABM(P)$ if each $P_{ij} = \lambda_{i z_j} \lambda_{j z_i}$,  
+Then $A \sim \PABM(\{\lambda_{ik}\}_K)$ if each $P_{ij} = \lambda_{i z_j} \lambda_{j z_i}$,  
 e.g., if $z_i = k$ and $z_j = l$, $P_{ij} = \lambda_{il} \lambda_{jk}$.
 
 **Lemma** (Noroozi, Rimal, and Pensky, 2020): 
@@ -274,30 +234,18 @@ of the $i$^th^ vertex of community $k$ towards community $l$.
 3. Each block can be decomposed as 
 $P^{(kl)} = \lambda^{(kl)} (\lambda^{(lk)})^\top$.
 
-**Notation**: $A \sim \PABM(\{\lambda^{(kl)}\}_K)$.
+## Generalized Random Dot Product Graph
 
-# Generalized Random Dot Product Graphs
-
-## (Generalized) Random Dot Product Graph Model
-
-Random Dot Product Graph $A \sim \RDPG(X)$  
-(Young and Scheinerman, 2007)
-
-* Latent vectors $x_1, ..., x_n \in \mathbb{R}^d$ such that 
-$x_i^\top x_j \in [0, 1]$
-* $A \sim \BG(X X^\top)$ where 
-$X = \begin{bmatrix} x_1 & \cdots & x_n \end{bmatrix}^\top$
-
-Generalized Random Dot Product Graph $A \sim \GRDPG_{p, q}(X)$  
+**Def** Generalized Random Dot Product Graph  
 (Rubin-Delanchy, Cape, Tang, Priebe, 2020)
+
+$A \sim \GRDPG_{p, q}(X)$ iff
 
 * Latent vectors $x_1, ..., x_n \in \mathbb{R}^{p+q}$ such that 
 $x_i^\top I_{p, q} x_j \in [0, 1]$ and $I_{p, q} = \blockdiag(I_p, -I_q)$
 * $A \sim \BG(X I_{p, q} X^\top)$ where 
 $X = \begin{bmatrix} x_1 & \cdots & x_n \end{bmatrix}^\top$
-
-If latent vectors $X_1, ..., X_n \iid F$, then we write 
-$(A, X) \sim \RDPG(F, n)$ or $(A, X) \sim \GRDPG_{p, q}(F, n)$.
+  * $P(\text{edge between } v_i, v_j) = x_i^\top I_{p,q} x_j$
 
 ## (Generalized) Random Dot Product Graph Model
 
@@ -308,26 +256,19 @@ interpoint distances, inner products, or angles.
 
 ### Adjacency Spectral Embedding
 
-To embed in $\mathbb{R}^d$, 
+To embed in $\mathbb{R}^{p+q}$, 
 
 1. Compute $A \approx \hat{V} \hat{\Lambda} \hat{V}^\top$ 
-where $\hat{\Lambda} \in \mathbb{R}^{d \times d}$ and 
-$\hat{V} \in \mathbb{R}^{n \times d}$.  
-For RDPG, use $d$ greatest eigenvalues; 
-for GRDPG, use $p$ most positive and $q$ most negative eigenvalues.
+where $\hat{\Lambda} \in \mathbb{R}^{(p+q) \times (p+q)}$ and 
+$\hat{V} \in \mathbb{R}^{n \times (p+q)}$ 
+by using the $p$ most positive and $q$ most negative eigenvalues.
 
-2. For RDPG, let $\hat{X} = \hat{V} \hat{\Lambda}^{1/2}$; 
-for GRDPG, let $\hat{X} = \hat{V} |\hat{\Lambda}|^{1/2}$.
+2. Let $\hat{X} = \hat{V} |\hat{\Lambda}|^{1/2}$.
 
 \vspace*{.5\baselineskip}
 
-RDPG: $\max\limits_i \|\hat{X}_i - W_n X_i \| \stackrel{a.s.}{\to} 0$
-(Athreya et al., 2018)  
-GRDPG: 
-$\max\limits_i \|\hat{X}_i - Q_n X_i \| \stackrel{a.s.}{\to} 0$
+$\max\limits_i \|\hat{X}_i - Q_n X_i \| = O_P \Big( \frac{(\log n)^c}{n^{1/2}} \Big)$
 (Rubin-Delanchy et al., 2020)
-
-# Connecting the PABM to the GRDPG
 
 ## Connecting Block Models to the (G)RDPG Model
 
@@ -402,22 +343,9 @@ points(X, pch = 16, col = z * 2)
 
 :::: column
 
-```{r, out.width = '50%', fig.height = 2.5, fig.width = 2.5}
-par(mar = rep(1.75, 4))
+```{r, out.width = '100%', fig.height = 4, fig.width = 4}
+# par(mar = rep(1.75, 4))
 plot(X, asp = 1, col = z, xlab = NA, ylab = NA, main = 'SBM: Point masses')
-```
-
-\vspace*{.5\baselineskip}
-
-```{r, out.width = '50%', fig.height = 2.5, fig.width = 2.5}
-par(mar = rep(1.75, 4))
-omega <- rbeta(n, 1, 1)
-dc.matrix <- omega %*% t(omega)
-P.dcbm <- P * dc.matrix
-dcbm.eigen <- eigen(P.dcbm)
-X.dcbm <- dcbm.eigen$vectors[, 1:2] %*% diag(dcbm.eigen$values[1:2] ** .5)
-plot(X.dcbm, asp = 1, col = z, xlab = NA, ylab = NA, main = 'DCBM: Rays')
-
 ```
 
 ::::
@@ -462,43 +390,7 @@ $$\Lambda^{(k)} = \begin{bmatrix}
 \end{bmatrix} 
 \in \mathbb{R}^{n_k \times K}$$
 
-## Connecting the PABM to the GRDPG
-
-::: columns
-
-:::: column
-
-$$X = \begin{bmatrix}
-\Lambda^{(1)} & \cdots & 0 \\
-0 & \ddots & 0 \\
-0 & \cdots & \Lambda^{(K)}
-\end{bmatrix}$$
-
-::::
-
-:::: column
-
-\vspace*{2\baselineskip}
-
-$$U \in \mathbb{O}(K^2)$$
-
-::::
-
-:::
-
 $$A \sim \PABM(\{\lambda^{(kl)}\}_K) \iff A \sim \GRDPG_{p, q}(X U)$$
-
-**Remark 1** (orthogonality of subspaces):
-If $y_i^\top$ and $y_j^\top$ are two rows of $X U$ corresponding 
-to different communities, then $y_i^\top y_j = 0$.
-
-**Remark 2** (non-uniqueness of the latent configuration):  
-If $A \sim \GRDPG_{p, q}(Y)$, then $A \sim \GRDPG_{p, q}(Y Q)$ for any $Q$ in 
-the indefinite orthogonal group with signature $p, q$.
-
-**Remark 3**: Communities correspond to subspaces even with linear transformation $Q \in \mathbb{O}(p, q)$, but this may break the orthogonality property.
-
-# Community Detection for the PABM
 
 ## Orthogonal Spectral Clustering
 
@@ -524,40 +416,16 @@ $$
 O_P \Big( \frac{(\log n)^c}{\sqrt{n \rho_n}} \Big)
 $$
 
-## Sparse Subspace Clustering
-
-**Corollary**: The ASE of $A \sim \PABM(\{\lambda^{(kl)}\}_K)$ lies near a collection of $K$-dimensional subspaces in $K^2$ dimensions.
-
-**Algorithm**: Sparse Subspace Clustering (Elhamifar & Vidal, 2009):
-
-1. Solve $n$ optimization problems $c_i = \arg\min_c \|c\|_1$ 
-subject to $x_i = X^\top c$ and $c^{(i)} = 0$.  
-This is typically performed via LASSO: 
-$c_i = \arg\min \frac{1}{2} \|x_i - X_{-i}^\top c\|_2^2 + \lambda \|c\|_1$
-2. Compile solutions $C = \begin{bmatrix} c_1 & \cdots & c_n \end{bmatrix}$.
-3. Construct affinity matrix $B = |C| + |C^\top|$.
-
-## Sparse Subspace Clustering
-
-**Theorem** (KTT): 
-
-Let 
-
-* $P_n$ describe the edge probability matrix of the PABM with $n$ vertices, and 
-$A_n \sim \BG(P_n)$;
-* $\hat{V}_n$ be the matrix of eigenvectors of $A_n$ corresponding to the 
-$K (K + 1) / 2$ most positive and $K (K - 1) / 2$ most negative eigenvalues. 
-
-Then 
-
-* For some $\lambda > 0$ and $N < \infty$, $\sqrt{n} \hat{V}_n$ obeys the Subspace Detection Property with probability 1 when $n > N$.
-
-Remarks:
-
-* For large $n$, we can identify $\lambda$ for SDP (Wang and Xu, 2016).
-* SDP does not guarantee community detection.
-
 ## Simulation Results
+
+Simulation setup:
+
+1. $z_1, ..., z_n \iid \Cat(1/K, ..., 1/K)$
+2. $\lambda_{ik} \iid \Betadist(a_{ik}, b_{ik})$  
+$a_{ik} = \begin{cases} 2 & z_i = k \\ 1 & z_i \neq k \end{cases}$ 
+$b_{ik} = \begin{cases} 1 & z_i = k \\ 2 & z_i \neq k \end{cases}$
+3. $P_{ij} = \lambda_{i z_j} \lambda_{j z_i}$
+4. $A \sim \BG(P)$
 
 ```{r, fig.height = 3, fig.width = 8, out.width = '100%'}
 clustering.df <- readr::read_csv('~/dev/pabm-grdpg/simulation-results/cluster-sim-balanced.csv')
@@ -619,3 +487,13 @@ clustering.df %>%
   scale_colour_brewer(palette = 'Set1') + 
   facet_wrap(~ K, labeller = 'label_both')
 ```
+
+## Conclusion
+
+1. The PABM is a recently developed flexible block model that can be used to describe graphs with community structure.
+
+2. The GRDPG, which can describe all block models, motivates a spectral approach to statistical inference on graphs.
+
+3. Under the GRDPG framework, the PABM with $K$ communities can be induced by a latent configuration in $\mathbb{R}^{K^2}$ consisting of $K$ $K$-dimensional subspaces that are orthogonal to each other.
+
+4. The latent configuration of the PABM under the GRDPG framework leads to an intuitive method for community detection with nice theoretical asymptotic properties. 
