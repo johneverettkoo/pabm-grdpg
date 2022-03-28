@@ -135,7 +135,7 @@ $A_{ji} = A_{ij}$ and $A_{ii} = 0$.
 
 $A \sim \BG(P)$ iff:
 
-1. $P$ is an $n \times n$ matrix of edge probabilities between pairs of vertices.
+1. $P$ is a matrix of edge probabilities between pairs of vertices.
 2. $A_{ij} \indep \Bernoulli(P_{ij})$ for each $i < j$.
 
 ## Block Models
@@ -429,11 +429,15 @@ clustering.df %>%
   facet_wrap(~ K, labeller = 'label_both')
 ```
 
+## Additional Slides
+
 ## Simulation Setup
 
 1. $z_1, ..., z_n \iid \Cat(1/K, ..., 1/K)$
-2. $\lambda_{ik} \iid \Betadist(a_{ik}, b_{ik})$  
-    * $a_{ik} = \begin{cases} 2 & z_i = k \\ 1 & z_i \neq k \end{cases}$   
+2. $\lambda_{ik} \iid \Betadist(a_{ik}, b_{ik})$
+    * $a_{ik} = \begin{cases} 2 & z_i = k \\ 1 & z_i \neq k \end{cases}$
     * $b_{ik} = \begin{cases} 1 & z_i = k \\ 2 & z_i \neq k \end{cases}$
 3. $P_{ij} = \lambda_{i z_j} \lambda_{j z_i}$
 4. $A \sim \BG(P)$
+
+## Future Work
