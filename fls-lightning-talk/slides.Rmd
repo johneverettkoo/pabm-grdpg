@@ -109,6 +109,10 @@ qgraph::qgraph(A, groups = factor(z), legend = FALSE)
 
 How might we cluster the nodes of a network?
 
+1. Define a probability model with communities that might generate the graph (e.g., popularity adjusted block model).
+2. Develop estimators for the parameters of the probability model, including the community labels.
+3. Describe the properties of the estimators (e.g., consistency). 
+
 ## Bernoulli Graphs
 
 <style type="text/css">
@@ -117,22 +121,21 @@ How might we cluster the nodes of a network?
 }
 </style>
 
-Let $G = (V, E)$ be an undirected and unweighted graph with $|V| = n$.
+Let $G$ be an undirected and unweighted graph with $n$ vertices.
 
 $G$ is described by adjacency matrix $A$ such that
 $A_{ij} = \begin{cases} 
-1 & \exists \text{ edge between } i \text{ and } j \\
-0 & \text{else}
+1 & \text{an edge connects vertices } i \text{ and } j \\
+0 & \text{otherwise}
 \end{cases}$
 
-$A_{ji} = A_{ij}$ and $A_{ii} = 0$ $\forall i, j \in [n]$.
+$A_{ji} = A_{ij}$ and $A_{ii} = 0$.
 
 \vspace*{1\baselineskip}
 
 $A \sim \BG(P)$ iff:
 
-1. $P \in [0, 1]^{n \times n}$ describes edge probabilities between pairs of 
-vertices.
+1. $P$ is an $n \times n$ matrix of edge probabilities between pairs of vertices.
 2. $A_{ij} \indep \Bernoulli(P_{ij})$ for each $i < j$.
 
 ## Block Models
@@ -141,14 +144,13 @@ Suppose each vertex $v_1, ..., v_n$ has labels $z_1, ..., z_n \in \{1, ..., K\}$
 and each $P_{ij}$ depends on labels $z_i$ and $z_j$.  
 Then $A \sim \BG(P)$ is a *block model*.
 
-**Example 1**: Stochastic Block Model with $K=2$ communities
+**Example 1**: Stochastic Block Model with $K=2$ communities. 
 
 ::: columns
 
 :::: column
 
-* $z_1, ..., z_n \in \{1, 2\}$
-* $P_{ij} = \begin{cases} 
+$P_{ij} = \begin{cases} 
 p & z_i = z_j = 1 \\
 q & z_i = z_j = 2 \\
 r & z_i \neq z_j
@@ -158,7 +160,7 @@ r & z_i \neq z_j
 
 :::: column
 
-```{r, fig.height = 3, fig.width = 4, out.width = '100%'}
+```{r, fig.height = 3, fig.width = 4, out.width = '100%', fig.cap = 'Two community SBM with $p=1/2$, $q=1/4$, $r=1/8$'}
 n1 <- 2 ** 5
 n2 <- 2 ** 5
 n <- n1 + n2
@@ -185,7 +187,7 @@ Let each vertex $i \in [n]$ have $K$ popularity parameters
 $\lambda_{i1}, ..., \lambda_{iK} \in [0, 1]$. 
 Then $A \sim \PABM(\{\lambda_{ik}\}_K)$ if each $P_{ij} = \lambda_{i z_j} \lambda_{j z_i}$. 
 
-**Lemma** (Noroozi, Rimal, and Pensky, 2020): 
+**Def** (Noroozi, Rimal, and Pensky, 2020): 
 
 $A$ is sampled from a PABM if $P$ can be described as:
 
@@ -204,7 +206,7 @@ $P^{(kl)} = \lambda^{(kl)} (\lambda^{(lk)})^\top$.
 (Rubin-Delanchy, Cape, Tang, Priebe, 2020)
 
 Let $I_{p,q} = \blockdiag(I_p, -I_q)$ and suppose that $x_1, \ldots, x_n \in \mathbb{R}^{p+q}$ are such that $x_i^\top I_{p,q} x_j \in [0,1]$.  
-Then $A \sim \GRDPG_{p, q}(X)$ iff $A \sim \BG(X I_{p,q} X^\top)$, where $X = \begin{bmatrix} x_1 & \cdots & x_n \end{bmatrix}^\top$
+Then $A \sim \GRDPG_{p, q}(X)$ iff $A \sim \BG(X I_{p,q} X^\top)$, where $X = \begin{bmatrix} x_1 & \cdots & x_n \end{bmatrix}^\top$. 
 
 Adjacency Spectral Embedding (Sussman et al., 2012) estimates $x_1, ..., x_n \in \mathbb{R}^{p+q}$ from $A$: 
 
@@ -212,15 +214,14 @@ Adjacency Spectral Embedding (Sussman et al., 2012) estimates $x_1, ..., x_n \in
 2. Let $\hat{V}$ be the matrix whose columns are the corresponding eigenvectors.
 3. Compute $\hat{X} = \hat{V} \hat{\Lambda}^{1/2}$.
 
-Theorem: $\max\limits_i \|\hat{X}_i - Q_n X_i \| = O_P \Big( \frac{(\log n)^c}{n^{1/2}} \Big)$
+**Theorem**: $\max\limits_i \|\hat{X}_i - Q_n X_i \| = O_P \Big( \frac{(\log n)^c}{n^{1/2}} \Big)$ 
+as $n \to \infty$
 
-## Connecting Block Models to the (G)RDPG Model
+## Connecting Block Models to the GRDPG Model
 
-All Bernoulli Graphs are RDPG (if $P$ is 
-positive semidefinite)  
-or GRDPG (in general).
+All Bernoulli Graphs are GRDPGs. 
 
-**Example 1** (cont'd): Assortative SBM ($p q > r^2$) with $K = 2$
+**Example 1** (cont'd): SBM with $K = 2$.
 
 ::: columns
 
@@ -245,7 +246,7 @@ $$P =
 P^{(11)} & P^{(12)} \\
 P^{(21)} & P^{(22)}
 \end{bmatrix} =
-X X^\top$$
+X I_{2,0} X^\top$$
 
 $$X = \begin{bmatrix} 
 \sqrt{p} & 0 \\
@@ -260,15 +261,15 @@ $$X = \begin{bmatrix}
 
 :::
 
-## Connecting Block Models to the (G)RDPG Model
+## Connecting Block Models to the GRDPG Model
 
-**Example 1** (cont'd): If we want to perform community detection, 
+**Example 1** (cont'd): To perform community detection, 
 
 1. Note that $A$ is a RDPG because $P = X X^\top$.
 2. Compute the ASE $A \approx \hat{X} \hat{X}^\top$ with 
 $\hat{X} = \hat{V} \hat{\Lambda}^{1/2}$.
-3. Apply clustering algorithm (e.g., $K$-means) to $\hat{X}$,  
-noting that as $n \to \infty$, the ASE approaches point masses.
+3. Apply a clustering algorithm (e.g., $K$-means) to $\hat{X}$,  
+noting that $\hat{X}$ approaches point masses as $n \to \infty$. 
 
 ```{r, fig.height = 5, fig.width = 5, out.width = '50%'}
 P.eigen = eigen(P)
@@ -281,7 +282,7 @@ plot(X.hat, asp = 1, col = z * 2, xlab = NA, ylab = NA,
 points(X, pch = 16, col = z * 2)
 ```
 
-## Connecting Block Models to the (G)RDPG Model
+## Connecting Block Models to the GRDPG Model
 
 ::: columns
 
@@ -316,11 +317,10 @@ pairs(X, col = z, asp = 1, pch = '.', main = 'PABM: Orthogonal subspaces')
 **Theorem** (KTT): $A \sim \PABM(\{\lambda^{(kl)}\}_K)$ is equivalent to 
 $A \sim \GRDPG_{p, q}(X U)$ with
 
-* $p = K (K + 1) / 2$, $q = K (K - 1) / 2$
-* $U \in \mathbb{O}(K^2)$
-* $X \in \mathbb{R}^{n \times K^2}$ is block diagonal and 
-composed of $\{\lambda^{(kl)}\}_K$ 
-with each block corresponding to a community.  
+* $p = K (K + 1) / 2$, $q = K (K - 1) / 2$;
+* $U$ is an orthogonal matrix;
+* $X \in \mathbb{R}^{n \times K^2}$ is a block diagonal matrix 
+composed of popularity vectors with each block corresponding to a community.  
 
 $$X = \begin{bmatrix}
 \Lambda^{(1)} & \cdots & 0 \\
@@ -334,7 +334,7 @@ $$\Lambda^{(k)} = \begin{bmatrix}
 \end{bmatrix} 
 \in \mathbb{R}^{n_k \times K}$$
 
-$$A \sim \PABM(\{\lambda_{ik}\}_K) \iff A \sim \GRDPG_{p, q}(X U)$$
+$$A \sim \PABM(\{\lambda_{ik}\}_K) \text{ iff } A \sim \GRDPG_{p, q}(X U)$$
 
 ## Orthogonal Spectral Clustering
 
@@ -351,25 +351,22 @@ positive and $K (K-1) / 2$ most negative eigenvalues.
 4. Partition $G$ into $K$ disconnected subgraphs.
 
 **Theorem** (KTT): 
-Let $\hat{B}_n$ with entries $\hat{B}_n^{(ij)}$ be the affinity matrix from OSC. 
+Let $\hat{B}$ with entries $\hat{B}_{ij}$ be the affinity matrix from OSC. 
 Then $\forall$ pairs $(i, j)$ belonging to different communities 
 and sparsity factor satisfying $n \rho_n = \omega\big((\log n)^{4c}\big)$, 
 
-$$
-\max_{i, j} \hat{B}^{(ij)}_n = 
-O_P \Big( \frac{(\log n)^c}{\sqrt{n \rho_n}} \Big)
-$$
+$\max_{i, j} \hat{B}_{ij} = 
+O_P \Big( \frac{(\log n)^c}{\sqrt{n \rho_n}} \Big)$ 
+as $n \to \infty$.
 
 ## Simulation Results
 
-Simulation setup:
+We compared a variety of algorithms for community detection on randomly generated PABMs:  
 
-1. $z_1, ..., z_n \iid \Cat(1/K, ..., 1/K)$
-2. $\lambda_{ik} \iid \Betadist(a_{ik}, b_{ik})$  
-$a_{ik} = \begin{cases} 2 & z_i = k \\ 1 & z_i \neq k \end{cases}$ 
-$b_{ik} = \begin{cases} 1 & z_i = k \\ 2 & z_i \neq k \end{cases}$
-3. $P_{ij} = \lambda_{i z_j} \lambda_{j z_i}$
-4. $A \sim \BG(P)$
+* Modularity Maximization (Sengupta and Chen) using the Louvain algorithm;
+* Orthogonal Spectral Clustering (KTT);
+* Sparse Subspace Clustering on the ASE (KTT);
+* Sparse Subspace Clustering on the columns of $A$ (Noorozi, Rimal, Pensky).
 
 ```{r, fig.height = 3, fig.width = 8, out.width = '100%'}
 clustering.df <- readr::read_csv('~/dev/pabm-grdpg/simulation-results/cluster-sim-balanced.csv')
@@ -431,3 +428,12 @@ clustering.df %>%
   scale_colour_brewer(palette = 'Set1') + 
   facet_wrap(~ K, labeller = 'label_both')
 ```
+
+## Simulation Setup
+
+1. $z_1, ..., z_n \iid \Cat(1/K, ..., 1/K)$
+2. $\lambda_{ik} \iid \Betadist(a_{ik}, b_{ik})$  
+    * $a_{ik} = \begin{cases} 2 & z_i = k \\ 1 & z_i \neq k \end{cases}$   
+    * $b_{ik} = \begin{cases} 1 & z_i = k \\ 2 & z_i \neq k \end{cases}$
+3. $P_{ij} = \lambda_{i z_j} \lambda_{j z_i}$
+4. $A \sim \BG(P)$
