@@ -107,16 +107,7 @@ A <- draw.graph(P)
 qgraph::qgraph(A, groups = factor(z), legend = FALSE)
 ```
 
-How can we cluster the nodes of a network?
-
-Statistical inference (parametric approach):
-
-1. Define a generative model for graph: 
-$G \mid z_1, ..., z_n, \vec{\theta} \sim P(\vec{z}, \vec{\theta})$.
-2. Develop a method for obtaining estimators: 
-$f(G) = (\hat{\vec{z}}, \hat{\vec{\theta}})$.
-3. Describe asymptotic properties of estimators: 
-$(\hat{\vec{z}}, \hat{\vec{\theta}}) \to (\vec{z}, \vec{\theta})$.
+How might we cluster the nodes of a network?
 
 ## Bernoulli Graphs
 
@@ -125,10 +116,6 @@ $(\hat{\vec{z}}, \hat{\vec{\theta}}) \to (\vec{z}, \vec{\theta})$.
     font-size: x-small;
 }
 </style>
-
-::: columns
-
-:::: {.column width=62.5%}
 
 Let $G = (V, E)$ be an undirected and unweighted graph with $|V| = n$.
 
@@ -148,32 +135,13 @@ $A \sim \BG(P)$ iff:
 vertices.
 2. $A_{ij} \indep \Bernoulli(P_{ij})$ for each $i < j$.
 
-::::
-
-:::: {.column width=37.5%}
-
-**Example 1**: If every entry $P_{ij} = \theta$, then $A \sim \BG(P)$ is an Erdos-Renyi graph.  
-For this model, $A_{ij} \iid \Bernoulli(\theta)$.
-
-```{r, fig.height = 2, fig.width = 2}
-n <- 2 ** 5
-p <- 1 / log(n)
-P <- matrix(p, nrow = n, ncol = n)
-A <- draw.graph(P)
-qgraph::qgraph(A, vsize = 4)
-```
-
-::::
-
-:::
-
 ## Block Models
 
 Suppose each vertex $v_1, ..., v_n$ has labels $z_1, ..., z_n \in \{1, ..., K\}$,  
 and each $P_{ij}$ depends on labels $z_i$ and $z_j$.  
 Then $A \sim \BG(P)$ is a *block model*.
 
-**Example 2**: Stochastic Block Model with two communities
+**Example 1**: Stochastic Block Model with $K=2$ communities
 
 ::: columns
 
@@ -235,36 +203,16 @@ $P^{(kl)} = \lambda^{(kl)} (\lambda^{(lk)})^\top$.
 **Def** Generalized Random Dot Product Graph  
 (Rubin-Delanchy, Cape, Tang, Priebe, 2020)
 
-$A \sim \GRDPG_{p, q}(X)$ iff
+Let $I_{p,q} = \blockdiag(I_p, -I_q)$ and suppose that $x_1, \ldots, x_n \in \mathbb{R}^{p+q}$ are such that $x_i^\top I_{p,q} x_j \in [0,1]$.  
+Then $A \sim \GRDPG_{p, q}(X)$ iff $A \sim \BG(X I_{p,q} X^\top)$, where $X = \begin{bmatrix} x_1 & \cdots & x_n \end{bmatrix}^\top$
 
-* Latent vectors $x_1, ..., x_n \in \mathbb{R}^{p+q}$ such that 
-$x_i^\top I_{p, q} x_j \in [0, 1]$ and $I_{p, q} = \blockdiag(I_p, -I_q)$
-* $A \sim \BG(X I_{p, q} X^\top)$ where 
-$X = \begin{bmatrix} x_1 & \cdots & x_n \end{bmatrix}^\top$
-  * $P(\text{edge between } v_i, v_j) = x_i^\top I_{p,q} x_j$
+Adjacency Spectral Embedding (Sussman et al., 2012) estimates $x_1, ..., x_n \in \mathbb{R}^{p+q}$ from $A$: 
 
-## (Generalized) Random Dot Product Graph Model
+1. Let $\hat{\Lambda}$ be the diagonal matrix that contains the absolute values of the $p$ most positive and the $q$ most negative eigenvalues.
+2. Let $\hat{V}$ be the matrix whose columns are the corresponding eigenvectors.
+3. Compute $\hat{X} = \hat{V} \hat{\Lambda}^{1/2}$.
 
-### Recovery/Estimation
-
-Want to estimate $X$ from $A$, or alternatively, 
-interpoint distances, inner products, or angles.
-
-### Adjacency Spectral Embedding
-
-To embed in $\mathbb{R}^{p+q}$, 
-
-1. Compute $A \approx \hat{V} \hat{\Lambda} \hat{V}^\top$ 
-where $\hat{\Lambda} \in \mathbb{R}^{(p+q) \times (p+q)}$ and 
-$\hat{V} \in \mathbb{R}^{n \times (p+q)}$ 
-by using the $p$ most positive and $q$ most negative eigenvalues.
-
-2. Let $\hat{X} = \hat{V} |\hat{\Lambda}|^{1/2}$.
-
-\vspace*{.5\baselineskip}
-
-$\max\limits_i \|\hat{X}_i - Q_n X_i \| = O_P \Big( \frac{(\log n)^c}{n^{1/2}} \Big)$
-(Rubin-Delanchy et al., 2020)
+Theorem: $\max\limits_i \|\hat{X}_i - Q_n X_i \| = O_P \Big( \frac{(\log n)^c}{n^{1/2}} \Big)$
 
 ## Connecting Block Models to the (G)RDPG Model
 
@@ -272,7 +220,7 @@ All Bernoulli Graphs are RDPG (if $P$ is
 positive semidefinite)  
 or GRDPG (in general).
 
-**Example 2** (cont'd): Assortative SBM ($p q > r^2$) with $K = 2$
+**Example 1** (cont'd): Assortative SBM ($p q > r^2$) with $K = 2$
 
 ::: columns
 
@@ -314,7 +262,7 @@ $$X = \begin{bmatrix}
 
 ## Connecting Block Models to the (G)RDPG Model
 
-**Example 2** (cont'd): If we want to perform community detection, 
+**Example 1** (cont'd): If we want to perform community detection, 
 
 1. Note that $A$ is a RDPG because $P = X X^\top$.
 2. Compute the ASE $A \approx \hat{X} \hat{X}^\top$ with 
@@ -483,13 +431,3 @@ clustering.df %>%
   scale_colour_brewer(palette = 'Set1') + 
   facet_wrap(~ K, labeller = 'label_both')
 ```
-
-## Conclusion
-
-1. The PABM is a recently developed flexible block model that can be used to describe graphs with community structure.
-
-2. The GRDPG, which can describe all block models, motivates a spectral approach to statistical inference on graphs.
-
-3. Under the GRDPG framework, the PABM with $K$ communities can be induced by a latent configuration in $\mathbb{R}^{K^2}$ consisting of $K$ $K$-dimensional subspaces that are orthogonal to each other.
-
-4. The latent configuration of the PABM under the GRDPG framework leads to an intuitive method for community detection with nice theoretical asymptotic properties. 
