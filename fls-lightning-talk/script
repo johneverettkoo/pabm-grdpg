@@ -9,9 +9,7 @@ Suppose we observe a network with binary and undirected edges, for example, a Fa
 
 An analysis task for these data might be to partition this network into subgraphs in an unsupervised yet meaningful manner. In the Facebook network example, we might want to identify cliques or friend groups. 
 
-One approach might be to define some metric or objective function, for example, minimizing the number of edges we need to cut to partition the graph into disconnected subgraphs. Then we just treat this as a standard ML optimization problem. examples of this include min-cut, ratio cut, normalized cut, etc. 
-
-Another approach, based on statistical inference, would start by defining a probability model from which this network might be sampled or generated. The parameters of this model might include hidden or unobserved labels associated with each node, along with a few other parameters. Then our goal would be to develop a method for estimating those parameters and deriving asymptotic properties for these estimators, such as consistency. In our work, we take the statistical inference approach. 
+One approach, based on statistical inference, would start by defining a probability model from which this network might be sampled or generated. The parameters of this model might include hidden or unobserved labels associated with each node, along with a few other parameters. Then our goal would be to develop a method for estimating those parameters and deriving asymptotic properties for these estimators, such as consistency. In our work, we take the statistical inference approach. 
 
 
 Let's begin very generally with bernoulli graphs. 

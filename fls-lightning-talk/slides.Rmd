@@ -1,15 +1,13 @@
 ---
-title: Popularity Adjusted Block Models are Generalized Random Dot Product Graphs
-subtitle: Future Leaders Summit 2022 Lightning Presentation
-author: John Koo, Indiana University
-date: 'April 2022'
 output: 
   beamer_presentation:
+    keep_tex: true
     fig_crop: no
     theme: 'default'
     colortheme: 'beaver'
     includes:
-      in_header: page_headers.tex
+      in_header: 
+        - page_headers.tex
 header-includes:
 - \usepackage{setspace}
 - \usepackage{float}
@@ -41,13 +39,25 @@ source('~/dev/pabm-grdpg/functions.R')
 set.seed(314159)
 ```
 
-## Contributors
+## {.plain}
+
+\center
+
+\LARGE
+
+\textcolor{darkred}{Popularity Adjusted Block Models are Generalized Random Dot Product Graphs}
+
+\normalsize
+
+Future Leaders Summit
+
+April 2022
 
 ::: columns
 
 :::: {.column width='33%'}
 
-```{r, out.width = '100px'}
+```{r, out.width = '75px'}
 knitr::include_graphics('john-koo.jpeg')
 ```
 
@@ -59,7 +69,7 @@ Indiana University
 
 :::: {.column width='33%'}
 
-```{r, out.width = '100px'}
+```{r, out.width = '75px'}
 knitr::include_graphics('minh-tang.jpg')
 ```
 
@@ -71,7 +81,7 @@ NC State University
 
 :::: {.column width='33%'}
 
-```{r, out.width = '100px'}
+```{r, out.width = '75px'}
 knitr::include_graphics('michael-trosset.jpg')
 ```
 
@@ -160,7 +170,7 @@ r & z_i \neq z_j
 
 :::: column
 
-```{r, fig.height = 3, fig.width = 4, out.width = '100%', fig.cap = 'Two community SBM with $p=1/2$, $q=1/4$, $r=1/8$'}
+```{r, fig.height = 3, fig.width = 4, out.width = '100%', fig.cap = 'SBM with $p=1/2$, $q=1/4$, $r=1/8$'}
 n1 <- 2 ** 5
 n2 <- 2 ** 5
 n <- n1 + n2
@@ -361,12 +371,12 @@ as $n \to \infty$.
 
 ## Simulation Results
 
-We compared a variety of algorithms for community detection on randomly generated PABMs:  
+We compare four algorithms for community detection on randomly generated PABMs:  
 
 * Modularity Maximization (Sengupta and Chen) using the Louvain algorithm;
 * Orthogonal Spectral Clustering (KTT);
-* Sparse Subspace Clustering on the ASE (KTT);
-* Sparse Subspace Clustering on the columns of $A$ (Noorozi, Rimal, Pensky).
+* Sparse Subspace Clustering on the columns of $A$ (Noorozi, Rimal, Pensky); 
+* Sparse Subspace Clustering on the ASE (KTT).
 
 ```{r, fig.height = 3, fig.width = 8, out.width = '100%'}
 clustering.df <- readr::read_csv('~/dev/pabm-grdpg/simulation-results/cluster-sim-balanced.csv')
