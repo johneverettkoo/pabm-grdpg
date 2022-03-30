@@ -324,7 +324,7 @@ pairs(X, col = z, asp = 1, pch = '.', main = 'PABM: Orthogonal subspaces')
 
 ## Connecting the PABM to the GRDPG
 
-**Theorem** (KTT): $A \sim \PABM(\{\lambda^{(kl)}\}_K)$ is equivalent to 
+**Theorem** (KTT): $A \sim \PABM(\{\lambda_{ik}\}_K)$ is equivalent to 
 $A \sim \GRDPG_{p, q}(X U)$ with
 
 * $p = K (K + 1) / 2$, $q = K (K - 1) / 2$;
@@ -363,8 +363,7 @@ positive and $K (K-1) / 2$ most negative eigenvalues.
 **Theorem** (KTT): 
 Let $\hat{B}$ with entries $\hat{B}_{ij}$ be the affinity matrix from OSC. 
 Then $\forall$ pairs $(i, j)$ belonging to different communities 
-and sparsity factor satisfying $n \rho_n = \omega\big((\log n)^{4c}\big)$, 
-
+and sparsity factor satisfying $n \rho_n = \omega\big((\log n)^{4c}\big)$,  
 $\max_{i, j} \hat{B}_{ij} = 
 O_P \Big( \frac{(\log n)^c}{\sqrt{n \rho_n}} \Big)$ 
 as $n \to \infty$.
@@ -375,7 +374,8 @@ We compare four algorithms for community detection on randomly generated PABMs:
 
 * Modularity Maximization (Sengupta and Chen) using the Louvain algorithm;
 * Orthogonal Spectral Clustering (KTT);
-* Sparse Subspace Clustering on the columns of $A$ (Noorozi, Rimal, Pensky); 
+* Sparse Subspace Clustering on the columns of $A$  
+(Noorozi, Rimal, Pensky); 
 * Sparse Subspace Clustering on the ASE (KTT).
 
 ```{r, fig.height = 3, fig.width = 8, out.width = '100%'}

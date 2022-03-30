@@ -361,7 +361,7 @@ X I_{2,0} X^\top\]
 
 \begin{frame}{Connecting the PABM to the GRDPG}
 \protect\hypertarget{connecting-the-pabm-to-the-grdpg}{}
-\textbf{Theorem} (KTT): \(A \sim \text{PABM}(\{\lambda^{(kl)}\}_K)\) is
+\textbf{Theorem} (KTT): \(A \sim \text{PABM}(\{\lambda_{ik}\}_K)\) is
 equivalent to \(A \sim \text{GRDPG}_{p, q}(X U)\) with
 
 \begin{itemize}
@@ -416,8 +416,7 @@ then \(B_{ij} = 0\) if \(z_i \neq z_j\).
 \textbf{Theorem} (KTT): Let \(\hat{B}\) with entries \(\hat{B}_{ij}\) be
 the affinity matrix from OSC. Then \(\forall\) pairs \((i, j)\)
 belonging to different communities and sparsity factor satisfying
-\(n \rho_n = \omega\big((\log n)^{4c}\big)\),
-
+\(n \rho_n = \omega\big((\log n)^{4c}\big)\),\\
 \(\max_{i, j} \hat{B}_{ij} = O_P \Big( \frac{(\log n)^c}{\sqrt{n \rho_n}} \Big)\)
 as \(n \to \infty\).
 \end{frame}
@@ -435,8 +434,8 @@ PABMs:
 \item
   Orthogonal Spectral Clustering (KTT);
 \item
-  Sparse Subspace Clustering on the columns of \(A\) (Noorozi, Rimal,
-  Pensky);
+  Sparse Subspace Clustering on the columns of \(A\)\\
+  (Noorozi, Rimal, Pensky);
 \item
   Sparse Subspace Clustering on the ASE (KTT).
 \end{itemize}
