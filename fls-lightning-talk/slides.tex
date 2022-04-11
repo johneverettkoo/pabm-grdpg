@@ -117,7 +117,7 @@ April 2022
 
 \begin{columns}[T]
 \begin{column}{0.33\textwidth}
-\begin{center}\includegraphics[width=75px]{john-koo} \end{center}
+\begin{center}\includegraphics[width=67px]{john-koo} \end{center}
 
 John Koo,\\
 PhD Student in Statistical Science,\\
@@ -125,7 +125,7 @@ Indiana University
 \end{column}
 
 \begin{column}{0.33\textwidth}
-\begin{center}\includegraphics[width=75px]{minh-tang} \end{center}
+\begin{center}\includegraphics[width=67px]{minh-tang} \end{center}
 
 Minh Tang,\\
 Assistant Professor of Statistics,\\
@@ -133,7 +133,7 @@ NC State University
 \end{column}
 
 \begin{column}{0.33\textwidth}
-\begin{center}\includegraphics[width=75px]{michael-trosset} \end{center}
+\begin{center}\includegraphics[width=67px]{michael-trosset} \end{center}
 
 Michael Trosset,\\
 Professor of Statistics,\\
@@ -419,6 +419,9 @@ belonging to different communities and sparsity factor satisfying
 \(n \rho_n = \omega\big((\log n)^{4c}\big)\),\\
 \(\max_{i, j} \hat{B}_{ij} = O_P \Big( \frac{(\log n)^c}{\sqrt{n \rho_n}} \Big)\)
 as \(n \to \infty\).
+
+\textbf{Corollary}: OSC results in zero clustering error as
+\(n \to \infty\), with probability 1.
 \end{frame}
 
 \begin{frame}{Simulation Results}
@@ -443,35 +446,17 @@ PABMs:
 \begin{center}\includegraphics[width=1\linewidth]{slides_files/figure-beamer/unnamed-chunk-10-1} \end{center}
 \end{frame}
 
-\begin{frame}{Additional Slides}
-\protect\hypertarget{additional-slides}{}
-\end{frame}
+\begin{frame}{Popularity Adjusted Block Models are Generalized Random
+Dot Product Graphs}
+\protect\hypertarget{popularity-adjusted-block-models-are-generalized-random-dot-product-graphs}{}
+Submitted to \emph{Journal of Computational and Graphical Statistics}
+(under review)
 
-\begin{frame}{Simulation Setup}
-\protect\hypertarget{simulation-setup}{}
-\begin{enumerate}
-\tightlist
-\item
-  \(z_1, ..., z_n \stackrel{\text{iid}}{\sim}\text{Categorical}(1/K, ..., 1/K)\)
-\item
-  \(\lambda_{ik} \stackrel{\text{iid}}{\sim}\text{Beta}(a_{ik}, b_{ik})\)
+arXiv preprint: \url{https://arxiv.org/abs/2109.04010}
 
-  \begin{itemize}
-  \tightlist
-  \item
-    \(a_{ik} = \begin{cases} 2 & z_i = k \\ 1 & z_i \neq k \end{cases}\)
-  \item
-    \(b_{ik} = \begin{cases} 1 & z_i = k \\ 2 & z_i \neq k \end{cases}\)
-  \end{itemize}
-\item
-  \(P_{ij} = \lambda_{i z_j} \lambda_{j z_i}\)
-\item
-  \(A \sim \text{BernoulliGraph}(P)\)
-\end{enumerate}
-\end{frame}
+GitHub repository: \url{https://github.com/johneverettkoo/pabm-grdpg}
 
-\begin{frame}{Future Work}
-\protect\hypertarget{future-work}{}
+R package: \url{https://github.com/johneverettkoo/osc}
 \end{frame}
 
 \end{document}

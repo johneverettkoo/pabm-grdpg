@@ -57,7 +57,7 @@ April 2022
 
 :::: {.column width='33%'}
 
-```{r, out.width = '75px'}
+```{r, out.width = '67px'}
 knitr::include_graphics('john-koo.jpeg')
 ```
 
@@ -69,7 +69,7 @@ Indiana University
 
 :::: {.column width='33%'}
 
-```{r, out.width = '75px'}
+```{r, out.width = '67px'}
 knitr::include_graphics('minh-tang.jpg')
 ```
 
@@ -81,7 +81,7 @@ NC State University
 
 :::: {.column width='33%'}
 
-```{r, out.width = '75px'}
+```{r, out.width = '67px'}
 knitr::include_graphics('michael-trosset.jpg')
 ```
 
@@ -368,6 +368,8 @@ $\max_{i, j} \hat{B}_{ij} =
 O_P \Big( \frac{(\log n)^c}{\sqrt{n \rho_n}} \Big)$ 
 as $n \to \infty$.
 
+**Corollary**: OSC results in zero clustering error as $n \to \infty$, with probability 1.
+
 ## Simulation Results
 
 We compare four algorithms for community detection on randomly generated PABMs:  
@@ -439,15 +441,12 @@ clustering.df %>%
   facet_wrap(~ K, labeller = 'label_both')
 ```
 
-## Additional Slides
+## Popularity Adjusted Block Models are Generalized Random Dot Product Graphs
 
-## Simulation Setup
+Submitted to *Journal of Computational and Graphical Statistics* (under review)
 
-1. $z_1, ..., z_n \iid \Cat(1/K, ..., 1/K)$
-2. $\lambda_{ik} \iid \Betadist(a_{ik}, b_{ik})$
-    * $a_{ik} = \begin{cases} 2 & z_i = k \\ 1 & z_i \neq k \end{cases}$
-    * $b_{ik} = \begin{cases} 1 & z_i = k \\ 2 & z_i \neq k \end{cases}$
-3. $P_{ij} = \lambda_{i z_j} \lambda_{j z_i}$
-4. $A \sim \BG(P)$
+arXiv preprint: https://arxiv.org/abs/2109.04010
 
-## Future Work
+GitHub repository: https://github.com/johneverettkoo/pabm-grdpg
+
+R package: https://github.com/johneverettkoo/osc
