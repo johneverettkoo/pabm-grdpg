@@ -2,4 +2,6 @@
 
 Main paper: `pabm-grdpg.pdf`
 
+Authors: John Koo, Minh Tang, Michael W. Trosset
+
 Submitted to JCGS
