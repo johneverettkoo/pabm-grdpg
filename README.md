@@ -1,1 +1,5 @@
-Notes on the popularity adjusted block model (PABM) and generalized random dot product graphs (GRDPG)
+# Popularity Adjusted Block Models are Generalized Random Dot Product Graphs
+
+Main paper: `pabm-grdpg.pdf`
+
+Submitted to JCGS
