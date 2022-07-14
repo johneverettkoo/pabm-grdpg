@@ -1,0 +1,360 @@
+---
+title: Popularity Adjusted Block Models are Generalized Random Dot Product Graphs
+author:
+  - name: John Koo
+    affil: 1
+  - name: Minh Tang
+    affil: 2
+  - name: Michael W. Trosset
+    affil: 1
+affiliation:
+  - num: 1
+    address: Department of Statistics, Indiana University
+  - num: 2
+    address: Department of Statistics, North Carolina State University
+title_textsize: "56pt"
+author_textsize: "32pt"
+affiliation_textsize: "8pt"
+sectitle_textsize: "36pt"
+sectitle2_textsize: "36pt"
+body_textsize: "32pt"
+column_numbers: 4
+poster_height: "20.5in"
+poster_width: "36.5in"
+column_margins: "0.1in"
+primary_colour: "#990000"
+secondary_colour: "#000000"
+accent_colour: "#990000"
+titlebox_borderwidth: "0.1cm"
+titlebox_bordercol: "#000000"
+title_textcol: "#ffffff"
+author_textcol: "#ffffff"
+sectitle2_textcol: "#990000"
+sectitle_borderwidth: "0mm"
+font_family: "Times New Roman"
+logoleft_name: poster_files/trident_medium.png
+output: 
+  posterdown::posterdown_html:
+    self_contained: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, 
+                      comment = NA, 
+                      warning = FALSE, 
+                      message = FALSE,
+                      fig.align = 'center',
+                      fig.lp = '')
+import::from(magrittr, `%>%`)
+library(ggplot2)
+library(ggraph)
+source('~/dev/pabm-grdpg/functions.R')
+```
+
+# Block Models
+
+\newcommand{\diag}{\text{diag}}
+\newcommand{\tr}{\text{Tr}}
+\newcommand{\blockdiag}{\text{blockdiag}}
+\newcommand{\indep}{\stackrel{\text{ind}}{\sim}}
+\newcommand{\iid}{\stackrel{\text{iid}}{\sim}}
+\newcommand{\Bernoulli}{\text{Bernoulli}}
+\newcommand{\Betadist}{\text{Beta}}
+\newcommand{\BG}{\text{BernoulliGraph}}
+\newcommand{\Cat}{\text{Categorical}}
+\newcommand{\Uniform}{\text{Uniform}}
+\newcommand{\RDPG}{\text{RDPG}}
+\newcommand{\GRDPG}{\text{GRDPG}}
+\newcommand{\PABM}{\text{PABM}}
+\newtheorem{theorem}{Theorem}
+
+A *block model* is a random graph model in which each vertex $v_i$ has a community label $z_i \in [K]$ and the edge probability between each pair of vertices is determined in part by the pair of labels.
+
+$A$ is an adjacency matrix of a block model if and only if each $A_{ij} \indep \Bernoulli(P_{ij})$ and $P_{ij} = f(z_i, z_j, \cdot)$. 
+
+## Stochastic Block Model
+
+Each edge probability is fixed for each pair of communities, i.e., $P_{ij} = \theta_{z_i, z_j}$.
+
+## Degree Corrected Block Model
+
+Each edge probability is determined by the community edge probability as well as each vertex's degree factor, i.e., $P_{ij} = \theta_{z_i, z_j} \omega_i \omega_j$.
+
+## Popularity Adjusted Block Model
+
+Each vertex has a popularity parameter for each community that determines its affinity toward that community, i.e., $P_{ij} = \lambda_{i, z_j} \lambda_{j, z_i}$.
+
+# Generalized Random Dot Product Graphs
+
+The *generalized random dot product graph* is a random graph model in which each vertex $v_i$ has a corresponding hidden vector $x_i \in \mathbb{R}^{p+q}$ and each edge probability is the indefinite inner product of the corresponding pair of hidden vectors, i.e., $P_{ij} = x_i^\top I_{p, q} x_j$, $I_{p,q} = \Bigl[\begin{smallmatrix} I_{p} & 0 \\ 0 & - I_{q} \end{smallmatrix} \Bigr]$
+
+## Adjacency Spectral Embedding
+
+Approximate $A$ by spectral decomposition $A \approx V_{p, q} \Lambda_{p, q} V_{p, q}^\top$. 
+The subscript $p, q$ denotes the $p$ most positive and $q$ most negative eigenvalues and corresponding eigenvectors. 
+Each $\hat{x}_i$, the $i^{th}$ row of $\hat{X} = V_{p, q} |\Lambda_{p, q}|^{1/2},$ estimates the relative position of its corresponding latent vector $x_i$, up to an indefinite orthogonal transformation.
+
+**Theorem**: $\max_i \| \hat{x}_i - Q_n x_i \| = O_P \Big( \frac{\log^c n}{n^{1/2}} \Big)$ for some $Q_n \in \mathbb{O}(p, q)$.
+
+```{r, cache = TRUE}
+n1 <- 2 ** 5
+n2 <- 2 ** 5
+n <- n1 + n2
+z <- c(rep(1, n1), rep(2, n2))
+u1 <- runif(n1)
+u2 <- runif(n2)
+x1 <- cos(pi / 3 * u1)
+y1 <- sin(pi / 3 * u1)
+x2 <- 1 + cos(pi / 3 * u2 + pi)
+y2 <- 1 + sin(pi / 3 * u2 + pi)
+
+data.matrix <- cbind(c(x1, x2), c(y1, y2))
+P <- data.matrix %*% diag(c(1, 1)) %*% t(data.matrix)
+A <- draw.graph(P)
+A.graph <- tidygraph::as_tbl_graph(A, directed = FALSE)
+
+Xhat <- embedding(A, 2, 0)
+Xhat[, 1] <- -Xhat[, 1]
+```
+
+```{r, fig.height = 2.2, fig.width = 6, out.width = '100%'}
+latent.config.plot <- ggplot() + 
+  geom_point(aes(x = data.matrix[, 1], y = data.matrix[, 2], 
+                 colour = factor(z))) + 
+  # coord_fixed() + 
+  theme_bw() + 
+  theme(legend.position = 'none') + 
+  labs(x = NULL, y = NULL, colour = NULL, title = 'Latent Vectors') + 
+  scale_colour_brewer(palette = 'Set1')
+
+graph.plot <- ggraph(A, layout = 'stress') + 
+  geom_edge_link(alpha = 1 / sqrt(n) / 2) + 
+  geom_node_point(aes(colour = factor(z)),
+                  show.legend = FALSE) + 
+  labs(colour = NULL, 
+       title = 'GRDPG') + 
+  # theme_graph() + 
+  theme_void() + 
+  scale_colour_brewer(palette = 'Set1') 
+
+ase.plot <- ggplot() + 
+  geom_point(aes(x = Xhat[, 1], y = Xhat[, 2],
+                 colour = factor(z))) + 
+  # coord_fixed() + 
+  theme_bw() + 
+  theme(legend.position = 'none') + 
+  labs(x = NULL, y = NULL, colour = NULL, title = 'ASE') + 
+  scale_colour_brewer(palette = 'Set1')
+
+gridExtra::grid.arrange(latent.config.plot, graph.plot, ase.plot, nrow = 1)
+```
+
+# Connecting Block Models to the GRDPG
+
+It has been previously shown that the SBM and DCBM are GRDPGs in which the communities lie on point masses and line segments respectively.
+
+**Theorem** (KTT): The PABM is GRDPG in which the communities lie on mutually orthogonal $K$-dimensional subspaces.
+
+```{r, cache = TRUE, fig.width = 5, fig.height = 2, out.width = '100%'}
+n <- 64
+n1 <- n / 2
+n2 <- n / 2
+z <- c(rep(1, n1), rep(2, n2))
+p <- 1/2
+q <- 1/2
+r <- 1/8
+P <- matrix(r, nrow = n, ncol = n)
+P[seq(n1), seq(n1)] <- p
+P[seq(n1 + 1, n), seq(n1 + 1, n)] <- q
+X <- embedding(P, 2, 0)
+A <- draw.graph(P)
+Xhat <- embedding(A, 2, 0)
+A.graph <- tidygraph::as_tbl_graph(A, directed = FALSE)
+
+sbm.graph.plot <- ggraph(A, layout = 'stress') + 
+  geom_edge_link(alpha = 1 / sqrt(n) / 2) + 
+  geom_node_point(aes(colour = factor(z)),
+                  show.legend = FALSE) + 
+  labs(colour = NULL, 
+       title = 'Stochastic Block Model') + 
+  # theme_graph() + 
+  theme_void() + 
+  scale_colour_brewer(palette = 'Set1') 
+
+sbm.ase.plot <- ggplot() + 
+  geom_point(aes(x = Xhat[, 2], y = Xhat[, 1],
+                 colour = factor(z)),
+             shape = 4) + 
+  geom_point(aes(x = X[, 2], y = X[, 1], 
+                 colour = factor(z))) + 
+  # coord_fixed() +
+  theme_bw() + 
+  theme(legend.position = 'none') + 
+  labs(x = NULL, y = NULL, colour = NULL, 
+       title = 'Point Masses') + 
+  scale_colour_brewer(palette = 'Set1')
+
+gridExtra::grid.arrange(sbm.graph.plot, sbm.ase.plot, nrow = 1)
+```
+
+```{r, cache = TRUE, fig.width = 5, fig.height = 2, out.width = '100%'}
+n <- 128
+n1 <- n / 2
+n2 <- n / 2
+z <- c(rep(1, n1), rep(2, n2))
+p <- 1/2
+q <- 1/2
+r <- 1/8
+P <- matrix(r, nrow = n, ncol = n)
+P[seq(n1), seq(n1)] <- p
+P[seq(n1 + 1, n), seq(n1 + 1, n)] <- q
+omega <- rbeta(n, 2, 1)
+P <- P * (omega %*% t(omega))
+X <- embedding(P, 2, 0)
+A <- draw.graph(P)
+Xhat <- embedding(A, 2, 0)
+Xhat <- -Xhat
+A.graph <- tidygraph::as_tbl_graph(A, directed = FALSE)
+
+dcbm.graph.plot <- ggraph(A, layout = 'stress') + 
+  geom_edge_link(alpha = 1 / sqrt(n) / 2) + 
+  geom_node_point(aes(colour = factor(z)),
+                  show.legend = FALSE) + 
+  labs(colour = NULL, 
+       title = 'Degree Corrected Block Model') + 
+  # theme_graph() + 
+  theme_void() + 
+  scale_colour_brewer(palette = 'Set1') 
+
+dcbm.ase.plot <- ggplot() + 
+  geom_point(aes(x = Xhat[, 1], y = Xhat[, 2],
+                 colour = factor(z)),
+             shape = 4) + 
+  geom_point(aes(x = X[, 1], y = X[, 2], 
+                 colour = factor(z))) + 
+  # coord_fixed() +
+  theme_bw() + 
+  theme(legend.position = 'none') + 
+  labs(x = NULL, y = NULL, colour = NULL, 
+       title = 'Rays') + 
+  scale_colour_brewer(palette = 'Set1')
+
+gridExtra::grid.arrange(dcbm.graph.plot, dcbm.ase.plot, nrow = 1)
+```
+
+```{r, cache = TRUE, fig.width = 5, fig.height = 2, out.width = '100%'}
+n <- 64
+Pz <- generate.P.beta(n)
+P <- Pz$P
+z <- Pz$clustering
+X <- embedding(P, 3, 1)
+A <- draw.graph(P)
+Xhat <- embedding(A, 3, 1)
+A.graph <- tidygraph::as_tbl_graph(A, directed = FALSE)
+
+pabm.graph.plot <- ggraph(A, layout = 'stress') + 
+  geom_edge_link(alpha = 1 / sqrt(n) / 2) + 
+  geom_node_point(aes(colour = factor(z)),
+                  show.legend = FALSE) + 
+  labs(colour = NULL, 
+       title = 'Popularity Adjusted Block Model') + 
+  # theme_graph() + 
+  theme_void() + 
+  scale_colour_brewer(palette = 'Set1') 
+
+pabm.ase.plot <- ggplot() + 
+  geom_point(aes(x = Xhat[, 1], y = Xhat[, 2],
+                 colour = factor(z)),
+             shape = 4) + 
+  geom_point(aes(x = X[, 1], y = X[, 2], 
+                 colour = factor(z))) + 
+  # coord_fixed() +
+  theme_bw() + 
+  theme(legend.position = 'none') + 
+  labs(x = NULL, y = NULL, colour = NULL, 
+       title = 'Subspaces (Projected)') + 
+  scale_colour_brewer(palette = 'Set1')
+
+gridExtra::grid.arrange(pabm.graph.plot, pabm.ase.plot, nrow = 1)
+```
+
+# Orthogonal Spectral Clustering
+
+1. Decompose $A \approx V_{p,q} \Lambda_{p,q} V_{p,q}^\top$, $p = \frac{K (K+1)}{2}$ and $q = \frac{K (K-1)}{2}$.
+2. Compute $B = |n V_{p,q} V_{p,q}^\top|$.
+3. Construct graph $G'$ from $B$.
+4. Partition $G'$ into $K$ disconnected subgraphs.
+
+**Theorem** (KTT): 
+Let $B$ be the affinity matrix from OSC. 
+Then $\forall$ pairs $(i, j)$ belonging to different communities 
+and sparsity factor satisfying $n \rho_n = \omega\big(\log^{4c} n\big)$,  
+$\max_{i, j} B_{ij} = O_P \Big( \frac{\log^c n}{\sqrt{n \rho_n}} \Big)$.
+
+## Simulation Study
+
+```{r, fig.height = 2, fig.width = 5, out.width = '100%'}
+clustering.df <- readr::read_csv('~/dev/pabm-grdpg/simulation-results/cluster-sim-balanced.csv')
+
+clustering.df %>%
+  dplyr::group_by(n, K) %>%
+  dplyr::summarise(
+    med.err = median(error.osc),
+    first.q = quantile(error.osc, .25),
+    third.q = quantile(error.osc, .75),
+    med.err.ssc = median(error.ssc.ase),
+    first.q.ssc = quantile(error.ssc.ase, .25),
+    third.q.ssc = quantile(error.ssc.ase, .75),
+    med.err.louvain = median(error.louvain),
+    first.q.louvain = quantile(error.louvain, .25),
+    third.q.louvain = quantile(error.louvain, .75),
+    med.err.ssc.A = median(error.ssc.A),
+    first.q.ssc.A = quantile(error.ssc.A, .25),
+    third.q.ssc.A = quantile(error.ssc.A, .75)
+  ) %>% 
+  dplyr::ungroup() %>% 
+  ggplot() +
+  theme_bw() + 
+  theme(legend.position = 'bottom',
+        legend.margin = margin(0, 0, 0, 0)) + 
+  scale_x_log10(breaks = c(128, 256, 512, 1024, 2048, 4096),
+                labels = c(expression(2^7), 
+                           expression(2^8), 
+                           expression(2^9), 
+                           expression(2^10), 
+                           expression(2^11), 
+                           expression(2^12))) +
+  scale_y_log10() + 
+  labs(y = 'error count', 
+       colour = NULL, shape = NULL) +
+  geom_line(aes(x = n, y = med.err * n,
+                colour = 'OSC')) +
+  geom_point(aes(x = n, y = med.err * n,
+                 colour = 'OSC', shape = 'OSC')) +
+  geom_errorbar(aes(x = n, ymin = first.q * n, ymax = third.q * n,
+                    colour = 'OSC'), width = .1) + 
+  geom_line(aes(x = n, y = med.err.ssc * n,
+                colour = 'SSC-ASE')) +
+  geom_point(aes(x = n, y = med.err.ssc * n,
+                 colour = 'SSC-ASE', shape = 'SSC-ASE')) +
+  geom_errorbar(aes(x = n, ymin = first.q.ssc * n, ymax = third.q.ssc * n,
+                    colour = 'SSC-ASE'), width = .1) +
+  geom_line(aes(x = n, y = med.err.ssc.A * n,
+                colour = 'SSC-A')) +
+  geom_point(aes(x = n, y = med.err.ssc.A * n,
+                 colour = 'SSC-A', shape = 'SSC-A')) +
+  geom_errorbar(aes(x = n, ymin = first.q.ssc.A * n, ymax = third.q.ssc.A * n,
+                    colour = 'SSC-A'), width = .1) +
+  geom_line(aes(x = n, y = med.err.louvain * n,
+                colour = 'MM-Louvain')) + 
+  geom_point(aes(x = n, y = med.err.louvain * n,
+                 colour = 'MM-Louvain', shape = 'MM-Louvain')) + 
+  geom_errorbar(aes(x = n, ymin = first.q.louvain * n, ymax = third.q.louvain * n,
+                    colour = 'MM-Louvain'), width = .1) + 
+  scale_colour_brewer(palette = 'Set1') + 
+  facet_wrap(~ K, labeller = 'label_both')
+```
+
+# Conclusion
+
+Exploiting the geometry of PABMs (and other block models) results in consistent community detection algorithms.

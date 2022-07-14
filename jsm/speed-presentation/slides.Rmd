@@ -263,12 +263,11 @@ Let $\hat{B}$ with entries $\hat{B}_{ij}$ be the affinity matrix from OSC.
 Then $\forall$ pairs $(i, j)$ belonging to different communities 
 and sparsity factor satisfying $n \rho_n = \omega\big((\log n)^{4c}\big)$,  
 $\max_{i, j} \hat{B}_{ij} = 
-O_P \Big( \frac{(\log n)^c}{\sqrt{n \rho_n}} \Big)$ 
-as $n \to \infty$.
+O_P \Big( \frac{(\log n)^c}{\sqrt{n \rho_n}} \Big)$.
 
 **Corollary**: OSC results in zero clustering error as $n \to \infty$, with probability 1.
 
-## Simulation Results
+## Simulation Study
 
 We compare four algorithms for community detection on randomly generated PABMs:  
 
