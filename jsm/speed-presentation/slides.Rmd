@@ -160,10 +160,9 @@ Adjacency Spectral Embedding (Sussman et al., 2012) estimates $x_1, ..., x_n \in
 2. Let $\hat{V}$ be the matrix whose columns are the corresponding eigenvectors.
 3. Compute $\hat{X} = \hat{V} \hat{\Lambda}^{1/2}$.
 
-**Theorem**: $\max\limits_i \|\hat{X}_i - Q_n X_i \| = O_P \Big( \frac{(\log n)^c}{n^{1/2}} \Big)$ 
-as $n \to \infty$
+**Theorem**: $\max\limits_i \|\hat{X}_i - Q_n X_i \| = O_P \Big( \frac{(\log n)^c}{n^{1/2}} \Big)$.
 
-## Connecting Block Models to the (G)RDPG Model
+## Connecting Block Models to the GRDPG Model
 
 ::: columns
 

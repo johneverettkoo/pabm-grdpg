@@ -280,16 +280,14 @@ gridExtra::grid.arrange(pabm.graph.plot, pabm.ase.plot, nrow = 1)
 
 # Orthogonal Spectral Clustering
 
-1. Decompose $A \approx V_{p,q} \Lambda_{p,q} V_{p,q}^\top$, $p = \frac{K (K+1)}{2}$ and $q = \frac{K (K-1)}{2}$.
+1. Eigendecompose $A \approx V_{p,q} \Lambda_{p,q} V_{p,q}^\top$ with $p = \frac{K (K+1)}{2}$ and $q = \frac{K (K-1)}{2}$.
 2. Compute $B = |n V_{p,q} V_{p,q}^\top|$.
 3. Construct graph $G'$ from $B$.
 4. Partition $G'$ into $K$ disconnected subgraphs.
 
 **Theorem** (KTT): 
 Let $B$ be the affinity matrix from OSC. 
-Then $\forall$ pairs $(i, j)$ belonging to different communities 
-and sparsity factor satisfying $n \rho_n = \omega\big(\log^{4c} n\big)$,  
-$\max_{i, j} B_{ij} = O_P \Big( \frac{\log^c n}{\sqrt{n \rho_n}} \Big)$.
+Then $\forall$ $(i, j)$ belonging to different communities and sparsity factor satisfying $n \rho_n = \omega\big(\log^{4c} n\big),$ $\max_{i, j} B_{ij} = O_P \Big( \frac{\log^c n}{\sqrt{n \rho_n}} \Big)$.
 
 ## Simulation Study
 
@@ -357,4 +355,4 @@ clustering.df %>%
 
 # Conclusion
 
-Exploiting the geometry of PABMs (and other block models) results in consistent community detection algorithms.
+Exploiting the geometry of PABMs (and other block models) results in intuitive and consistent community detection algorithms.
