@@ -32,6 +32,7 @@ knitr::opts_chunk$set(echo = FALSE,
 options(xtable.comment = FALSE, 
         xtable.table.placement = 'H')
 library(ggplot2)
+library(ggraph)
 import::from(magrittr, `%>%`)
 theme_set(theme_bw())
 
@@ -85,7 +86,7 @@ NC State University
 knitr::include_graphics('michael-trosset.jpg')
 ```
 
-Michael Trosset,  
+Michael W. Trosset,  
 Professor of Statistics,  
 Indiana University
 
@@ -125,123 +126,163 @@ $\lambda_{i1}, ..., \lambda_{iK} \in [0, 1]$.
 Then $A \sim \BG(P)$ is a PABM if each 
 $P_{ij} = \lambda_{i z_j} \lambda_{j z_i}$
 
-## Popularity Adjusted Block Model
-
-**Def** Popularity Adjusted Block Model (Sengupta and Chen, 2017):
-
-Let each vertex $i \in [n]$ have $K$ popularity parameters
-$\lambda_{i1}, ..., \lambda_{iK} \in [0, 1]$. 
-Then $A \sim \PABM(\{\lambda_{ik}\}_K)$ if each $P_{ij} = \lambda_{i z_j} \lambda_{j z_i}$. 
-
-**Def** (Noroozi, Rimal, and Pensky, 2020): 
-
-$A$ is sampled from a PABM if $P$ can be described as:
-
-1. Let each $P^{(kl)}$ denote the $n_k \times n_l$ matrix of edge probabilities 
-between communities $k$ and $l$. 
-2. Organize popularity parameters as vectors 
-$\lambda^{(kl)} \in \mathbb{R}^{n_k}$ 
-such that $\lambda^{(kl)}_i = \lambda_{k_i l}$ is the popularity parameter 
-of the $i$^th^ vertex of community $k$ towards community $l$. 
-3. Each block can be decomposed as 
-$P^{(kl)} = \lambda^{(kl)} (\lambda^{(lk)})^\top$.
-
-## Generalized Random Dot Product Graph
-
-**Def** Generalized Random Dot Product Graph  
-(Rubin-Delanchy, Cape, Tang, Priebe, 2020)
-
-Let $I_{p,q} = \blockdiag(I_p, -I_q)$ and suppose that $x_1, \ldots, x_n \in \mathbb{R}^{p+q}$ are such that $x_i^\top I_{p,q} x_j \in [0,1]$.  
-Then $A \sim \GRDPG_{p, q}(X)$ iff $A \sim \BG(X I_{p,q} X^\top)$, where $X = \begin{bmatrix} x_1 & \cdots & x_n \end{bmatrix}^\top$. 
-
-Adjacency Spectral Embedding (Sussman et al., 2012) estimates $x_1, ..., x_n \in \mathbb{R}^{p+q}$ from $A$: 
-
-1. Let $\hat{\Lambda}$ be the diagonal matrix that contains the absolute values of the $p$ most positive and the $q$ most negative eigenvalues.
-2. Let $\hat{V}$ be the matrix whose columns are the corresponding eigenvectors.
-3. Compute $\hat{X} = \hat{V} \hat{\Lambda}^{1/2}$.
-
-**Theorem**: $\max\limits_i \|\hat{X}_i - Q_n X_i \| = O_P \Big( \frac{(\log n)^c}{n^{1/2}} \Big)$.
-
-## Connecting Block Models to the GRDPG Model
+## Connecting Block Models to the GRDPG
 
 ::: columns
 
-:::: column
+:::: {.column width='67%'}
 
-```{r, out.width = '50%', fig.height = 2.5, fig.width = 2.5}
+```{r, cache = TRUE, fig.width = 6, fig.height = 2, out.width = '100%'}
+n <- 64
 n1 <- n / 2
 n2 <- n / 2
 z <- c(rep(1, n1), rep(2, n2))
 p <- 1/2
-q <- 1/4
+q <- 1/2
 r <- 1/8
 P <- matrix(r, nrow = n, ncol = n)
 P[seq(n1), seq(n1)] <- p
 P[seq(n1 + 1, n), seq(n1 + 1, n)] <- q
-P.eigen = eigen(P)
-X <- P.eigen$vectors[, 1:2] %*% diag(P.eigen$values[1:2] ** .5)
+X <- embedding(P, 2, 0)
+A <- draw.graph(P)
+Xhat <- embedding(A, 2, 0)
+A.graph <- tidygraph::as_tbl_graph(A, directed = FALSE)
 
-A.eigen <- eigen(A)
-X.hat <- A.eigen$vectors[, 1:2] %*% diag(A.eigen$values[1:2] ** .5)
-par(mar = rep(1.75, 4))
-plot(X, asp = 1, col = z, xlab = NA, ylab = NA, main = 'SBM: Point masses')
+sbm.graph.plot <- ggraph(A, layout = 'stress') + 
+  geom_edge_link(alpha = 1 / sqrt(n) / 2) + 
+  geom_node_point(aes(colour = factor(z)),
+                  show.legend = FALSE) + 
+  labs(colour = NULL, 
+       title = 'SBM') + 
+  # theme_graph() + 
+  theme_void() + 
+  scale_colour_brewer(palette = 'Set1') 
+
+sbm.ase.plot <- ggplot() + 
+  geom_point(aes(x = Xhat[, 2], y = Xhat[, 1],
+                 colour = factor(z)),
+             shape = 4) + 
+  geom_point(aes(x = X[, 2], y = X[, 1], 
+                 colour = factor(z))) + 
+  # coord_fixed() +
+  theme_bw() + 
+  theme(legend.position = 'none') + 
+  labs(x = NULL, y = NULL, colour = NULL, 
+       title = 'Point Masses') + 
+  scale_colour_brewer(palette = 'Set1')
+
+gridExtra::grid.arrange(sbm.graph.plot, sbm.ase.plot, nrow = 1)
 ```
 
-\vspace*{.5\baselineskip}
+```{r, cache = TRUE, fig.width = 6, fig.height = 2, out.width = '100%'}
+n <- 128
+n1 <- n / 2
+n2 <- n / 2
+z <- c(rep(1, n1), rep(2, n2))
+p <- 1/2
+q <- 1/2
+r <- 1/8
+P <- matrix(r, nrow = n, ncol = n)
+P[seq(n1), seq(n1)] <- p
+P[seq(n1 + 1, n), seq(n1 + 1, n)] <- q
+omega <- rbeta(n, 2, 1)
+P <- P * (omega %*% t(omega))
+X <- embedding(P, 2, 0)
+A <- draw.graph(P)
+Xhat <- embedding(A, 2, 0)
+# Xhat <- -Xhat
+A.graph <- tidygraph::as_tbl_graph(A, directed = FALSE)
 
-```{r, out.width = '50%', fig.height = 2.5, fig.width = 2.5}
-par(mar = rep(1.75, 4))
-omega <- rbeta(n, 1, 1)
-dc.matrix <- omega %*% t(omega)
-P.dcbm <- P * dc.matrix
-dcbm.eigen <- eigen(P.dcbm)
-X.dcbm <- dcbm.eigen$vectors[, 1:2] %*% diag(dcbm.eigen$values[1:2] ** .5)
-plot(X.dcbm, asp = 1, col = z, xlab = NA, ylab = NA, main = 'DCBM: Rays')
+dcbm.graph.plot <- ggraph(A, layout = 'stress') + 
+  geom_edge_link(alpha = 1 / sqrt(n) / 2) + 
+  geom_node_point(aes(colour = factor(z)),
+                  show.legend = FALSE) + 
+  labs(colour = NULL, 
+       title = 'DCBM') + 
+  # theme_graph() + 
+  theme_void() + 
+  scale_colour_brewer(palette = 'Set1') 
 
+dcbm.ase.plot <- ggplot() + 
+  geom_point(aes(x = Xhat[, 1], y = Xhat[, 2],
+                 colour = factor(z)),
+             shape = 4) + 
+  geom_point(aes(x = X[, 1], y = X[, 2], 
+                 colour = factor(z))) + 
+  # coord_fixed() +
+  theme_bw() + 
+  theme(legend.position = 'none') + 
+  labs(x = NULL, y = NULL, colour = NULL, 
+       title = 'Rays') + 
+  scale_colour_brewer(palette = 'Set1')
+
+gridExtra::grid.arrange(dcbm.graph.plot, dcbm.ase.plot, nrow = 1)
+```
+
+```{r, cache = TRUE, fig.width = 6, fig.height = 2, out.width = '100%'}
+n <- 64
+Pz <- generate.P.beta(n)
+P <- Pz$P
+z <- Pz$clustering
+X <- embedding(P, 3, 1)
+A <- draw.graph(P)
+Xhat <- embedding(A, 3, 1)
+Xhat[, 1] <- -Xhat[, 1]
+A.graph <- tidygraph::as_tbl_graph(A, directed = FALSE)
+
+pabm.graph.plot <- ggraph(A, layout = 'stress') + 
+  geom_edge_link(alpha = 1 / sqrt(n) / 2) + 
+  geom_node_point(aes(colour = factor(z)),
+                  show.legend = FALSE) + 
+  labs(colour = NULL, 
+       title = 'PABM') + 
+  # theme_graph() + 
+  theme_void() + 
+  scale_colour_brewer(palette = 'Set1') 
+
+pabm.ase.plot <- ggplot() + 
+  geom_point(aes(x = Xhat[, 1], y = Xhat[, 2],
+                 colour = factor(z)),
+             shape = 4) + 
+  geom_point(aes(x = X[, 1], y = X[, 2], 
+                 colour = factor(z))) + 
+  # coord_fixed() +
+  theme_bw() + 
+  theme(legend.position = 'none') + 
+  labs(x = NULL, y = NULL, colour = NULL, 
+       title = 'Subspaces (Projected)') + 
+  scale_colour_brewer(palette = 'Set1')
+
+gridExtra::grid.arrange(pabm.graph.plot, pabm.ase.plot, nrow = 1)
 ```
 
 ::::
 
-:::: column
+:::: {.column width='33%'}
 
-\vspace*{0\baselineskip}
+&nbsp;
 
-```{r, out.width = '100%', fig.height = 4, fig.width = 4}
-par(mar = rep(1.75, 4))
-Pz <- generate.P.beta(n * 10)
-P <- Pz$P
-z <- Pz$clustering
-X <- embedding(P, 3, 1)
-pairs(X, col = z, asp = 1, pch = '.', main = 'PABM: Orthogonal subspaces')
-```
+&nbsp;
+
+* K-means clustering
+* Gaussian mixture models
+
+&nbsp;
+
+* K-means with cosine similarity
+* GMM on angles
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+* ???
 
 ::::
 
 :::
-
-## Connecting the PABM to the GRDPG
-
-**Theorem** (KTT): $A \sim \PABM(\{\lambda_{ik}\}_K)$ is equivalent to 
-$A \sim \GRDPG_{p, q}(X U)$ with
-
-* $p = K (K + 1) / 2$, $q = K (K - 1) / 2$;
-* $U$ is an orthogonal matrix;
-* $X \in \mathbb{R}^{n \times K^2}$ is a block diagonal matrix 
-composed of popularity vectors with each block corresponding to a community.  
-
-$$X = \begin{bmatrix}
-\Lambda^{(1)} & \cdots & 0 \\
-0 & \ddots & 0 \\
-0 & \cdots & \Lambda^{(K)}
-\end{bmatrix} 
-\in \mathbb{R}^{n \times K^2}$$
-
-$$\Lambda^{(k)} = \begin{bmatrix} 
-\lambda^{(k1)} & \cdots & \lambda^{(kK)} 
-\end{bmatrix} 
-\in \mathbb{R}^{n_k \times K}$$
-
-$$A \sim \PABM(\{\lambda_{ik}\}_K) \text{ iff } A \sim \GRDPG_{p, q}(X U)$$
 
 ## Orthogonal Spectral Clustering
 
@@ -258,23 +299,12 @@ positive and $K (K-1) / 2$ most negative eigenvalues.
 4. Partition $G$ into $K$ disconnected subgraphs.
 
 **Theorem** (KTT): 
-Let $\hat{B}$ with entries $\hat{B}_{ij}$ be the affinity matrix from OSC. 
-Then $\forall$ pairs $(i, j)$ belonging to different communities 
-and sparsity factor satisfying $n \rho_n = \omega\big((\log n)^{4c}\big)$,  
-$\max_{i, j} \hat{B}_{ij} = 
-O_P \Big( \frac{(\log n)^c}{\sqrt{n \rho_n}} \Big)$.
+$\forall$ pairs $(i, j)$ belonging to different communities, 
+$\max\limits_{i, j} B_{ij} = O_P \Big( \frac{(\log n)^c}{\sqrt{n \rho_n}} \Big)$.
 
 **Corollary**: OSC results in zero clustering error as $n \to \infty$, with probability 1.
 
 ## Simulation Study
-
-We compare four algorithms for community detection on randomly generated PABMs:  
-
-* Modularity Maximization (Sengupta and Chen) using the Louvain algorithm;
-* Orthogonal Spectral Clustering (KTT);
-* Sparse Subspace Clustering on the columns of $A$  
-(Noorozi, Rimal, Pensky); 
-* Sparse Subspace Clustering on the ASE (KTT).
 
 ```{r, fig.height = 3, fig.width = 8, out.width = '100%'}
 clustering.df <- readr::read_csv('~/dev/pabm-grdpg/simulation-results/cluster-sim-balanced.csv')

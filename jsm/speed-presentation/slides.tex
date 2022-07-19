@@ -146,7 +146,7 @@ NC State University
 \begin{column}{0.33\textwidth}
 \begin{center}\includegraphics[width=67px]{michael-trosset} \end{center}
 
-Michael Trosset,\\
+Michael W. Trosset,\\
 Professor of Statistics,\\
 Indiana University
 \end{column}
@@ -179,117 +179,53 @@ Then \(A \sim \text{BernoulliGraph}(P)\) is a PABM if each
 \(P_{ij} = \lambda_{i z_j} \lambda_{j z_i}\)
 \end{frame}
 
-\begin{frame}{Popularity Adjusted Block Model}
-\protect\hypertarget{popularity-adjusted-block-model}{}
-\textbf{Def} Popularity Adjusted Block Model (Sengupta and Chen, 2017):
-
-Let each vertex \(i \in [n]\) have \(K\) popularity parameters
-\(\lambda_{i1}, ..., \lambda_{iK} \in [0, 1]\). Then
-\(A \sim \text{PABM}(\{\lambda_{ik}\}_K)\) if each
-\(P_{ij} = \lambda_{i z_j} \lambda_{j z_i}\).
-
-\textbf{Def} (Noroozi, Rimal, and Pensky, 2020):
-
-\(A\) is sampled from a PABM if \(P\) can be described as:
-
-\begin{enumerate}
-\tightlist
-\item
-  Let each \(P^{(kl)}\) denote the \(n_k \times n_l\) matrix of edge
-  probabilities between communities \(k\) and \(l\).
-\item
-  Organize popularity parameters as vectors
-  \(\lambda^{(kl)} \in \mathbb{R}^{n_k}\) such that
-  \(\lambda^{(kl)}_i = \lambda_{k_i l}\) is the popularity parameter of
-  the \(i\)\textsuperscript{th} vertex of community \(k\) towards
-  community \(l\).
-\item
-  Each block can be decomposed as
-  \(P^{(kl)} = \lambda^{(kl)} (\lambda^{(lk)})^\top\).
-\end{enumerate}
-\end{frame}
-
-\begin{frame}{Generalized Random Dot Product Graph}
-\protect\hypertarget{generalized-random-dot-product-graph}{}
-\textbf{Def} Generalized Random Dot Product Graph\\
-(Rubin-Delanchy, Cape, Tang, Priebe, 2020)
-
-Let \(I_{p,q} = \text{blockdiag}(I_p, -I_q)\) and suppose that
-\(x_1, \ldots, x_n \in \mathbb{R}^{p+q}\) are such that
-\(x_i^\top I_{p,q} x_j \in [0,1]\).\\
-Then \(A \sim \text{GRDPG}_{p, q}(X)\) iff
-\(A \sim \text{BernoulliGraph}(X I_{p,q} X^\top)\), where
-\(X = \begin{bmatrix} x_1 & \cdots & x_n \end{bmatrix}^\top\).
-
-Adjacency Spectral Embedding (Sussman et al., 2012) estimates
-\(x_1, ..., x_n \in \mathbb{R}^{p+q}\) from \(A\):
-
-\begin{enumerate}
-\tightlist
-\item
-  Let \(\hat{\Lambda}\) be the diagonal matrix that contains the
-  absolute values of the \(p\) most positive and the \(q\) most negative
-  eigenvalues.
-\item
-  Let \(\hat{V}\) be the matrix whose columns are the corresponding
-  eigenvectors.
-\item
-  Compute \(\hat{X} = \hat{V} \hat{\Lambda}^{1/2}\).
-\end{enumerate}
-
-\textbf{Theorem}:
-\(\max\limits_i \|\hat{X}_i - Q_n X_i \| = O_P \Big( \frac{(\log n)^c}{n^{1/2}} \Big)\).
-\end{frame}
-
-\begin{frame}{Connecting Block Models to the GRDPG Model}
-\protect\hypertarget{connecting-block-models-to-the-grdpg-model}{}
+\begin{frame}{Connecting Block Models to the GRDPG}
+\protect\hypertarget{connecting-block-models-to-the-grdpg}{}
 \begin{columns}[T]
-\begin{column}{0.48\textwidth}
-\begin{center}\includegraphics[width=0.5\linewidth]{slides_files/figure-beamer/unnamed-chunk-5-1} \end{center}
+\begin{column}{0.67\textwidth}
+\begin{center}\includegraphics[width=1\linewidth]{slides_files/figure-beamer/unnamed-chunk-5-1} \end{center}
 
-\vspace*{.5\baselineskip}
-
-\begin{center}\includegraphics[width=0.5\linewidth]{slides_files/figure-beamer/unnamed-chunk-6-1} \end{center}
-\end{column}
-
-\begin{column}{0.48\textwidth}
-\vspace*{0\baselineskip}
+\begin{center}\includegraphics[width=1\linewidth]{slides_files/figure-beamer/unnamed-chunk-6-1} \end{center}
 
 \begin{center}\includegraphics[width=1\linewidth]{slides_files/figure-beamer/unnamed-chunk-7-1} \end{center}
 \end{column}
-\end{columns}
-\end{frame}
 
-\begin{frame}{Connecting the PABM to the GRDPG}
-\protect\hypertarget{connecting-the-pabm-to-the-grdpg}{}
-\textbf{Theorem} (KTT): \(A \sim \text{PABM}(\{\lambda_{ik}\}_K)\) is
-equivalent to \(A \sim \text{GRDPG}_{p, q}(X U)\) with
+\begin{column}{0.33\textwidth}
+~
+
+~
 
 \begin{itemize}
 \tightlist
 \item
-  \(p = K (K + 1) / 2\), \(q = K (K - 1) / 2\);
+  K-means clustering
 \item
-  \(U\) is an orthogonal matrix;
-\item
-  \(X \in \mathbb{R}^{n \times K^2}\) is a block diagonal matrix
-  composed of popularity vectors with each block corresponding to a
-  community.
+  Gaussian mixture models
 \end{itemize}
 
-\[X = \begin{bmatrix}
-\Lambda^{(1)} & \cdots & 0 \\
-0 & \ddots & 0 \\
-0 & \cdots & \Lambda^{(K)}
-\end{bmatrix} 
-\in \mathbb{R}^{n \times K^2}\]
+~
 
-\[\Lambda^{(k)} = \begin{bmatrix} 
-\lambda^{(k1)} & \cdots & \lambda^{(kK)} 
-\end{bmatrix} 
-\in \mathbb{R}^{n_k \times K}\]
+\begin{itemize}
+\tightlist
+\item
+  K-means with cosine similarity
+\item
+  GMM on angles
+\end{itemize}
 
-\[A \sim \text{PABM}(\{\lambda_{ik}\}_K) \text{ iff } A \sim \text{GRDPG}_{p, q}(X U)\]
+~
+
+~
+
+~
+
+\begin{itemize}
+\tightlist
+\item
+  ???
+\end{itemize}
+\end{column}
+\end{columns}
 \end{frame}
 
 \begin{frame}{Orthogonal Spectral Clustering}
@@ -314,11 +250,9 @@ then \(B_{ij} = 0\) if \(z_i \neq z_j\).
   Partition \(G\) into \(K\) disconnected subgraphs.
 \end{enumerate}
 
-\textbf{Theorem} (KTT): Let \(\hat{B}\) with entries \(\hat{B}_{ij}\) be
-the affinity matrix from OSC. Then \(\forall\) pairs \((i, j)\)
-belonging to different communities and sparsity factor satisfying
-\(n \rho_n = \omega\big((\log n)^{4c}\big)\),\\
-\(\max_{i, j} \hat{B}_{ij} = O_P \Big( \frac{(\log n)^c}{\sqrt{n \rho_n}} \Big)\).
+\textbf{Theorem} (KTT): \(\forall\) pairs \((i, j)\) belonging to
+different communities,
+\(\max\limits_{i, j} B_{ij} = O_P \Big( \frac{(\log n)^c}{\sqrt{n \rho_n}} \Big)\).
 
 \textbf{Corollary}: OSC results in zero clustering error as
 \(n \to \infty\), with probability 1.
@@ -326,23 +260,6 @@ belonging to different communities and sparsity factor satisfying
 
 \begin{frame}{Simulation Study}
 \protect\hypertarget{simulation-study}{}
-We compare four algorithms for community detection on randomly generated
-PABMs:
-
-\begin{itemize}
-\tightlist
-\item
-  Modularity Maximization (Sengupta and Chen) using the Louvain
-  algorithm;
-\item
-  Orthogonal Spectral Clustering (KTT);
-\item
-  Sparse Subspace Clustering on the columns of \(A\)\\
-  (Noorozi, Rimal, Pensky);
-\item
-  Sparse Subspace Clustering on the ASE (KTT).
-\end{itemize}
-
 \begin{center}\includegraphics[width=1\linewidth]{slides_files/figure-beamer/unnamed-chunk-8-1} \end{center}
 \end{frame}
 
