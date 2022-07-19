@@ -306,7 +306,7 @@ $\max\limits_{i, j} B_{ij} = O_P \Big( \frac{(\log n)^c}{\sqrt{n \rho_n}} \Big)$
 
 ## Simulation Study
 
-```{r, fig.height = 3, fig.width = 8, out.width = '100%'}
+```{r, fig.height = 3, fig.width = 5, out.width = '100%'}
 clustering.df <- readr::read_csv('~/dev/pabm-grdpg/simulation-results/cluster-sim-balanced.csv')
 
 clustering.df %>%
@@ -328,7 +328,9 @@ clustering.df %>%
   dplyr::ungroup() %>% 
   ggplot() +
   theme_bw() + 
-  theme(legend.position = 'bottom') + 
+  theme(legend.position = 'top',
+        legend.direction = 'vertical',
+        legend.justification = 0) + 
   scale_x_log10(breaks = c(128, 256, 512, 1024, 2048, 4096),
                 labels = c(expression(2^7), 
                            expression(2^8), 
@@ -337,32 +339,37 @@ clustering.df %>%
                            expression(2^11), 
                            expression(2^12))) +
   scale_y_log10() + 
-  labs(y = 'community detection error count', 
+  labs(y = 'error count', 
        colour = NULL, shape = NULL) +
   geom_line(aes(x = n, y = med.err * n,
-                colour = 'OSC')) +
+                colour = 'Orthogonal Spectral Clustering')) +
   geom_point(aes(x = n, y = med.err * n,
-                 colour = 'OSC', shape = 'OSC')) +
+                 colour = 'Orthogonal Spectral Clustering', 
+                 shape = 'Orthogonal Spectral Clustering')) +
   geom_errorbar(aes(x = n, ymin = first.q * n, ymax = third.q * n,
-                    colour = 'OSC'), width = .1) + 
+                    colour = 'Orthogonal Spectral Clustering'), width = .1) + 
   geom_line(aes(x = n, y = med.err.ssc * n,
-                colour = 'SSC-ASE')) +
+                colour = 'Sparse Subspace Clustering on ASE')) +
   geom_point(aes(x = n, y = med.err.ssc * n,
-                 colour = 'SSC-ASE', shape = 'SSC-ASE')) +
+                 colour = 'Sparse Subspace Clustering on ASE', 
+                 shape = 'Sparse Subspace Clustering on ASE')) +
   geom_errorbar(aes(x = n, ymin = first.q.ssc * n, ymax = third.q.ssc * n,
-                    colour = 'SSC-ASE'), width = .1) +
+                    colour = 'Sparse Subspace Clustering on ASE'), width = .1) +
   geom_line(aes(x = n, y = med.err.ssc.A * n,
-                colour = 'SSC-A')) +
+                colour = 'Sparse Subspace Clustering on Adj. Matrix')) +
   geom_point(aes(x = n, y = med.err.ssc.A * n,
-                 colour = 'SSC-A', shape = 'SSC-A')) +
+                 colour = 'Sparse Subspace Clustering on Adj. Matrix', 
+                 shape = 'Sparse Subspace Clustering on Adj. Matrix')) +
   geom_errorbar(aes(x = n, ymin = first.q.ssc.A * n, ymax = third.q.ssc.A * n,
-                    colour = 'SSC-A'), width = .1) +
+                    colour = 'Sparse Subspace Clustering on Adj. Matrix'), 
+                width = .1) +
   geom_line(aes(x = n, y = med.err.louvain * n,
-                colour = 'MM-Louvain')) + 
+                colour = 'Modularity Maximization')) + 
   geom_point(aes(x = n, y = med.err.louvain * n,
-                 colour = 'MM-Louvain', shape = 'MM-Louvain')) + 
+                 colour = 'Modularity Maximization', 
+                 shape = 'Modularity Maximization')) + 
   geom_errorbar(aes(x = n, ymin = first.q.louvain * n, ymax = third.q.louvain * n,
-                    colour = 'MM-Louvain'), width = .1) + 
+                    colour = 'Modularity Maximization'), width = .1) + 
   scale_colour_brewer(palette = 'Set1') + 
   facet_wrap(~ K, labeller = 'label_both')
 ```
