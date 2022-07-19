@@ -80,7 +80,7 @@ Each edge probability is fixed for each pair of communities, i.e., $P_{ij} = \th
 
 Each edge probability is determined by the community edge probability as well as each vertex's degree factor, i.e., $P_{ij} = \theta_{z_i, z_j} \omega_i \omega_j$.
 
-## Popularity Adjusted Block Model
+## Popularity Adjusted Block Model (Sengupta and Chen 2018)
 
 Each vertex has a popularity parameter for each community that determines its affinity toward that community, i.e., $P_{ij} = \lambda_{i, z_j} \lambda_{j, z_i}$.
 
@@ -94,7 +94,7 @@ Approximate $A$ by spectral decomposition $A \approx V_{p, q} \Lambda_{p, q} V_{
 The subscript $p, q$ denotes the $p$ most positive and $q$ most negative eigenvalues and corresponding eigenvectors. 
 Each $\hat{x}_i$, the $i^{th}$ row of $\hat{X} = V_{p, q} |\Lambda_{p, q}|^{1/2},$ estimates the relative position of its corresponding latent vector $x_i$, up to an indefinite orthogonal transformation.
 
-**Theorem**: $\max_i \| \hat{x}_i - Q_n x_i \| = O_P \Big( \frac{\log^c n}{n^{1/2}} \Big)$ for some $Q_n \in \mathbb{O}(p, q)$.
+**Theorem** (Rubin-Delanchy et al. 2022): $\max_i \| \hat{x}_i - Q_n x_i \| = O_P \Big( \frac{\log^c n}{n^{1/2}} \Big)$ for some $Q_n \in \mathbb{O}(p, q)$.
 
 ```{r, cache = TRUE}
 n1 <- 2 ** 5
@@ -176,7 +176,7 @@ sbm.graph.plot <- ggraph(A, layout = 'stress') +
   geom_node_point(aes(colour = factor(z)),
                   show.legend = FALSE) + 
   labs(colour = NULL, 
-       title = 'Stochastic Block Model') + 
+       title = 'SBM') + 
   # theme_graph() + 
   theme_void() + 
   scale_colour_brewer(palette = 'Set1') 
@@ -221,7 +221,7 @@ dcbm.graph.plot <- ggraph(A, layout = 'stress') +
   geom_node_point(aes(colour = factor(z)),
                   show.legend = FALSE) + 
   labs(colour = NULL, 
-       title = 'Degree Corrected Block Model') + 
+       title = 'DCBM') + 
   # theme_graph() + 
   theme_void() + 
   scale_colour_brewer(palette = 'Set1') 
@@ -257,7 +257,7 @@ pabm.graph.plot <- ggraph(A, layout = 'stress') +
   geom_node_point(aes(colour = factor(z)),
                   show.legend = FALSE) + 
   labs(colour = NULL, 
-       title = 'Popularity Adjusted Block Model') + 
+       title = 'PABM') + 
   # theme_graph() + 
   theme_void() + 
   scale_colour_brewer(palette = 'Set1') 
@@ -280,18 +280,18 @@ gridExtra::grid.arrange(pabm.graph.plot, pabm.ase.plot, nrow = 1)
 
 # Orthogonal Spectral Clustering
 
-1. Eigendecompose $A \approx V_{p,q} \Lambda_{p,q} V_{p,q}^\top$ with $p = \frac{K (K+1)}{2}$ and $q = \frac{K (K-1)}{2}$.
-2. Compute $B = |n V_{p,q} V_{p,q}^\top|$.
-3. Construct graph $G'$ from $B$.
-4. Partition $G'$ into $K$ disconnected subgraphs.
+1. Set $p = \frac{K (K+1)}{2}$, $q = \frac{K (K-1)}{2}$ and decompose $A \approx V_{p,q} \Lambda_{p,q} V_{p,q}^\top$.
+2. Construct graph $G'$ from $B = |n V_{p,q} V_{p,q}^\top|$.
+3. Partition $G'$ into $K$ disconnected subgraphs.
 
 **Theorem** (KTT): 
-Let $B$ be the affinity matrix from OSC. 
-Then $\forall$ $(i, j)$ belonging to different communities and sparsity factor satisfying $n \rho_n = \omega\big(\log^{4c} n\big),$ $\max_{i, j} B_{ij} = O_P \Big( \frac{\log^c n}{\sqrt{n \rho_n}} \Big)$.
+$\max\limits_{i, j} B_{ij} = O_P \Big( \frac{\log^c n}{\sqrt{n \rho_n}} \Big)$ for each $(i, j)$ in different communities.
+
+**Corollary**: OSC results in zero community detection error with probability 1 as $n \to \infty$.
 
 ## Simulation Study
 
-```{r, fig.height = 2, fig.width = 5, out.width = '100%'}
+```{r, fig.height = 2.25, fig.width = 5, out.width = '100%'}
 clustering.df <- readr::read_csv('~/dev/pabm-grdpg/simulation-results/cluster-sim-balanced.csv')
 
 clustering.df %>%
