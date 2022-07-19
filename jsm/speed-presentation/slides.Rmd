@@ -367,7 +367,7 @@ clustering.df %>%
   facet_wrap(~ K, labeller = 'label_both')
 ```
 
-## Popularity Adjusted Block Models are Generalized Random Dot Product Graphs
+## Thank you
 
 Published in *Journal of Computational and Graphical Statistics*
 
