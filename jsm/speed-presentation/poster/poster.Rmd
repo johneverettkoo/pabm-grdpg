@@ -36,6 +36,7 @@ logoleft_name: poster_files/trident_medium.png
 output: 
   posterdown::posterdown_html:
     self_contained: true
+    keep_tex: true
 ---
 
 ```{r setup, include=FALSE}
