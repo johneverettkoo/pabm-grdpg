@@ -73,12 +73,6 @@
   \KOMAoptions{parskip=half}}
 \makeatother
 \usepackage{xcolor}
-\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
-\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
-\hypersetup{
-  hidelinks,
-  pdfcreator={LaTeX via pandoc}}
-\urlstyle{same} % disable monospaced font for URLs
 \newif\ifbibliography
 \setlength{\emergencystretch}{3em} % prevent overfull lines
 \providecommand{\tightlist}{%
@@ -106,6 +100,12 @@ https://tex.stackexchange.com/questions/392324/how-to-exclude-total-slide-number
 \ifLuaTeX
   \usepackage{selnolig}  % disable illegal ligatures
 \fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same} % disable monospaced font for URLs
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
 
 \author{}
 \date{\vspace{-2.5em}}
@@ -131,7 +131,7 @@ August 2022
 \begin{center}\includegraphics[width=67px]{john-koo} \end{center}
 
 John Koo,\\
-PhD Student in Statistical Science,\\
+PhD Student in Statistics,\\
 Indiana University
 \end{column}
 
@@ -174,9 +174,10 @@ Indiana University
 \textbf{Def} Popularity Adjusted Block Model (Sengupta and Chen, 2017):
 
 Let each vertex \(i \in [n]\) have \(K\) popularity parameters
-\(\lambda_{i1}, ..., \lambda_{iK} \in [0, 1]\).\\
+\(\lambda_{i1}, ..., \lambda_{iK} \in [0, 1]\).
+
 Then \(A \sim \text{BernoulliGraph}(P)\) is a PABM if each
-\(P_{ij} = \lambda_{i z_j} \lambda_{j z_i}\)
+\(P_{ij} = \lambda_{i z_j} \lambda_{j z_i}\).
 \end{frame}
 
 \begin{frame}{Connecting Block Models to the GRDPG}
@@ -230,9 +231,9 @@ Then \(A \sim \text{BernoulliGraph}(P)\) is a PABM if each
 
 \begin{frame}{Orthogonal Spectral Clustering}
 \protect\hypertarget{orthogonal-spectral-clustering}{}
-\textbf{Theorem} (KTT): If \(P = V \Lambda V^\top\) and
-\(B = n V V^\top\),\\
-then \(B_{ij} = 0\) if \(z_i \neq z_j\).
+\textbf{Theorem} (KTT): If \(P = V \Lambda V^\top\), \(B = n V V^\top\),
+and \(z_i \neq z_j\),\\
+then \(B_{ij} = 0\).
 
 \textbf{Algorithm}: Orthogonal Spectral Clustering:
 
@@ -243,19 +244,19 @@ then \(B_{ij} = 0\) if \(z_i \neq z_j\).
   \(K (K+1)/2\) most positive and \(K (K-1) / 2\) most negative
   eigenvalues.
 \item
-  Compute \(B = |n V V^\top|\) applying \(|\cdot|\) entry-wise.
+  Compute \(B = |n V V^\top|\), applying \(|\cdot|\) entry-wise.
 \item
   Construct graph \(G\) using \(B\) as its similarity matrix.
 \item
   Partition \(G\) into \(K\) disconnected subgraphs.
 \end{enumerate}
 
-\textbf{Theorem} (KTT): \(\forall\) pairs \((i, j)\) belonging to
-different communities,
+\textbf{Theorem} (KTT): For all pairs \((i, j)\) belonging to different
+communities,
 \(\max\limits_{i, j} B_{ij} = O_P \Big( \frac{(\log n)^c}{\sqrt{n \rho_n}} \Big)\).
 
-\textbf{Corollary}: OSC results in zero clustering error as
-\(n \to \infty\), with probability 1.
+\textbf{Corollary}: OSC results in zero clustering error almost surely
+as \(n \to \infty\).
 \end{frame}
 
 \begin{frame}{Simulation Study}
@@ -271,7 +272,7 @@ arXiv preprint: \url{https://arxiv.org/abs/2109.04010}
 
 GitHub repository: \url{https://github.com/johneverettkoo/pabm-grdpg}
 
-R package: \url{https://github.com/johneverettkoo/osc}
+R package (WIP): \url{https://github.com/johneverettkoo/osc}
 \end{frame}
 
 \end{document}

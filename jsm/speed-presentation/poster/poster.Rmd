@@ -288,7 +288,7 @@ gridExtra::grid.arrange(pabm.graph.plot, pabm.ase.plot, nrow = 1)
 **Theorem** (KTT): 
 $\max\limits_{i, j} B_{ij} = O_P \Big( \frac{\log^c n}{\sqrt{n \rho_n}} \Big)$ for each $(i, j)$ in different communities.
 
-**Corollary**: OSC results in zero community detection error with probability 1 as $n \to \infty$.
+**Corollary**: OSC results in zero clustering error almost surely as $n \to \infty$.
 
 ## Simulation Study
 
@@ -317,14 +317,10 @@ clustering.df %>%
   theme(legend.position = 'bottom',
         legend.margin = margin(0, 0, 0, 0)) + 
   scale_x_log10(breaks = c(128, 256, 512, 1024, 2048, 4096),
-                labels = c(expression(2^7), 
-                           expression(2^8), 
-                           expression(2^9), 
-                           expression(2^10), 
-                           expression(2^11), 
-                           expression(2^12))) +
+                labels = c(7, 8, 9, 10, 11, 12)) +
   scale_y_log10() + 
   labs(y = 'error count', 
+       x = expression(log[2](n)), 
        colour = NULL, shape = NULL) +
   geom_line(aes(x = n, y = med.err * n,
                 colour = 'OSC')) +

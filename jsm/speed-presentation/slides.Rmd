@@ -63,7 +63,7 @@ knitr::include_graphics('john-koo.jpeg')
 ```
 
 John Koo,  
-PhD Student in Statistical Science,  
+PhD Student in Statistics,  
 Indiana University
 
 ::::
@@ -122,9 +122,10 @@ qgraph::qgraph(A, groups = factor(z), legend = FALSE)
 **Def** Popularity Adjusted Block Model (Sengupta and Chen, 2017):
 
 Let each vertex $i \in [n]$ have $K$ popularity parameters
-$\lambda_{i1}, ..., \lambda_{iK} \in [0, 1]$.  
+$\lambda_{i1}, ..., \lambda_{iK} \in [0, 1]$. 
+
 Then $A \sim \BG(P)$ is a PABM if each 
-$P_{ij} = \lambda_{i z_j} \lambda_{j z_i}$
+$P_{ij} = \lambda_{i z_j} \lambda_{j z_i}$.
 
 ## Connecting Block Models to the GRDPG
 
@@ -287,22 +288,23 @@ gridExtra::grid.arrange(pabm.graph.plot, pabm.ase.plot, nrow = 1)
 ## Orthogonal Spectral Clustering
 
 **Theorem** (KTT): 
-If $P = V \Lambda V^\top$ and $B = n V V^\top$,  
-then $B_{ij} = 0$ if $z_i \neq z_j$.
+If $P = V \Lambda V^\top$, $B = n V V^\top$, and $z_i \neq z_j$,  
+then $B_{ij} = 0$. 
 
 **Algorithm**: Orthogonal Spectral Clustering:
 
 1. Let $V$ be the eigenvectors of $A$ corresponding to the $K (K+1)/2$ most 
 positive and $K (K-1) / 2$ most negative eigenvalues.
-2. Compute $B = |n V V^\top|$ applying $|\cdot|$ entry-wise.
+2. Compute $B = |n V V^\top|$, applying $|\cdot|$ entry-wise.
 3. Construct graph $G$ using $B$ as its similarity matrix.
 4. Partition $G$ into $K$ disconnected subgraphs.
 
 **Theorem** (KTT): 
-$\forall$ pairs $(i, j)$ belonging to different communities, 
+For all pairs $(i, j)$ belonging to different communities, 
 $\max\limits_{i, j} B_{ij} = O_P \Big( \frac{(\log n)^c}{\sqrt{n \rho_n}} \Big)$.
 
-**Corollary**: OSC results in zero clustering error as $n \to \infty$, with probability 1.
+**Corollary**: OSC results in zero clustering error almost surely as $n \to \infty$. 
+
 
 ## Simulation Study
 
@@ -332,14 +334,10 @@ clustering.df %>%
         legend.direction = 'vertical',
         legend.justification = 0) + 
   scale_x_log10(breaks = c(128, 256, 512, 1024, 2048, 4096),
-                labels = c(expression(2^7), 
-                           expression(2^8), 
-                           expression(2^9), 
-                           expression(2^10), 
-                           expression(2^11), 
-                           expression(2^12))) +
+                labels = c(7, 8, 9, 10, 11, 12)) +
   scale_y_log10() + 
   labs(y = 'error count', 
+       x = expression(log[2] (n)),
        colour = NULL, shape = NULL) +
   geom_line(aes(x = n, y = med.err * n,
                 colour = 'Orthogonal Spectral Clustering')) +
@@ -382,4 +380,4 @@ arXiv preprint: https://arxiv.org/abs/2109.04010
 
 GitHub repository: https://github.com/johneverettkoo/pabm-grdpg
 
-R package: https://github.com/johneverettkoo/osc
+R package (WIP): https://github.com/johneverettkoo/osc
