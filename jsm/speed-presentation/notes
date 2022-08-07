@@ -1,0 +1,23 @@
+Thank you for attending my talk, titled, "popularity adjusted block models are generalized random dot product graphs".
+
+This is joint work with Dr. Minh Tang of NC State University and Dr. Michael Trosset of Indiana University, where i am currently a PhD student.
+
+
+Network analysis often involves community detection, or classifying the vertices of the graph in an unsupervised manner. One approach to this task is to define a probability distribution for graphs that includes community labels and fit the network to the model. The most popular version of this is the stochastic block model, and various generalizations of it have been proposed, including the degree corrected block model and the popularity adjusted block model, which is the focus of our contribution. 
+
+
+There is another family of models for graphs called generalized random dot product graphs, which assigns a latent vector to each vertex. These latent vectors can be estimated via spectral embedding. 
+
+It turns out that the stochastic block model and degree corrected block model are generalized random dot product graphs in which the latent vectors are organized by community. In the case of the stochastic block model, the communities are organized as point masses. In the case of the degree corrected block model, the communities are organized as rays. 
+
+We were able to show that the popularity adjusted block model is also a generalized random dot product graph in which communities are organized as orthogonal subspaces. 
+
+Each of these latent vector configurations lend themselves to various clustering techniques. The final contribution of this work is developing a clustering technique tuned specifically to the latent configuration of the popularity adjusted block model.
+
+
+We call this orthogonal spectral clustering. I don't have time to get into the details here, but this clustering method relies on the fact that in the latent configuration, two vertices belonging to two different communities have orthogonal latent vectors, so their dot product is zero. This allows us to create an auxilliary affinity graph that is partitioned into subgraphs that map exactly to each community. 
+
+We were able to derive an asymptotic result for this algorithm in which the number of misclustered vertices goes to zero almost surely as n grows.
+
+
+Finally, we validated our theoretical results via simulation study, comparing our method against other proposed community detection methods for the popularity adjusted block model. The simulation study demonstrates that the number of misclustered vertices indeed goes to zero as n grows. 
